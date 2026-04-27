@@ -7,6 +7,7 @@ import {
   getBrandFromDb,
 } from "@/lib/data/brands";
 import { getRsvpMetaForEvents } from "@/lib/data/events";
+import { listSpecialsForBrand, formatRecurrence } from "@/lib/data/specials";
 import { getCurrentMember } from "@/lib/data/member";
 import { canAccess, getViewerEntitlement } from "@/lib/entitlements";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -66,12 +67,13 @@ export default async function BrandPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [brand, member, isFollowing, entitlement, founderData] = await Promise.all([
+  const [brand, member, isFollowing, entitlement, founderData, specials] = await Promise.all([
     getBrandFromDb(slug),
     getCurrentMember(),
     doesMemberFollowBrand(slug),
     getViewerEntitlement(slug),
     getFounderCount(slug),
+    listSpecialsForBrand(slug),
   ]);
   if (!brand) notFound();
   const isSignedIn = member !== null;
@@ -220,6 +222,79 @@ export default async function BrandPage({
           </ul>
         </div>
       </section>
+
+      {/* Specials — recurring offers a brand publishes to its members */}
+      {specials.length > 0 && (
+        <section className="glass-card p-8">
+          <p className="text-sm uppercase tracking-wide text-white/60">Specials</p>
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            {specials.map((s) => {
+              const access = canAccess(s.tier, entitlement);
+              if (!access.allowed) {
+                return (
+                  <PremiumPaywall
+                    key={s.id}
+                    feature={s.title}
+                    description="Premium members get access to off-menu specials, member-only pours, and the small-batch stuff we don\u2019t put on the regular menu."
+                    communityId={slug}
+                    accentFrom={brand.accentFrom}
+                    accentTo={brand.accentTo}
+                    reason={
+                      access.reason === "signed-out"
+                        ? "signed-out"
+                        : access.reason === "needs-founder"
+                          ? "needs-founder"
+                          : "needs-premium"
+                    }
+                    compact
+                  />
+                );
+              }
+              const cadence = formatRecurrence(s);
+              return (
+                <div key={s.id} className="rounded-2xl bg-black/30 p-5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold">{s.title}</p>
+                      {s.description && (
+                        <p className="mt-1 text-xs leading-relaxed text-white/70">
+                          {s.description}
+                        </p>
+                      )}
+                      <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]">
+                        {cadence && (
+                          <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 uppercase tracking-wide text-white/70">
+                            {cadence}
+                          </span>
+                        )}
+                        {s.tier !== "public" && (
+                          <span className="rounded-full border border-amber-300/30 bg-amber-300/10 px-2 py-0.5 uppercase tracking-wide text-amber-200">
+                            {s.tier === "founder-only" ? "Founders" : "Premium"}
+                          </span>
+                        )}
+                        {s.points_required && s.points_required > 0 ? (
+                          <span className="rounded-full border border-emerald-300/30 bg-emerald-300/10 px-2 py-0.5 uppercase tracking-wide text-emerald-200">
+                            {s.points_required.toLocaleString()} pts
+                          </span>
+                        ) : null}
+                      </div>
+                      {s.redemption_code && (
+                        <p className="mt-3 text-[11px] text-white/50">
+                          Show code{" "}
+                          <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-white/90">
+                            {s.redemption_code}
+                          </code>{" "}
+                          at the register.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* Upcoming */}
       <section className="glass-card p-8">
