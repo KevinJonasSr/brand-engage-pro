@@ -1,0 +1,115 @@
+import { NextResponse, type NextRequest } from "next/server";
+import { createServerClient } from "@supabase/ssr";
+import { resolveCommunityFromHost } from "@/lib/community";
+
+/**
+ * Routes a signed-in user must be able to reach.
+ * Everything else under /app that's not here or public is open.
+ */
+const PROTECTED_PREFIXES = ["/rewards", "/marketplace", "/referrals", "/admin", "/inbox"] as const;
+
+/**
+ * Optional extra protection: a second HTTP Basic Auth layer on /admin/*.
+ * Set ADMIN_BASIC_USER + ADMIN_BASIC_PASS in Vercel to enable. When not
+ * set the route still falls through to the Supabase + ADMIN_EMAILS gate
+ * in getAdminUser, so dev flows aren't blocked.
+ */
+function enforceAdminBasicAuth(request: NextRequest): NextResponse | null {
+  if (!request.nextUrl.pathname.startsWith("/admin")) return null;
+  const user = process.env.ADMIN_BASIC_USER;
+  const pass = process.env.ADMIN_BASIC_PASS;
+  if (!user || !pass) return null;
+
+  const header = request.headers.get("authorization") ?? "";
+  if (header.toLowerCase().startsWith("basic ")) {
+    try {
+      const decoded = atob(header.slice(6).trim());
+      const [u, ...rest] = decoded.split(":");
+      const p = rest.join(":");
+      if (u === user && p === pass) return null; // pass through
+    } catch {
+      /* fallthrough to challenge */
+    }
+  }
+
+  return new NextResponse("Admin access required", {
+    status: 401,
+    headers: {
+      "WWW-Authenticate": 'Basic realm="Brand Engage Pro Admin", charset="UTF-8"',
+    },
+  });
+}
+
+/**
+ * Refreshes the Supabase session on every request and redirects unauthenticated
+ * users away from protected routes to /login.
+ *
+ * If Supabase env vars aren't set yet (e.g. on a PR preview before keys are
+ * wired) the middleware becomes a no-op instead of crashing the whole app —
+ * so previews of non-protected routes still work end-to-end.
+ */
+export async function middleware(request: NextRequest) {
+  // Layer 0: optional HTTP Basic Auth on /admin/*
+  const basicAuthBlock = enforceAdminBasicAuth(request);
+  if (basicAuthBlock) return basicAuthBlock;
+
+  // Layer 1: resolve the community from the hostname and stamp it on the
+  // request so downstream RSCs / server actions can scope their queries
+  // via lib/community.ts::getCurrentCommunityId(). For brand-engage-pro
+  // and localhost the resolver returns the DEFAULT (raelynn), preserving
+  // single-tenant behavior until wildcard DNS is pointed at the platform.
+  const communityId = resolveCommunityFromHost(request.headers.get("host"));
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-community-id", communityId);
+
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anon) {
+    return NextResponse.next({ request: { headers: requestHeaders } });
+  }
+
+  let response = NextResponse.next({ request: { headers: requestHeaders } });
+
+  const supabase = createServerClient(url, anon, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value }) =>
+          request.cookies.set(name, value),
+        );
+        // Re-propagate the x-community-id header stamp when Supabase
+        // refreshes the session — otherwise it gets lost during the
+        // NextResponse.next() call and downstream RSCs fall back to
+        // the default community.
+        response = NextResponse.next({ request: { headers: requestHeaders } });
+        cookiesToSet.forEach(({ name, value, options }) =>
+          response.cookies.set(name, value, options),
+        );
+      },
+    },
+  });
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const pathname = request.nextUrl.pathname;
+  const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p));
+
+  if (isProtected && !user) {
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("next", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  return response;
+}
+
+export const config = {
+  matcher: [
+    // Run on everything except static assets / image optimization / favicon.
+    "/((?!_next/static|_next/image|favicon.ico|api/fan-engage).*)",
+  ],
+};
