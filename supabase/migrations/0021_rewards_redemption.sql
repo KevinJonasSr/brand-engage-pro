@@ -69,13 +69,7 @@ create policy redemptions_fan_read on public.reward_redemptions
 
 drop policy if exists redemptions_admin_read on public.reward_redemptions;
 create policy redemptions_admin_read on public.reward_redemptions
-  for select using (
-    auth.uid() in (
-      select fan_id from fan_community_memberships
-      where community_id = reward_redemptions.community_id
-      and is_admin = true
-    )
-  );
+  for select using (is_admin_of(community_id));
 
 -- ─── Helper: redeem_reward ────────────────────────────────────────────────
 -- Atomically:
