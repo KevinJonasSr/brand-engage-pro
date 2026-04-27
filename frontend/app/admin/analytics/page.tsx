@@ -9,18 +9,18 @@ async function loadAnalytics() {
   const since30 = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
   const [
-    fansAll, fans7, fans30,
+    membersAll, members7, members30,
     postsAll, posts7,
     commentsAll, comments7,
     pollVotes, entries,
     ledgerRes,
     topReferrersRes,
-    byArtistRes,
+    byBrandRes,
     actionCompletionsRes,
   ] = await Promise.all([
-    admin.from("fans").select("id", { count: "exact", head: true }),
-    admin.from("fans").select("id", { count: "exact", head: true }).gte("created_at", since7),
-    admin.from("fans").select("id", { count: "exact", head: true }).gte("created_at", since30),
+    admin.from("members").select("id", { count: "exact", head: true }),
+    admin.from("members").select("id", { count: "exact", head: true }).gte("created_at", since7),
+    admin.from("members").select("id", { count: "exact", head: true }).gte("created_at", since30),
     admin.from("community_posts").select("id", { count: "exact", head: true }),
     admin.from("community_posts").select("id", { count: "exact", head: true }).gte("created_at", since7),
     admin.from("community_comments").select("id", { count: "exact", head: true }),
@@ -30,10 +30,10 @@ async function loadAnalytics() {
     admin.from("points_ledger").select("delta"),
     admin
       .from("referrals")
-      .select("referrer_id,status,fans!referrals_referrer_id_fkey(first_name)")
+      .select("referrer_id,status,members!referrals_referrer_id_fkey(first_name)")
       .eq("status", "verified"),
-    admin.from("community_posts").select("artist_slug"),
-    admin.from("fan_action_completions").select("fan_id", { count: "exact", head: true }),
+    admin.from("community_posts").select("brand_slug"),
+    admin.from("member_action_completions").select("member_id", { count: "exact", head: true }),
   ]);
 
   const totalPoints = (ledgerRes.data ?? []).reduce(
@@ -45,31 +45,31 @@ async function loadAnalytics() {
   for (const r of topReferrersRes.data ?? []) {
     const id = r.referrer_id as string;
     const existing = referralCounts.get(id);
-    const fanName = Array.isArray(r.fans)
-      ? (r.fans[0]?.first_name as string | null) ?? null
-      : (r.fans as { first_name: string | null } | null)?.first_name ?? null;
+    const memberName = Array.isArray(r.members)
+      ? (r.members[0]?.first_name as string | null) ?? null
+      : (r.members as { first_name: string | null } | null)?.first_name ?? null;
     if (existing) existing.count += 1;
-    else referralCounts.set(id, { name: fanName, count: 1 });
+    else referralCounts.set(id, { name: memberName, count: 1 });
   }
   const topReferrers = [...referralCounts.entries()]
     .map(([id, v]) => ({ id, ...v }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
 
-  const byArtist = new Map<string, number>();
-  for (const row of byArtistRes.data ?? []) {
-    const a = row.artist_slug as string;
-    byArtist.set(a, (byArtist.get(a) ?? 0) + 1);
+  const byBrand = new Map<string, number>();
+  for (const row of byBrandRes.data ?? []) {
+    const a = row.brand_slug as string;
+    byBrand.set(a, (byBrand.get(a) ?? 0) + 1);
   }
-  const topArtists = [...byArtist.entries()]
+  const topBrands = [...byBrand.entries()]
     .map(([slug, count]) => ({ slug, count }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
 
   return {
-    fansAll: fansAll.count ?? 0,
-    fans7: fans7.count ?? 0,
-    fans30: fans30.count ?? 0,
+    membersAll: membersAll.count ?? 0,
+    members7: members7.count ?? 0,
+    members30: members30.count ?? 0,
     postsAll: postsAll.count ?? 0,
     posts7: posts7.count ?? 0,
     commentsAll: commentsAll.count ?? 0,
@@ -78,7 +78,7 @@ async function loadAnalytics() {
     entries: entries.count ?? 0,
     totalPoints,
     topReferrers,
-    topArtists,
+    topBrands,
     actionCompletions: actionCompletionsRes.count ?? 0,
   };
 }
@@ -105,16 +105,16 @@ export default async function AdminAnalyticsPage() {
           Analytics
         </h1>
         <p className="mt-1 text-sm text-white/60">
-          Quick health check on the fan base. Rollups are live — no cached counts.
+          Quick health check on the member base. Rollups are live — no cached counts.
         </p>
       </div>
 
       <section>
-        <p className="mb-2 text-xs uppercase tracking-wide text-white/50">Fans</p>
+        <p className="mb-2 text-xs uppercase tracking-wide text-white/50">Members</p>
         <div className="grid gap-3 sm:grid-cols-3">
-          <KpiCard label="Total fans" value={a.fansAll} />
-          <KpiCard label="New · 7d" value={a.fans7} sub={a.fans7 === 0 ? "No signups yet this week" : undefined} />
-          <KpiCard label="New · 30d" value={a.fans30} />
+          <KpiCard label="Total members" value={a.membersAll} />
+          <KpiCard label="New · 7d" value={a.members7} sub={a.members7 === 0 ? "No signups yet this week" : undefined} />
+          <KpiCard label="New · 30d" value={a.members30} />
         </div>
       </section>
 
@@ -149,7 +149,7 @@ export default async function AdminAnalyticsPage() {
                   className="flex items-center justify-between py-2 text-sm"
                 >
                   <Link
-                    href={`/admin/fans/${r.id}`}
+                    href={`/admin/members/${r.id}`}
                     className="text-white/80 hover:text-white"
                   >
                     {r.name ?? "Anonymous"}
@@ -162,18 +162,18 @@ export default async function AdminAnalyticsPage() {
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-          <p className="mb-3 text-sm font-semibold">Most active artists (by post count)</p>
-          {a.topArtists.length === 0 ? (
+          <p className="mb-3 text-sm font-semibold">Most active brands (by post count)</p>
+          {a.topBrands.length === 0 ? (
             <p className="text-xs text-white/50">No community activity yet.</p>
           ) : (
             <div className="divide-y divide-white/5">
-              {a.topArtists.map((row) => (
+              {a.topBrands.map((row) => (
                 <div
                   key={row.slug}
                   className="flex items-center justify-between py-2 text-sm"
                 >
                   <Link
-                    href={`/artists/${row.slug}/community`}
+                    href={`/brands/${row.slug}/community`}
                     className="text-white/80 hover:text-white"
                   >
                     /{row.slug}

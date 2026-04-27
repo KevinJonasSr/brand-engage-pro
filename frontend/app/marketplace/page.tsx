@@ -1,7 +1,7 @@
 import { getActiveOffers } from "@/lib/data/offers";
 import type { Offer } from "@/lib/data/types";
 
-const tabs = ["Featured", "Merch", "Experiences", "Collectibles", "Fan-Exclusive"];
+const tabs = ["Featured", "Merch", "Experiences", "Collectibles", "Member-Exclusive"];
 
 // Static preview content used when Supabase has no offers yet.
 const fallbackProducts = [
@@ -9,7 +9,7 @@ const fallbackProducts = [
   { title: "Backstage Polaroid Pack", tier: "Gold Exclusive", pts: "5,200 pts", category: "Featured", badge: "Drop" },
   { title: "VIP Soundcheck + Meet", tier: "Platinum", pts: "9,800 pts", category: "Experiences", badge: "New" },
   { title: "Handwritten Lyric Sheet", tier: "Gold", pts: "4,750 pts", category: "Collectibles", badge: "1/50" },
-  { title: "Fan-Exclusive Vinyl Variant", tier: "All tiers", pts: "$45", category: "Fan-Exclusive", badge: "Preorder" },
+  { title: "Member-Exclusive Vinyl Variant", tier: "All tiers", pts: "$45", category: "Member-Exclusive", badge: "Preorder" },
 ];
 
 function formatPrice(o: Offer): string {

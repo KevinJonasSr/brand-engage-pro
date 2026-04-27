@@ -31,13 +31,13 @@ export const metadata: Metadata = {
     template: "%s · Brand Engage Pro",
   },
   description:
-    "The superfan platform. Follow artists, earn points for every fan move, and unlock real drops — signed vinyl, backstage access, listening parties.",
+    "The supermember platform. Follow brands, earn points for every member move, and unlock real drops — signed vinyl, backstage access, listening parties.",
   applicationName: "Brand Engage Pro",
   keywords: [
-    "superfan",
-    "fan club",
-    "artist community",
-    "fan rewards",
+    "supermember",
+    "member club",
+    "brand community",
+    "member rewards",
     "listening party",
     "VIP access",
   ],
@@ -50,13 +50,13 @@ export const metadata: Metadata = {
     siteName: "Brand Engage Pro",
     title: "Brand Engage Pro — your front-row seat",
     description:
-      "Follow artists, earn points, unlock real drops. The superfan platform built for fans who actually show up.",
+      "Follow brands, earn points, unlock real drops. The supermember platform built for members who actually show up.",
   },
   twitter: {
     card: "summary_large_image",
     title: "Brand Engage Pro — your front-row seat",
     description:
-      "Follow artists, earn points, unlock real drops. Built for the fans who actually show up.",
+      "Follow brands, earn points, unlock real drops. Built for the members who actually show up.",
   },
   appleWebApp: {
     capable: true,
@@ -71,11 +71,11 @@ export const metadata: Metadata = {
 };
 
 const navItems = [
-  { href: "/", label: "Fan Home" },
+  { href: "/", label: "Member Home" },
   { href: "/rewards", label: "Rewards" },
   { href: "/marketplace", label: "Marketplace" },
   { href: "/referrals", label: "Referrals" },
-  { href: "/artists", label: "Artists" },
+  { href: "/brands", label: "Brands" },
 ];
 
 /**
@@ -88,16 +88,16 @@ async function getCurrentUserSafe() {
     const supabase = await createClient();
     const { data } = await supabase.auth.getUser();
     if (!data.user) return null;
-    const { data: fan } = await supabase
-      .from("fans")
+    const { data: member } = await supabase
+      .from("members")
       .select("first_name, avatar_url")
       .eq("id", data.user.id)
       .maybeSingle();
     return {
       id: data.user.id,
       email: data.user.email,
-      first_name: (fan?.first_name as string | null) ?? null,
-      avatar_url: (fan?.avatar_url as string | null) ?? null,
+      first_name: (member?.first_name as string | null) ?? null,
+      avatar_url: (member?.avatar_url as string | null) ?? null,
     };
   } catch {
     return null;
@@ -111,7 +111,7 @@ export default async function RootLayout({
 }>) {
   const user = await getCurrentUserSafe();
   // Unread inbox count + premium entitlement are only meaningful for
-  // signed-in fans. Both are wrapped so a transient DB hiccup never
+  // signed-in members. Both are wrapped so a transient DB hiccup never
   // breaks the header render.
   let unread = 0;
   let isPremium = false;
@@ -195,7 +195,7 @@ export default async function RootLayout({
                     </span>
                   )}
                 </Link>
-                <UserMenu fan={user} isAdmin={isAdmin} unreadCount={unread} />
+                <UserMenu member={user} isAdmin={isAdmin} unreadCount={unread} />
               </div>
             ) : (
               <div className="flex items-center gap-2">

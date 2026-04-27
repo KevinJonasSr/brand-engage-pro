@@ -6,37 +6,37 @@ import { getStripe } from "@/lib/stripe";
  */
 
 /**
- * Get-or-create the Stripe Customer for a fan. Caches the customer id on
- * `fans.stripe_customer_id`. One customer per fan, shared across every
+ * Get-or-create the Stripe Customer for a member. Caches the customer id on
+ * `members.stripe_customer_id`. One customer per member, shared across every
  * community they subscribe to — matches Stripe's best practice for
  * multi-product, single-customer setups.
  */
 export async function getOrCreateStripeCustomer(params: {
-  fanId: string;
+  memberId: string;
   email: string;
   firstName?: string | null;
 }): Promise<string> {
   const admin = createAdminClient();
-  const { data: fan } = await admin
-    .from("fans")
+  const { data: member } = await admin
+    .from("members")
     .select("stripe_customer_id")
-    .eq("id", params.fanId)
+    .eq("id", params.memberId)
     .maybeSingle();
 
-  const existing = fan?.stripe_customer_id as string | null;
+  const existing = member?.stripe_customer_id as string | null;
   if (existing) return existing;
 
   const stripe = getStripe();
   const customer = await stripe.customers.create({
     email: params.email,
     name: params.firstName ?? undefined,
-    metadata: { fan_id: params.fanId },
+    metadata: { member_id: params.memberId },
   });
 
   await admin
-    .from("fans")
+    .from("members")
     .update({ stripe_customer_id: customer.id })
-    .eq("id", params.fanId);
+    .eq("id", params.memberId);
 
   return customer.id;
 }
@@ -64,8 +64,8 @@ export async function getFounderState(communityId: string): Promise<FounderState
       .eq("slug", communityId)
       .maybeSingle(),
     admin
-      .from("fan_community_memberships")
-      .select("fan_id", { count: "exact", head: true })
+      .from("member_community_memberships")
+      .select("member_id", { count: "exact", head: true })
       .eq("community_id", communityId)
       .in("subscription_tier", ["premium", "past_due", "cancelled"]),
   ]);

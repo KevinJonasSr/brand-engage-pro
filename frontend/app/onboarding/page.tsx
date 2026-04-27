@@ -6,7 +6,7 @@ import { ArrowRight, CheckCircle2, Star, Users } from "lucide-react";
 
 const steps = [
   {
-    title: "Fan Profile",
+    title: "Member Profile",
     description: "Capture the basics so the experience can personalize immediately.",
     fields: [
       { label: "Preferred name", name: "firstName", placeholder: "Taylor", type: "text" },
@@ -16,7 +16,7 @@ const steps = [
   },
   {
     title: "Interests",
-    description: "Fans choose what they care about—rewards, marketplace drops, live moments.",
+    description: "Members choose what they care about—rewards, marketplace drops, live moments.",
     fields: [
       { label: "Pick a lane", name: "interest", placeholder: "Rewards, VIP, Marketplace", type: "text" },
       { label: "Favorite song", name: "favoriteSong", placeholder: "Keep Up", type: "text" },
@@ -27,7 +27,7 @@ const steps = [
     description: "Tie their phone and socials to automate points + referrals.",
     fields: [
       { label: "Phone number", name: "phone", placeholder: "+1 (615) 555-0123", type: "tel" },
-      { label: "TikTok or Instagram handle", name: "handle", placeholder: "@superfan", type: "text" },
+      { label: "TikTok or Instagram handle", name: "handle", placeholder: "@supermember", type: "text" },
     ],
   },
 ];
@@ -75,7 +75,7 @@ export default function OnboardingWizard() {
     try {
       setSmsStatus("loading");
       setSmsMessage("Sending confirmation text...");
-      const response = await fetch("/api/fan-engage/sms", {
+      const response = await fetch("/api/member-engage/sms", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -90,12 +90,12 @@ export default function OnboardingWizard() {
       }
 
       setSmsStatus("success");
-      setSmsMessage("Confirmation text delivered. Fan is live in the journey.");
+      setSmsMessage("Confirmation text delivered. Member is live in the journey.");
 
       // Fire-and-forget Mailchimp subscribe — don't block the SMS success path
       // if Mailchimp isn't configured yet or the audience ID is missing.
       if (formState.email) {
-        fetch("/api/fan-engage/mailchimp", {
+        fetch("/api/member-engage/mailchimp", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -115,7 +115,7 @@ export default function OnboardingWizard() {
         typeof window !== "undefined"
           ? new URLSearchParams(window.location.search).get("ref") ?? undefined
           : undefined;
-      fetch("/api/fan-engage/onboard", {
+      fetch("/api/member-engage/onboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -150,7 +150,7 @@ export default function OnboardingWizard() {
       setFinishStatus("saving");
 
       // 1. Persist the profile + award signup bonus + record any ?ref= code.
-      // Fallback to the fanengage_ref cookie that /invite/[code] sets so the
+      // Fallback to the memberengage_ref cookie that /invite/[code] sets so the
       // attribution survives the auth round-trip.
       const refFromUrl =
         typeof window !== "undefined"
@@ -160,11 +160,11 @@ export default function OnboardingWizard() {
         typeof document !== "undefined"
           ? document.cookie
               .split("; ")
-              .find((c) => c.startsWith("fanengage_ref="))
+              .find((c) => c.startsWith("memberengage_ref="))
               ?.split("=")[1]
           : undefined;
       const refCode = refFromUrl ?? refFromCookie;
-      const onboardRes = await fetch("/api/fan-engage/onboard", {
+      const onboardRes = await fetch("/api/member-engage/onboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -188,7 +188,7 @@ export default function OnboardingWizard() {
 
       // Clear the referral cookie — attribution is now recorded in the DB.
       if (refFromCookie && typeof document !== "undefined") {
-        document.cookie = "fanengage_ref=; path=/; max-age=0";
+        document.cookie = "memberengage_ref=; path=/; max-age=0";
       }
 
       // 2. Mailchimp subscribe (fire-and-forget). Adds a "welcome" tag so
@@ -197,7 +197,7 @@ export default function OnboardingWizard() {
       if (formState.email) {
         const tags = ["welcome"];
         if (formState.interest) tags.push(formState.interest);
-        fetch("/api/fan-engage/mailchimp", {
+        fetch("/api/member-engage/mailchimp", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -210,7 +210,7 @@ export default function OnboardingWizard() {
 
       // 3. Twilio SMS confirmation (fire-and-forget; only if phone given)
       if (formState.phone) {
-        fetch("/api/fan-engage/sms", {
+        fetch("/api/member-engage/sms", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -308,7 +308,7 @@ export default function OnboardingWizard() {
                       className="mt-0.5 h-4 w-4 accent-aurora"
                     />
                     <span>
-                      I consent to receive SMS from Brand Engage Pro about artist drops, events, and
+                      I consent to receive SMS from Brand Engage Pro about brand drops, events, and
                       rewards. Msg &amp; data rates may apply. Reply STOP to opt out.
                     </span>
                   </label>

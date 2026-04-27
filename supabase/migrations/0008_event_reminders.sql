@@ -5,13 +5,13 @@
 -- ────────────────────────────────────────────────────────────────────────────
 
 -- ─── Per-event reminder template override ─────────────────────────────────
-alter table public.artist_events
+alter table public.brand_events
   add column if not exists reminder_sms_template text;
 
 -- ─── event_reminders (audit + de-dupe for scheduled sends) ────────────────
 create table if not exists public.event_reminders (
   id             uuid primary key default gen_random_uuid(),
-  event_id       uuid not null references public.artist_events(id) on delete cascade,
+  event_id       uuid not null references public.brand_events(id) on delete cascade,
   kind           text not null check (kind in ('reminder_24h', 'reminder_1h', 'manual')),
   sent_at        timestamptz not null default now(),
   recipients_sms integer not null default 0,
@@ -31,9 +31,9 @@ create index if not exists event_reminders_event_idx
 -- ─── Row Level Security ────────────────────────────────────────────────────
 alter table public.event_reminders enable row level security;
 
--- Admin-only reads/writes via service role. No policies exposed to fans.
+-- Admin-only reads/writes via service role. No policies exposed to members.
 
 -- ─── Smoke test ────────────────────────────────────────────────────────────
 -- select * from event_reminders order by sent_at desc;
 -- select column_name from information_schema.columns
---   where table_name='artist_events' and column_name='reminder_sms_template';
+--   where table_name='brand_events' and column_name='reminder_sms_template';

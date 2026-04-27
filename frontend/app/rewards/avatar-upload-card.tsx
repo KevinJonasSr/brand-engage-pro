@@ -33,7 +33,7 @@ export default function AvatarUploadCard({
           </span>
         )}
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold">{firstName ?? "Fan"}</p>
+          <p className="truncate text-sm font-semibold">{firstName ?? "Member"}</p>
           <p className="truncate text-xs text-white/60">{email ?? ""}</p>
         </div>
       </div>

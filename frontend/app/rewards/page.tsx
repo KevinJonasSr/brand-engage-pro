@@ -2,18 +2,18 @@ import Link from "next/link";
 import AvatarUploadCard from "./avatar-upload-card";
 import { getBadgesWithEarnedStatus } from "@/lib/data/badges";
 import {
-  getCurrentFan,
-  getCurrentFanKpis,
+  getCurrentMember,
+  getCurrentMemberKpis,
   getPointBreakdown,
-} from "@/lib/data/fan";
+} from "@/lib/data/member";
 import { getTiers, tierIcon } from "@/lib/data/tiers";
 import type { Badge, BadgeCategory, TierSlug } from "@/lib/data/types";
 
 // ─── Static preview content ────────────────────────────────────────────────
 const fallbackBadges: Badge[] = [
-  { slug: "welcome",       name: "Welcome aboard",     description: "Created your fan profile.",              icon: "👋",  point_value: 25,  category: "welcome",   threshold: null, sort_order: 1,  earned: true,  earned_at: null, progress: null },
+  { slug: "welcome",       name: "Welcome aboard",     description: "Created your member profile.",              icon: "👋",  point_value: 25,  category: "welcome",   threshold: null, sort_order: 1,  earned: true,  earned_at: null, progress: null },
   { slug: "first-post",    name: "First post",          description: "Shared your first community post.",     icon: "✍️",  point_value: 25,  category: "welcome",   threshold: 1,    sort_order: 2,  earned: false, earned_at: null, progress: null },
-  { slug: "referral-1",    name: "Recruiter",           description: "Referred your first fan.",              icon: "🎯",  point_value: 50,  category: "referral",  threshold: 1,    sort_order: 4,  earned: false, earned_at: null, progress: null },
+  { slug: "referral-1",    name: "Recruiter",           description: "Referred your first member.",              icon: "🎯",  point_value: 50,  category: "referral",  threshold: 1,    sort_order: 4,  earned: false, earned_at: null, progress: null },
   { slug: "tier-bronze",   name: "Bronze tier",         description: "Welcome to the Bronze circle.",         icon: "🥉",  point_value: 0,   category: "tier",      threshold: null, sort_order: 10, earned: true,  earned_at: null, progress: null },
 ];
 
@@ -52,9 +52,9 @@ function formatPts(n: number | null | undefined) {
 }
 
 export default async function RewardsPage() {
-  const [fan, kpis, tiers, dbBadges, breakdown] = await Promise.all([
-    getCurrentFan(),
-    getCurrentFanKpis(),
+  const [member, kpis, tiers, dbBadges, breakdown] = await Promise.all([
+    getCurrentMember(),
+    getCurrentMemberKpis(),
     getTiers(),
     getBadgesWithEarnedStatus(),
     getPointBreakdown(),
@@ -62,7 +62,7 @@ export default async function RewardsPage() {
 
   // Signed-in users see their real badges (empty until earned).
   // Anonymous visitors see a preview grid so the page isn't blank.
-  const isSignedIn = fan !== null;
+  const isSignedIn = member !== null;
   const badges: Badge[] = isSignedIn ? dbBadges : fallbackBadges;
   const earnedCount = badges.filter((b) => b.earned).length;
   const totalBadges = badges.length;
@@ -77,7 +77,7 @@ export default async function RewardsPage() {
   }
 
   // Tier progress — real if signed in, fallback if preview.
-  const currentSlug = (fan?.current_tier ?? "bronze") as TierSlug;
+  const currentSlug = (member?.current_tier ?? "bronze") as TierSlug;
   const currentTier = tiers.find((t) => t.slug === currentSlug);
   const nextTier = kpis?.next_tier ?? null;
   const totalPoints = kpis?.total_points ?? 8500;
@@ -226,9 +226,9 @@ export default async function RewardsPage() {
         <aside className="w-full max-w-sm space-y-6">
           {isSignedIn && (
             <AvatarUploadCard
-              initialUrl={fan?.avatar_url ?? null}
-              firstName={fan?.first_name ?? null}
-              email={fan?.email ?? null}
+              initialUrl={member?.avatar_url ?? null}
+              firstName={member?.first_name ?? null}
+              email={member?.email ?? null}
             />
           )}
 

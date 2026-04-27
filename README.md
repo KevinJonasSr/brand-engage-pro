@@ -7,7 +7,7 @@ V1 launch customer: **Nellie's Southern Kitchen** (Belmont, NC).
 
 ## What this is
 
-Most loyalty programs are punch cards in disguise. Brand Engage Pro is what an artist fan club is to a musician's superfans, applied to brands: a place where regulars become members, members earn status by engaging (posts, polls, RSVPs, challenges) — not just by spending — and the brand has a real surface to talk to its most loyal customers.
+Most loyalty programs are punch cards in disguise. Brand Engage Pro is what an brand member club is to a musician's supermembers, applied to brands: a place where regulars become members, members earn status by engaging (posts, polls, RSVPs, challenges) — not just by spending — and the brand has a real surface to talk to its most loyal customers.
 
 - **Free tier** — brand page, posts, polls, challenges, events with RSVP, manual rewards. 50 active members.
 - **Pro tier ($49/mo)** — unlimited members, custom accent colors, premium membership tier, CSV import, weekly broadcast, basic analytics.
@@ -35,9 +35,9 @@ See [`docs/STRATEGY_AND_SPEC.md`](docs/STRATEGY_AND_SPEC.md) for the full produc
 
 ## Lineage
 
-Brand Engage Pro is a fork of [Fan Engage](https://github.com/KevinJonasSr/Superfan-platform) (the Jonas Group's music fan-club platform). The architecture maps onto loyalty almost 1:1 — multi-tenant communities, tiered memberships, points + rewards catalog, social posts, RSVPs, premium gating via Stripe — so we cloned the codebase, dropped the music-specific seed data, and pivoted the vocabulary toward brands and members.
+Brand Engage Pro is a fork of [Member Engage](https://github.com/KevinJonasSr/Supermember-platform) (the Jonas Group's music member-club platform). The architecture maps onto loyalty almost 1:1 — multi-tenant communities, tiered memberships, points + rewards catalog, social posts, RSVPs, premium gating via Stripe — so we cloned the codebase, dropped the music-specific seed data, and pivoted the vocabulary toward brands and members.
 
-The migration paper trail starts at `0001_init.sql` (inherited from Fan Engage) and continues with Brand Engage Pro–specific migrations from `0024_*` onward (brands schema, specials table, brand-locations, etc.).
+The migration paper trail starts at `0001_init.sql` (inherited from Member Engage) and continues with Brand Engage Pro–specific migrations from `0024_*` onward (brands schema, specials table, brand-locations, etc.).
 
 ## Quick start
 

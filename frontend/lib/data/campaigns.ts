@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 
-export interface FanActionRow {
+export interface MemberActionRow {
   id: string;
   kind: string;
   title: string;
@@ -12,13 +12,13 @@ export interface FanActionRow {
 }
 
 /**
- * Returns active fan_actions for an artist plus whether the current fan has
+ * Returns active member_actions for an brand plus whether the current member has
  * already completed each one. Safe for signed-out callers (returns
  * completed=false for everything).
  */
-export async function getActiveFanActionsForArtist(
-  artistSlug: string,
-): Promise<FanActionRow[]> {
+export async function getActiveMemberActionsForBrand(
+  brandSlug: string,
+): Promise<MemberActionRow[]> {
   try {
     const supabase = await createClient();
     const {
@@ -26,9 +26,9 @@ export async function getActiveFanActionsForArtist(
     } = await supabase.auth.getUser();
 
     const { data: actions, error } = await supabase
-      .from("fan_actions")
+      .from("member_actions")
       .select("id,kind,title,description,url,cta_label,point_value")
-      .eq("artist_slug", artistSlug)
+      .eq("brand_slug", brandSlug)
       .eq("active", true)
       .order("sort_order");
     if (error) throw error;
@@ -37,9 +37,9 @@ export async function getActiveFanActionsForArtist(
     let completedSet = new Set<string>();
     if (user) {
       const { data: done } = await supabase
-        .from("fan_action_completions")
+        .from("member_action_completions")
         .select("action_id")
-        .eq("fan_id", user.id)
+        .eq("member_id", user.id)
         .in(
           "action_id",
           actions.map((a) => a.id as string),
@@ -58,7 +58,7 @@ export async function getActiveFanActionsForArtist(
           cta_label: a.cta_label as string,
           point_value: a.point_value as number,
           completed: completedSet.has(a.id as string),
-        }) as FanActionRow,
+        }) as MemberActionRow,
     );
   } catch {
     return [];

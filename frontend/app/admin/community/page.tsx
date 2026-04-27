@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 type PostRow = {
   id: string;
-  artist_slug: string;
+  brand_slug: string;
   kind: string;
   title: string | null;
   body: string;
@@ -37,16 +37,16 @@ type EntryRow = {
   body: string | null;
   image_url: string | null;
   created_at: string;
-  fan_id: string;
-  fan_first_name: string | null;
+  member_id: string;
+  member_first_name: string | null;
 };
 
 async function loadFeed() {
   const admin = createAdminClient();
-  const [postsRes, commentsRes, entriesRes, fansRes] = await Promise.all([
+  const [postsRes, commentsRes, entriesRes, membersRes] = await Promise.all([
     admin
       .from("community_posts")
-      .select("id,artist_slug,kind,title,body,pinned,created_at,author_id")
+      .select("id,brand_slug,kind,title,body,pinned,created_at,author_id")
       .order("created_at", { ascending: false })
       .limit(100),
     admin
@@ -56,14 +56,14 @@ async function loadFeed() {
       .limit(50),
     admin
       .from("community_challenge_entries")
-      .select("id,post_id,body,image_url,created_at,fan_id")
+      .select("id,post_id,body,image_url,created_at,member_id")
       .order("created_at", { ascending: false })
       .limit(50),
-    admin.from("fans").select("id,first_name"),
+    admin.from("members").select("id,first_name"),
   ]);
 
   const nameById = new Map<string, string | null>(
-    (fansRes.data ?? []).map((f) => [f.id as string, (f.first_name as string | null) ?? null]),
+    (membersRes.data ?? []).map((f) => [f.id as string, (f.first_name as string | null) ?? null]),
   );
 
   const posts: PostRow[] = (postsRes.data ?? []).map((p) => ({
@@ -75,8 +75,8 @@ async function loadFeed() {
     author_first_name: nameById.get(c.author_id as string) ?? null,
   }));
   const entries: EntryRow[] = (entriesRes.data ?? []).map((e) => ({
-    ...(e as Omit<EntryRow, "fan_first_name">),
-    fan_first_name: nameById.get(e.fan_id as string) ?? null,
+    ...(e as Omit<EntryRow, "member_first_name">),
+    member_first_name: nameById.get(e.member_id as string) ?? null,
   }));
   return { posts, comments, entries };
 }
@@ -122,7 +122,7 @@ export default async function AdminCommunityPage() {
           Community moderation
         </h1>
         <p className="mt-2 text-sm text-white/60">
-          Cross-artist feed — pin, delete, and jump to the fan who authored a post.
+          Cross-brand feed — pin, delete, and jump to the member who authored a post.
         </p>
       </div>
 
@@ -144,10 +144,10 @@ export default async function AdminCommunityPage() {
                 <div className="flex flex-wrap items-center gap-2 text-xs">
                   <KindChip kind={p.kind} />
                   <Link
-                    href={`/artists/${p.artist_slug}/community`}
+                    href={`/brands/${p.brand_slug}/community`}
                     className="rounded-full bg-white/5 px-2 py-0.5 text-white/70 hover:bg-white/10"
                   >
-                    /{p.artist_slug}
+                    /{p.brand_slug}
                   </Link>
                   {p.pinned && (
                     <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-amber-200">
@@ -155,7 +155,7 @@ export default async function AdminCommunityPage() {
                     </span>
                   )}
                   <Link
-                    href={`/admin/fans/${p.author_id}`}
+                    href={`/admin/members/${p.author_id}`}
                     className="text-white/70 hover:text-white"
                   >
                     {p.author_first_name ?? "Anonymous"}
@@ -203,7 +203,7 @@ export default async function AdminCommunityPage() {
               <div className="min-w-0 flex-1">
                 <p className="text-xs">
                   <Link
-                    href={`/admin/fans/${c.author_id}`}
+                    href={`/admin/members/${c.author_id}`}
                     className="font-semibold text-white/70 hover:text-white"
                   >
                     {c.author_first_name ?? "Anonymous"}
@@ -249,10 +249,10 @@ export default async function AdminCommunityPage() {
               <div className="min-w-0 flex-1">
                 <p className="text-xs">
                   <Link
-                    href={`/admin/fans/${e.fan_id}`}
+                    href={`/admin/members/${e.member_id}`}
                     className="font-semibold text-white/70 hover:text-white"
                   >
-                    {e.fan_first_name ?? "Anonymous"}
+                    {e.member_first_name ?? "Anonymous"}
                   </Link>
                   <span className="text-white/40">
                     {" "}entry on challenge {e.post_id.slice(0, 8)}…

@@ -15,7 +15,7 @@ async function getInviter(code: string): Promise<{
   try {
     const admin = createAdminClient();
     const { data } = await admin
-      .from("fans")
+      .from("members")
       .select("id, first_name")
       .eq("referral_code", code)
       .maybeSingle();
@@ -35,7 +35,7 @@ export default async function InvitePage({
   const inviter = await getInviter(code);
   if (!inviter) notFound();
 
-  const inviterName = inviter.firstName ?? "A Brand Engage Pro fan";
+  const inviterName = inviter.firstName ?? "A Brand Engage Pro member";
 
   return (
     <main className="mx-auto flex min-h-[80vh] max-w-xl flex-col justify-center gap-6 px-6 py-12">

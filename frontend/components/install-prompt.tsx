@@ -3,7 +3,7 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 
 /**
- * Tasteful "Install Brand Engage Pro" prompt that appears after a fan engages for
+ * Tasteful "Install Brand Engage Pro" prompt that appears after a member engages for
  * a bit (not immediately on first visit). Registers the service worker and
  * listens for the browser's `beforeinstallprompt` event so we can offer our
  * own button instead of relying on the browser's mini-infobar.
@@ -17,7 +17,7 @@ type BeforeInstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 };
 
-const DISMISSED_KEY = "fanengage_install_dismissed";
+const DISMISSED_KEY = "memberengage_install_dismissed";
 
 // External-store reader so we can short-circuit without a setState-in-effect.
 function subscribe() { return () => {}; }
@@ -112,7 +112,7 @@ export default function InstallPrompt() {
         </p>
       ) : (
         <p className="mt-1 text-xs text-white/70">
-          Add Brand Engage Pro to your home screen for quick access to your artists, events, and rewards.
+          Add Brand Engage Pro to your home screen for quick access to your brands, events, and rewards.
         </p>
       )}
       <div className="mt-3 flex items-center justify-end gap-2">

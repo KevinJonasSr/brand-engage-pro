@@ -46,14 +46,14 @@ export default function PremiumPaywall({
 
   if (reason === "signed-out") {
     ctaLabel = "Sign in to unlock";
-    featureCopy = `${feature} is for Premium fans`;
+    featureCopy = `${feature} is for Premium members`;
   } else if (reason === "needs-founder") {
-    ctaLabel = "Become a Founding Fan";
+    ctaLabel = "Become a Founding Member";
     featureCopy = `${feature} is for Founders only`;
   } else {
     // needs-premium
     ctaLabel = "Upgrade to Premium — $10/mo";
-    featureCopy = `${feature} is for Premium fans`;
+    featureCopy = `${feature} is for Premium members`;
   }
 
   if (compact) {
@@ -95,7 +95,7 @@ export default function PremiumPaywall({
           <div>
             <p className="text-sm font-semibold text-white/90">
               {reason === "needs-founder"
-                ? "Founders only — the first 100 paying fans"
+                ? "Founders only — the first 100 paying members"
                 : reason === "signed-out"
                   ? "Sign in to unlock Premium"
                   : "Upgrade to Premium"}
@@ -114,18 +114,18 @@ export default function PremiumPaywall({
           {reason === "needs-founder" ? (
             <>
               <p className="text-xs text-white/60">
-                Be one of the first 100 fans to support this artist directly. Founders get:
+                Be one of the first 100 members to support this brand directly. Founders get:
               </p>
               <ul className="space-y-1 text-xs text-white/70">
                 <li>✓ Exclusive founder-only posts & events</li>
-                <li>✓ Direct support of your favorite artist</li>
+                <li>✓ Direct support of your favorite brand</li>
                 <li>✓ Lifetime founder status & badge</li>
               </ul>
             </>
           ) : (
             <>
               <p className="text-xs text-white/60">
-                Premium fans get exclusive access to:
+                Premium members get exclusive access to:
               </p>
               <ul className="space-y-1 text-xs text-white/70">
                 <li>✓ Backstage posts & voice notes</li>

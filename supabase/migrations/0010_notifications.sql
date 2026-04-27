@@ -5,12 +5,12 @@
 -- ────────────────────────────────────────────────────────────────────────────
 
 -- ─── Notifications table ──────────────────────────────────────────────────
--- One row per delivered in-app notification. Fans read their own rows; mark
+-- One row per delivered in-app notification. Members read their own rows; mark
 -- them read via an update that sets `read_at`. Server-side inserts only (via
 -- service-role admin client or SECURITY DEFINER triggers).
 create table if not exists public.notifications (
   id         uuid primary key default gen_random_uuid(),
-  fan_id     uuid not null references public.fans(id) on delete cascade,
+  member_id     uuid not null references public.members(id) on delete cascade,
   kind       text not null,
   title      text not null,
   body       text,
@@ -22,13 +22,13 @@ create table if not exists public.notifications (
 );
 
 -- Unread-first feed index
-create index if not exists notifications_fan_created_idx
-  on public.notifications (fan_id, created_at desc);
+create index if not exists notifications_member_created_idx
+  on public.notifications (member_id, created_at desc);
 
--- Dedup guard: the same fan can't get two notifications with the same key.
+-- Dedup guard: the same member can't get two notifications with the same key.
 -- Partial index so multiple rows without a dedup_key don't conflict.
-create unique index if not exists notifications_fan_dedup_idx
-  on public.notifications (fan_id, dedup_key)
+create unique index if not exists notifications_member_dedup_idx
+  on public.notifications (member_id, dedup_key)
   where dedup_key is not null;
 
 -- ─── RLS ──────────────────────────────────────────────────────────────────
@@ -36,20 +36,20 @@ alter table public.notifications enable row level security;
 
 drop policy if exists notifications_own_read on public.notifications;
 create policy notifications_own_read on public.notifications
-  for select using (auth.uid() = fan_id);
+  for select using (auth.uid() = member_id);
 
--- Fans can mark their own notifications read (update read_at). They cannot
--- change fan_id / kind / content.
+-- Members can mark their own notifications read (update read_at). They cannot
+-- change member_id / kind / content.
 drop policy if exists notifications_own_update on public.notifications;
 create policy notifications_own_update on public.notifications
-  for update using (auth.uid() = fan_id) with check (auth.uid() = fan_id);
+  for update using (auth.uid() = member_id) with check (auth.uid() = member_id);
 
 -- Inserts via service role only (triggers below run as SECURITY DEFINER, and
 -- server-side inserts go through the admin client).
 
 -- ─── Helper: upsert_notification (idempotent via dedup_key) ───────────────
 create or replace function public.upsert_notification(
-  p_fan_id    uuid,
+  p_member_id    uuid,
   p_kind      text,
   p_title     text,
   p_body      text default null,
@@ -62,11 +62,11 @@ begin
   if p_dedup_key is not null then
     if exists (
       select 1 from notifications
-      where fan_id = p_fan_id and dedup_key = p_dedup_key
+      where member_id = p_member_id and dedup_key = p_dedup_key
     ) then return; end if;
   end if;
-  insert into notifications (fan_id, kind, title, body, url, icon, dedup_key)
-  values (p_fan_id, p_kind, p_title, p_body, p_url, p_icon, p_dedup_key);
+  insert into notifications (member_id, kind, title, body, url, icon, dedup_key)
+  values (p_member_id, p_kind, p_title, p_body, p_url, p_icon, p_dedup_key);
 exception when unique_violation then
   -- Race condition: another txn won the dedup. Silently swallow.
   return;
@@ -75,7 +75,7 @@ end $$;
 -- ─── Extend award_badge to also fire an in-app notification ───────────────
 -- Same signature as 0004; just adds the notification call. Idempotent since
 -- upsert_notification skips on dedup_key match.
-create or replace function public.award_badge(p_fan_id uuid, p_slug text)
+create or replace function public.award_badge(p_member_id uuid, p_slug text)
 returns void language plpgsql security definer set search_path = public as $$
 declare
   v_points   integer;
@@ -84,9 +84,9 @@ declare
   v_ref      text;
   v_inserted boolean;
 begin
-  insert into fan_badges (fan_id, badge_slug)
-  values (p_fan_id, p_slug)
-  on conflict (fan_id, badge_slug) do nothing
+  insert into member_badges (member_id, badge_slug)
+  values (p_member_id, p_slug)
+  on conflict (member_id, badge_slug) do nothing
   returning true into v_inserted;
 
   if v_inserted is null then return; end if;  -- already earned
@@ -95,20 +95,20 @@ begin
     from badges where slug = p_slug;
 
   if coalesce(v_points, 0) > 0 then
-    v_ref := 'badge:' || p_slug || ':' || p_fan_id::text;
+    v_ref := 'badge:' || p_slug || ':' || p_member_id::text;
     if not exists (select 1 from points_ledger where source_ref = v_ref) then
-      insert into points_ledger (fan_id, delta, source, source_ref, note)
-      values (p_fan_id, v_points, 'manual_adjustment', v_ref, 'Badge earned: ' || p_slug);
+      insert into points_ledger (member_id, delta, source, source_ref, note)
+      values (p_member_id, v_points, 'manual_adjustment', v_ref, 'Badge earned: ' || p_slug);
 
-      update fans
+      update members
         set total_points = coalesce(total_points, 0) + v_points
-      where id = p_fan_id;
+      where id = p_member_id;
     end if;
   end if;
 
-  -- Fan-out in-app notification
+  -- Member-out in-app notification
   perform upsert_notification(
-    p_fan_id,
+    p_member_id,
     'badge_earned',
     coalesce(v_name, 'Badge earned'),
     case when coalesce(v_points, 0) > 0
@@ -125,21 +125,21 @@ create or replace function public.notify_rsvp_confirmed()
 returns trigger language plpgsql security definer set search_path = public as $$
 declare
   v_title       text;
-  v_artist_name text;
-  v_artist_slug text;
+  v_brand_name text;
+  v_brand_slug text;
   v_starts_at   timestamptz;
   v_event_date  text;
   v_body        text;
 begin
-  select ae.title, ae.artist_slug, ae.starts_at, ae.event_date, a.name
-    into v_title, v_artist_slug, v_starts_at, v_event_date, v_artist_name
-    from artist_events ae
-    left join artists a on a.slug = ae.artist_slug
+  select ae.title, ae.brand_slug, ae.starts_at, ae.event_date, a.name
+    into v_title, v_brand_slug, v_starts_at, v_event_date, v_brand_name
+    from brand_events ae
+    left join brands a on a.slug = ae.brand_slug
     where ae.id = new.event_id;
 
   v_body := coalesce(v_title, 'Event');
-  if v_artist_name is not null then
-    v_body := v_body || ' · ' || v_artist_name;
+  if v_brand_name is not null then
+    v_body := v_body || ' · ' || v_brand_name;
   end if;
   if v_starts_at is not null then
     v_body := v_body || ' · ' || to_char(v_starts_at at time zone 'UTC', 'Mon DD');
@@ -148,11 +148,11 @@ begin
   end if;
 
   perform upsert_notification(
-    new.fan_id,
+    new.member_id,
     'rsvp_confirmed',
     'You''re on the list',
     v_body,
-    '/artists/' || coalesce(v_artist_slug, ''),
+    '/brands/' || coalesce(v_brand_slug, ''),
     '🎟️',
     'rsvp:' || new.event_id::text
   );
@@ -174,8 +174,8 @@ begin
   if new.status <> 'verified' then return new; end if;
   if tg_op = 'UPDATE' and old.status = 'verified' then return new; end if;
 
-  select first_name into v_referred_name from fans where id = new.referred_id;
-  v_body := coalesce(v_referred_name, 'A new fan') || ' just joined via your invite. +' ||
+  select first_name into v_referred_name from members where id = new.referred_id;
+  v_body := coalesce(v_referred_name, 'A new member') || ' just joined via your invite. +' ||
             coalesce(new.points_awarded, 150) || ' pts.';
 
   perform upsert_notification(
@@ -208,5 +208,5 @@ create trigger referrals_notify_upd
 -- ─── Smoke-test queries ────────────────────────────────────────────────────
 -- select count(*) as total, count(*) filter (where read_at is null) as unread
 --   from notifications;
--- select fan_id, kind, title, body, dedup_key, created_at
+-- select member_id, kind, title, body, dedup_key, created_at
 --   from notifications order by created_at desc limit 20;

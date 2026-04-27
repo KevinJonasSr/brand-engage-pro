@@ -39,14 +39,14 @@ create table if not exists public.tiers (
 );
 
 insert into public.tiers (slug, display_name, min_points, sort_order, perks) values
-  ('bronze',   'Bronze',    0,     1, '["Welcome badge", "Access to fan home"]'::jsonb),
+  ('bronze',   'Bronze',    0,     1, '["Welcome badge", "Access to member home"]'::jsonb),
   ('silver',   'Silver',    2500,  2, '["Priority merch drops", "Monthly livestream"]'::jsonb),
   ('gold',     'Gold',      10000, 3, '["VIP soundcheck access", "Signed merch eligibility"]'::jsonb),
   ('platinum', 'Platinum',  25000, 4, '["Backstage experiences", "Meet & greet slots"]'::jsonb)
 on conflict (slug) do nothing;
 
--- ─── Fans (profile row per auth user) ───────────────────────────────────────
-create table if not exists public.fans (
+-- ─── Members (profile row per auth user) ───────────────────────────────────────
+create table if not exists public.members (
   id             uuid primary key references auth.users(id) on delete cascade,
   email          citext unique,
   first_name     text,
@@ -57,7 +57,7 @@ create table if not exists public.fans (
   favorite_song  text,
   interest       text,
   referral_code  text unique default encode(gen_random_bytes(6), 'hex'),
-  referred_by    uuid references public.fans(id) on delete set null,
+  referred_by    uuid references public.members(id) on delete set null,
   total_points   integer not null default 0,
   current_tier   tier_slug not null default 'bronze',
   sms_opted_in   boolean not null default false,
@@ -66,13 +66,13 @@ create table if not exists public.fans (
   updated_at     timestamptz not null default now()
 );
 
-create index if not exists fans_referred_by_idx on public.fans (referred_by);
-create index if not exists fans_current_tier_idx on public.fans (current_tier);
+create index if not exists members_referred_by_idx on public.members (referred_by);
+create index if not exists members_current_tier_idx on public.members (current_tier);
 
 -- ─── Points ledger (immutable audit trail) ──────────────────────────────────
 create table if not exists public.points_ledger (
   id          uuid primary key default gen_random_uuid(),
-  fan_id      uuid not null references public.fans(id) on delete cascade,
+  member_id      uuid not null references public.members(id) on delete cascade,
   delta       integer not null,
   source      point_source not null,
   source_ref  text,
@@ -80,9 +80,9 @@ create table if not exists public.points_ledger (
   created_at  timestamptz not null default now()
 );
 
-create index if not exists points_ledger_fan_idx on public.points_ledger (fan_id, created_at desc);
+create index if not exists points_ledger_member_idx on public.points_ledger (member_id, created_at desc);
 
--- ─── Badges + fan_badges ────────────────────────────────────────────────────
+-- ─── Badges + member_badges ────────────────────────────────────────────────────
 create table if not exists public.badges (
   slug         text primary key,
   name         text not null,
@@ -92,18 +92,18 @@ create table if not exists public.badges (
   created_at   timestamptz not null default now()
 );
 
-create table if not exists public.fan_badges (
-  fan_id      uuid not null references public.fans(id) on delete cascade,
+create table if not exists public.member_badges (
+  member_id      uuid not null references public.members(id) on delete cascade,
   badge_slug  text not null references public.badges(slug) on delete cascade,
   earned_at   timestamptz not null default now(),
-  primary key (fan_id, badge_slug)
+  primary key (member_id, badge_slug)
 );
 
 -- ─── Referrals ──────────────────────────────────────────────────────────────
 create table if not exists public.referrals (
   id            uuid primary key default gen_random_uuid(),
-  referrer_id   uuid not null references public.fans(id) on delete cascade,
-  referred_id   uuid references public.fans(id) on delete set null,
+  referrer_id   uuid not null references public.members(id) on delete cascade,
+  referred_id   uuid references public.members(id) on delete set null,
   referred_email citext,
   status        text not null default 'pending', -- pending | verified | expired
   points_awarded integer not null default 0,
@@ -137,7 +137,7 @@ create index if not exists offers_active_idx on public.offers (active, starts_at
 -- ─── Purchases ──────────────────────────────────────────────────────────────
 create table if not exists public.purchases (
   id           uuid primary key default gen_random_uuid(),
-  fan_id       uuid not null references public.fans(id) on delete cascade,
+  member_id       uuid not null references public.members(id) on delete cascade,
   offer_id     uuid not null references public.offers(id) on delete restrict,
   points_spent integer not null default 0,
   cents_spent  integer not null default 0,
@@ -146,23 +146,23 @@ create table if not exists public.purchases (
   created_at   timestamptz not null default now()
 );
 
-create index if not exists purchases_fan_idx on public.purchases (fan_id, created_at desc);
+create index if not exists purchases_member_idx on public.purchases (member_id, created_at desc);
 
 -- ─── Updated-at trigger ─────────────────────────────────────────────────────
 create or replace function public.set_updated_at()
 returns trigger language plpgsql as $$
 begin new.updated_at = now(); return new; end $$;
 
-drop trigger if exists fans_set_updated_at on public.fans;
-create trigger fans_set_updated_at
-  before update on public.fans
+drop trigger if exists members_set_updated_at on public.members;
+create trigger members_set_updated_at
+  before update on public.members
   for each row execute function public.set_updated_at();
 
--- ─── Auto-create fan row when a new auth user signs up ──────────────────────
+-- ─── Auto-create member row when a new auth user signs up ──────────────────────
 create or replace function public.handle_new_auth_user()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
-  insert into public.fans (id, email)
+  insert into public.members (id, email)
   values (new.id, new.email)
   on conflict (id) do nothing;
   return new;
@@ -174,9 +174,9 @@ create trigger on_auth_user_created
   for each row execute function public.handle_new_auth_user();
 
 -- ─── Row Level Security ─────────────────────────────────────────────────────
-alter table public.fans           enable row level security;
+alter table public.members           enable row level security;
 alter table public.points_ledger  enable row level security;
-alter table public.fan_badges     enable row level security;
+alter table public.member_badges     enable row level security;
 alter table public.referrals      enable row level security;
 alter table public.purchases      enable row level security;
 -- Public read tables (tiers, badges, offers) still get RLS on, with permissive policies
@@ -185,28 +185,28 @@ alter table public.badges         enable row level security;
 alter table public.offers         enable row level security;
 
 -- Helper: drop-then-create so the migration stays idempotent
--- Fans: a user sees + updates only their own row
-drop policy if exists fans_self_select on public.fans;
-create policy fans_self_select on public.fans
+-- Members: a user sees + updates only their own row
+drop policy if exists members_self_select on public.members;
+create policy members_self_select on public.members
   for select using (auth.uid() = id);
 
-drop policy if exists fans_self_update on public.fans;
-create policy fans_self_update on public.fans
+drop policy if exists members_self_update on public.members;
+create policy members_self_update on public.members
   for update using (auth.uid() = id);
 
-drop policy if exists fans_self_insert on public.fans;
-create policy fans_self_insert on public.fans
+drop policy if exists members_self_insert on public.members;
+create policy members_self_insert on public.members
   for insert with check (auth.uid() = id);
 
 -- Points ledger: a user sees their own history. Writes flow through service role only.
 drop policy if exists points_self_select on public.points_ledger;
 create policy points_self_select on public.points_ledger
-  for select using (auth.uid() = fan_id);
+  for select using (auth.uid() = member_id);
 
--- Fan badges: a user sees their own
-drop policy if exists fan_badges_self_select on public.fan_badges;
-create policy fan_badges_self_select on public.fan_badges
-  for select using (auth.uid() = fan_id);
+-- Member badges: a user sees their own
+drop policy if exists member_badges_self_select on public.member_badges;
+create policy member_badges_self_select on public.member_badges
+  for select using (auth.uid() = member_id);
 
 -- Referrals: a user sees referrals they made
 drop policy if exists referrals_self_select on public.referrals;
@@ -220,11 +220,11 @@ create policy referrals_self_insert on public.referrals
 -- Purchases: a user sees their own
 drop policy if exists purchases_self_select on public.purchases;
 create policy purchases_self_select on public.purchases
-  for select using (auth.uid() = fan_id);
+  for select using (auth.uid() = member_id);
 
 drop policy if exists purchases_self_insert on public.purchases;
 create policy purchases_self_insert on public.purchases
-  for insert with check (auth.uid() = fan_id);
+  for insert with check (auth.uid() = member_id);
 
 -- Public reference data: any authenticated user can read
 drop policy if exists tiers_public_read on public.tiers;

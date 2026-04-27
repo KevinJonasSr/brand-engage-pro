@@ -59,7 +59,7 @@ export async function seedStripeProductsAction(formData: FormData): Promise<void
   try {
     // 1) Product
     const product = await stripe.products.create({
-      name: `${community.display_name} — Premium Fan Club`,
+      name: `${community.display_name} — Premium Member Club`,
       description:
         community.tagline ??
         `Premium membership for ${community.display_name}. Includes exclusive drops, early event access, and backstage perks.`,

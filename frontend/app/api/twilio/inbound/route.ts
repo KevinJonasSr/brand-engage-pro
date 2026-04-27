@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
  *   Messaging Service → Integration → Incoming Messages
  *   URL: https://<your-domain>/api/twilio/inbound (POST, x-www-form-urlencoded)
  *
- * We respond with TwiML so Twilio sends the correct reply back to the fan.
+ * We respond with TwiML so Twilio sends the correct reply back to the member.
  * STOP / STOPALL / UNSUB / UNSUBSCRIBE / CANCEL / END / QUIT → opt out
  * HELP / INFO                                               → help text
  * START / YES / UNSTOP                                      → opt back in
@@ -61,14 +61,14 @@ export async function POST(request: Request) {
     if (STOP_KEYWORDS.has(keyword)) {
       // Match by normalized phone in case formatting drifts
       const digits = normalizePhone(from);
-      const { data: fans } = await admin
-        .from("fans")
+      const { data: members } = await admin
+        .from("members")
         .select("id, phone, first_name");
-      const target = (fans ?? []).find(
+      const target = (members ?? []).find(
         (f) => normalizePhone(f.phone as string | null) === digits,
       );
       if (target) {
-        await admin.from("fans").update({ sms_opted_in: false }).eq("id", target.id);
+        await admin.from("members").update({ sms_opted_in: false }).eq("id", target.id);
       }
       // Twilio also auto-handles STOP at the carrier level, but we reply explicitly
       // so both systems stay in sync.
@@ -79,14 +79,14 @@ export async function POST(request: Request) {
 
     if (START_KEYWORDS.has(keyword)) {
       const digits = normalizePhone(from);
-      const { data: fans } = await admin
-        .from("fans")
+      const { data: members } = await admin
+        .from("members")
         .select("id, phone, first_name");
-      const target = (fans ?? []).find(
+      const target = (members ?? []).find(
         (f) => normalizePhone(f.phone as string | null) === digits,
       );
       if (target) {
-        await admin.from("fans").update({ sms_opted_in: true }).eq("id", target.id);
+        await admin.from("members").update({ sms_opted_in: true }).eq("id", target.id);
       }
       return twimlResponse(
         "You're back in for Brand Engage Pro updates. Reply STOP anytime to opt out.",
@@ -95,7 +95,7 @@ export async function POST(request: Request) {
 
     if (HELP_KEYWORDS.has(keyword)) {
       return twimlResponse(
-        "Brand Engage Pro: artist alerts + fan rewards. Msg & data rates may apply. Reply STOP to opt out. Support: support@fanengage.app",
+        "Brand Engage Pro: brand alerts + member rewards. Msg & data rates may apply. Reply STOP to opt out. Support: support@memberengage.app",
       );
     }
 

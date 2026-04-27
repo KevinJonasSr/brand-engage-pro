@@ -9,9 +9,9 @@
 
 ## TL;DR
 
-We extract the Fan Engage architecture into a horizontal **community-driven loyalty platform** for brands, leading with **restaurants** in V1 and expanding to retail, sports clubs, and hotels in subsequent phases. Consumers get one marketplace app where they discover and join multiple brands' loyalty programs; brands get a self-serve dashboard to publish specials, run challenges, host events, and reward their most loyal customers — not just their highest spenders. Freemium for the long tail (free brand pages, basic points and rewards), paid tiers for serious operators (custom branding, POS integration, premium content, advanced analytics).
+We extract the Member Engage architecture into a horizontal **community-driven loyalty platform** for brands, leading with **restaurants** in V1 and expanding to retail, sports clubs, and hotels in subsequent phases. Consumers get one marketplace app where they discover and join multiple brands' loyalty programs; brands get a self-serve dashboard to publish specials, run challenges, host events, and reward their most loyal customers — not just their highest spenders. Freemium for the long tail (free brand pages, basic points and rewards), paid tiers for serious operators (custom branding, POS integration, premium content, advanced analytics).
 
-The thesis: **loyalty as a category is over-served on the transactional side and under-served on the community side**. Fan Engage already has the community DNA — posts, polls, challenges, premium memberships, RSVPs, badges — that punch-card and card-swipe tools don't. We're not trying to out-execute Toast Loyalty's POS depth; we're building the loyalty product that makes a customer feel like part of the brand.
+The thesis: **loyalty as a category is over-served on the transactional side and under-served on the community side**. Member Engage already has the community DNA — posts, polls, challenges, premium memberships, RSVPs, badges — that punch-card and card-swipe tools don't. We're not trying to out-execute Toast Loyalty's POS depth; we're building the loyalty product that makes a customer feel like part of the brand.
 
 ---
 
@@ -23,7 +23,7 @@ Most loyalty programs today fall into one of two failure modes:
 
 2. **Heavy and expensive** — Sailthru, Bond, Salesforce Loyalty Management. Built for enterprise marketers, six-figure implementations, irrelevant to the 99% of brands that just want to make their best customers feel seen.
 
-There's no widely adopted product that does for restaurants/retail/sports/hospitality what an artist fan club does for a musician's superfans: lets the brand publish stuff, lets the customer engage with that stuff, and rewards engagement (not just spend) with status, perks, and access. That's the gap.
+There's no widely adopted product that does for restaurants/retail/sports/hospitality what an brand member club does for a musician's supermembers: lets the brand publish stuff, lets the customer engage with that stuff, and rewards engagement (not just spend) with status, perks, and access. That's the gap.
 
 Adjacent: the SMB owner today has to choose between a free POS-bolted loyalty plugin (transactional, no community) and a $300/mo marketing tool (overkill, no community), with nothing in between that treats their regulars as a community to cultivate.
 
@@ -54,17 +54,17 @@ Buyer pains today:
 - Will engage with the brand if there's something to engage with: behind-the-scenes content, challenges, polls about the next menu, RSVP-only events.
 - Will pay for premium membership if it actually unlocks status (best table, member-only menu, early access to drops, badge flair).
 
-This is the same psychology as a music fan — and we already know how to build for it.
+This is the same psychology as a music member — and we already know how to build for it.
 
 ---
 
 ## 3. Differentiation
 
-Fan Engage's architecture gives us three angles competitors don't have:
+Member Engage's architecture gives us three angles competitors don't have:
 
 1. **Community-first loyalty** — posts, polls, challenges, comments, reactions all live in the brand's "club" page. Members talk to each other and to the brand. No competitor in the loyalty category does this depth of social. (The closest analog is Patreon, but Patreon is creator-focused; loyalty platforms are membership-card-focused; nobody owns the SMB community-loyalty intersection.)
 
-2. **Engagement-earned status, not just spend** — bronze → silver → gold → platinum tiers can be earned through points, *and points can be earned through engagement*: posting a photo of your meal (+5 pts), voting in a poll about the next special (+1 pt), completing a challenge ("post a selfie at all 4 game days this season" → +50 pts and a "Diehard" badge), RSVP'ing to a tasting (+10 pts). This makes status feel earned by being a real fan, not just by having money.
+2. **Engagement-earned status, not just spend** — bronze → silver → gold → platinum tiers can be earned through points, *and points can be earned through engagement*: posting a photo of your meal (+5 pts), voting in a poll about the next special (+1 pt), completing a challenge ("post a selfie at all 4 game days this season" → +50 pts and a "Diehard" badge), RSVP'ing to a tasting (+10 pts). This makes status feel earned by being a real member, not just by having money.
 
 3. **Multi-vertical from one codebase** — most competitors are single-vertical. We can serve a hotel that owns a restaurant that owns a merch store under one consumer app, with one consumer login. Cross-brand discovery becomes a feature ("members at La Casita also love Brewers Coffee").
 
@@ -131,9 +131,9 @@ Three surfaces:
 `https://app.[name].com/` — single consumer login, discover and join many brands.
 
 - **/discover** — browse/search brands by location and category. "Restaurants near me," "Coffee shops," "Sports clubs."
-- **/brands/[slug]** — brand profile page (the equivalent of today's `/artists/[slug]`). Shows brand bio, hours, location, upcoming specials, current member challenges, photo wall, member tier ladder, "Join the club" CTA.
+- **/brands/[slug]** — brand profile page (the equivalent of today's `/brands/[slug]`). Shows brand bio, hours, location, upcoming specials, current member challenges, photo wall, member tier ladder, "Join the club" CTA.
 - **/brands/[slug]/community** — social feed for members of this brand. Posts from the brand, posts from fellow members, polls, challenges. Same component as today's community page.
-- **/** (Fan Home equivalent) — "My clubs" — lists all the brands the user has joined, their tier in each, upcoming specials/events from those brands, recent activity, badges in progress, total points across the network.
+- **/** (Member Home equivalent) — "My clubs" — lists all the brands the user has joined, their tier in each, upcoming specials/events from those brands, recent activity, badges in progress, total points across the network.
 - **/rewards** — cross-brand redemption catalog (later) or per-brand redemption pages (V1).
 
 ### 6b. Brand admin dashboard
@@ -142,16 +142,16 @@ Three surfaces:
 
 - **Brand profile editor** — name, tagline, hero image, hours, location, social links, accent colors, category.
 - **Specials manager** — create/edit time-windowed specials ("2-for-1 Tuesdays," "Happy Hour 5-7 PM," "Free dessert with entree this week"). Each special has a window, a description, optional image, and a redemption mechanism (member shows code at register).
-- **Events manager** — same as today's Fan Engage event tool: create RSVP-able events, set capacity, attach to a date/time, get reminders fired automatically.
+- **Events manager** — same as today's Member Engage event tool: create RSVP-able events, set capacity, attach to a date/time, get reminders fired automatically.
 - **Community composer** — post / announcement / poll / challenge, with photo and optional video (we already have video support from migration 0022).
 - **Members list** — every customer who joined, sortable by tier, points, last activity. Click into each for their profile, history, redemption log.
-- **Rewards catalog** — define what members can redeem points for (free coffee = 50 pts, swag = 200 pts, "name on the wall" = 1000 pts, etc.). Same as Fan Engage's rewards system.
+- **Rewards catalog** — define what members can redeem points for (free coffee = 50 pts, swag = 200 pts, "name on the wall" = 1000 pts, etc.). Same as Member Engage's rewards system.
 - **Broadcast** — send a message to a segment (all members, gold+, opted-in for SMS, etc.). V1 supports email; SMS and per-segment in V2.
 - **Analytics** — basic engagement dashboard: member growth, points earned/redeemed, top specials, most active members.
 
 ### 6c. Brand onboarding self-serve
 
-The currently-admin-managed artist setup needs to become self-serve.
+The currently-admin-managed brand setup needs to become self-serve.
 
 - **/onboarding-brand** — wizard for new brands. Step 1: brand name, category, address. Step 2: photo + tagline. Step 3: pick a starter rewards catalog (templates per category). Step 4: invite team members. Step 5: paste a QR code link they can put on receipts/menus to grow membership.
 
@@ -182,7 +182,7 @@ Three tiers, designed to land on a freemium that's actually free (not hostile-tr
 
 ---
 
-## 8. Schema deltas from Fan Engage
+## 8. Schema deltas from Member Engage
 
 Most of the existing schema works as-is. The migrations that need explicit attention:
 
@@ -190,10 +190,10 @@ Most of the existing schema works as-is. The migrations that need explicit atten
 
 | Today | Becomes | Notes |
 |---|---|---|
-| `artists` | `brands` | Rename + new columns: `category` (enum: restaurant/retail/sports/hotel), `address`, `lat`, `lng`, `hours_json`, `cuisine_or_subcategory`, `phone`. |
-| `artist_events` | `brand_events` | Same shape. |
-| `fan_artist_following` | `fan_brand_following` | Rename. |
-| `fan_community_memberships` | `member_brand_memberships` (or keep) | Could keep as-is — the table is already brand-scoped via `community_id`. |
+| `brands` | `brands` | Rename + new columns: `category` (enum: restaurant/retail/sports/hotel), `address`, `lat`, `lng`, `hours_json`, `cuisine_or_subcategory`, `phone`. |
+| `brand_events` | `brand_events` | Same shape. |
+| `member_brand_following` | `member_brand_following` | Rename. |
+| `member_community_memberships` | `member_brand_memberships` (or keep) | Could keep as-is — the table is already brand-scoped via `community_id`. |
 | `community_posts` | `member_posts` (or keep) | Same — already scoped by `community_id`. |
 | `rewards_catalog` | `rewards_catalog` | Keep. |
 | _(new)_ `brand_locations` | _(new)_ | One brand → many locations in V2. V1 ignores this and treats `brands.address` as the single location. |
@@ -203,12 +203,12 @@ Most of the existing schema works as-is. The migrations that need explicit atten
 
 A find-and-replace pass across the codebase:
 
-- `fan` → `member`
-- `fans` → `members`
-- `artist` → `brand`
-- `artists` → `brands`
+- `member` → `member`
+- `members` → `members`
+- `brand` → `brand`
+- `brands` → `brands`
 - `community` → `club` (only in user-facing copy; database stays `community_id` for back-compat)
-- `Fan Engage` → new product name throughout
+- `Member Engage` → new product name throughout
 - `RaeLynn community` → `[Brand] club`
 
 Database column names mostly stay (less disruptive). UI strings change everywhere.
@@ -216,7 +216,7 @@ Database column names mostly stay (less disruptive). UI strings change everywher
 ### New environment
 
 - New Supabase project (separate DB, separate auth, separate storage buckets).
-- New Vercel project + domain (separate from Fan Engage).
+- New Vercel project + domain (separate from Member Engage).
 - New Stripe account or Stripe Connect platform setup.
 - Mailchimp can stay one account but use a separate audience.
 - Twilio: new messaging service for SMS in this product, especially since 10DLC registration is brand-by-brand.
@@ -246,13 +246,13 @@ Database column names mostly stay (less disruptive). UI strings change everywher
 
 ### Phase 1 — Clone + rename (Weeks 2–3)
 
-- Fork `Superfan-platform` repo to a new repo.
-- Run the find-and-replace rename pass (artist → brand, fan → member, etc.) — automated where possible.
-- Rename `artists` → `brands`, add the category-specific columns.
+- Fork `Supermember-platform` repo to a new repo.
+- Run the find-and-replace rename pass (brand → brand, member → member, etc.) — automated where possible.
+- Rename `brands` → `brands`, add the category-specific columns.
 - Drop the music-specific seed data (RaeLynn, Danger Twins, etc.).
 - Spin up a new Supabase project, apply all migrations clean (including 0023's signup fix from yesterday).
 - Spin up new Vercel project on the new domain.
-- First build green, fan home loads as "member home," admin loads as "brand admin."
+- First build green, member home loads as "member home," admin loads as "brand admin."
 
 ### Phase 2 — MVP feature set (Weeks 4–7)
 
@@ -328,8 +328,8 @@ In rough priority order:
 4. **Free tier member cap — is 50 the right number?** Could be 100, could be 25. Lower forces conversion sooner; higher attracts more long-tail brands.
 5. **Pricing currency strategy** — start USD only or include CAD/EUR/GBP from day 1? Stripe handles multi-currency cleanly.
 6. **Verifying brand identity on signup** — anti-spoof. Self-serve means anyone can claim a brand page. Need a verification flow ("send proof of business address" or "verify via Google My Business" or "manual review by us") to avoid impersonation.
-7. **Consumer profile uniqueness** — same email signed in to multiple brands' clubs? Yes (the marketplace model is one consumer login → many brands). The fan_community_memberships pattern already handles this.
-8. **Data ownership and exit** — if a brand cancels Pro, do they get to export their member list? (Should be yes — common SaaS expectation.) What about consumers — can they delete their data per CCPA/GDPR? (Already partially handled in Fan Engage; need to formalize.)
+7. **Consumer profile uniqueness** — same email signed in to multiple brands' clubs? Yes (the marketplace model is one consumer login → many brands). The member_community_memberships pattern already handles this.
+8. **Data ownership and exit** — if a brand cancels Pro, do they get to export their member list? (Should be yes — common SaaS expectation.) What about consumers — can they delete their data per CCPA/GDPR? (Already partially handled in Member Engage; need to formalize.)
 9. **Content moderation** — when consumers post in a brand's club, who moderates? V1 = brand admin moderates their own. V2 = ML-based pre-flagging. Need T&Cs that make this clear.
 10. **Geographic launch** — US-only V1 (10DLC, Stripe US, Twilio US). International is V2.
 
@@ -352,7 +352,7 @@ A few directions to consider, with rationale:
 | **Insider language** | Insidr, Inner Circle, Inside Track, Insiders Co, Backstage, Greenroom | Plays to "feel like a regular." Risk: feels exclusive in a way that might alienate the long tail. |
 | **Loyalty / club** | Clubhaus, Stamp Club, Loyal, The Regulars, House Members | Direct. Tells you what it is. Slight risk of feeling generic. |
 | **Community + perks** | Patron, Patrons, Cohort, Founders, Familia | Warm. "Patron" is taken (Patreon, Patron tequila); needs a twist. |
-| **Verb / action** | Pulse, Tap, Mingle, Reverb, Engage | Energetic. "Engage" already used in Fan Engage so might be confusing internally. |
+| **Verb / action** | Pulse, Tap, Mingle, Reverb, Engage | Energetic. "Engage" already used in Member Engage so might be confusing internally. |
 | **Coined / abstract** | Membra, Loomly, Crowely, Knotch, Folio | Brandable, harder to evaluate without testing. |
 | **Geographic / locality** | Hometown, Mainstreet, Local League, Block, Neighborhood | Plays to the SMB-local angle. |
 
@@ -366,7 +366,7 @@ Wildcards worth a few minutes' thought:
 
 - **"Regulars"** — describes exactly who this is for.
 - **"Patron"** — high TM risk but conceptually pure.
-- **"Backstage"** — leverages your music heritage for a soft brand bridge from Fan Engage.
+- **"Backstage"** — leverages your music heritage for a soft brand bridge from Member Engage.
 - **"The Hub"** — generic but works.
 
 Suggest doing a 30-minute trademark check on the top 3 (USPTO TESS database) and a domain availability sweep, then pick.
@@ -385,7 +385,7 @@ Suggest doing a 30-minute trademark check on the top 3 (USPTO TESS database) and
 | **Pricing too low for sustained growth** | Medium | Premium tier at $149 gives upgrade path; SMS metering, Connect cuts, sponsored campaigns are revenue-stacks-on-top. |
 | **Brand impersonation / trademark abuse** | Medium | Verification step at signup (proof of business). Takedown flow for trademark holders. |
 | **Building four verticals diffuses focus** | High (if not careful) | V1 = restaurants only, full stop. Other verticals only after restaurant economics prove out. |
-| **Competing with Fan Engage for engineering attention** | Real | Plan for it: hire / contract dedicated engineering before serious build. Fan Engage is pre-launch and can't afford parallel-track distraction without help. |
+| **Competing with Member Engage for engineering attention** | Real | Plan for it: hire / contract dedicated engineering before serious build. Member Engage is pre-launch and can't afford parallel-track distraction without help. |
 
 ---
 
@@ -395,8 +395,8 @@ Suggest doing a 30-minute trademark check on the top 3 (USPTO TESS database) and
 
 1. **Decide on the name within 1 week.** I'd test "Inner Circle," "Clubhaus," and "Loyal" with 5–10 of your target restaurant owners — text them and ask which one they'd be more likely to sign up for.
 2. **Spec walkthrough + sign-off** with the team (Carla, Raymond, Paul, George) once they've read this doc. Capture their challenges and revisions in v2.
-3. **Hire or contract one mid-senior full-stack engineer** focused on this product, working from this spec, for the 13-week V1 build. Fan Engage's launch can't share an engineering bench with a parallel build without slipping.
+3. **Hire or contract one mid-senior full-stack engineer** focused on this product, working from this spec, for the 13-week V1 build. Member Engage's launch can't share an engineering bench with a parallel build without slipping.
 
-If those three things are squared away, V1 is shippable in 90 days. The architecture work has already been done — Fan Engage is the de-risked starting point. The remaining work is rename, re-skin, add specials + multi-location-deferred, do self-serve brand signup, and find your first 10 paying customers.
+If those three things are squared away, V1 is shippable in 90 days. The architecture work has already been done — Member Engage is the de-risked starting point. The remaining work is rename, re-skin, add specials + multi-location-deferred, do self-serve brand signup, and find your first 10 paying customers.
 
 The angle is real. Community-first loyalty for SMB brands is a seat that's been open for years. Let's take it.

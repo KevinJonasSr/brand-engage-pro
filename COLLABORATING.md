@@ -1,14 +1,14 @@
 # Brand Engage Pro — Collaborator Guide
 
-Welcome. This is the working manual for engineers contributing to the Brand Engage Pro / Superfan Platform. It covers what the project is, how to get access, how to run the code locally, and the conventions we follow. Treat this as a living doc — update it whenever a setup step or convention changes.
+Welcome. This is the working manual for engineers contributing to the Brand Engage Pro / Supermember Platform. It covers what the project is, how to get access, how to run the code locally, and the conventions we follow. Treat this as a living doc — update it whenever a setup step or convention changes.
 
 ---
 
 ## What this is
 
-Brand Engage Pro is the multi-tenant fan-club platform powering Jonas Group artist communities. Today it serves:
+Brand Engage Pro is the multi-tenant member-club platform powering Jonas Group brand communities. Today it serves:
 
-- **RaeLynn** (live community, real fans, real Stripe subscriptions in test mode)
+- **RaeLynn** (live community, real members, real Stripe subscriptions in test mode)
 - **Danger Twins**, **Dan Marshall**, **Hunter Hawkins** (activated, content + heroes still being filled in)
 
 It's pre-public-launch. The single source of truth for what's done and what's left is `LAUNCH_CHECKLIST.md` at the repo root — read that before anything else.
@@ -18,7 +18,7 @@ It's pre-public-launch. The single source of truth for what's done and what's le
 - Public app: <https://brand-engage-pro.vercel.app/>
 - Admin: <https://brand-engage-pro.vercel.app/admin> (HTTP Basic Auth + email allowlist)
 - GitHub repo: <https://github.com/KevinJonasSr/brand-engage-pro>
-- Vercel project: <https://vercel.com/jonas-group/fan-engage>
+- Vercel project: <https://vercel.com/jonas-group/member-engage>
 - Supabase project: <https://supabase.com/dashboard/project/uhovonrljcauaoctypbg>
 
 ---
@@ -30,7 +30,7 @@ Walk through these before writing any code. Kevin (kevinjonassr@gmail.com) grant
 | # | Platform | What you need | How |
 |---|---|---|---|
 | 1 | **GitHub** | Push access to `KevinJonasSr/brand-engage-pro` (full collaborator) | Kevin → Repo → Settings → Collaborators → Add collaborator → your GitHub username → Write role |
-| 2 | **Vercel** | Member of the `jonas-group` team with access to the `fan-engage` project | Kevin → Vercel Dashboard → jonas-group → Settings → Members → Invite Member → your email |
+| 2 | **Vercel** | Member of the `jonas-group` team with access to the `member-engage` project | Kevin → Vercel Dashboard → jonas-group → Settings → Members → Invite Member → your email |
 | 3 | **Supabase** | Member of `KevinJonasSr's Org` with access to the `Brand Engage Pro` project | Kevin → Supabase Dashboard → Organization → Team → Invite member → your email → Developer role |
 | 4 | **Stripe (test)** | Optional — only if you'll work on subscriptions / webhooks | Kevin → Stripe Dashboard → Settings → Team → Invite member |
 | 5 | **Mailchimp** | Optional — only if you'll work on email campaigns | Kevin → Mailchimp → Account → Users → Invite user |
@@ -62,13 +62,13 @@ brand-engage-pro/
 ├── frontend/                    Next.js app (the only app right now)
 │   ├── app/                     Routes (App Router)
 │   │   ├── admin/               Admin surfaces (gated by ADMIN_EMAILS + Basic Auth)
-│   │   ├── artists/[slug]/      Public artist pages, community, events, rewards, founders
+│   │   ├── brands/[slug]/      Public brand pages, community, events, rewards, founders
 │   │   ├── api/                 Route handlers (cron, twilio webhook, stripe webhook, upload)
 │   │   ├── onboarding/          Profile creation flow
-│   │   └── page.tsx             Fan Home (the / route)
-│   ├── components/              Shared components (FanHomeDashboard, PremiumPaywall, etc.)
+│   │   └── page.tsx             Member Home (the / route)
+│   ├── components/              Shared components (MemberHomeDashboard, PremiumPaywall, etc.)
 │   ├── lib/                     Server-side data layer + helpers
-│   │   ├── data/                One file per domain: artists, fan, fan-home, events, etc.
+│   │   ├── data/                One file per domain: brands, member, member-home, events, etc.
 │   │   ├── supabase/            Server + admin client factories
 │   │   ├── use-form-save.tsx    Retry-on-503 hook (read this!)
 │   │   ├── reminders.ts         Event reminder send logic
@@ -105,7 +105,7 @@ cd brand-engage-pro/frontend
 npm install
 
 # 3. Create .env.local — copy values from Vercel
-#    Dashboard → fan-engage → Settings → Environment Variables → reveal each
+#    Dashboard → member-engage → Settings → Environment Variables → reveal each
 cp .env.example .env.local   # if there's a template; otherwise create it
 # Fill in the values listed in the next section
 
@@ -150,7 +150,7 @@ To grab them quickly: Vercel project → Settings → Environment Variables → 
 We use conventional commits where they help:
 
 ```
-feat(fan-home): broaden upcoming-events query
+feat(member-home): broaden upcoming-events query
 fix(admin/events): EditEventForm now refreshes after save
 docs: bump checklist for Phase 8 work
 ```
@@ -240,7 +240,7 @@ Use the `<ModerationButton>` wrapper at `frontend/app/admin/community/moderation
 
 ### Multi-tenancy
 
-Every fan-scoped table has a `community_id text not null default 'raelynn'` column (added in `0011_multi_tenant.sql`). When inserting new rows, include `community_id`. When querying, filter by it. Right now `community_id` always equals `artist_slug` for tenant rows, but they're separate columns by design.
+Every member-scoped table has a `community_id text not null default 'raelynn'` column (added in `0011_multi_tenant.sql`). When inserting new rows, include `community_id`. When querying, filter by it. Right now `community_id` always equals `brand_slug` for tenant rows, but they're separate columns by design.
 
 ### Image uploads
 
@@ -259,12 +259,12 @@ Every fan-scoped table has a `community_id text not null default 'raelynn'` colu
 | `LAUNCH_CHECKLIST.md` | Source of truth for launch state. Update when you ship. |
 | `frontend/lib/use-form-save.tsx` | Retry-on-503 hook for Server Action POSTs. |
 | `frontend/app/admin/community/moderation-button.tsx` | Reusable typed-arg click action. |
-| `frontend/lib/data/fan-home.ts` | The whole `/` data layer in one file. |
-| `frontend/lib/data/artists.ts` | Artist + events queries used across public + admin. |
+| `frontend/lib/data/member-home.ts` | The whole `/` data layer in one file. |
+| `frontend/lib/data/brands.ts` | Brand + events queries used across public + admin. |
 | `frontend/lib/reminders.ts` | Reminder send logic invoked by the cron. |
-| `frontend/app/admin/artists/[slug]/page.tsx` | Reference example of admin CRUD with EditableEventRow + CreateEventForm. |
+| `frontend/app/admin/brands/[slug]/page.tsx` | Reference example of admin CRUD with EditableEventRow + CreateEventForm. |
 | `supabase/migrations/0011_multi_tenant.sql` | The community_id model — read before touching schema. |
-| `supabase/migrations/0015_premium_gating.sql` | `community_posts.visibility` + `artist_events.tier`. |
+| `supabase/migrations/0015_premium_gating.sql` | `community_posts.visibility` + `brand_events.tier`. |
 
 ---
 
@@ -273,7 +273,7 @@ Every fan-scoped table has a `community_id text not null default 'raelynn'` colu
 - **Cold-start 503s on Server Action POSTs** — mitigated by `useFormSave`, but root cause still open (see Observability in `LAUNCH_CHECKLIST.md`). Symptom: form looks like it saved but the data wasn't persisted.
 - **Image upload limit is really 4 MB**, not 8 MB — Vercel rejects bodies >4.5 MB before the function runs. The `/api/upload` cap of 8 MB is moot.
 - **Datetime-local inputs don't carry timezone** — see code conventions above.
-- **`active=false` events still show in admin** — set the flag to hide from the public artist page without deleting (the public query filters; the admin query doesn't).
+- **`active=false` events still show in admin** — set the flag to hide from the public brand page without deleting (the public query filters; the admin query doesn't).
 - **Migrations are run by hand** in the Supabase SQL Editor. There's no migration runner. If you add a migration file, ship the file in a commit AND apply it manually before any code that depends on it goes live.
 - **Bandsintown affiliate links get stripped** by the security filter in our test environment. Real ticket URLs work in production fetches.
 
@@ -285,7 +285,7 @@ Pick something small to get the workflow muscle memory:
 
 1. Read `LAUNCH_CHECKLIST.md` end to end. ~10 min.
 2. Run the app locally and sign in with your jonasgroup.com email (you should land in `/admin` thanks to the allowlist).
-3. Pick an item from the **Save reliability — useFormSave hook rollout** section's "Remaining unprotected" list and apply the pattern. Each is ~30 minutes once you've seen one example. Reference: any of the `useFormSave`-using forms (e.g. `frontend/app/admin/artists/[slug]/edit-form.tsx`).
+3. Pick an item from the **Save reliability — useFormSave hook rollout** section's "Remaining unprotected" list and apply the pattern. Each is ~30 minutes once you've seen one example. Reference: any of the `useFormSave`-using forms (e.g. `frontend/app/admin/brands/[slug]/edit-form.tsx`).
 4. Or pick a **Nice-to-have** item — they're all scoped and have rough estimates.
 
 ---

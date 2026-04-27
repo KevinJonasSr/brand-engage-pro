@@ -97,7 +97,7 @@ export async function POST(request: Request) {
 
   try {
     const product = await stripe.products.create({
-      name: `${community.display_name} — Premium Fan Club`,
+      name: `${community.display_name} — Premium Member Club`,
       description:
         community.tagline ??
         `Premium membership for ${community.display_name}.`,

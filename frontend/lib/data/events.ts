@@ -3,7 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export interface EventRow {
   id: string;
-  artist_slug: string;
+  brand_slug: string;
   title: string;
   detail: string | null;
   event_date: string | null;
@@ -17,11 +17,11 @@ export interface EventRow {
   active: boolean;
 }
 
-/** Single event with RSVP count + whether the current fan has RSVPed. */
+/** Single event with RSVP count + whether the current member has RSVPed. */
 export interface EventWithRsvp extends EventRow {
   rsvp_count: number;
   rsvp_by_me: boolean;
-  artist_name?: string | null;
+  brand_name?: string | null;
 }
 
 export async function getEventById(eventId: string): Promise<EventWithRsvp | null> {
@@ -31,9 +31,9 @@ export async function getEventById(eventId: string): Promise<EventWithRsvp | nul
 
     const [{ data: event }, { count }] = await Promise.all([
       supabase
-        .from("artist_events")
+        .from("brand_events")
         .select(
-          "id, artist_slug, title, detail, event_date, url, location, image_url, capacity, starts_at, ends_at, sort_order, active",
+          "id, brand_slug, title, detail, event_date, url, location, image_url, capacity, starts_at, ends_at, sort_order, active",
         )
         .eq("id", eventId)
         .maybeSingle(),
@@ -44,13 +44,13 @@ export async function getEventById(eventId: string): Promise<EventWithRsvp | nul
     ]);
     if (!event) return null;
 
-    const [{ data: artist }, {
+    const [{ data: brand }, {
       data: { user },
     }] = await Promise.all([
       supabase
-        .from("artists")
+        .from("brands")
         .select("name")
-        .eq("slug", event.artist_slug as string)
+        .eq("slug", event.brand_slug as string)
         .maybeSingle(),
       supabase.auth.getUser(),
     ]);
@@ -61,7 +61,7 @@ export async function getEventById(eventId: string): Promise<EventWithRsvp | nul
         .from("event_rsvps")
         .select("event_id")
         .eq("event_id", eventId)
-        .eq("fan_id", user.id)
+        .eq("member_id", user.id)
         .maybeSingle();
       rsvpByMe = data !== null;
     }
@@ -70,14 +70,14 @@ export async function getEventById(eventId: string): Promise<EventWithRsvp | nul
       ...(event as EventRow),
       rsvp_count: count ?? 0,
       rsvp_by_me: rsvpByMe,
-      artist_name: (artist?.name as string | null) ?? null,
+      brand_name: (brand?.name as string | null) ?? null,
     };
   } catch {
     return null;
   }
 }
 
-/** RSVP counts + fan's own RSVP status for a set of events (artist page). */
+/** RSVP counts + member's own RSVP status for a set of events (brand page). */
 export async function getRsvpMetaForEvents(eventIds: string[]): Promise<{
   counts: Map<string, number>;
   mine: Set<string>;
@@ -101,7 +101,7 @@ export async function getRsvpMetaForEvents(eventIds: string[]): Promise<{
           .from("event_rsvps")
           .select("event_id")
           .in("event_id", eventIds)
-          .eq("fan_id", user.id);
+          .eq("member_id", user.id);
       })(),
     ]);
 
@@ -118,34 +118,34 @@ export async function getRsvpMetaForEvents(eventIds: string[]): Promise<{
   return { counts, mine };
 }
 
-/** Admin-scoped: list every RSVP for an event with fan info. */
+/** Admin-scoped: list every RSVP for an event with member info. */
 export async function listRsvpsForEvent(eventId: string) {
   const admin = createAdminClient();
   const { data: rsvps } = await admin
     .from("event_rsvps")
-    .select("fan_id, rsvp_at")
+    .select("member_id, rsvp_at")
     .eq("event_id", eventId)
     .order("rsvp_at", { ascending: false });
   if (!rsvps || rsvps.length === 0) return [];
 
-  const fanIds = rsvps.map((r) => r.fan_id as string);
-  const { data: fans } = await admin
-    .from("fans")
+  const memberIds = rsvps.map((r) => r.member_id as string);
+  const { data: members } = await admin
+    .from("members")
     .select("id, first_name, email, avatar_url")
-    .in("id", fanIds);
-  const byId = new Map((fans ?? []).map((f) => [f.id as string, f]));
+    .in("id", memberIds);
+  const byId = new Map((members ?? []).map((f) => [f.id as string, f]));
   return rsvps.map((r) => ({
-    fan_id: r.fan_id as string,
+    member_id: r.member_id as string,
     rsvp_at: r.rsvp_at as string,
-    fan: byId.get(r.fan_id as string) ?? null,
+    member: byId.get(r.member_id as string) ?? null,
   }));
 }
 
 /** Generate an iCalendar VEVENT payload for an event. */
-export function buildIcs(event: EventRow & { artist_name?: string | null }): string {
+export function buildIcs(event: EventRow & { brand_name?: string | null }): string {
   const now = new Date();
   const dtstamp = icsDate(now);
-  const uid = `${event.id}@fan-engage.app`;
+  const uid = `${event.id}@member-engage.app`;
 
   // Prefer starts_at if set; otherwise fall back to event_date treated as
   // a free-form string so the calendar still has useful context.
@@ -168,7 +168,7 @@ export function buildIcs(event: EventRow & { artist_name?: string | null }): str
   lines.push(`SUMMARY:${icsEscape(event.title)}`);
   if (event.location) lines.push(`LOCATION:${icsEscape(event.location)}`);
   const description = [
-    event.artist_name ? `${event.artist_name}` : null,
+    event.brand_name ? `${event.brand_name}` : null,
     event.detail ?? null,
     event.url ? `More info: ${event.url}` : null,
     !start && event.event_date ? `When: ${event.event_date}` : null,

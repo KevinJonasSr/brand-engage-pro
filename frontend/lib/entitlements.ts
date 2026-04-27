@@ -3,7 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
  * Subscription tier states we recognize. Mirrors the enum space of
- * fan_community_memberships.subscription_tier.
+ * member_community_memberships.subscription_tier.
  */
 export type SubscriptionTier =
   | "free"
@@ -13,7 +13,7 @@ export type SubscriptionTier =
   | "cancelled";
 
 export interface MembershipEntitlement {
-  fanId: string;
+  memberId: string;
   communityId: string;
   tier: SubscriptionTier;
   isPremium: boolean;
@@ -40,19 +40,19 @@ export function isPremiumTier(
  * Fetch the current viewer's entitlement for a specific community. Returns
  * null if signed out, or if no membership row exists. Uses the admin
  * client so RLS doesn't interfere — entitlement checks MUST be exhaustive
- * across all fans/communities regardless of RLS scoping.
+ * across all members/communities regardless of RLS scoping.
  */
 export async function getEntitlement(
-  fanId: string,
+  memberId: string,
   communityId: string,
 ): Promise<MembershipEntitlement | null> {
   const admin = createAdminClient();
   const { data } = await admin
-    .from("fan_community_memberships")
+    .from("member_community_memberships")
     .select(
-      "fan_id, community_id, subscription_tier, is_founder, founder_number, current_period_end, cancel_at_period_end, monthly_credit_cents, billing_period",
+      "member_id, community_id, subscription_tier, is_founder, founder_number, current_period_end, cancel_at_period_end, monthly_credit_cents, billing_period",
     )
-    .eq("fan_id", fanId)
+    .eq("member_id", memberId)
     .eq("community_id", communityId)
     .maybeSingle();
 
@@ -60,7 +60,7 @@ export async function getEntitlement(
 
   const tier = (data.subscription_tier as SubscriptionTier | null) ?? "free";
   return {
-    fanId: data.fan_id as string,
+    memberId: data.member_id as string,
     communityId: data.community_id as string,
     tier,
     isPremium: isPremiumTier(tier),

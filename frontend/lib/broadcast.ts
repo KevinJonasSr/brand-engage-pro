@@ -1,8 +1,8 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
- * Campaign broadcast helpers — send a single email or SMS blast to every fan
- * of an artist (or every fan globally) who has opted in via the matching
+ * Campaign broadcast helpers — send a single email or SMS blast to every member
+ * of an brand (or every member globally) who has opted in via the matching
  * channel. Safe to call from server actions and API routes.
  */
 
@@ -10,12 +10,12 @@ export type BroadcastResult = {
   attempted: number;
   sent: number;
   failed: number;
-  recipients: number; // how many fans matched before any send
+  recipients: number; // how many members matched before any send
   error?: string;
 };
 
 async function loadRecipients(opts: {
-  artistSlug?: string | null;
+  brandSlug?: string | null;
   eventId?: string | null;
   channel: "email" | "sms";
 }) {
@@ -24,29 +24,29 @@ async function loadRecipients(opts: {
   const contactColumn = opts.channel === "email" ? "email" : "phone";
 
   // Audience precedence (most specific wins):
-  //   eventId  → fans who RSVPed to this event (for reminder blasts)
-  //   artist   → fans who follow that artist
-  //   (none)   → every opted-in fan (platform-wide announcement)
+  //   eventId  → members who RSVPed to this event (for reminder blasts)
+  //   brand   → members who follow that brand
+  //   (none)   → every opted-in member (platform-wide announcement)
   let scopedIds: string[] | null = null;
 
   if (opts.eventId) {
     const { data } = await admin
       .from("event_rsvps")
-      .select("fan_id")
+      .select("member_id")
       .eq("event_id", opts.eventId);
-    scopedIds = (data ?? []).map((r) => r.fan_id as string);
+    scopedIds = (data ?? []).map((r) => r.member_id as string);
     if (scopedIds.length === 0) return [];
-  } else if (opts.artistSlug) {
+  } else if (opts.brandSlug) {
     const { data } = await admin
-      .from("fan_artist_following")
-      .select("fan_id")
-      .eq("artist_slug", opts.artistSlug);
-    scopedIds = (data ?? []).map((f) => f.fan_id as string);
+      .from("member_brand_following")
+      .select("member_id")
+      .eq("brand_slug", opts.brandSlug);
+    scopedIds = (data ?? []).map((f) => f.member_id as string);
     if (scopedIds.length === 0) return [];
   }
 
   let query = admin
-    .from("fans")
+    .from("members")
     .select("id, first_name, email, phone, sms_opted_in, email_opted_in, suspended")
     .eq(optColumn, true)
     .eq("suspended", false)
@@ -65,10 +65,10 @@ async function loadRecipients(opts: {
   }>;
 }
 
-/** Send an SMS to every opted-in fan via Twilio. */
+/** Send an SMS to every opted-in member via Twilio. */
 export async function broadcastSms(params: {
   body: string;
-  artistSlug?: string | null;
+  brandSlug?: string | null;
   eventId?: string | null;
 }): Promise<BroadcastResult> {
   const result: BroadcastResult = { attempted: 0, sent: 0, failed: 0, recipients: 0 };
@@ -82,7 +82,7 @@ export async function broadcastSms(params: {
   }
 
   const recipients = await loadRecipients({
-    artistSlug: params.artistSlug,
+    brandSlug: params.brandSlug,
     eventId: params.eventId,
     channel: "sms",
   });
@@ -98,12 +98,12 @@ export async function broadcastSms(params: {
   const smsBody =
     params.body + (params.body.toUpperCase().includes("STOP") ? "" : " Reply STOP to opt out.");
 
-  for (const fan of recipients) {
-    if (!fan.phone) continue;
+  for (const member of recipients) {
+    if (!member.phone) continue;
     result.attempted += 1;
     try {
       await client.messages.create({
-        to: fan.phone,
+        to: member.phone,
         body: smsBody,
         ...(messagingServiceSid
           ? { messagingServiceSid }
@@ -111,7 +111,7 @@ export async function broadcastSms(params: {
       });
       result.sent += 1;
     } catch (err) {
-      console.error("broadcastSms: send failed for", fan.id, err);
+      console.error("broadcastSms: send failed for", member.id, err);
       result.failed += 1;
     }
     // Throttle to stay under Twilio trial rate limits (1 msg/sec).
@@ -126,7 +126,7 @@ export async function broadcastSms(params: {
  * regular campaign against the configured audience, sets plain-text + html
  * content, and fires it immediately.
  *
- * Note: this sends to every audience member (not just fans who logged in
+ * Note: this sends to every audience member (not just members who logged in
  * via the app), since Mailchimp segments are owned on their side. For
  * app-only targeting we'd need a Mailchimp interest/group or tag-based
  * segment — wire-up deferred to a future phase.
@@ -161,7 +161,7 @@ export async function broadcastEmail(params: {
           subject_line: params.subject,
           title: `Brand Engage Pro — ${params.subject}`.slice(0, 100),
           from_name: params.fromName ?? "Brand Engage Pro",
-          reply_to: params.replyTo ?? "no-reply@fanengage.app",
+          reply_to: params.replyTo ?? "no-reply@memberengage.app",
           preview_text: params.subject,
         },
       }),

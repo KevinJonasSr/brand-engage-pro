@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 
 /**
  * Mark a single notification read. Uses the user-scoped client so RLS enforces
- * that fans can only touch their own rows — no extra check needed here.
+ * that members can only touch their own rows — no extra check needed here.
  *
  * If the form submits a `redirect_to` value, we follow the deep link after
  * marking read. Otherwise we just revalidate the inbox.
@@ -37,7 +37,7 @@ export async function markNotificationReadAction(formData: FormData) {
 }
 
 /**
- * Mark all unread notifications read for the signed-in fan.
+ * Mark all unread notifications read for the signed-in member.
  * Returns void so it can be used directly as a server-action form action.
  */
 export async function markAllReadAction() {
@@ -50,7 +50,7 @@ export async function markAllReadAction() {
   await supabase
     .from("notifications")
     .update({ read_at: new Date().toISOString() })
-    .eq("fan_id", user.id)
+    .eq("member_id", user.id)
     .is("read_at", null);
 
   revalidatePath("/inbox");

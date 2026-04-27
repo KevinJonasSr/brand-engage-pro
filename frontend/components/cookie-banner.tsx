@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSyncExternalStore, useState } from "react";
 
-const STORAGE_KEY = "fanengage_cookie_consent";
+const STORAGE_KEY = "memberengage_cookie_consent";
 
 // Read-only external store: any tab can dismiss via the button below; we
 // return the stored string (or null) and let the component decide what to

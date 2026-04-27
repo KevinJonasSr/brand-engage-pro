@@ -4,26 +4,26 @@
 -- Apply via: Supabase dashboard → SQL Editor → paste → Run.
 -- ────────────────────────────────────────────────────────────────────────────
 
--- ─── Expand artist_events with real event metadata ─────────────────────────
-alter table public.artist_events
+-- ─── Expand brand_events with real event metadata ─────────────────────────
+alter table public.brand_events
   add column if not exists capacity    integer,
   add column if not exists starts_at   timestamptz,
   add column if not exists ends_at     timestamptz,
   add column if not exists location    text,
   add column if not exists image_url   text;
 
-create index if not exists artist_events_starts_at_idx
-  on public.artist_events (starts_at);
+create index if not exists brand_events_starts_at_idx
+  on public.brand_events (starts_at);
 
--- ─── event_rsvps (one row per fan per event) ───────────────────────────────
+-- ─── event_rsvps (one row per member per event) ───────────────────────────────
 create table if not exists public.event_rsvps (
-  event_id   uuid not null references public.artist_events(id) on delete cascade,
-  fan_id     uuid not null references public.fans(id) on delete cascade,
+  event_id   uuid not null references public.brand_events(id) on delete cascade,
+  member_id     uuid not null references public.members(id) on delete cascade,
   rsvp_at    timestamptz not null default now(),
-  primary key (event_id, fan_id)
+  primary key (event_id, member_id)
 );
 
-create index if not exists event_rsvps_fan_idx on public.event_rsvps (fan_id, rsvp_at desc);
+create index if not exists event_rsvps_member_idx on public.event_rsvps (member_id, rsvp_at desc);
 create index if not exists event_rsvps_event_idx on public.event_rsvps (event_id);
 
 -- ─── Points on RSVP (+10 pts, idempotent via source_ref guard) ────────────
@@ -31,15 +31,15 @@ create or replace function public.award_event_rsvp_points()
 returns trigger language plpgsql security definer set search_path = public as $$
 declare
   award int := 10;
-  ref_id text := 'event_rsvp:' || new.event_id::text || ':' || new.fan_id::text;
+  ref_id text := 'event_rsvp:' || new.event_id::text || ':' || new.member_id::text;
 begin
   if not exists (select 1 from points_ledger where source_ref = ref_id) then
-    insert into points_ledger (fan_id, delta, source, source_ref, note)
-    values (new.fan_id, award, 'event_rsvp', ref_id, 'RSVPed to event');
+    insert into points_ledger (member_id, delta, source, source_ref, note)
+    values (new.member_id, award, 'event_rsvp', ref_id, 'RSVPed to event');
 
-    update fans
+    update members
       set total_points = coalesce(total_points, 0) + award
-    where id = new.fan_id;
+    where id = new.member_id;
   end if;
   return new;
 end $$;
@@ -56,7 +56,7 @@ declare
   v_capacity integer;
   v_current  integer;
 begin
-  select capacity into v_capacity from artist_events where id = new.event_id;
+  select capacity into v_capacity from brand_events where id = new.event_id;
   if v_capacity is null then return new; end if;  -- unlimited
 
   select count(*) into v_current from event_rsvps where event_id = new.event_id;
@@ -74,25 +74,25 @@ create trigger event_rsvps_enforce_capacity
 -- ─── Row Level Security ────────────────────────────────────────────────────
 alter table public.event_rsvps enable row level security;
 
--- Fan can read own RSVPs
+-- Member can read own RSVPs
 drop policy if exists event_rsvps_select_own on public.event_rsvps;
 create policy event_rsvps_select_own on public.event_rsvps
-  for select using (auth.uid() = fan_id);
+  for select using (auth.uid() = member_id);
 
--- Aggregate counts are public — but since the table has fan_id in it, we
+-- Aggregate counts are public — but since the table has member_id in it, we
 -- expose a view instead of a separate public policy. Counts are fetched
 -- via service-role admin client.
 
--- Fan can insert own RSVP
+-- Member can insert own RSVP
 drop policy if exists event_rsvps_insert_own on public.event_rsvps;
 create policy event_rsvps_insert_own on public.event_rsvps
-  for insert with check (auth.uid() = fan_id);
+  for insert with check (auth.uid() = member_id);
 
--- Fan can delete (un-RSVP) own row
+-- Member can delete (un-RSVP) own row
 drop policy if exists event_rsvps_delete_own on public.event_rsvps;
 create policy event_rsvps_delete_own on public.event_rsvps
-  for delete using (auth.uid() = fan_id);
+  for delete using (auth.uid() = member_id);
 
 -- ─── Smoke test ────────────────────────────────────────────────────────────
--- select id, title, capacity, starts_at from artist_events order by sort_order;
+-- select id, title, capacity, starts_at from brand_events order by sort_order;
 -- select count(*) from event_rsvps;

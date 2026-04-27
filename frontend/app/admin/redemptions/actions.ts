@@ -28,7 +28,7 @@ export async function markFulfilledAction(redemptionId: string, fulfillmentNote:
 
 export async function cancelRedemptionAction(
   redemptionId: string,
-  fanId: string,
+  memberId: string,
   pointCost: number
 ) {
   const ctx = await getAdminContext();
@@ -66,21 +66,21 @@ export async function cancelRedemptionAction(
 
   // Refund points: read current, then update (no race concern — refunds are
   // admin-triggered and low-volume).
-  const { data: currentFan } = await supabase
-    .from("fans")
+  const { data: currentMember } = await supabase
+    .from("members")
     .select("total_points")
-    .eq("id", fanId)
+    .eq("id", memberId)
     .maybeSingle();
-  const currentPoints = (currentFan?.total_points as number | null) ?? 0;
+  const currentPoints = (currentMember?.total_points as number | null) ?? 0;
   await supabase
-    .from("fans")
+    .from("members")
     .update({ total_points: currentPoints + pointCost })
-    .eq("id", fanId);
+    .eq("id", memberId);
 
   // Ledger entry for audit trail.
   await supabase.from("points_ledger").insert([
     {
-      fan_id: fanId,
+      member_id: memberId,
       delta: pointCost,
       source: "reward_redemption",
       source_ref: `redemption:${redemptionId}:refund`,

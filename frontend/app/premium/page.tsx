@@ -59,9 +59,9 @@ export default async function PremiumPage({
   let tier: string | null = null;
   if (user) {
     const { data: membership } = await admin
-      .from("fan_community_memberships")
+      .from("member_community_memberships")
       .select("subscription_tier")
-      .eq("fan_id", user.id)
+      .eq("member_id", user.id)
       .eq("community_id", communityId)
       .maybeSingle();
     tier = (membership?.subscription_tier as string | null) ?? null;
@@ -79,12 +79,12 @@ export default async function PremiumPage({
   );
 
   const perks = [
-    { icon: "🎙️", title: "Backstage feed", body: "Posts only Premium fans see — raw tour moments, works-in-progress, voice notes." },
+    { icon: "🎙️", title: "Backstage feed", body: "Posts only Premium members see — raw tour moments, works-in-progress, voice notes." },
     { icon: "🎟️", title: "Early ticket access", body: "First crack at tour tickets, limited by venue capacity." },
     { icon: "🎁", title: "Exclusive drops", body: "Premium-only signed merch, vinyl, limited runs." },
-    { icon: "💬", title: "Monthly AMA", body: "Live Q&A with the artist — ask anything." },
+    { icon: "💬", title: "Monthly AMA", body: "Live Q&A with the brand — ask anything." },
     { icon: "🏆", title: "Premium badges", body: "The full status ladder — Silver, Gold, Platinum, and event badges." },
-    { icon: "⚡", title: "1.5× points", body: "Every fan action earns 1.5× more toward rewards." },
+    { icon: "⚡", title: "1.5× points", body: "Every member action earns 1.5× more toward rewards." },
     { icon: "💸", title: "$5/mo store credit", body: "Refreshed monthly — spend on merch, events, or bank it up." },
     { icon: "🎧", title: "VIP parties", body: "Listening parties and soundchecks reserved for Premium." },
   ];
@@ -110,14 +110,14 @@ export default async function PremiumPage({
         )}
         {params.already_active && (
           <div className="mb-8 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
-            You&apos;re already a Premium fan of {community.display_name} —
+            You&apos;re already a Premium member of {community.display_name} —
             welcome back.
           </div>
         )}
 
         {/* Header */}
         <p className="text-xs uppercase tracking-widest text-white/50">
-          Premium Fan Club
+          Premium Member Club
         </p>
         <h1
           className="mt-3 text-4xl font-semibold md:text-5xl"
@@ -148,12 +148,12 @@ export default async function PremiumPage({
             }}
           >
             <span aria-hidden>🌟</span>
-            Founding Fan pricing — {founder.slotsRemaining} of {founder.founderCap} spots left. Lock in today&apos;s price forever.
+            Founding Member pricing — {founder.slotsRemaining} of {founder.founderCap} spots left. Lock in today&apos;s price forever.
           </div>
         )}
         {founder.isFull && (
           <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-white/55">
-            Founding Fan spots are full. Standard pricing applies — future
+            Founding Member spots are full. Standard pricing applies — future
             price increases won&apos;t affect existing subscribers on either
             plan.
           </div>
@@ -163,10 +163,10 @@ export default async function PremiumPage({
         {founder.founderCap > 0 && (
           <div className="mt-3">
             <Link
-              href={`/artists/${communityId}/founders`}
+              href={`/brands/${communityId}/founders`}
               className="text-xs text-white/60 hover:text-white/80 transition"
             >
-              See who&apos;s already a Founding Fan →
+              See who&apos;s already a Founding Member →
             </Link>
           </div>
         )}
@@ -288,7 +288,7 @@ export default async function PremiumPage({
           <p className="mt-4 text-sm text-white/60">
             You&apos;ll need to{" "}
             <Link href={`/onboarding?next=${encodeURIComponent("/premium")}`} className="underline hover:text-white">
-              create a fan profile
+              create a member profile
             </Link>{" "}
             or{" "}
             <Link href={`/login?next=${encodeURIComponent("/premium")}`} className="underline hover:text-white">

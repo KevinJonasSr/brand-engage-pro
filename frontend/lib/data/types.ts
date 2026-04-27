@@ -24,7 +24,7 @@ export interface Tier {
   sort_order: number;
 }
 
-export interface FanProfile {
+export interface MemberProfile {
   id: string;
   email: string | null;
   first_name: string | null;
@@ -45,7 +45,7 @@ export interface FanProfile {
 
 export type BadgeCategory = "welcome" | "referral" | "community" | "tier";
 
-export interface FanKpis {
+export interface MemberKpis {
   total_points: number;
   referral_count: number;
   badge_count: number;
@@ -94,7 +94,7 @@ export interface Referral {
 }
 
 export interface LeaderboardRow {
-  fan_id: string;
+  member_id: string;
   display_name: string;
   referral_count: number;
 }
@@ -107,7 +107,7 @@ export type CommunityPostVisibility = "public" | "premium";
 
 export interface CommunityPost {
   id: string;
-  artist_slug: string;
+  brand_slug: string;
   author_id: string;
   author_first_name: string | null;
   kind: CommunityPostKind;
@@ -120,7 +120,7 @@ export interface CommunityPost {
   visibility: CommunityPostVisibility;
   created_at: string;
   reaction_counts: Record<string, number>; // { "❤️": 3, "🔥": 2 }
-  my_reactions: string[]; // emoji list the current fan has already given
+  my_reactions: string[]; // emoji list the current member has already given
   comment_count: number;
 }
 
@@ -144,14 +144,14 @@ export interface PollOption {
 export interface PollData {
   options: PollOption[];
   total_votes: number;
-  my_option_id: string | null; // null if the current fan hasn't voted yet
+  my_option_id: string | null; // null if the current member hasn't voted yet
 }
 
 export interface ChallengeEntry {
   id: string;
   post_id: string;
-  fan_id: string;
-  fan_first_name: string | null;
+  member_id: string;
+  member_first_name: string | null;
   body: string | null;
   image_url: string | null;
   created_at: string;

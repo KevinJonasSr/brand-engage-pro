@@ -23,21 +23,21 @@ export default async function UnsubscribePage({
   if (token) {
     try {
       const admin = createAdminClient();
-      const { data: fan } = await admin
-        .from("fans")
+      const { data: member } = await admin
+        .from("members")
         .select("id, first_name")
         .eq("unsubscribe_token", token)
         .maybeSingle();
-      if (!fan) {
+      if (!member) {
         status = "not_found";
       } else {
         const update =
           ch === "sms"
             ? { sms_opted_in: false }
             : { email_opted_in: false };
-        await admin.from("fans").update(update).eq("id", fan.id);
+        await admin.from("members").update(update).eq("id", member.id);
         status = "ok";
-        firstName = (fan.first_name as string | null) ?? null;
+        firstName = (member.first_name as string | null) ?? null;
       }
     } catch {
       status = "error";
@@ -62,7 +62,7 @@ export default async function UnsubscribePage({
           <h1 className="text-2xl font-semibold">Link not recognized</h1>
           <p className="text-sm text-white/70">
             The unsubscribe token in this link doesn&apos;t match any account. If you&apos;re still
-            getting messages you don&apos;t want, email support@fanengage.app.
+            getting messages you don&apos;t want, email support@memberengage.app.
           </p>
         </>
       )}
@@ -71,7 +71,7 @@ export default async function UnsubscribePage({
           <h1 className="text-2xl font-semibold">Missing unsubscribe token</h1>
           <p className="text-sm text-white/70">
             Unsubscribe links in our emails include a token. Use the link in a recent email, or
-            email support@fanengage.app for help.
+            email support@memberengage.app for help.
           </p>
         </>
       )}
@@ -79,7 +79,7 @@ export default async function UnsubscribePage({
         <>
           <h1 className="text-2xl font-semibold">Something went wrong</h1>
           <p className="text-sm text-white/70">
-            Please try again in a moment, or email support@fanengage.app.
+            Please try again in a moment, or email support@memberengage.app.
           </p>
         </>
       )}
@@ -87,7 +87,7 @@ export default async function UnsubscribePage({
         href="/"
         className="mt-4 rounded-full border border-white/20 px-5 py-2 text-sm text-white/80 hover:bg-white/10"
       >
-        ← Fan Home
+        ← Member Home
       </Link>
     </main>
   );

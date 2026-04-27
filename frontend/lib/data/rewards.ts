@@ -19,7 +19,7 @@ export interface RewardRow {
 
 export interface RedemptionRow {
   id: string;
-  fan_id: string;
+  member_id: string;
   reward_id: string;
   community_id: string | null;
   point_cost: number;
@@ -56,21 +56,21 @@ export async function listRewardsForCommunity(communityId: string): Promise<Rewa
 }
 
 /**
- * List a fan's redemption history, newest first.
+ * List a member's redemption history, newest first.
  */
-export async function listMyRedemptions(fanId: string): Promise<RedemptionWithReward[]> {
+export async function listMyRedemptions(memberId: string): Promise<RedemptionWithReward[]> {
   try {
     const supabase = await createClient();
     const { data } = await supabase
       .from("reward_redemptions")
       .select(
         `
-        id, fan_id, reward_id, community_id, point_cost, status,
+        id, member_id, reward_id, community_id, point_cost, status,
         delivery_details, fulfillment_note, created_at, fulfilled_at, cancelled_at,
         reward:rewards_catalog(*)
         `
       )
-      .eq("fan_id", fanId)
+      .eq("member_id", memberId)
       .order("created_at", { ascending: false })
       .limit(50);
     // Supabase types the joined `reward` as an array by default, but it's
@@ -98,7 +98,7 @@ export async function listPendingRedemptions(communityId: string): Promise<Redem
       .from("reward_redemptions")
       .select(
         `
-        id, fan_id, reward_id, community_id, point_cost, status,
+        id, member_id, reward_id, community_id, point_cost, status,
         delivery_details, fulfillment_note, created_at, fulfilled_at, cancelled_at,
         reward:rewards_catalog(*)
         `
@@ -143,18 +143,18 @@ export async function countPendingRedemptions(communityId: string): Promise<numb
  * Returns { ok, redemptionId?, error? }
  */
 export async function redeemReward({
-  fanId,
+  memberId,
   rewardId,
   deliveryDetails,
 }: {
-  fanId: string;
+  memberId: string;
   rewardId: string;
   deliveryDetails?: string;
 }): Promise<{ ok: boolean; redemptionId?: string; error?: string }> {
   try {
     const supabase = await createClient();
     const { data, error } = await supabase.rpc("redeem_reward", {
-      p_fan_id: fanId,
+      p_member_id: memberId,
       p_reward_id: rewardId,
       p_delivery_details: deliveryDetails ?? null,
     });

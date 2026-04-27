@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
  *
  *   customer.subscription.created  → flip membership to 'premium',
  *                                    assign founder slot if applicable,
- *                                    award Founding Fan badge
+ *                                    award Founding Member badge
  *   customer.subscription.updated  → sync status (past_due / cancelled /
  *                                    active), period end, cancel-at-end
  *   customer.subscription.deleted  → revert to 'free', clear sub id
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
       id: event.id,
       type: event.type,
       community_id: extractCommunityId(event),
-      fan_id: extractFanId(event),
+      member_id: extractMemberId(event),
       payload: event as unknown as Record<string, unknown>,
     });
   }
@@ -148,11 +148,11 @@ function extractCommunityId(event: Stripe.Event): string | null {
   return obj.metadata?.community_id ?? null;
 }
 
-function extractFanId(event: Stripe.Event): string | null {
+function extractMemberId(event: Stripe.Event): string | null {
   const obj = event.data.object as unknown as {
-    metadata?: { fan_id?: string };
+    metadata?: { member_id?: string };
   };
-  return obj.metadata?.fan_id ?? null;
+  return obj.metadata?.member_id ?? null;
 }
 
 // ─── Event handlers ───────────────────────────────────────────────────────
@@ -161,8 +161,8 @@ async function handleSubscriptionCreated(
   sub: Stripe.Subscription,
   admin: SupabaseClient,
 ) {
-  const { fanId, communityId, tier, billingPeriod } = parseSubMetadata(sub);
-  if (!fanId || !communityId) {
+  const { memberId, communityId, tier, billingPeriod } = parseSubMetadata(sub);
+  if (!memberId || !communityId) {
     console.warn("subscription.created: missing metadata", sub.id);
     return;
   }
@@ -178,9 +178,9 @@ async function handleSubscriptionCreated(
   };
 
   const { error: updErr } = await admin
-    .from("fan_community_memberships")
+    .from("member_community_memberships")
     .update(updates)
-    .eq("fan_id", fanId)
+    .eq("member_id", memberId)
     .eq("community_id", communityId);
   if (updErr) throw new Error(`membership update failed: ${updErr.message}`);
 
@@ -190,21 +190,21 @@ async function handleSubscriptionCreated(
   // is hit.
   if (tier === "founder") {
     const { data: slot } = await admin.rpc("claim_founder_slot", {
-      p_fan_id: fanId,
+      p_member_id: memberId,
       p_community_id: communityId,
     });
     if (typeof slot === "number" && slot > 0) {
-      // Phase 5e: route through award_community_badge so the fan also
+      // Phase 5e: route through award_community_badge so the member also
       // gets the +500 pts ledger entry AND the in-app notification.
       // Idempotent — ON CONFLICT DO NOTHING, returns false if already
       // earned in this community (e.g. Stripe retry after a 5xx).
       const { error: awardErr } = await admin.rpc("award_community_badge", {
-        p_fan_id: fanId,
-        p_slug: "founding-fan",
+        p_member_id: memberId,
+        p_slug: "founding-member",
         p_community_id: communityId,
       });
       if (awardErr) {
-        console.warn("founding-fan badge award failed", awardErr);
+        console.warn("founding-member badge award failed", awardErr);
       }
     }
   }
@@ -214,13 +214,13 @@ async function handleSubscriptionUpdated(
   sub: Stripe.Subscription,
   admin: SupabaseClient,
 ) {
-  const { fanId, communityId } = parseSubMetadata(sub);
-  if (!fanId || !communityId) {
+  const { memberId, communityId } = parseSubMetadata(sub);
+  if (!memberId || !communityId) {
     // Fall back to locating the membership by stripe_subscription_id —
     // handles the edge case where metadata was stripped somehow.
     const { data: row } = await admin
-      .from("fan_community_memberships")
-      .select("fan_id, community_id")
+      .from("member_community_memberships")
+      .select("member_id, community_id")
       .eq("stripe_subscription_id", sub.id)
       .maybeSingle();
     if (!row) {
@@ -237,7 +237,7 @@ async function handleSubscriptionUpdated(
   };
 
   await admin
-    .from("fan_community_memberships")
+    .from("member_community_memberships")
     .update(updates)
     .eq("stripe_subscription_id", sub.id);
 }
@@ -249,7 +249,7 @@ async function handleSubscriptionDeleted(
   // Stripe fires this when the subscription ends (after cancel_at_period_end
   // runs out, or after payment_failed retries exhaust). Revert to free.
   await admin
-    .from("fan_community_memberships")
+    .from("member_community_memberships")
     .update({
       subscription_tier: "free",
       stripe_subscription_id: null,
@@ -265,16 +265,16 @@ async function handleInvoicePaid(
   admin: SupabaseClient,
 ) {
   // An invoice paid against an active subscription — the canonical
-  // signal that the subscription is healthy. If the fan was past_due,
+  // signal that the subscription is healthy. If the member was past_due,
   // this flips them back to premium. Also refresh the $5 monthly credit.
   const subscriptionField = (invoice as unknown as { subscription?: string | null }).subscription;
   const subId = typeof subscriptionField === "string" ? subscriptionField : null;
   if (!subId) return; // Non-subscription invoice — ignore.
 
   const { data: membership } = await admin
-    .from("fan_community_memberships")
+    .from("member_community_memberships")
     .select(
-      "fan_id, community_id, subscription_tier, monthly_credit_refreshed_at",
+      "member_id, community_id, subscription_tier, monthly_credit_refreshed_at",
     )
     .eq("stripe_subscription_id", subId)
     .maybeSingle();
@@ -295,7 +295,7 @@ async function handleInvoicePaid(
     updates.monthly_credit_refreshed_at = new Date().toISOString();
 
     await admin.from("credit_grants").insert({
-      fan_id: membership.fan_id,
+      member_id: membership.member_id,
       community_id: membership.community_id,
       amount_cents: 500,
       reason: "monthly_refresh",
@@ -304,7 +304,7 @@ async function handleInvoicePaid(
   }
 
   await admin
-    .from("fan_community_memberships")
+    .from("member_community_memberships")
     .update(updates)
     .eq("stripe_subscription_id", subId);
 }
@@ -314,7 +314,7 @@ async function handleInvoicePaymentFailed(
   admin: SupabaseClient,
 ) {
   // Card declined — Stripe enters its retry schedule (3-4 attempts over
-  // ~14 days). Flip to past_due so the UI can nudge the fan to update
+  // ~14 days). Flip to past_due so the UI can nudge the member to update
   // their card, but keep access alive during the grace window. When
   // retries are exhausted, Stripe fires subscription.deleted and we
   // revert to 'free'.
@@ -323,7 +323,7 @@ async function handleInvoicePaymentFailed(
   if (!subId) return;
 
   await admin
-    .from("fan_community_memberships")
+    .from("member_community_memberships")
     .update({ subscription_tier: "past_due" })
     .eq("stripe_subscription_id", subId);
 }
@@ -333,7 +333,7 @@ async function handleInvoicePaymentFailed(
 function parseSubMetadata(sub: Stripe.Subscription) {
   const meta = sub.metadata ?? {};
   return {
-    fanId: meta.fan_id ?? null,
+    memberId: meta.member_id ?? null,
     communityId: meta.community_id ?? null,
     tier: (meta.tier as "standard" | "founder" | undefined) ?? "standard",
     billingPeriod:

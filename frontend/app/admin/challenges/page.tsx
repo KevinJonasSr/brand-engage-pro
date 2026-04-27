@@ -7,15 +7,15 @@ export const dynamic = "force-dynamic";
 
 type ChallengeWithEntries = {
   id: string;
-  artist_slug: string;
+  brand_slug: string;
   title: string | null;
   body: string;
   created_at: string;
   pinned: boolean;
   entries: Array<{
     id: string;
-    fan_id: string;
-    fan_first_name: string | null;
+    member_id: string;
+    member_first_name: string | null;
     body: string | null;
     image_url: string | null;
     created_at: string;
@@ -27,19 +27,19 @@ async function load(): Promise<ChallengeWithEntries[]> {
   const admin = createAdminClient();
   const { data: posts } = await admin
     .from("community_posts")
-    .select("id,artist_slug,title,body,pinned,created_at")
+    .select("id,brand_slug,title,body,pinned,created_at")
     .eq("kind", "challenge")
     .order("created_at", { ascending: false })
     .limit(50);
   if (!posts || posts.length === 0) return [];
   const ids = posts.map((p) => p.id as string);
-  const [{ data: entries }, { data: fans }, { data: winners }] = await Promise.all([
+  const [{ data: entries }, { data: members }, { data: winners }] = await Promise.all([
     admin
       .from("community_challenge_entries")
-      .select("id,post_id,fan_id,body,image_url,created_at")
+      .select("id,post_id,member_id,body,image_url,created_at")
       .in("post_id", ids)
       .order("created_at", { ascending: false }),
-    admin.from("fans").select("id,first_name"),
+    admin.from("members").select("id,first_name"),
     admin
       .from("campaign_items")
       .select("metadata,ref_id")
@@ -47,7 +47,7 @@ async function load(): Promise<ChallengeWithEntries[]> {
       .in("ref_id", ids),
   ]);
   const nameById = new Map<string, string | null>(
-    (fans ?? []).map((f) => [f.id as string, (f.first_name as string | null) ?? null]),
+    (members ?? []).map((f) => [f.id as string, (f.first_name as string | null) ?? null]),
   );
   const entriesByPost = new Map<string, ChallengeWithEntries["entries"]>();
   for (const e of entries ?? []) {
@@ -55,8 +55,8 @@ async function load(): Promise<ChallengeWithEntries[]> {
     const arr = entriesByPost.get(pid) ?? [];
     arr.push({
       id: e.id as string,
-      fan_id: e.fan_id as string,
-      fan_first_name: nameById.get(e.fan_id as string) ?? null,
+      member_id: e.member_id as string,
+      member_first_name: nameById.get(e.member_id as string) ?? null,
       body: (e.body as string | null) ?? null,
       image_url: (e.image_url as string | null) ?? null,
       created_at: e.created_at as string,
@@ -65,13 +65,13 @@ async function load(): Promise<ChallengeWithEntries[]> {
   }
   const winnerByPost = new Map<string, string>();
   for (const w of winners ?? []) {
-    const meta = (w.metadata ?? {}) as { fan_id?: string };
-    if (meta.fan_id && w.ref_id) winnerByPost.set(w.ref_id as string, meta.fan_id);
+    const meta = (w.metadata ?? {}) as { member_id?: string };
+    if (meta.member_id && w.ref_id) winnerByPost.set(w.ref_id as string, meta.member_id);
   }
 
   return posts.map((p) => ({
     id: p.id as string,
-    artist_slug: p.artist_slug as string,
+    brand_slug: p.brand_slug as string,
     title: (p.title as string | null) ?? null,
     body: p.body as string,
     pinned: p.pinned as boolean,
@@ -107,7 +107,7 @@ export default async function AdminChallengesPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/70">
-                      /{c.artist_slug}
+                      /{c.brand_slug}
                     </span>
                     {c.winner_id && (
                       <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] uppercase tracking-wide text-emerald-200">
@@ -119,7 +119,7 @@ export default async function AdminChallengesPage() {
                   <p className="mt-1 text-sm text-white/70 line-clamp-2">{c.body}</p>
                 </div>
                 <Link
-                  href={`/artists/${c.artist_slug}/community`}
+                  href={`/brands/${c.brand_slug}/community`}
                   className="text-xs text-white/60 hover:text-white"
                 >
                   View live →
@@ -131,7 +131,7 @@ export default async function AdminChallengesPage() {
               ) : (
                 <div className="mt-3 grid gap-3 md:grid-cols-2">
                   {c.entries.map((e) => {
-                    const isWinner = c.winner_id === e.fan_id;
+                    const isWinner = c.winner_id === e.member_id;
                     return (
                       <div
                         key={e.id}
@@ -143,10 +143,10 @@ export default async function AdminChallengesPage() {
                       >
                         <div className="flex items-center justify-between">
                           <Link
-                            href={`/admin/fans/${e.fan_id}`}
+                            href={`/admin/members/${e.member_id}`}
                             className="text-xs font-semibold hover:text-white"
                           >
-                            {e.fan_first_name ?? "Anonymous"}
+                            {e.member_first_name ?? "Anonymous"}
                             {isWinner && " 🏆"}
                           </Link>
                           <span className="text-[10px] text-white/40">
@@ -169,7 +169,7 @@ export default async function AdminChallengesPage() {
                             <form action={pickWinnerAction}>
                               <input type="hidden" name="post_id" value={c.id} />
                               <input type="hidden" name="entry_id" value={e.id} />
-                              <input type="hidden" name="fan_id" value={e.fan_id} />
+                              <input type="hidden" name="member_id" value={e.member_id} />
                               <button className="rounded-full bg-gradient-to-r from-aurora to-ember px-3 py-1 text-[11px] font-semibold text-white">
                                 Pick winner · +200 pts
                               </button>

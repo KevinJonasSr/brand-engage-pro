@@ -13,7 +13,7 @@ export default function Footer() {
           <Link href="/privacy" className="hover:text-white">Privacy</Link>
           <Link href="/cookie-policy" className="hover:text-white">Cookies</Link>
           <Link href="/unsubscribe" className="hover:text-white">Unsubscribe</Link>
-          <a href="mailto:support@fanengage.app" className="hover:text-white">Contact</a>
+          <a href="mailto:support@memberengage.app" className="hover:text-white">Contact</a>
         </nav>
       </div>
     </footer>

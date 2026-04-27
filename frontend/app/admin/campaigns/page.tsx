@@ -8,7 +8,7 @@ async function loadCampaigns() {
   const admin = createAdminClient();
   const { data: campaigns } = await admin
     .from("campaigns")
-    .select("id,artist_slug,title,description,published_at,ends_at,created_at")
+    .select("id,brand_slug,title,description,published_at,ends_at,created_at")
     .order("created_at", { ascending: false })
     .limit(100);
 
@@ -80,7 +80,7 @@ export default async function AdminCampaignsPage() {
             Campaigns
           </h1>
           <p className="mt-1 text-sm text-white/60">
-            Bundle announcements, polls, challenges, offers, and fan CTAs into a single coordinated drop.
+            Bundle announcements, polls, challenges, offers, and member CTAs into a single coordinated drop.
           </p>
         </div>
         <Link
@@ -95,7 +95,7 @@ export default async function AdminCampaignsPage() {
         <div className="rounded-2xl border border-dashed border-white/15 bg-black/20 p-8 text-center">
           <p className="text-sm font-semibold">No campaigns yet</p>
           <p className="mt-2 text-xs text-white/60">
-            Create your first campaign to publish an announcement, poll, challenge, offer, and fan CTAs in one shot.
+            Create your first campaign to publish an announcement, poll, challenge, offer, and member CTAs in one shot.
           </p>
         </div>
       ) : (
@@ -111,7 +111,7 @@ export default async function AdminCampaignsPage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/70">
-                        /{c.artist_slug as string}
+                        /{c.brand_slug as string}
                       </span>
                       {active ? (
                         <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] uppercase tracking-wide text-emerald-200">

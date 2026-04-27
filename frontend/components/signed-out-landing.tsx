@@ -1,16 +1,16 @@
 import Link from "next/link";
-import type { Artist } from "@/lib/artists";
+import type { Brand } from "@/lib/brands";
 
 /**
  * Public-facing marketing landing rendered at `/` for signed-out visitors.
  *
  * Structured like the funnel we actually want: big hero with a single primary
  * CTA, then progressive disclosure (how-it-works → feature pillars → featured
- * artists → closing CTA). Signed-in fans never see this — they hit the
- * personalized Fan Home dashboard from Phase 3e instead.
+ * brands → closing CTA). Signed-in members never see this — they hit the
+ * personalized Member Home dashboard from Phase 3e instead.
  */
-export default function SignedOutLanding({ artists }: { artists: Artist[] }) {
-  const featured = artists.slice(0, 5);
+export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
+  const featured = brands.slice(0, 5);
 
   return (
     <main className="overflow-hidden">
@@ -28,29 +28,29 @@ export default function SignedOutLanding({ artists }: { artists: Artist[] }) {
           <div className="flex flex-col justify-center">
             <p className="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs uppercase tracking-widest text-white/70">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              The superfan platform
+              The supermember platform
             </p>
             <h1
               className="text-5xl font-semibold leading-[1.05] md:text-6xl"
               style={{ fontFamily: "var(--font-display)" }}
             >
-              Your favorite artists.
+              Your favorite brands.
               <br />
               <span className="bg-gradient-to-r from-aurora via-fuchsia-400 to-ember bg-clip-text text-transparent">
                 Your front-row seat.
               </span>
             </h1>
             <p className="mt-6 max-w-xl text-lg text-white/70">
-              Follow the artists you love, earn points for every fan move, and
+              Follow the brands you love, earn points for every member move, and
               unlock real drops — signed vinyl, backstage access, listening
-              parties. Built for the fans who actually show up.
+              parties. Built for the members who actually show up.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
                 href="/onboarding"
                 className="rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white shadow-glass transition hover:brightness-110"
               >
-                Create your fan profile →
+                Create your member profile →
               </Link>
               <Link
                 href="/login"
@@ -86,7 +86,7 @@ export default function SignedOutLanding({ artists }: { artists: Artist[] }) {
                 <div className="absolute left-0 top-0 h-[380px] w-[320px] -rotate-2 rounded-3xl border border-white/10 bg-gradient-to-br from-aurora/40 via-slate-900 to-black p-6 shadow-glass">
                   <div className="flex items-center justify-between">
                     <p className="text-[10px] uppercase tracking-widest text-white/60">
-                      Fan Profile
+                      Member Profile
                     </p>
                     <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/80">
                       Gold tier
@@ -129,19 +129,19 @@ export default function SignedOutLanding({ artists }: { artists: Artist[] }) {
           className="mt-2 max-w-2xl text-3xl font-semibold md:text-4xl"
           style={{ fontFamily: "var(--font-display)" }}
         >
-          Three steps from lurker to superfan.
+          Three steps from lurker to supermember.
         </h2>
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {[
             {
               n: "01",
-              title: "Follow your artists",
-              body: "Pick the artists you love. You'll get their drops, events, polls, and challenges in one feed.",
+              title: "Follow your brands",
+              body: "Pick the brands you love. You'll get their drops, events, polls, and challenges in one feed.",
               icon: "🎧",
             },
             {
               n: "02",
-              title: "Earn points for every fan move",
+              title: "Earn points for every member move",
               body: "RSVPing an event, voting in a poll, commenting, sharing your referral code — all of it earns points.",
               icon: "⚡",
             },
@@ -183,7 +183,7 @@ export default function SignedOutLanding({ artists }: { artists: Artist[] }) {
               >
                 More than a mailing list.
                 <br />
-                A real fan club.
+                A real member club.
               </h2>
               <p className="mt-6 max-w-md text-white/70">
                 Everything in one place — events, community, rewards, and the
@@ -199,7 +199,7 @@ export default function SignedOutLanding({ artists }: { artists: Artist[] }) {
                 },
                 {
                   title: "Community Hub",
-                  body: "Posts, polls, challenges — per artist, moderated, never spam.",
+                  body: "Posts, polls, challenges — per brand, moderated, never spam.",
                   icon: "💬",
                 },
                 {
@@ -227,13 +227,13 @@ export default function SignedOutLanding({ artists }: { artists: Artist[] }) {
         </div>
       </section>
 
-      {/* ─── Featured artists ─────────────────────────────────────────────── */}
+      {/* ─── Featured brands ─────────────────────────────────────────────── */}
       {featured.length > 0 && (
         <section className="mx-auto max-w-6xl px-6 py-20">
           <div className="flex items-end justify-between gap-4">
             <div>
               <p className="text-xs uppercase tracking-widest text-white/50">
-                Featured artists
+                Featured brands
               </p>
               <h2
                 className="mt-2 text-3xl font-semibold md:text-4xl"
@@ -243,7 +243,7 @@ export default function SignedOutLanding({ artists }: { artists: Artist[] }) {
               </h2>
             </div>
             <Link
-              href="/artists"
+              href="/brands"
               className="hidden items-center gap-1 text-sm font-medium text-white/70 hover:text-white sm:inline-flex"
             >
               See all →
@@ -253,7 +253,7 @@ export default function SignedOutLanding({ artists }: { artists: Artist[] }) {
             {featured.map((a) => (
               <Link
                 key={a.slug}
-                href={`/artists/${a.slug}`}
+                href={`/brands/${a.slug}`}
                 className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/30 p-5 transition hover:border-white/25 hover:bg-white/5"
               >
                 <div
@@ -295,21 +295,21 @@ export default function SignedOutLanding({ artists }: { artists: Artist[] }) {
             Join free in under a minute.
           </h2>
           <p className="relative mt-4 text-white/70">
-            No credit card. No spam. Just your favorite artists and the perks
-            they reserve for real fans.
+            No credit card. No spam. Just your favorite brands and the perks
+            they reserve for real members.
           </p>
           <div className="relative mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/onboarding"
               className="rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white shadow-glass transition hover:brightness-110"
             >
-              Create fan profile →
+              Create member profile →
             </Link>
             <Link
-              href="/artists"
+              href="/brands"
               className="rounded-full border border-white/25 px-5 py-3 text-sm font-medium text-white/80 hover:bg-white/10"
             >
-              Browse artists
+              Browse brands
             </Link>
           </div>
         </div>

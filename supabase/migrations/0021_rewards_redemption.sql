@@ -9,7 +9,7 @@ do $$ begin
 exception when others then null; end $$;
 
 -- ─── Rewards Catalog ──────────────────────────────────────────────────────
--- The rewards artists offer fans in their communities.
+-- The rewards brands offer members in their communities.
 -- Admin-editable. Can be community-scoped OR global (community_id null = global).
 create table if not exists public.rewards_catalog (
   id              uuid primary key default gen_random_uuid(),
@@ -35,7 +35,7 @@ create index if not exists rewards_catalog_community_idx
 -- Status: pending → fulfilled / cancelled
 create table if not exists public.reward_redemptions (
   id                uuid primary key default gen_random_uuid(),
-  fan_id            uuid not null references public.fans(id) on delete cascade,
+  member_id            uuid not null references public.members(id) on delete cascade,
   reward_id         uuid not null references public.rewards_catalog(id) on delete restrict,
   community_id      text references public.communities(slug) on delete set null,
   point_cost        integer not null,
@@ -47,8 +47,8 @@ create table if not exists public.reward_redemptions (
   cancelled_at      timestamptz
 );
 
-create index if not exists reward_redemptions_fan_idx
-  on public.reward_redemptions (fan_id, created_at desc);
+create index if not exists reward_redemptions_member_idx
+  on public.reward_redemptions (member_id, created_at desc);
 
 create index if not exists reward_redemptions_status_idx
   on public.reward_redemptions (community_id, status, created_at desc);
@@ -62,10 +62,10 @@ drop policy if exists rewards_catalog_public_read on public.rewards_catalog;
 create policy rewards_catalog_public_read on public.rewards_catalog
   for select using (active = true);
 
--- reward_redemptions: fans see their own; admins see all in their community
-drop policy if exists redemptions_fan_read on public.reward_redemptions;
-create policy redemptions_fan_read on public.reward_redemptions
-  for select using (auth.uid() = fan_id);
+-- reward_redemptions: members see their own; admins see all in their community
+drop policy if exists redemptions_member_read on public.reward_redemptions;
+create policy redemptions_member_read on public.reward_redemptions
+  for select using (auth.uid() = member_id);
 
 drop policy if exists redemptions_admin_read on public.reward_redemptions;
 create policy redemptions_admin_read on public.reward_redemptions
@@ -73,25 +73,25 @@ create policy redemptions_admin_read on public.reward_redemptions
 
 -- ─── Helper: redeem_reward ────────────────────────────────────────────────
 -- Atomically:
--- 1. Check fan has enough points
+-- 1. Check member has enough points
 -- 2. Check reward is active and in-stock
 -- 3. Check tier gating
 -- 4. Insert redemption row
--- 5. Decrement fan points (global + per-community)
+-- 5. Decrement member points (global + per-community)
 -- 6. Write points_ledger entry
 -- 7. Decrement stock
--- 8. Notify fan
+-- 8. Notify member
 -- Returns redemption id or raises exception
 create or replace function public.redeem_reward(
-  p_fan_id uuid,
+  p_member_id uuid,
   p_reward_id uuid,
   p_delivery_details text default null
 )
 returns uuid language plpgsql security definer set search_path = public as $$
 declare
-  v_fan fans%rowtype;
+  v_member members%rowtype;
   v_reward rewards_catalog%rowtype;
-  v_membership fan_community_memberships%rowtype;
+  v_membership member_community_memberships%rowtype;
   v_redemption_id uuid;
 begin
   -- Lock the reward row to prevent overselling
@@ -110,20 +110,20 @@ begin
     raise exception 'Reward is out of stock';
   end if;
 
-  -- Get fan and check total points
-  select * into v_fan from fans where id = p_fan_id;
-  if v_fan is null then
-    raise exception 'Fan not found';
+  -- Get member and check total points
+  select * into v_member from members where id = p_member_id;
+  if v_member is null then
+    raise exception 'Member not found';
   end if;
 
-  if v_fan.total_points < v_reward.point_cost then
+  if v_member.total_points < v_reward.point_cost then
     raise exception 'Insufficient points';
   end if;
 
   -- Check tier gating if required
   if v_reward.requires_tier is not null then
-    select * into v_membership from fan_community_memberships
-    where fan_id = p_fan_id and community_id = v_reward.community_id;
+    select * into v_membership from member_community_memberships
+    where member_id = p_member_id and community_id = v_reward.community_id;
 
     if v_membership is null then
       raise exception 'Not a member of this community';
@@ -139,25 +139,25 @@ begin
   end if;
 
   -- Insert redemption row
-  insert into reward_redemptions (fan_id, reward_id, community_id, point_cost, delivery_details, status)
-  values (p_fan_id, p_reward_id, v_reward.community_id, v_reward.point_cost, p_delivery_details, 'pending')
+  insert into reward_redemptions (member_id, reward_id, community_id, point_cost, delivery_details, status)
+  values (p_member_id, p_reward_id, v_reward.community_id, v_reward.point_cost, p_delivery_details, 'pending')
   returning id into v_redemption_id;
 
   -- Decrement global points
-  update fans set total_points = total_points - v_reward.point_cost
-  where id = p_fan_id;
+  update members set total_points = total_points - v_reward.point_cost
+  where id = p_member_id;
 
   -- Decrement community points if scoped
   if v_reward.community_id is not null then
-    update fan_community_memberships
+    update member_community_memberships
     set total_points = total_points - v_reward.point_cost
-    where fan_id = p_fan_id and community_id = v_reward.community_id;
+    where member_id = p_member_id and community_id = v_reward.community_id;
   end if;
 
   -- Write points ledger
-  insert into points_ledger (fan_id, delta, source, source_ref, note)
+  insert into points_ledger (member_id, delta, source, source_ref, note)
   values (
-    p_fan_id,
+    p_member_id,
     -v_reward.point_cost,
     'reward_redemption',
     'redemption:' || v_redemption_id,
@@ -169,13 +169,13 @@ begin
     update rewards_catalog set stock = stock - 1 where id = p_reward_id;
   end if;
 
-  -- Notify fan
+  -- Notify member
   perform upsert_notification(
-    p_fan_id,
+    p_member_id,
     'reward_redeemed',
     'Reward redeemed!',
-    'You''ve redeemed ' || v_reward.title || '. An artist will fulfill it soon.',
-    '/artists/' || v_reward.community_id || '/rewards',
+    'You''ve redeemed ' || v_reward.title || '. An brand will fulfill it soon.',
+    '/brands/' || v_reward.community_id || '/rewards',
     null,
     'redemption:' || v_redemption_id
   );

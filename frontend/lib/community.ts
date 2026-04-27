@@ -19,7 +19,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export interface Community {
   slug: string;
   display_name: string;
-  type: "artist" | "label_meta" | "brand";
+  type: "brand" | "label_meta" | "brand";
   tagline: string | null;
   bio: string | null;
   accent_from: string;
@@ -57,24 +57,24 @@ export const COMMUNITY_BY_SUBDOMAIN: Record<string, string> = {
  * source of truth for resolution.
  *
  * Examples:
- *   'raelynn.fanengage.app'          → 'raelynn'
- *   'streetteam.fanengage.app'       → 'street-team'
+ *   'raelynn.memberengage.app'          → 'raelynn'
+ *   'streetteam.memberengage.app'       → 'street-team'
  *   'brand-engage-pro.vercel.app'    → 'raelynn'  (legacy default)
- *   'fanengage.app'                  → 'raelynn'  (apex, for now)
+ *   'memberengage.app'                  → 'raelynn'  (apex, for now)
  *   'localhost:3000'                 → 'raelynn'  (dev)
  */
 export function resolveCommunityFromHost(host: string | null | undefined): string {
   if (!host) return DEFAULT_COMMUNITY_ID;
   const hostname = host.split(":")[0].toLowerCase();
 
-  // Production *.fanengage.app subdomains
-  const fanengageMatch = hostname.match(/^([a-z0-9-]+)\.fanengage\.app$/);
-  if (fanengageMatch) {
-    return COMMUNITY_BY_SUBDOMAIN[fanengageMatch[1]] ?? DEFAULT_COMMUNITY_ID;
+  // Production *.memberengage.app subdomains
+  const memberengageMatch = hostname.match(/^([a-z0-9-]+)\.memberengage\.app$/);
+  if (memberengageMatch) {
+    return COMMUNITY_BY_SUBDOMAIN[memberengageMatch[1]] ?? DEFAULT_COMMUNITY_ID;
   }
 
   // Vercel preview subdomains for per-community deploys, e.g.
-  // 'raelynn-fan-engage-<hash>-jonas-group.vercel.app'. We don't use
+  // 'raelynn-member-engage-<hash>-jonas-group.vercel.app'. We don't use
   // these today, but this pattern is easy to add later.
 
   return DEFAULT_COMMUNITY_ID;

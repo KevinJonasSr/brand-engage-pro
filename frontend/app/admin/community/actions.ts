@@ -52,13 +52,13 @@ export async function adminDeleteEntryAction(formData: FormData) {
   revalidatePath("/admin/challenges");
 }
 
-export async function adminSuspendFanAction(formData: FormData) {
+export async function adminSuspendMemberAction(formData: FormData) {
   await requireAdmin();
-  const fanId = String(formData.get("fan_id") ?? "");
+  const memberId = String(formData.get("member_id") ?? "");
   const suspend = String(formData.get("suspend") ?? "true") === "true";
-  if (!fanId) return;
+  if (!memberId) return;
   const admin = createAdminClient();
-  await admin.from("fans").update({ suspended: suspend }).eq("id", fanId);
-  revalidatePath("/admin/fans");
-  revalidatePath(`/admin/fans/${fanId}`);
+  await admin.from("members").update({ suspended: suspend }).eq("id", memberId);
+  revalidatePath("/admin/members");
+  revalidatePath(`/admin/members/${memberId}`);
 }

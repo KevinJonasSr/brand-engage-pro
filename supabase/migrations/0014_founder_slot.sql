@@ -12,7 +12,7 @@
 -- ────────────────────────────────────────────────────────────────────────────
 
 create or replace function public.claim_founder_slot(
-  p_fan_id      uuid,
+  p_member_id      uuid,
   p_community_id text
 )
 returns integer language plpgsql security definer set search_path = public as $$
@@ -31,7 +31,7 @@ begin
   if v_cap is null then return null; end if;
 
   select count(*) into v_taken
-    from fan_community_memberships
+    from member_community_memberships
     where community_id = p_community_id
       and founder_number is not null;
 
@@ -39,11 +39,11 @@ begin
 
   v_next := v_taken + 1;
 
-  -- Atomically write founder_number + is_founder on the fan's membership.
-  update fan_community_memberships
+  -- Atomically write founder_number + is_founder on the member's membership.
+  update member_community_memberships
      set founder_number = v_next,
          is_founder     = true
-   where fan_id = p_fan_id
+   where member_id = p_member_id
      and community_id = p_community_id;
 
   return v_next;
@@ -51,8 +51,8 @@ end $$;
 
 
 -- ─── Smoke-test ────────────────────────────────────────────────────────────
--- -- Try claiming a slot for a test fan/community (no-op if already has one):
+-- -- Try claiming a slot for a test member/community (no-op if already has one):
 -- select public.claim_founder_slot(
---   (select id from fans limit 1),
+--   (select id from members limit 1),
 --   'raelynn'
 -- );

@@ -9,11 +9,11 @@ do $$ begin
   create type community_post_kind as enum ('post', 'announcement', 'poll', 'challenge');
 exception when duplicate_object then null; end $$;
 
--- ─── Community posts (one feed per artist) ─────────────────────────────────
+-- ─── Community posts (one feed per brand) ─────────────────────────────────
 create table if not exists public.community_posts (
   id           uuid primary key default gen_random_uuid(),
-  artist_slug  text not null,
-  author_id    uuid not null references public.fans(id) on delete cascade,
+  brand_slug  text not null,
+  author_id    uuid not null references public.members(id) on delete cascade,
   kind         community_post_kind not null default 'post',
   title        text,
   body         text not null,
@@ -22,18 +22,18 @@ create table if not exists public.community_posts (
   created_at   timestamptz not null default now()
 );
 
-create index if not exists community_posts_artist_idx
-  on public.community_posts (artist_slug, pinned desc, created_at desc);
+create index if not exists community_posts_brand_idx
+  on public.community_posts (brand_slug, pinned desc, created_at desc);
 create index if not exists community_posts_author_idx
   on public.community_posts (author_id);
 
--- ─── Reactions (emoji per (post, fan)) ─────────────────────────────────────
+-- ─── Reactions (emoji per (post, member)) ─────────────────────────────────────
 create table if not exists public.community_reactions (
   post_id     uuid not null references public.community_posts(id) on delete cascade,
-  fan_id      uuid not null references public.fans(id) on delete cascade,
+  member_id      uuid not null references public.members(id) on delete cascade,
   emoji       text not null,
   created_at  timestamptz not null default now(),
-  primary key (post_id, fan_id, emoji)
+  primary key (post_id, member_id, emoji)
 );
 
 create index if not exists community_reactions_post_idx
@@ -43,7 +43,7 @@ create index if not exists community_reactions_post_idx
 create table if not exists public.community_comments (
   id          uuid primary key default gen_random_uuid(),
   post_id     uuid not null references public.community_posts(id) on delete cascade,
-  author_id   uuid not null references public.fans(id) on delete cascade,
+  author_id   uuid not null references public.members(id) on delete cascade,
   body        text not null,
   created_at  timestamptz not null default now()
 );
@@ -66,10 +66,10 @@ declare
   ref_id text := 'community_post:' || new.id::text;
 begin
   if not exists (select 1 from points_ledger where source_ref = ref_id) then
-    insert into points_ledger (fan_id, delta, source, source_ref, note)
+    insert into points_ledger (member_id, delta, source, source_ref, note)
     values (new.author_id, award, 'challenge', ref_id, 'Community post');
 
-    update fans
+    update members
     set total_points = coalesce(total_points, 0) + award
     where id = new.author_id;
   end if;
@@ -88,10 +88,10 @@ declare
   ref_id text := 'community_comment:' || new.id::text;
 begin
   if not exists (select 1 from points_ledger where source_ref = ref_id) then
-    insert into points_ledger (fan_id, delta, source, source_ref, note)
+    insert into points_ledger (member_id, delta, source, source_ref, note)
     values (new.author_id, award, 'challenge', ref_id, 'Community comment');
 
-    update fans
+    update members
     set total_points = coalesce(total_points, 0) + award
     where id = new.author_id;
   end if;
@@ -132,11 +132,11 @@ create policy community_reactions_select on public.community_reactions
 
 drop policy if exists community_reactions_insert on public.community_reactions;
 create policy community_reactions_insert on public.community_reactions
-  for insert with check (auth.uid() = fan_id);
+  for insert with check (auth.uid() = member_id);
 
 drop policy if exists community_reactions_delete on public.community_reactions;
 create policy community_reactions_delete on public.community_reactions
-  for delete using (auth.uid() = fan_id);
+  for delete using (auth.uid() = member_id);
 
 -- Comments: authenticated read, authors manage their own.
 drop policy if exists community_comments_select on public.community_comments;

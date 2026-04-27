@@ -57,7 +57,7 @@ export default async function PremiumWelcomePage({
   // The webhook is async, so we briefly retry — if claim_founder_slot()
   // hasn't run yet, founder_number is null and we show a pending state.
   let founderNumber: number | null = null;
-  let fanFirstName: string | null = null;
+  let memberFirstName: string | null = null;
   if (isFounder && status === "complete" && community) {
     try {
       const supabase = await createClient();
@@ -70,9 +70,9 @@ export default async function PremiumWelcomePage({
         // webhook on typical paths, short enough to not block the render.
         for (let attempt = 0; attempt < 3; attempt++) {
           const { data } = await admin
-            .from("fan_community_memberships")
+            .from("member_community_memberships")
             .select("founder_number")
-            .eq("fan_id", user.id)
+            .eq("member_id", user.id)
             .eq("community_id", community.slug)
             .maybeSingle();
           const n = (data?.founder_number as number | null) ?? null;
@@ -82,12 +82,12 @@ export default async function PremiumWelcomePage({
           }
           if (attempt < 2) await new Promise((r) => setTimeout(r, 800));
         }
-        const { data: fan } = await admin
-          .from("fans")
+        const { data: member } = await admin
+          .from("members")
           .select("first_name")
           .eq("id", user.id)
           .maybeSingle();
-        fanFirstName = (fan?.first_name as string | null) ?? null;
+        memberFirstName = (member?.first_name as string | null) ?? null;
       }
     } catch (err) {
       console.warn("PremiumWelcomePage: founder lookup failed", err);
@@ -119,7 +119,7 @@ export default async function PremiumWelcomePage({
               {/* Phase 5e: Founder celebration.
                   When founderNumber is set, show the big slot reveal.
                   When it's still null (webhook race), show a pending state
-                  that lets the fan refresh once the webhook lands. */}
+                  that lets the member refresh once the webhook lands. */}
               {founderNumber !== null ? (
                 <>
                   <p
@@ -128,8 +128,8 @@ export default async function PremiumWelcomePage({
                       color: accentFrom,
                     }}
                   >
-                    {fanFirstName
-                      ? `${fanFirstName}, you made it.`
+                    {memberFirstName
+                      ? `${memberFirstName}, you made it.`
                       : "You made it."}
                   </p>
                   <h1
@@ -143,7 +143,7 @@ export default async function PremiumWelcomePage({
                         backgroundImage: `linear-gradient(90deg, ${accentFrom}, ${accentTo})`,
                       }}
                     >
-                      Founding Fan #{founderNumber}
+                      Founding Member #{founderNumber}
                     </span>
                     .
                   </h1>
@@ -160,7 +160,7 @@ export default async function PremiumWelcomePage({
                     #{founderNumber}
                   </p>
                   <p className="mt-6 text-white/75">
-                    One of the first 100 paying fans of{" "}
+                    One of the first 100 paying members of{" "}
                     <span className="text-white">
                       {community?.display_name ?? "this community"}
                     </span>
@@ -175,7 +175,7 @@ export default async function PremiumWelcomePage({
                       backgroundColor: "rgba(255,255,255,0.03)",
                     }}
                   >
-                    🌟 Founding Fan badge · +500 pts
+                    🌟 Founding Member badge · +500 pts
                   </div>
                   {customerEmail && (
                     <p className="mt-6 text-xs text-white/50">
@@ -194,7 +194,7 @@ export default async function PremiumWelcomePage({
                   </h1>
                   <p className="mt-4 text-white/70">
                     Stripe confirmed your payment and we&apos;re assigning your
-                    Founding Fan number. Refresh in a moment to see which slot
+                    Founding Member number. Refresh in a moment to see which slot
                     you got — your badge and locked-in pricing are already
                     yours.
                   </p>

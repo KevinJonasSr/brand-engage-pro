@@ -33,9 +33,9 @@ export async function getBadgesWithEarnedStatus(): Promise<Badge[]> {
     const [earnedRes, postCountRes, commentCountRes, pollVoteCountRes,
            challengeEntryCountRes, referralVerifiedCountRes] = await Promise.all([
       supabase
-        .from("fan_badges")
+        .from("member_badges")
         .select("badge_slug,earned_at")
-        .eq("fan_id", user.id),
+        .eq("member_id", user.id),
       supabase
         .from("community_posts")
         .select("id", { count: "exact", head: true })
@@ -48,11 +48,11 @@ export async function getBadgesWithEarnedStatus(): Promise<Badge[]> {
       supabase
         .from("community_poll_votes")
         .select("post_id", { count: "exact", head: true })
-        .eq("fan_id", user.id),
+        .eq("member_id", user.id),
       supabase
         .from("community_challenge_entries")
         .select("id", { count: "exact", head: true })
-        .eq("fan_id", user.id),
+        .eq("member_id", user.id),
       supabase
         .from("referrals")
         .select("id", { count: "exact", head: true })

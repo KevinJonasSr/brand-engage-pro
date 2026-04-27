@@ -8,8 +8,8 @@ import { broadcastEmail, broadcastSms } from "@/lib/broadcast";
 import { createNotification } from "@/lib/data/notifications";
 
 /**
- * Campaign builder — single "Publish" action fans out into community posts,
- * offers, fan_actions (CTAs), optional email/SMS blasts, and records a
+ * Campaign builder — single "Publish" action members out into community posts,
+ * offers, member_actions (CTAs), optional email/SMS blasts, and records a
  * campaign_items row per side-effect for reporting.
  */
 async function requireAdmin() {
@@ -31,16 +31,16 @@ export async function createAndPublishCampaign(formData: FormData) {
   const admin = await requireAdmin();
   const supa = createAdminClient();
 
-  const artistSlug = String(formData.get("artist_slug") ?? "").trim();
+  const brandSlug = String(formData.get("brand_slug") ?? "").trim();
   const title = String(formData.get("title") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
-  if (!artistSlug || !title) return;
+  if (!brandSlug || !title) return;
 
   // 1) Create the campaign row
   const { data: campaign } = await supa
     .from("campaigns")
     .insert({
-      artist_slug: artistSlug,
+      brand_slug: brandSlug,
       title,
       description: description || null,
       created_by: admin.id,
@@ -68,7 +68,7 @@ export async function createAndPublishCampaign(formData: FormData) {
     const { data: post } = await supa
       .from("community_posts")
       .insert({
-        artist_slug: artistSlug,
+        brand_slug: brandSlug,
         author_id: admin.id,
         kind: "announcement",
         title: announcementTitle || title,
@@ -89,7 +89,7 @@ export async function createAndPublishCampaign(formData: FormData) {
     const { data: post } = await supa
       .from("community_posts")
       .insert({
-        artist_slug: artistSlug,
+        brand_slug: brandSlug,
         author_id: admin.id,
         kind: "poll",
         body: poll.question,
@@ -114,7 +114,7 @@ export async function createAndPublishCampaign(formData: FormData) {
     const { data: post } = await supa
       .from("community_posts")
       .insert({
-        artist_slug: artistSlug,
+        brand_slug: brandSlug,
         author_id: admin.id,
         kind: "challenge",
         title: challengeTitle || null,
@@ -150,7 +150,7 @@ export async function createAndPublishCampaign(formData: FormData) {
     if (offer) await recordItem("offer", offer.id as string);
   }
 
-  // 6) Fan actions / CTAs — JSON block: [{ kind, title, url, cta_label, point_value }]
+  // 6) Member actions / CTAs — JSON block: [{ kind, title, url, cta_label, point_value }]
   const ctas = parseJsonBlock<
     Array<{
       kind: string;
@@ -164,10 +164,10 @@ export async function createAndPublishCampaign(formData: FormData) {
   for (const cta of ctas) {
     if (!cta.title || !cta.kind) continue;
     const { data: action } = await supa
-      .from("fan_actions")
+      .from("member_actions")
       .insert({
         campaign_id: campaignId,
-        artist_slug: artistSlug,
+        brand_slug: brandSlug,
         kind: cta.kind,
         title: cta.title,
         description: cta.description ?? null,
@@ -183,7 +183,7 @@ export async function createAndPublishCampaign(formData: FormData) {
 
   // 7) Event (optional) — either create a new one or reference an existing id.
   //    When an event is attached, the SMS blast below will target its RSVPers
-  //    (instead of all artist followers) if "target_event_rsvpers" is on.
+  //    (instead of all brand followers) if "target_event_rsvpers" is on.
   let attachedEventId: string | null = null;
   const eventTitle = String(formData.get("event_title") ?? "").trim();
   const existingEventId = String(formData.get("existing_event_id") ?? "").trim();
@@ -195,9 +195,9 @@ export async function createAndPublishCampaign(formData: FormData) {
     const eventUrl = String(formData.get("event_url") ?? "").trim();
     const detail = String(formData.get("event_detail") ?? "").trim();
     const { data: ev } = await supa
-      .from("artist_events")
+      .from("brand_events")
       .insert({
-        artist_slug: artistSlug,
+        brand_slug: brandSlug,
         title: eventTitle,
         detail: detail || null,
         event_date: dateText || null,
@@ -235,13 +235,13 @@ export async function createAndPublishCampaign(formData: FormData) {
     });
   }
 
-  // 9) SMS blast — iterate opted-in fans via Twilio (throttled).
+  // 9) SMS blast — iterate opted-in members via Twilio (throttled).
   //    Honors the per-event RSVP filter when attached.
   const smsBody = String(formData.get("sms_body") ?? "").trim();
   if (smsBody) {
     const result = await broadcastSms({
       body: smsBody,
-      artistSlug,
+      brandSlug,
       eventId: targetEventRsvpers ? attachedEventId : null,
     });
     await recordItem("sms", null, {
@@ -254,50 +254,50 @@ export async function createAndPublishCampaign(formData: FormData) {
     });
   }
 
-  // 10) In-app inbox notification for every fan this campaign targets.
-  //     Audience: artist followers when no event is attached; event RSVPers
-  //     when targetEventRsvpers is on. Dedup'd by campaign_id so a fan can
+  // 10) In-app inbox notification for every member this campaign targets.
+  //     Audience: brand followers when no event is attached; event RSVPers
+  //     when targetEventRsvpers is on. Dedup'd by campaign_id so a member can
   //     never see the same campaign twice in their inbox.
   try {
-    let audienceFanIds: string[] = [];
+    let audienceMemberIds: string[] = [];
     if (targetEventRsvpers && attachedEventId) {
       const { data: rsvpers } = await supa
         .from("event_rsvps")
-        .select("fan_id")
+        .select("member_id")
         .eq("event_id", attachedEventId);
-      audienceFanIds = (rsvpers ?? []).map((r) => r.fan_id as string);
+      audienceMemberIds = (rsvpers ?? []).map((r) => r.member_id as string);
     } else {
       const { data: followers } = await supa
-        .from("fan_artist_following")
-        .select("fan_id")
-        .eq("artist_slug", artistSlug);
-      audienceFanIds = (followers ?? []).map((r) => r.fan_id as string);
+        .from("member_brand_following")
+        .select("member_id")
+        .eq("brand_slug", brandSlug);
+      audienceMemberIds = (followers ?? []).map((r) => r.member_id as string);
     }
 
     const body =
       String(formData.get("announcement_body") ?? "").trim().slice(0, 140) ||
       description ||
-      "New artist drop";
+      "New brand drop";
     await Promise.all(
-      audienceFanIds.map((fanId) =>
+      audienceMemberIds.map((memberId) =>
         createNotification({
-          fanId,
+          memberId,
           kind: "campaign",
           title,
           body,
-          url: `/artists/${artistSlug}/community`,
+          url: `/brands/${brandSlug}/community`,
           icon: "📣",
           dedupKey: `campaign:${campaignId}`,
         }),
       ),
     );
   } catch (err) {
-    console.warn("campaign fan-out (notifications) failed:", err);
+    console.warn("campaign member-out (notifications) failed:", err);
   }
 
   revalidatePath("/admin/campaigns");
-  revalidatePath(`/artists/${artistSlug}/community`);
-  revalidatePath(`/artists/${artistSlug}`);
+  revalidatePath(`/brands/${brandSlug}/community`);
+  revalidatePath(`/brands/${brandSlug}`);
   redirect(`/admin/campaigns`);
 }
 
@@ -306,13 +306,13 @@ export async function deactivateCampaignAction(formData: FormData) {
   const campaignId = String(formData.get("campaign_id") ?? "");
   if (!campaignId) return;
   const supa = createAdminClient();
-  // Set ends_at to now + deactivate linked fan_actions
+  // Set ends_at to now + deactivate linked member_actions
   await supa
     .from("campaigns")
     .update({ ends_at: new Date().toISOString() })
     .eq("id", campaignId);
   await supa
-    .from("fan_actions")
+    .from("member_actions")
     .update({ active: false })
     .eq("campaign_id", campaignId);
   revalidatePath("/admin/campaigns");

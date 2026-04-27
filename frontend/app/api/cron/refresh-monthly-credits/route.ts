@@ -46,9 +46,9 @@ export async function GET(request: Request) {
   // Candidates: paid tiers only. past_due (Stripe grace window) and
   // free/cancelled don't earn the credit.
   const { data: candidates, error: fetchErr } = await admin
-    .from("fan_community_memberships")
+    .from("member_community_memberships")
     .select(
-      "fan_id, community_id, subscription_tier, monthly_credit_refreshed_at",
+      "member_id, community_id, subscription_tier, monthly_credit_refreshed_at",
     )
     .in("subscription_tier", ["premium", "comped"])
     .or(
@@ -63,7 +63,7 @@ export async function GET(request: Request) {
   }
 
   const results: Array<{
-    fan_id: string;
+    member_id: string;
     community_id: string;
     tier: string;
     refreshed: boolean;
@@ -71,7 +71,7 @@ export async function GET(request: Request) {
   }> = [];
 
   for (const row of candidates ?? []) {
-    const fanId = row.fan_id as string;
+    const memberId = row.member_id as string;
     const communityId = row.community_id as string;
     const tier = row.subscription_tier as string;
     const nowIso = new Date().toISOString();
@@ -82,12 +82,12 @@ export async function GET(request: Request) {
       // converge to monthly_credit_cents = 500, monthly_credit_refreshed_at
       // ≈ now, which is exactly what we want).
       const { error: updErr } = await admin
-        .from("fan_community_memberships")
+        .from("member_community_memberships")
         .update({
           monthly_credit_cents: 500,
           monthly_credit_refreshed_at: nowIso,
         })
-        .eq("fan_id", fanId)
+        .eq("member_id", memberId)
         .eq("community_id", communityId);
       if (updErr) throw new Error(updErr.message);
 
@@ -95,7 +95,7 @@ export async function GET(request: Request) {
       // event tied to a cron-driven refresh. reason='monthly_refresh'
       // matches what the webhook writes.
       const { error: grantErr } = await admin.from("credit_grants").insert({
-        fan_id: fanId,
+        member_id: memberId,
         community_id: communityId,
         amount_cents: 500,
         reason: "monthly_refresh",
@@ -103,14 +103,14 @@ export async function GET(request: Request) {
       if (grantErr) throw new Error(grantErr.message);
 
       results.push({
-        fan_id: fanId,
+        member_id: memberId,
         community_id: communityId,
         tier,
         refreshed: true,
       });
     } catch (e) {
       results.push({
-        fan_id: fanId,
+        member_id: memberId,
         community_id: communityId,
         tier,
         refreshed: false,

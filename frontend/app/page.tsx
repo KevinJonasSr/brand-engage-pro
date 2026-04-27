@@ -1,12 +1,12 @@
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import FanHomeDashboard from "@/components/fan-home-dashboard";
+import MemberHomeDashboard from "@/components/member-home-dashboard";
 import InviteQRCode from "@/components/invite-qr";
 import SignedOutLanding from "@/components/signed-out-landing";
-import { listArtistsFromDb } from "@/lib/data/artists";
-import { getCurrentFan, getCurrentFanKpis } from "@/lib/data/fan";
-import { getFanHomeData } from "@/lib/data/fan-home";
+import { listBrandsFromDb } from "@/lib/data/brands";
+import { getCurrentMember, getCurrentMemberKpis } from "@/lib/data/member";
+import { getMemberHomeData } from "@/lib/data/member-home";
 import { getFeaturedOffers } from "@/lib/data/offers";
 import { getTiers, tierIcon } from "@/lib/data/tiers";
 import type { TierSlug } from "@/lib/data/types";
@@ -46,23 +46,23 @@ export default async function Home({
     redirect(`/auth/callback?code=${encodeURIComponent(params.code)}&next=/onboarding`);
   }
 
-  // First pass: just fetch the fan. If signed-out, render the marketing
+  // First pass: just fetch the member. If signed-out, render the marketing
   // landing and skip all the signed-in data queries (they're noise here).
-  const fan = await getCurrentFan();
-  const isSignedIn = fan !== null;
+  const member = await getCurrentMember();
+  const isSignedIn = member !== null;
 
   if (!isSignedIn) {
-    const artists = await listArtistsFromDb();
-    return <SignedOutLanding artists={artists} />;
+    const brands = await listBrandsFromDb();
+    return <SignedOutLanding brands={brands} />;
   }
 
   // Signed-in path — parallel-fetch everything the dashboard needs. Each
   // gracefully returns null / empty on error so the page never breaks.
-  const [kpis, featured, tiers, fanHome] = await Promise.all([
-    getCurrentFanKpis(),
+  const [kpis, featured, tiers, memberHome] = await Promise.all([
+    getCurrentMemberKpis(),
     getFeaturedOffers(3),
     getTiers(),
-    getFanHomeData(),
+    getMemberHomeData(),
   ]);
 
   // KPI grid — real data from Supabase. If kpis is null (DB hiccup), we
@@ -96,7 +96,7 @@ export default async function Home({
   ];
 
   // Show a "Finish profile" nudge when signed-in users have no first_name yet.
-  const needsProfile = !fan.first_name;
+  const needsProfile = !member.first_name;
 
   // Featured offers: DB only — no more fallback/lie content now that this
   // branch is signed-in-only.
@@ -106,18 +106,18 @@ export default async function Home({
     points: o.price_points ? formatPts(o.price_points) : `$${(o.price_cents ?? 0) / 100}`,
   }));
 
-  // Tier journey card — use real tier + fan's current status if available.
-  const currentTier = (fan?.current_tier ?? "bronze") as TierSlug;
+  // Tier journey card — use real tier + member's current status if available.
+  const currentTier = (member?.current_tier ?? "bronze") as TierSlug;
 
-  // Build the invite URL for signed-in fans (used by the QR card).
+  // Build the invite URL for signed-in members (used by the QR card).
   const headerList = await headers();
   const host =
     process.env.NEXT_PUBLIC_APP_URL ??
     (headerList.get("x-forwarded-host") ?? headerList.get("host"));
   const proto = headerList.get("x-forwarded-proto") ?? "https";
   const origin = host?.startsWith("http") ? host : `${proto}://${host}`;
-  const inviteUrl = fan?.referral_code
-    ? `${origin}/invite/${fan.referral_code}`
+  const inviteUrl = member?.referral_code
+    ? `${origin}/invite/${member.referral_code}`
     : null;
 
   return (
@@ -140,16 +140,16 @@ export default async function Home({
               </Link>
             </section>
           )}
-          {/* Personalized Fan Home dashboard — only for fans past
+          {/* Personalized Member Home dashboard — only for members past
               onboarding. Still signed-in, so the marketing landing never
               appears here. */}
-          {!needsProfile && fanHome && <FanHomeDashboard data={fanHome} />}
+          {!needsProfile && memberHome && <MemberHomeDashboard data={memberHome} />}
           <section className="glass-card p-6">
             <p className="flex items-center gap-2 text-sm uppercase tracking-wide text-white/60">
               <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-amber-500/20 text-amber-300">
                 ★
               </span>
-              {fan?.first_name ? `Welcome back, ${fan.first_name}` : "Fan Momentum"}
+              {member?.first_name ? `Welcome back, ${member.first_name}` : "Member Momentum"}
             </p>
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {kpiCards.map((kpi) => (
@@ -196,7 +196,7 @@ export default async function Home({
                 <span>📅</span> Upcoming Events
               </p>
               <div className="rounded-2xl border border-dashed border-white/15 bg-black/20 p-6 text-center text-xs text-white/60">
-                No events scheduled yet. Artist drops and listening parties will show here.
+                No events scheduled yet. Brand drops and listening parties will show here.
               </div>
             </div>
             <div className="glass-card space-y-4 p-6">

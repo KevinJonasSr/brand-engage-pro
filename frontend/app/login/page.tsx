@@ -144,7 +144,7 @@ function LoginForm() {
         )}
 
         <p className="text-center text-sm text-white/60">
-          New fan?{" "}
+          New member?{" "}
           <Link href="/signup" className="text-white underline-offset-4 hover:underline">
             Create an account
           </Link>

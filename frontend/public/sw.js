@@ -1,4 +1,4 @@
-// Fan Engage — minimal service worker.
+// Member Engage — minimal service worker.
 // Intentionally does NOT cache routes. Next.js already handles caching +
 // static-asset delivery well, and a too-aggressive SW causes stale-HTML
 // bugs that are hard to debug. We just register so "Add to Home Screen"

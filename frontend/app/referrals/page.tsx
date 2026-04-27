@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import { getCurrentFan } from "@/lib/data/fan";
+import { getCurrentMember } from "@/lib/data/member";
 import { getMyReferrals, getReferralLeaderboard } from "@/lib/data/referrals";
 import InviteQRCode from "@/components/invite-qr";
 import CopyLinkButton from "./copy-link-button";
@@ -32,14 +32,14 @@ async function buildInviteUrl(code: string | null | undefined): Promise<string> 
 }
 
 export default async function ReferralsPage() {
-  const [fan, myReferrals, leaderboard] = await Promise.all([
-    getCurrentFan(),
+  const [member, myReferrals, leaderboard] = await Promise.all([
+    getCurrentMember(),
     getMyReferrals(),
     getReferralLeaderboard(5),
   ]);
 
-  const isSignedIn = fan !== null;
-  const inviteUrl = await buildInviteUrl(fan?.referral_code);
+  const isSignedIn = member !== null;
+  const inviteUrl = await buildInviteUrl(member?.referral_code);
   const myCount = myReferrals.length;
 
   const leaderboardRows = isSignedIn
@@ -49,7 +49,7 @@ export default async function ReferralsPage() {
       }))
     : previewLeaderboard;
 
-  const possessive = fan?.first_name ? `${fan.first_name}'s` : "your";
+  const possessive = member?.first_name ? `${member.first_name}'s` : "your";
 
   return (
     <div className="min-h-screen bg-midnight">
@@ -58,11 +58,11 @@ export default async function ReferralsPage() {
           <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-purple-800/30 via-slate-900 to-midnight p-6 shadow-glass">
             <p className="text-sm uppercase tracking-wide text-white/60">Referrals</p>
             <h1 className="mt-2 text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
-              Turn friends into superfans
+              Turn friends into supermembers
             </h1>
             <p className="mt-4 text-sm text-white/70">
               {isSignedIn
-                ? `You've invited ${myCount} fan${myCount === 1 ? "" : "s"} so far. Keep sharing to climb the ladder.`
+                ? `You've invited ${myCount} member${myCount === 1 ? "" : "s"} so far. Keep sharing to climb the ladder.`
                 : "Share your personal link to earn bonus points, badges, and early access rewards every time a friend joins."}
             </p>
             <div className="mt-6 flex flex-wrap items-center gap-3">
@@ -103,7 +103,7 @@ export default async function ReferralsPage() {
               <p className="text-sm uppercase tracking-wide text-white/60">Top referrers</p>
               {leaderboardRows.length === 0 ? (
                 <div className="mt-4 rounded-2xl border border-dashed border-white/15 bg-black/20 p-6 text-center text-xs text-white/60">
-                  The leaderboard will appear once fans start referring.
+                  The leaderboard will appear once members start referring.
                 </div>
               ) : (
                 <div className="mt-4 space-y-4">

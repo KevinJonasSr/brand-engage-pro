@@ -49,9 +49,9 @@ export async function getReferralLeaderboard(limit = 10): Promise<LeaderboardRow
     return [...counts.entries()]
       .sort(([, a], [, b]) => b - a)
       .slice(0, limit)
-      .map(([fan_id, referral_count]) => ({
-        fan_id,
-        display_name: fan_id.slice(0, 6), // placeholder until we join to fans + display rules
+      .map(([member_id, referral_count]) => ({
+        member_id,
+        display_name: member_id.slice(0, 6), // placeholder until we join to members + display rules
         referral_count,
       }));
   } catch {

@@ -11,7 +11,7 @@ interface KpiData {
   foundersClaimed: number;
   founderCap: number;
   mrrCents: number;
-  activeFansThisWeek: number;
+  activeMembersThisWeek: number;
   totalPointsThisMonth: number;
 }
 
@@ -23,8 +23,8 @@ interface DailyActivity {
   pointsEarned: number;
 }
 
-interface TopFan {
-  fan_id: string;
+interface TopMember {
+  member_id: string;
   first_name: string | null;
   last_name: string | null;
   avatar_url: string | null;
@@ -33,7 +33,7 @@ interface TopFan {
 }
 
 interface SubscriptionActivity {
-  fan_id: string;
+  member_id: string;
   first_name: string | null;
   last_name: string | null;
   subscription_tier: string;
@@ -45,7 +45,7 @@ interface SubscriptionActivity {
 
 async function getAnalyticsData(
   communityId: string
-): Promise<{ kpi: KpiData; daily: DailyActivity[]; topFans: TopFan[]; subscriptions: SubscriptionActivity[]; community: any }> {
+): Promise<{ kpi: KpiData; daily: DailyActivity[]; topMembers: TopMember[]; subscriptions: SubscriptionActivity[]; community: any }> {
   const admin = createAdminClient();
 
   // Get community details
@@ -68,28 +68,28 @@ async function getAnalyticsData(
 
   // 1. Total active members
   const totalRes = await admin
-    .from("fan_community_memberships")
-    .select("fan_id", { count: "exact", head: true })
+    .from("member_community_memberships")
+    .select("member_id", { count: "exact", head: true })
     .eq("community_id", communityId)
     .eq("status", "active");
 
   // 2. Premium/Comped members
   const premiumRes = await admin
-    .from("fan_community_memberships")
-    .select("fan_id", { count: "exact", head: true })
+    .from("member_community_memberships")
+    .select("member_id", { count: "exact", head: true })
     .eq("community_id", communityId)
     .in("subscription_tier", ["premium", "comped", "past_due"]);
 
   // 3. Founders claimed
   const foundersRes = await admin
-    .from("fan_community_memberships")
-    .select("fan_id", { count: "exact", head: true })
+    .from("member_community_memberships")
+    .select("member_id", { count: "exact", head: true })
     .eq("community_id", communityId)
     .eq("is_founder", true);
 
   // 4. MRR calculation
   const mrrRes = await admin
-    .from("fan_community_memberships")
+    .from("member_community_memberships")
     .select("subscription_tier")
     .eq("community_id", communityId)
     .in("subscription_tier", ["premium", "comped", "past_due"]);
@@ -103,10 +103,10 @@ async function getAnalyticsData(
     mrrCents += monthlyPrice;
   }
 
-  // 5. Active fans this week (with any points_ledger entry in last 7 days)
+  // 5. Active members this week (with any points_ledger entry in last 7 days)
   const activeWeekRes = await admin
     .from("points_ledger")
-    .select("fan_id", { count: "exact", head: true })
+    .select("member_id", { count: "exact", head: true })
     .eq("community_id", communityId)
     .gte("created_at", sevenDaysAgo.toISOString());
 
@@ -132,8 +132,8 @@ async function getAnalyticsData(
     const [newMembersRes, newPostsRes, newRsvpsRes, pointsRes] =
       await Promise.all([
         admin
-          .from("fan_community_memberships")
-          .select("fan_id", { count: "exact", head: true })
+          .from("member_community_memberships")
+          .select("member_id", { count: "exact", head: true })
           .eq("community_id", communityId)
           .gte("joined_at", date.toISOString())
           .lt("joined_at", nextDate.toISOString()),
@@ -171,15 +171,15 @@ async function getAnalyticsData(
     });
   }
 
-  // 8. Top 10 fans by points
-  const topFansRes = await admin
-    .from("fan_community_memberships")
+  // 8. Top 10 members by points
+  const topMembersRes = await admin
+    .from("member_community_memberships")
     .select(
       `
-      fan_id,
+      member_id,
       total_points,
       subscription_tier,
-      fans:fans (
+      members:members (
         first_name,
         last_name,
         avatar_url
@@ -190,13 +190,13 @@ async function getAnalyticsData(
     .order("total_points", { ascending: false })
     .limit(10);
 
-  const topFans = (topFansRes.data ?? []).map((row: any) => {
-    const fan = Array.isArray(row.fans) ? row.fans[0] : row.fans || {};
+  const topMembers = (topMembersRes.data ?? []).map((row: any) => {
+    const member = Array.isArray(row.members) ? row.members[0] : row.members || {};
     return {
-      fan_id: row.fan_id,
-      first_name: fan.first_name,
-      last_name: fan.last_name,
-      avatar_url: fan.avatar_url,
+      member_id: row.member_id,
+      first_name: member.first_name,
+      last_name: member.last_name,
+      avatar_url: member.avatar_url,
       total_points: row.total_points,
       subscription_tier: row.subscription_tier,
     };
@@ -204,16 +204,16 @@ async function getAnalyticsData(
 
   // 9. Recent subscription activity (last 10)
   const subscriptionsRes = await admin
-    .from("fan_community_memberships")
+    .from("member_community_memberships")
     .select(
       `
-      fan_id,
+      member_id,
       subscription_tier,
       is_founder,
       founder_number,
       joined_at,
       current_period_end,
-      fans:fans (
+      members:members (
         first_name,
         last_name
       )
@@ -224,11 +224,11 @@ async function getAnalyticsData(
     .limit(10);
 
   const subscriptions = (subscriptionsRes.data ?? []).map((row: any) => {
-    const fan = Array.isArray(row.fans) ? row.fans[0] : row.fans || {};
+    const member = Array.isArray(row.members) ? row.members[0] : row.members || {};
     return {
-      fan_id: row.fan_id,
-      first_name: fan.first_name,
-      last_name: fan.last_name,
+      member_id: row.member_id,
+      first_name: member.first_name,
+      last_name: member.last_name,
       subscription_tier: row.subscription_tier,
       is_founder: row.is_founder,
       founder_number: row.founder_number,
@@ -244,11 +244,11 @@ async function getAnalyticsData(
       foundersClaimed: foundersRes.count ?? 0,
       founderCap: community.founder_cap ?? 100,
       mrrCents,
-      activeFansThisWeek: activeWeekRes.count ?? 0,
+      activeMembersThisWeek: activeWeekRes.count ?? 0,
       totalPointsThisMonth,
     },
     daily: dailyData,
-    topFans,
+    topMembers,
     subscriptions,
     community,
   };
@@ -344,7 +344,7 @@ export default async function AdminCommunityAnalyticsPage({
           />
           <KpiCard
             label="Active This Week"
-            value={data.kpi.activeFansThisWeek}
+            value={data.kpi.activeMembersThisWeek}
             sub="With points earned"
           />
           <KpiCard
@@ -410,20 +410,20 @@ export default async function AdminCommunityAnalyticsPage({
         </div>
       </section>
 
-      {/* Top Fans & Recent Subscriptions */}
+      {/* Top Members & Recent Subscriptions */}
       <section className="grid gap-4 lg:grid-cols-2">
         <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-          <p className="mb-3 text-sm font-semibold">Top Fans by Points</p>
-          {data.topFans.length === 0 ? (
-            <p className="text-xs text-white/50">No fans yet.</p>
+          <p className="mb-3 text-sm font-semibold">Top Members by Points</p>
+          {data.topMembers.length === 0 ? (
+            <p className="text-xs text-white/50">No members yet.</p>
           ) : (
             <div className="divide-y divide-white/5">
-              {data.topFans.map((fan) => (
-                <div key={fan.fan_id} className="flex items-center gap-3 py-3">
-                  {fan.avatar_url && (
+              {data.topMembers.map((member) => (
+                <div key={member.member_id} className="flex items-center gap-3 py-3">
+                  {member.avatar_url && (
                     <Image
-                      src={fan.avatar_url}
-                      alt={fan.first_name || "Fan"}
+                      src={member.avatar_url}
+                      alt={member.first_name || "Member"}
                       width={32}
                       height={32}
                       className="h-8 w-8 rounded-full object-cover"
@@ -431,12 +431,12 @@ export default async function AdminCommunityAnalyticsPage({
                   )}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-white truncate">
-                      {fan.first_name} {fan.last_name}
+                      {member.first_name} {member.last_name}
                     </p>
-                    <p className="text-xs text-white/50">{fan.subscription_tier}</p>
+                    <p className="text-xs text-white/50">{member.subscription_tier}</p>
                   </div>
                   <p className="font-mono text-sm font-semibold tabular-nums text-right">
-                    {fan.total_points.toLocaleString()}
+                    {member.total_points.toLocaleString()}
                   </p>
                 </div>
               ))}
@@ -451,7 +451,7 @@ export default async function AdminCommunityAnalyticsPage({
           ) : (
             <div className="divide-y divide-white/5">
               {data.subscriptions.map((sub) => (
-                <div key={sub.fan_id} className="py-2.5 text-sm">
+                <div key={sub.member_id} className="py-2.5 text-sm">
                   <div className="flex items-center justify-between">
                     <div className="min-w-0">
                       <p className="font-medium text-white truncate">

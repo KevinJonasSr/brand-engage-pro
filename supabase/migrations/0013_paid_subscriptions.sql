@@ -11,20 +11,20 @@
 -- ────────────────────────────────────────────────────────────────────────────
 
 
--- ─── 1. fans — Stripe customer id ─────────────────────────────────────────
--- One Stripe Customer per fan, shared across every community they
--- subscribe to. A fan subscribed to RaeLynn + Danger Twins has two
+-- ─── 1. members — Stripe customer id ─────────────────────────────────────────
+-- One Stripe Customer per member, shared across every community they
+-- subscribe to. A member subscribed to RaeLynn + Danger Twins has two
 -- Stripe Subscriptions but one Customer record.
 
-alter table public.fans
+alter table public.members
   add column if not exists stripe_customer_id text;
 
-create unique index if not exists fans_stripe_customer_idx
-  on public.fans (stripe_customer_id)
+create unique index if not exists members_stripe_customer_idx
+  on public.members (stripe_customer_id)
   where stripe_customer_id is not null;
 
 
--- ─── 2. fan_community_memberships — subscription state ────────────────────
+-- ─── 2. member_community_memberships — subscription state ────────────────────
 -- subscription_tier:
 --   'free'       — default; no paid subscription
 --   'premium'    — active paid Stripe subscription
@@ -34,7 +34,7 @@ create unique index if not exists fans_stripe_customer_idx
 --                  then transitions to 'free'
 --   'comped'     — manually granted (Street Team, customer service overrides)
 
-alter table public.fan_community_memberships
+alter table public.member_community_memberships
   add column if not exists subscription_tier text not null default 'free'
     check (subscription_tier in ('free','premium','past_due','cancelled','comped')),
   add column if not exists stripe_subscription_id text,
@@ -48,12 +48,12 @@ alter table public.fan_community_memberships
     check (billing_period is null or billing_period in ('monthly','annual'));
 
 create unique index if not exists fcm_stripe_subscription_idx
-  on public.fan_community_memberships (stripe_subscription_id)
+  on public.member_community_memberships (stripe_subscription_id)
   where stripe_subscription_id is not null;
 
--- Unique founder_number per community (no duplicate "Founding Fan #7" slots)
+-- Unique founder_number per community (no duplicate "Founding Member #7" slots)
 create unique index if not exists fcm_founder_number_idx
-  on public.fan_community_memberships (community_id, founder_number)
+  on public.member_community_memberships (community_id, founder_number)
   where founder_number is not null;
 
 
@@ -80,7 +80,7 @@ alter table public.communities
 
 -- ─── 4. badges — tier column ──────────────────────────────────────────────
 -- Foundation badges stay free-tier (keeps conversion funnel alive — a free
--- fan who earned "Recruiter" sees the ladder continues and only unlocks
+-- member who earned "Recruiter" sees the ladder continues and only unlocks
 -- via Premium). Prestige badges gate behind Premium.
 
 alter table public.badges
@@ -98,13 +98,13 @@ update public.badges set tier = 'premium' where slug in (
   'tier-platinum'
 );
 
--- Seed the Founding Fan badge. One-time award when a fan enters the
+-- Seed the Founding Member badge. One-time award when a member enters the
 -- founder cohort. Premium-tier so it only awards to paying (or comped)
 -- subscribers.
 insert into public.badges (slug, name, description, icon, point_value, category, threshold, sort_order, tier)
 values (
-  'founding-fan',
-  'Founding Fan',
+  'founding-member',
+  'Founding Member',
   'Among the first 100 subscribers to this community. Locked-in pricing for life.',
   '🌟',
   500,
@@ -128,7 +128,7 @@ create table if not exists public.stripe_events (
   id             text primary key,
   type           text not null,
   community_id   text,
-  fan_id         uuid references public.fans(id) on delete set null,
+  member_id         uuid references public.members(id) on delete set null,
   received_at    timestamptz not null default now(),
   processed_at   timestamptz,
   error          text,
@@ -148,17 +148,17 @@ create index if not exists stripe_events_type_idx
 
 create table if not exists public.credit_grants (
   id                uuid primary key default gen_random_uuid(),
-  fan_id            uuid not null references public.fans(id) on delete cascade,
+  member_id            uuid not null references public.members(id) on delete cascade,
   community_id      text not null references public.communities(slug) on delete cascade,
   amount_cents      integer not null,
   reason            text not null,                 -- 'monthly_refresh' | 'manual' | 'promo'
   granted_at        timestamptz not null default now(),
-  granted_by        uuid references public.fans(id) on delete set null,
+  granted_by        uuid references public.members(id) on delete set null,
   stripe_event_id   text references public.stripe_events(id)
 );
 
-create index if not exists credit_grants_fan_idx
-  on public.credit_grants (fan_id, granted_at desc);
+create index if not exists credit_grants_member_idx
+  on public.credit_grants (member_id, granted_at desc);
 create index if not exists credit_grants_community_idx
   on public.credit_grants (community_id, granted_at desc);
 
@@ -166,14 +166,14 @@ create index if not exists credit_grants_community_idx
 -- ─── 7. RLS ───────────────────────────────────────────────────────────────
 
 alter table public.stripe_events enable row level security;
--- stripe_events is service-role only — no fan or admin should read it
+-- stripe_events is service-role only — no member or admin should read it
 -- directly from the browser. No policies = no access.
 
 alter table public.credit_grants enable row level security;
 drop policy if exists credit_grants_own_read on public.credit_grants;
 create policy credit_grants_own_read on public.credit_grants
   for select using (
-    auth.uid() = fan_id
+    auth.uid() = member_id
     or is_admin_of(community_id)
   );
 
@@ -185,7 +185,7 @@ create policy credit_grants_own_read on public.credit_grants
 -- select column_name, data_type, column_default
 --   from information_schema.columns
 --  where table_schema = 'public'
---    and table_name = 'fan_community_memberships'
+--    and table_name = 'member_community_memberships'
 --    and column_name in ('subscription_tier','stripe_subscription_id','is_founder','monthly_credit_cents');
 --
 -- -- Badges tiered correctly? Expect 8 premium badges (after migration runs).
@@ -194,4 +194,4 @@ create policy credit_grants_own_read on public.credit_grants
 -- -- Communities ready to be seeded with Stripe ids?
 -- select slug, monthly_price_cents, annual_price_cents, founder_cap,
 --        stripe_product_id is not null as has_product
---   from communities where type = 'artist' order by sort_order;
+--   from communities where type = 'brand' order by sort_order;

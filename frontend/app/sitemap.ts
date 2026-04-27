@@ -1,11 +1,11 @@
 import type { MetadataRoute } from "next";
-import { listArtistsFromDb } from "@/lib/data/artists";
+import { listBrandsFromDb } from "@/lib/data/brands";
 
 const appUrl =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://brand-engage-pro.vercel.app";
 
 // Dynamic sitemap — lists the public, crawlable surfaces of Brand Engage Pro:
-// marketing root, every active artist page, and the legal pages. We omit
+// marketing root, every active brand page, and the legal pages. We omit
 // anything auth-gated (admin, /inbox) and anything that would require a
 // session to be meaningful (rewards, marketplace, referrals).
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -18,7 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
-      url: `${appUrl}/artists`,
+      url: `${appUrl}/brands`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.8,
@@ -44,17 +44,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   try {
-    const artists = await listArtistsFromDb();
-    for (const a of artists) {
+    const brands = await listBrandsFromDb();
+    for (const a of brands) {
       base.push({
-        url: `${appUrl}/artists/${a.slug}`,
+        url: `${appUrl}/brands/${a.slug}`,
         lastModified: now,
         changeFrequency: "weekly",
         priority: 0.7,
       });
     }
   } catch {
-    // Silently skip artist pages if the DB fetch errors — we still want a
+    // Silently skip brand pages if the DB fetch errors — we still want a
     // working sitemap for crawlers.
   }
 

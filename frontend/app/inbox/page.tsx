@@ -140,7 +140,7 @@ export default async function InboxPage({
           <p className="text-sm">
             {filter === "unread"
               ? "Nothing unread. Enjoy the calm."
-              : "Your notifications will show up here — new badges, RSVPs, referrals, and artist drops."}
+              : "Your notifications will show up here — new badges, RSVPs, referrals, and brand drops."}
           </p>
         </div>
       ) : (

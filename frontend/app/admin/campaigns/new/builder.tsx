@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createAndPublishCampaign } from "../actions";
 
-type Artist = { slug: string; name: string };
+type Brand = { slug: string; name: string };
 type CTAKind = "pre_save" | "stream" | "share" | "radio_request" | "playlist_add" | "social_follow" | "custom";
 
 type CTA = {
@@ -35,8 +35,8 @@ const DEFAULT_CTA_BY_KIND: Record<CTAKind, Partial<CTA>> = {
   custom: { cta_label: "Complete", point_value: 25 },
 };
 
-export default function CampaignBuilder({ artists }: { artists: Artist[] }) {
-  const [artistSlug, setArtistSlug] = useState(artists[0]?.slug ?? "");
+export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
+  const [brandSlug, setBrandSlug] = useState(brands[0]?.slug ?? "");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
@@ -141,20 +141,20 @@ export default function CampaignBuilder({ artists }: { artists: Artist[] }) {
 
   return (
     <form action={handleSubmit} className="space-y-6">
-      <input type="hidden" name="artist_slug" value={artistSlug} />
+      <input type="hidden" name="brand_slug" value={brandSlug} />
 
       {/* Base */}
       <section className="glass-card space-y-3 p-5">
         <p className="text-sm font-semibold">Campaign basics</p>
         <div className="grid gap-3 md:grid-cols-2">
           <label className="block">
-            <span className="text-xs uppercase tracking-wide text-white/60">Artist</span>
+            <span className="text-xs uppercase tracking-wide text-white/60">Brand</span>
             <select
-              value={artistSlug}
-              onChange={(e) => setArtistSlug(e.target.value)}
+              value={brandSlug}
+              onChange={(e) => setBrandSlug(e.target.value)}
               className="mt-1 w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
             >
-              {artists.map((a) => (
+              {brands.map((a) => (
                 <option key={a.slug} value={a.slug}>
                   {a.name}
                 </option>
@@ -180,7 +180,7 @@ export default function CampaignBuilder({ artists }: { artists: Artist[] }) {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
-            placeholder="For your own tracking — not shown to fans."
+            placeholder="For your own tracking — not shown to members."
             className="mt-1 w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
           />
         </label>
@@ -204,7 +204,7 @@ export default function CampaignBuilder({ artists }: { artists: Artist[] }) {
           value={announcementBody}
           onChange={(e) => setAnnouncementBody(e.target.value)}
           rows={3}
-          placeholder="Body copy — what's happening and why fans should care."
+          placeholder="Body copy — what's happening and why members should care."
           className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
         />
       </Section>
@@ -272,7 +272,7 @@ export default function CampaignBuilder({ artists }: { artists: Artist[] }) {
           value={challengeBody}
           onChange={(e) => setChallengeBody(e.target.value)}
           rows={3}
-          placeholder="What should fans submit? How will winners be chosen?"
+          placeholder="What should members submit? How will winners be chosen?"
           className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
         />
       </Section>
@@ -327,7 +327,7 @@ export default function CampaignBuilder({ artists }: { artists: Artist[] }) {
           value={offerDescription}
           onChange={(e) => setOfferDescription(e.target.value)}
           rows={2}
-          placeholder="Describe what fans get."
+          placeholder="Describe what members get."
           className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
         />
       </Section>
@@ -335,7 +335,7 @@ export default function CampaignBuilder({ artists }: { artists: Artist[] }) {
       {/* CTAs */}
       <section className="glass-card space-y-3 p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm font-semibold">🎯 Fan CTAs (pre-saves, streams, shares, radio, etc.)</p>
+          <p className="text-sm font-semibold">🎯 Member CTAs (pre-saves, streams, shares, radio, etc.)</p>
           <div className="flex flex-wrap gap-1">
             {(Object.keys(CTA_KIND_LABELS) as CTAKind[]).map((k) => (
               <button
@@ -351,7 +351,7 @@ export default function CampaignBuilder({ artists }: { artists: Artist[] }) {
         </div>
         {ctas.length === 0 ? (
           <p className="text-xs text-white/50">
-            No CTAs yet. Add one or more to reward fans for taking action.
+            No CTAs yet. Add one or more to reward members for taking action.
           </p>
         ) : (
           <div className="space-y-3">
@@ -399,7 +399,7 @@ export default function CampaignBuilder({ artists }: { artists: Artist[] }) {
                     value={c.description}
                     onChange={(e) => updateCTA(i, { description: e.target.value })}
                     rows={2}
-                    placeholder="Short description shown to fans"
+                    placeholder="Short description shown to members"
                     className="md:col-span-2 rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
                   />
                 </div>
@@ -474,7 +474,7 @@ export default function CampaignBuilder({ artists }: { artists: Artist[] }) {
             onChange={(e) => setTargetEventRsvpers(e.target.checked)}
             className="h-4 w-4 accent-aurora"
           />
-          Target SMS blast at event RSVPers (instead of all artist followers)
+          Target SMS blast at event RSVPers (instead of all brand followers)
         </label>
       </Section>
 
@@ -512,7 +512,7 @@ export default function CampaignBuilder({ artists }: { artists: Artist[] }) {
           className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
         />
         <p className="text-[11px] text-white/50">
-          Recorded as a campaign item; sends via Twilio to opted-in fans.
+          Recorded as a campaign item; sends via Twilio to opted-in members.
         </p>
       </Section>
 
@@ -525,7 +525,7 @@ export default function CampaignBuilder({ artists }: { artists: Artist[] }) {
         </a>
         <button
           type="submit"
-          disabled={submitting || !title.trim() || !artistSlug}
+          disabled={submitting || !title.trim() || !brandSlug}
           className="rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-2 text-sm font-semibold text-white shadow-glass hover:brightness-110 disabled:opacity-50"
         >
           {submitting ? "Publishing…" : "Publish campaign"}

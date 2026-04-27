@@ -12,7 +12,7 @@ create table if not exists public.policy_pages (
   effective_date  date,
   is_draft        boolean not null default true,
   updated_at      timestamptz not null default now(),
-  updated_by      uuid references public.fans(id) on delete set null
+  updated_by      uuid references public.members(id) on delete set null
 );
 
 drop trigger if exists policy_pages_set_updated_at on public.policy_pages;
@@ -33,20 +33,20 @@ insert into public.policy_pages (slug, title, content_md, is_draft) values
    E'## 4. Content + intellectual property\nYou retain rights to your content; you grant Brand Engage Pro a license to display it within the platform.\n\n' ||
    E'## 5. Points + rewards\nPoints have no cash value and cannot be transferred between accounts.\n\n' ||
    E'## 6. Termination\nBrand Engage Pro may suspend or terminate accounts that violate these terms.\n\n' ||
-   E'## 7. Contact\nQuestions? Email support@fanengage.app.',
+   E'## 7. Contact\nQuestions? Email support@memberengage.app.',
    true),
   ('privacy', 'Privacy Policy',
    E'# Privacy Policy — DRAFT\n\n_This is a placeholder. Final policy pending legal review._\n\n' ||
    E'## 1. Information we collect\nWe collect the information you provide at signup: email, phone number, first name, city, and your opt-in choices for SMS and email.\n\n' ||
-   E'## 2. How we use it\n- To send you opted-in communications about your chosen artists\n- To track points, badges, referrals, and RSVPs\n- To improve the platform\n\n' ||
+   E'## 2. How we use it\n- To send you opted-in communications about your chosen brands\n- To track points, badges, referrals, and RSVPs\n- To improve the platform\n\n' ||
    E'## 3. Sharing\nWe do not sell your data. We share it only with service providers (Supabase, Mailchimp, Twilio) as needed to operate the platform.\n\n' ||
-   E'## 4. Your rights\nYou can request data export or account deletion at any time by emailing support@fanengage.app.\n\n' ||
+   E'## 4. Your rights\nYou can request data export or account deletion at any time by emailing support@memberengage.app.\n\n' ||
    E'## 5. Cookies\nSee our Cookie Policy for details about cookies and local storage.\n\n' ||
-   E'## 6. Contact\nPrivacy questions? Email privacy@fanengage.app.',
+   E'## 6. Contact\nPrivacy questions? Email privacy@memberengage.app.',
    true),
   ('cookie_policy', 'Cookie Policy',
    E'# Cookie Policy — DRAFT\n\n_This is a placeholder. Final policy pending legal review._\n\n' ||
-   E'## What we use\n- **Authentication cookies** — set by Supabase when you sign in\n- **Referral cookie** (`fanengage_ref`) — 30-day cookie tracking invite codes\n- **Local storage** — remembering that you dismissed the cookie banner and caching lightweight UI state\n\n' ||
+   E'## What we use\n- **Authentication cookies** — set by Supabase when you sign in\n- **Referral cookie** (`memberengage_ref`) — 30-day cookie tracking invite codes\n- **Local storage** — remembering that you dismissed the cookie banner and caching lightweight UI state\n\n' ||
    E'## What we don''t use\nWe don''t use advertising cookies, third-party trackers, or analytics cookies tied to individual users.\n\n' ||
    E'## Your choices\nYou can clear cookies from your browser at any time. Signed-in features won''t work without authentication cookies.',
    true)
@@ -57,23 +57,23 @@ on conflict (slug) do update set
   content_md = case when policy_pages.is_draft and policy_pages.content_md like '%DRAFT%'
                    then excluded.content_md else policy_pages.content_md end;
 
--- ─── Fan consent + unsubscribe token ──────────────────────────────────────
-alter table public.fans
+-- ─── Member consent + unsubscribe token ──────────────────────────────────────
+alter table public.members
   add column if not exists consent_accepted_at timestamptz,
   add column if not exists consent_version     text,
   add column if not exists unsubscribe_token   text;
 
--- Backfill unsubscribe_token for existing fans (random 32 hex chars)
-update public.fans
+-- Backfill unsubscribe_token for existing members (random 32 hex chars)
+update public.members
   set unsubscribe_token = encode(gen_random_bytes(16), 'hex')
   where unsubscribe_token is null;
 
--- From now on new fans get one automatically
-alter table public.fans
+-- From now on new members get one automatically
+alter table public.members
   alter column unsubscribe_token set default encode(gen_random_bytes(16), 'hex');
 
-create unique index if not exists fans_unsubscribe_token_idx
-  on public.fans (unsubscribe_token);
+create unique index if not exists members_unsubscribe_token_idx
+  on public.members (unsubscribe_token);
 
 -- ─── RLS ──────────────────────────────────────────────────────────────────
 alter table public.policy_pages enable row level security;
@@ -88,4 +88,4 @@ create policy policy_pages_public_read on public.policy_pages
 
 -- ─── Smoke test ────────────────────────────────────────────────────────────
 -- select slug, title, is_draft, effective_date from policy_pages;
--- select count(*) as fans_with_token from fans where unsubscribe_token is not null;
+-- select count(*) as members_with_token from members where unsubscribe_token is not null;

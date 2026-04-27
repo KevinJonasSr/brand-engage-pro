@@ -5,14 +5,14 @@ export type ReminderKind = "reminder_24h" | "reminder_1h" | "manual";
 
 export interface ReminderWindowEvent {
   id: string;
-  artist_slug: string;
+  brand_slug: string;
   title: string;
   detail: string | null;
   starts_at: string;
   location: string | null;
   url: string | null;
   reminder_sms_template: string | null;
-  artist_name: string | null;
+  brand_name: string | null;
 }
 
 /**
@@ -33,8 +33,8 @@ export async function loadEventsInReminderWindow(kind: "reminder_24h" | "reminde
   const windowEnd = new Date(center + halfWidthMs).toISOString();
 
   const { data: candidates } = await admin
-    .from("artist_events")
-    .select("id, artist_slug, title, detail, starts_at, location, url, reminder_sms_template")
+    .from("brand_events")
+    .select("id, brand_slug, title, detail, starts_at, location, url, reminder_sms_template")
     .eq("active", true)
     .not("starts_at", "is", null)
     .gte("starts_at", windowStart)
@@ -54,26 +54,26 @@ export async function loadEventsInReminderWindow(kind: "reminder_24h" | "reminde
   const remaining = candidates.filter((c) => !alreadySet.has(c.id as string));
   if (remaining.length === 0) return [];
 
-  // Attach artist name for nicer default template copy.
-  const slugs = [...new Set(remaining.map((r) => r.artist_slug as string))];
-  const { data: artists } = await admin
-    .from("artists")
+  // Attach brand name for nicer default template copy.
+  const slugs = [...new Set(remaining.map((r) => r.brand_slug as string))];
+  const { data: brands } = await admin
+    .from("brands")
     .select("slug, name")
     .in("slug", slugs);
-  const byName = new Map((artists ?? []).map((a) => [a.slug as string, a.name as string]));
+  const byName = new Map((brands ?? []).map((a) => [a.slug as string, a.name as string]));
 
   return remaining.map(
     (r) =>
       ({
         id: r.id as string,
-        artist_slug: r.artist_slug as string,
+        brand_slug: r.brand_slug as string,
         title: r.title as string,
         detail: (r.detail as string | null) ?? null,
         starts_at: r.starts_at as string,
         location: (r.location as string | null) ?? null,
         url: (r.url as string | null) ?? null,
         reminder_sms_template: (r.reminder_sms_template as string | null) ?? null,
-        artist_name: byName.get(r.artist_slug as string) ?? null,
+        brand_name: byName.get(r.brand_slug as string) ?? null,
       }) as ReminderWindowEvent,
   );
 }
@@ -89,13 +89,13 @@ function buildDefaultReminderCopy(event: ReminderWindowEvent, kind: ReminderKind
       : kind === "reminder_1h"
         ? "in 1 hour"
         : "soon";
-  const artistName = event.artist_name ?? "Your artist";
+  const brandName = event.brand_name ?? "Your brand";
   const locBit = event.location ? ` at ${event.location}` : "";
   const linkBit = event.url ? ` Link: ${event.url}` : "";
-  const sms = `${artistName}'s ${event.title} starts ${when}${locBit}.${linkBit} See you there!`;
+  const sms = `${brandName}'s ${event.title} starts ${when}${locBit}.${linkBit} See you there!`;
   const subject = `Reminder: ${event.title} starts ${when}`;
   const email =
-    `Hey — quick heads up: ${artistName}'s ${event.title} starts ${when}${locBit}.\n\n` +
+    `Hey — quick heads up: ${brandName}'s ${event.title} starts ${when}${locBit}.\n\n` +
     (event.detail ? `${event.detail}\n\n` : "") +
     (event.url ? `Details: ${event.url}\n\n` : "") +
     `Thanks for RSVPing.`;
@@ -117,7 +117,7 @@ export async function sendEventReminder(
   const smsBody = event.reminder_sms_template || copy.sms;
 
   const [smsResult, emailResult] = await Promise.all([
-    broadcastSms({ body: smsBody, artistSlug: event.artist_slug, eventId: event.id }),
+    broadcastSms({ body: smsBody, brandSlug: event.brand_slug, eventId: event.id }),
     broadcastEmail({ subject: copy.subject, body: copy.email }),
   ]);
 

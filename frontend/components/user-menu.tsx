@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 interface UserMenuProps {
-  fan: {
+  member: {
     id: string;
     email: string | null | undefined;
     first_name: string | null;
@@ -17,9 +17,9 @@ interface UserMenuProps {
 /**
  * Dropdown user menu. Replaces the bare "Sign out" button + name combo.
  * Opens on click, closes on click-outside or Escape.
- * Shows Fan home, Rewards, Inbox, and optionally Admin if isAdmin is true.
+ * Shows Member home, Rewards, Inbox, and optionally Admin if isAdmin is true.
  */
-export default function UserMenu({ fan, isAdmin, unreadCount = 0 }: UserMenuProps) {
+export default function UserMenu({ member, isAdmin, unreadCount = 0 }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -54,10 +54,10 @@ export default function UserMenu({ fan, isAdmin, unreadCount = 0 }: UserMenuProp
     };
   }, [isOpen]);
 
-  if (!fan) return null;
+  if (!member) return null;
 
-  const displayName = fan.first_name ?? fan.email?.split("@")[0] ?? "Signed in";
-  const initial = (fan.first_name?.[0] ?? fan.email?.[0] ?? "F").toUpperCase();
+  const displayName = member.first_name ?? member.email?.split("@")[0] ?? "Signed in";
+  const initial = (member.first_name?.[0] ?? member.email?.[0] ?? "F").toUpperCase();
 
   return (
     <div className="relative">
@@ -68,12 +68,12 @@ export default function UserMenu({ fan, isAdmin, unreadCount = 0 }: UserMenuProp
         className="flex items-center gap-2 rounded-full border border-white/15 bg-black/30 px-2 py-1 text-xs text-white/80 hover:bg-white/10 transition"
         aria-haspopup="menu"
         aria-expanded={isOpen}
-        title={fan.email ?? undefined}
+        title={member.email ?? undefined}
       >
-        {fan.avatar_url ? (
+        {member.avatar_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={fan.avatar_url}
+            src={member.avatar_url}
             alt=""
             className="h-6 w-6 rounded-full object-cover"
           />
@@ -101,14 +101,14 @@ export default function UserMenu({ fan, isAdmin, unreadCount = 0 }: UserMenuProp
           role="menu"
         >
           <nav className="py-1">
-            {/* Fan Home */}
+            {/* Member Home */}
             <Link
               href="/"
               className="block px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition"
               role="menuitem"
               onClick={() => setIsOpen(false)}
             >
-              Fan home
+              Member home
             </Link>
 
             {/* My Rewards */}

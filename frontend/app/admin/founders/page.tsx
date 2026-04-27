@@ -6,7 +6,7 @@ import Image from "next/image";
 export const dynamic = "force-dynamic";
 
 interface Founder {
-  fan_id: string;
+  member_id: string;
   founder_number: number;
   first_name: string | null;
   last_name: string | null;
@@ -52,16 +52,16 @@ async function getFoundersData(): Promise<CommunityData[]> {
 
   for (const community of communities.data) {
     const foundersResult = await admin
-      .from("fan_community_memberships")
+      .from("member_community_memberships")
       .select(
         `
-        fan_id,
+        member_id,
         founder_number,
         subscription_tier,
         joined_at,
         billing_period,
         monthly_credit_cents,
-        fans:fans (
+        members:members (
           id,
           first_name,
           last_name,
@@ -76,16 +76,16 @@ async function getFoundersData(): Promise<CommunityData[]> {
 
     const founders: Founder[] = (foundersResult.data ?? [])
       .map((row: any) => {
-        const fan = Array.isArray(row.fans)
-          ? row.fans[0]
-          : row.fans || {};
+        const member = Array.isArray(row.members)
+          ? row.members[0]
+          : row.members || {};
         return {
-          fan_id: row.fan_id,
+          member_id: row.member_id,
           founder_number: row.founder_number,
-          first_name: fan.first_name,
-          last_name: fan.last_name,
-          email: fan.email,
-          avatar_url: fan.avatar_url,
+          first_name: member.first_name,
+          last_name: member.last_name,
+          email: member.email,
+          avatar_url: member.avatar_url,
           subscription_tier: row.subscription_tier,
           joined_at: row.joined_at,
           billing_period: row.billing_period,
@@ -154,7 +154,7 @@ export default async function AdminFoundersPage() {
             Founder rosters
           </h1>
           <p className="mt-2 text-sm text-white/60">
-            View founding fans per community.
+            View founding members per community.
           </p>
         </div>
         <div className="rounded-2xl border border-white/10 bg-black/30 p-8 text-center">
@@ -174,7 +174,7 @@ export default async function AdminFoundersPage() {
           Founder rosters
         </h1>
         <p className="mt-2 text-sm text-white/60">
-          Founding fans per community. Sorted by founder number within each community.
+          Founding members per community. Sorted by founder number within each community.
         </p>
       </div>
 
@@ -210,7 +210,7 @@ export default async function AdminFoundersPage() {
                 <thead className="bg-black/40 text-left text-xs uppercase tracking-wide text-white/50">
                   <tr>
                     <th className="px-4 py-3 w-12">#</th>
-                    <th className="px-4 py-3">Fan</th>
+                    <th className="px-4 py-3">Member</th>
                     <th className="px-4 py-3">Email</th>
                     <th className="px-4 py-3">Status</th>
                     <th className="px-4 py-3">Joined</th>
@@ -220,7 +220,7 @@ export default async function AdminFoundersPage() {
                 </thead>
                 <tbody>
                   {community.founders.map((founder) => (
-                    <tr key={`${community.slug}-${founder.fan_id}`} className="border-t border-white/5">
+                    <tr key={`${community.slug}-${founder.member_id}`} className="border-t border-white/5">
                       <td className="px-4 py-3 font-semibold text-white/70">
                         {founder.founder_number}
                       </td>

@@ -7,7 +7,7 @@ import { countPendingRedemptions } from "@/lib/data/rewards";
 
 const adminNav = [
   { href: "/admin", label: "Overview" },
-  { href: "/admin/artists", label: "Artists" },
+  { href: "/admin/brands", label: "Brands" },
   { href: "/admin/campaigns", label: "Campaigns" },
   { href: "/admin/analytics", label: "Analytics" },
   { href: "/admin/community", label: "Community" },
@@ -15,7 +15,7 @@ const adminNav = [
   { href: "/admin/offers", label: "Offers" },
   { href: "/admin/rewards", label: "Rewards" },
   { href: "/admin/redemptions", label: "Redemptions" },
-  { href: "/admin/fans", label: "Fans" },
+  { href: "/admin/members", label: "Members" },
   { href: "/admin/policies", label: "Policies" },
 ];
 
@@ -93,7 +93,7 @@ export default async function AdminLayout({
             href="/"
             className="text-xs text-white/60 hover:text-white"
           >
-            ← Back to fan site
+            ← Back to member site
           </Link>
         </div>
 

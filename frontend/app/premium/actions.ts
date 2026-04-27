@@ -14,7 +14,7 @@ import { getCurrentCommunityId } from "@/lib/community";
 
 /**
  * Start a Stripe Checkout Session for Premium. Reads the current
- * community from request context, resolves the fan, gets-or-creates
+ * community from request context, resolves the member, gets-or-creates
  * their Stripe customer, picks the right price_id (founder vs
  * standard × monthly vs annual), creates the session, and redirects
  * the browser to Stripe.
@@ -67,9 +67,9 @@ export async function createCheckoutSessionAction(formData: FormData) {
 
   // 3) Already subscribed? Don't let them create a second subscription.
   const { data: existing } = await admin
-    .from("fan_community_memberships")
+    .from("member_community_memberships")
     .select("subscription_tier")
-    .eq("fan_id", user.id)
+    .eq("member_id", user.id)
     .eq("community_id", communityId)
     .maybeSingle();
   if (
@@ -80,14 +80,14 @@ export async function createCheckoutSessionAction(formData: FormData) {
     redirect(`/premium?already_active=1`);
   }
 
-  // 4) Make sure the fan has a membership row — the webhook handler will
+  // 4) Make sure the member has a membership row — the webhook handler will
   //    update it when the subscription is created. If they don't have one
   //    yet (e.g. they signed up pre-migration-0011 and never got their
   //    raelynn membership), insert a free placeholder now.
   await admin
-    .from("fan_community_memberships")
+    .from("member_community_memberships")
     .insert({
-      fan_id: user.id,
+      member_id: user.id,
       community_id: communityId,
       subscription_tier: "free",
     })
@@ -105,16 +105,16 @@ export async function createCheckoutSessionAction(formData: FormData) {
     );
   }
 
-  // 6) Stripe Customer (get-or-create, cached on fans.stripe_customer_id)
-  const { data: fanRow } = await admin
-    .from("fans")
+  // 6) Stripe Customer (get-or-create, cached on members.stripe_customer_id)
+  const { data: memberRow } = await admin
+    .from("members")
     .select("first_name")
     .eq("id", user.id)
     .maybeSingle();
   const customerId = await getOrCreateStripeCustomer({
-    fanId: user.id,
+    memberId: user.id,
     email: user.email,
-    firstName: (fanRow?.first_name as string | null) ?? null,
+    firstName: (memberRow?.first_name as string | null) ?? null,
   });
 
   // 7) Create the Checkout Session
@@ -131,14 +131,14 @@ export async function createCheckoutSessionAction(formData: FormData) {
     allow_promotion_codes: true,
     client_reference_id: `${user.id}:${communityId}`,
     metadata: {
-      fan_id: user.id,
+      member_id: user.id,
       community_id: communityId,
       tier: asFounder ? "founder" : "standard",
       billing_period: billingPeriod,
     },
     subscription_data: {
       metadata: {
-        fan_id: user.id,
+        member_id: user.id,
         community_id: communityId,
         tier: asFounder ? "founder" : "standard",
         billing_period: billingPeriod,

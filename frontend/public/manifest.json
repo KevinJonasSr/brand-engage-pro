@@ -1,7 +1,7 @@
 {
   "name": "Brand Engage Pro",
   "short_name": "Brand Engage Pro",
-  "description": "Your fan club — rewards, community, and artist drops.",
+  "description": "Your member club — rewards, community, and brand drops.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

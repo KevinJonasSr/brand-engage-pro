@@ -8,12 +8,12 @@ import type {
 } from "./types";
 
 /**
- * Fetches the community feed for one artist, newest first with pinned
+ * Fetches the community feed for one brand, newest first with pinned
  * posts always at the top. Aggregates reactions + comment counts so the
  * UI renders in a single round-trip.
  */
-export async function getPostsByArtist(
-  artistSlug: string,
+export async function getPostsByBrand(
+  brandSlug: string,
   limit = 30,
 ): Promise<CommunityPost[]> {
   try {
@@ -25,9 +25,9 @@ export async function getPostsByArtist(
     const { data: posts, error: postsErr } = await supabase
       .from("community_posts")
       .select(
-        "id, artist_slug, author_id, kind, title, body, image_url, video_url, video_poster_url, pinned, visibility, created_at",
+        "id, brand_slug, author_id, kind, title, body, image_url, video_url, video_poster_url, pinned, visibility, created_at",
       )
-      .eq("artist_slug", artistSlug)
+      .eq("brand_slug", brandSlug)
       .order("pinned", { ascending: false })
       .order("created_at", { ascending: false })
       .limit(limit);
@@ -40,7 +40,7 @@ export async function getPostsByArtist(
 
     const [authorsRes, reactionsRes, myReactionsRes, commentCountRes] = await Promise.all([
       supabase
-        .from("fans")
+        .from("members")
         .select("id, first_name")
         .in("id", authorIds),
       supabase
@@ -52,7 +52,7 @@ export async function getPostsByArtist(
             .from("community_reactions")
             .select("post_id, emoji")
             .in("post_id", postIds)
-            .eq("fan_id", user.id)
+            .eq("member_id", user.id)
         : Promise.resolve({ data: [] as { post_id: string; emoji: string }[], error: null }),
       supabase
         .from("community_comments")
@@ -91,7 +91,7 @@ export async function getPostsByArtist(
       (p) =>
         ({
           id: p.id as string,
-          artist_slug: p.artist_slug as string,
+          brand_slug: p.brand_slug as string,
           author_id: p.author_id as string,
           author_first_name: authorNameById.get(p.author_id as string) ?? null,
           kind: p.kind,
@@ -116,7 +116,7 @@ export async function getPostsByArtist(
 
 /**
  * Fetch the poll data for a single poll post: options + vote counts + whether
- * the current fan has already voted (and which option they picked).
+ * the current member has already voted (and which option they picked).
  */
 export async function getPollData(postId: string): Promise<PollData | null> {
   try {
@@ -140,7 +140,7 @@ export async function getPollData(postId: string): Promise<PollData | null> {
             .from("community_poll_votes")
             .select("option_id")
             .eq("post_id", postId)
-            .eq("fan_id", user.id)
+            .eq("member_id", user.id)
             .maybeSingle()
         : Promise.resolve({ data: null, error: null }),
     ]);
@@ -182,19 +182,19 @@ export async function getChallengeEntries(
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("community_challenge_entries")
-      .select("id, post_id, fan_id, body, image_url, created_at")
+      .select("id, post_id, member_id, body, image_url, created_at")
       .eq("post_id", postId)
       .order("created_at", { ascending: false });
     if (error) throw error;
     if (!data || data.length === 0) return [];
 
-    const fanIds = [...new Set(data.map((e) => e.fan_id as string))];
-    const { data: fans } = await supabase
-      .from("fans")
+    const memberIds = [...new Set(data.map((e) => e.member_id as string))];
+    const { data: members } = await supabase
+      .from("members")
       .select("id, first_name")
-      .in("id", fanIds);
+      .in("id", memberIds);
     const nameById = new Map<string, string | null>(
-      (fans ?? []).map((f) => [f.id as string, (f.first_name as string | null) ?? null]),
+      (members ?? []).map((f) => [f.id as string, (f.first_name as string | null) ?? null]),
     );
 
     return data.map(
@@ -202,8 +202,8 @@ export async function getChallengeEntries(
         ({
           id: e.id as string,
           post_id: e.post_id as string,
-          fan_id: e.fan_id as string,
-          fan_first_name: nameById.get(e.fan_id as string) ?? null,
+          member_id: e.member_id as string,
+          member_first_name: nameById.get(e.member_id as string) ?? null,
           body: e.body as string | null,
           image_url: e.image_url as string | null,
           created_at: e.created_at as string,
@@ -230,7 +230,7 @@ export async function getCommentsByPost(
 
     const authorIds = [...new Set(data.map((c) => c.author_id as string))];
     const { data: authors } = await supabase
-      .from("fans")
+      .from("members")
       .select("id, first_name")
       .in("id", authorIds);
     const nameById = new Map<string, string | null>(

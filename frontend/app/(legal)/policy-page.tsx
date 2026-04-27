@@ -11,7 +11,7 @@ export default async function PolicyPage({ slug }: { slug: string }) {
     <main className="mx-auto max-w-3xl space-y-6 px-6 py-12">
       <div className="flex items-center justify-between">
         <Link href="/" className="text-xs text-white/50 hover:text-white">
-          ← Fan Home
+          ← Member Home
         </Link>
         {policy.effective_date && (
           <span className="text-xs text-white/50">

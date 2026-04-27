@@ -10,7 +10,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
  *
  * Response: { url: string }
  *
- * Uploads go to `{bucket}/{fan_id}/{timestamp}-{safe_filename}` so the fan's
+ * Uploads go to `{bucket}/{member_id}/{timestamp}-{safe_filename}` so the member's
  * auth.uid() prefix satisfies the storage RLS policy.
  */
 const ALLOWED_BUCKETS = new Set(["community-uploads", "avatars"]);
@@ -79,11 +79,11 @@ export async function POST(req: NextRequest) {
 
   const { data: publicUrl } = admin.storage.from(bucket).getPublicUrl(path);
 
-  // For avatars: persist to fans.avatar_url so the header / post list pick
+  // For avatars: persist to members.avatar_url so the header / post list pick
   // it up without another round-trip.
   if (bucket === "avatars") {
     await admin
-      .from("fans")
+      .from("members")
       .update({ avatar_url: publicUrl.publicUrl })
       .eq("id", user.id);
   }

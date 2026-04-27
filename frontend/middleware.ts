@@ -110,6 +110,6 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     // Run on everything except static assets / image optimization / favicon.
-    "/((?!_next/static|_next/image|favicon.ico|api/fan-engage).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api/member-engage).*)",
   ],
 };

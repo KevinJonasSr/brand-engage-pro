@@ -13,15 +13,15 @@ export default async function AdminRedemptionsPage() {
 
   const pending = await listPendingRedemptions(ctx.currentCommunityId || "");
 
-  // Get fan details for pending redemptions
+  // Get member details for pending redemptions
   const supabase = createAdminClient();
-  const fanIds = pending.map((p) => p.fan_id);
-  const { data: fans } = await supabase
-    .from("fans")
+  const memberIds = pending.map((p) => p.member_id);
+  const { data: members } = await supabase
+    .from("members")
     .select("id, first_name, last_name, avatar_url")
-    .in("id", fanIds);
+    .in("id", memberIds);
 
-  const fanMap = new Map(fans?.map((f) => [f.id, f]) ?? []);
+  const memberMap = new Map(members?.map((f) => [f.id, f]) ?? []);
 
   return (
     <div className="space-y-6">
@@ -35,18 +35,18 @@ export default async function AdminRedemptionsPage() {
       {pending.length > 0 ? (
         <div className="glass-card divide-y divide-white/5 rounded-2xl overflow-hidden">
           {pending.map((redemption) => {
-            const fan = fanMap.get(redemption.fan_id);
+            const member = memberMap.get(redemption.member_id);
             return (
               <div
                 key={redemption.id}
                 className="flex items-center justify-between gap-4 p-4 hover:bg-black/20"
               >
                 <div className="flex items-center gap-3 flex-1">
-                  {fan?.avatar_url && (
+                  {member?.avatar_url && (
                     <div className="relative h-10 w-10 overflow-hidden rounded-full">
                       <Image
-                        src={fan.avatar_url}
-                        alt={fan.first_name || "Fan"}
+                        src={member.avatar_url}
+                        alt={member.first_name || "Member"}
                         fill
                         className="object-cover"
                       />
@@ -54,7 +54,7 @@ export default async function AdminRedemptionsPage() {
                   )}
                   <div className="flex-1">
                     <p className="text-sm font-medium">
-                      {fan?.first_name || "Fan"} · {redemption.reward.title}
+                      {member?.first_name || "Member"} · {redemption.reward.title}
                     </p>
                     {redemption.delivery_details && (
                       <p className="mt-1 text-xs text-white/60">{redemption.delivery_details}</p>
@@ -67,7 +67,7 @@ export default async function AdminRedemptionsPage() {
 
                 <RedemptionAction
                   redemptionId={redemption.id}
-                  fanId={redemption.fan_id}
+                  memberId={redemption.member_id}
                   pointCost={redemption.point_cost}
                 />
               </div>
