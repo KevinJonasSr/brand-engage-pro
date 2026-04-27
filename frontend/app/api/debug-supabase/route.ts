@@ -1,21 +1,20 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
  * TEMPORARY diagnostic route — DELETE before public launch.
- * Surfaces what env Vercel is actually serving and what Supabase says back,
- * so we can pin down why getBrandFromDb is silently falling back to the
- * hardcoded BRANDS map.
  *
- * Returns:
- *   - urlPrefix:        first 35 chars of NEXT_PUBLIC_SUPABASE_URL (project ref visible)
- *   - anonKeyPrefix:    first 12 chars of NEXT_PUBLIC_SUPABASE_ANON_KEY
- *   - servicePrefix:    first 12 chars of SUPABASE_SERVICE_ROLE_KEY
- *   - brandsCount:      result/error of `select count(*) from brands`
- *   - nelliesRow:       result/error of `select … from brands where slug='nellies'`
- *   - rawProbe:         raw fetch to PostgREST /rest/v1/brands?slug=eq.nellies
- *
- * No secrets exposed (only key prefixes).
+ * Surfaces:
+ *   1. env: which Supabase project we're connected to + key prefixes
+ *   2. brands query: count + nellies row + raw PostgREST probe
+ *   3. auth probe: list-users via service_role (proves we can reach
+ *      auth.users at all and surfaces any auth schema RLS/grant issues)
+ *   4. signup dry-run: attempts a fake-domain signup just to see what
+ *      error code comes back from Supabase Auth — Auth will reject the
+ *      fake domain after triggers + checks have run, which is exactly
+ *      where the previous "Database error saving new user" failure
+ *      surfaced. We can read the message without leaving a real user.
  */
 export const dynamic = "force-dynamic";
 
@@ -32,46 +31,63 @@ export async function GET() {
     serviceKeyLen: service.length,
   };
 
-  // 1. Supabase JS client probe — this is the path getBrandFromDb takes.
+  // 1. Brands query — proven path from the earlier GRANT bug.
   try {
     const supabase = await createClient();
     const { count, error: countErr } = await supabase
       .from("brands")
       .select("*", { count: "exact", head: true });
     result.brandsCount = countErr
-      ? { error: { message: countErr.message, code: countErr.code, details: countErr.details } }
+      ? { error: { message: countErr.message, code: countErr.code } }
       : { count };
-
-    const { data: nellie, error: nellieErr } = await supabase
-      .from("brands")
-      .select("slug, name, active, city, state, cuisine")
-      .eq("slug", "nellies")
-      .maybeSingle();
-    result.nelliesRow = nellieErr
-      ? { error: { message: nellieErr.message, code: nellieErr.code, details: nellieErr.details } }
-      : { row: nellie };
   } catch (e) {
     result.clientThrew = String(e);
   }
 
-  // 2. Raw PostgREST probe — bypasses our client wrapper to confirm the
-  //    URL+key combo can reach a Supabase instance at all.
+  // 2. Auth admin probe — list users via service role. Proves we can
+  //    reach auth.users at all. If service_role key is wrong this fails
+  //    with a 401.
   try {
-    const probeRes = await fetch(`${url}/rest/v1/brands?slug=eq.nellies&select=slug,name,active`, {
-      headers: {
-        apikey: anon,
-        Authorization: `Bearer ${anon}`,
-      },
-      cache: "no-store",
-    });
-    const text = await probeRes.text();
-    result.rawProbe = {
-      status: probeRes.status,
-      ok: probeRes.ok,
-      body: text.slice(0, 500),
-    };
+    const admin = createAdminClient();
+    const { data, error } = await admin.auth.admin.listUsers({ perPage: 1 });
+    result.authListUsers = error
+      ? { error: { message: error.message, status: error.status } }
+      : { totalProbed: data?.users?.length ?? 0 };
   } catch (e) {
-    result.rawProbeThrew = String(e);
+    result.authAdminThrew = String(e);
+  }
+
+  // 3. Signup dry-run — uses a syntactically-valid email at a fake
+  //    domain. Supabase Auth runs all the on_auth_user_created triggers
+  //    BEFORE deciding whether to send the confirmation email, so any
+  //    handle_new_member / handle_new_fan trigger that's broken will
+  //    surface here as "Database error saving new user".
+  //
+  //    We use a unique random local-part so this never collides with an
+  //    existing user. The fake domain means no real email is delivered.
+  try {
+    const supabase = await createClient();
+    const probeEmail = `bep-probe+${Date.now()}@example-debug.invalid`;
+    const { data, error } = await supabase.auth.signUp({
+      email: probeEmail,
+      password: `Probe-${Date.now()}-x9!`,
+    });
+    result.signupProbe = error
+      ? {
+          error: {
+            message: error.message,
+            status: error.status,
+            code: (error as { code?: string }).code ?? null,
+          },
+        }
+      : {
+          emailUsed: probeEmail,
+          userCreated: !!data?.user,
+          sessionCreated: !!data?.session,
+          identitiesCount: data?.user?.identities?.length ?? 0,
+        };
+  } catch (e) {
+    result.signupProbeThrew = String(e);
   }
 
   return NextResponse.json(result, {
