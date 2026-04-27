@@ -235,7 +235,7 @@ export default async function BrandPage({
                   <PremiumPaywall
                     key={s.id}
                     feature={s.title}
-                    description="Premium members get access to off-menu specials, member-only pours, and the small-batch stuff we don\u2019t put on the regular menu."
+                    description="Premium members get access to off-menu specials, member-only pours, and the small-batch stuff we don’t put on the regular menu."
                     communityId={slug}
                     accentFrom={brand.accentFrom}
                     accentTo={brand.accentTo}
