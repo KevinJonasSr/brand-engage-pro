@@ -5,7 +5,7 @@
 
 -- ─── Add 'reward_redemption' to point_source enum ───────────────────────────
 do $$ begin
-  alter type point_source add value 'reward_redemption' if not exists;
+  alter type point_source add value if not exists 'reward_redemption';
 exception when others then null; end $$;
 
 -- ─── Rewards Catalog ──────────────────────────────────────────────────────
