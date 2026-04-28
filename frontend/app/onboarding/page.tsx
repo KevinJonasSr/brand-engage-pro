@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, CheckCircle2, Star, Users } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 const steps = [
   {
@@ -57,6 +58,23 @@ export default function OnboardingWizard() {
 
   const currentStep = steps[stepIndex];
   const progress = useMemo(() => ((stepIndex + 1) / steps.length) * 100, [stepIndex]);
+
+  // Auth guard: /onboarding is the profile-completion wizard; it expects
+  // the visitor to already have a Supabase auth session. Anyone who lands
+  // here unauthenticated would dead-end at the Finish button (the backend
+  // /api/member-engage/onboard endpoint 401s without a session). Bounce
+  // them to /signup with the same ?ref= attribution preserved.
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) {
+        const ref = searchParams.get("ref");
+        const next = ref ? `/signup?ref=${encodeURIComponent(ref)}` : "/signup";
+        router.replace(next);
+      }
+    });
+  }, [router, searchParams]);
 
   const handleInput = (name: string, value: string) => {
     setFormState((prev) => ({ ...prev, [name]: value }));

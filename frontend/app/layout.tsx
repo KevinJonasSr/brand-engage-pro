@@ -206,7 +206,7 @@ export default async function RootLayout({
                   Sign in
                 </Link>
                 <Link
-                  href="/onboarding"
+                  href="/signup"
                   className="rounded-full bg-gradient-to-r from-aurora to-ember px-4 py-2 text-sm font-semibold text-white shadow-glass transition hover:brightness-110"
                 >
                   Join

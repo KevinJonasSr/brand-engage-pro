@@ -2,11 +2,16 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function SignupPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const ref = searchParams.get("ref");
+  // Where to send the user after a successful signup. Preserve any
+  // ?ref=<brand-slug> attribution from the brand-page Join CTA.
+  const onboardingHref = ref ? `/onboarding?ref=${encodeURIComponent(ref)}` : "/onboarding";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "error" | "confirm">("idle");
@@ -22,7 +27,7 @@ export default function SignupPage() {
         email,
         password,
         options: {
-          emailRedirectTo: `${location.origin}/auth/callback?next=/onboarding`,
+          emailRedirectTo: `${location.origin}/auth/callback?next=${encodeURIComponent(onboardingHref)}`,
         },
       });
       if (error) throw error;
@@ -30,7 +35,7 @@ export default function SignupPage() {
       // If email confirmation is OFF in Supabase, Supabase returns a session here
       // and we can push straight into onboarding.
       if (data.session) {
-        router.push("/onboarding");
+        router.push(onboardingHref);
         router.refresh();
         return;
       }

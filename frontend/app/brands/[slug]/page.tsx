@@ -89,11 +89,11 @@ export default async function BrandPage({
   const ctaGradient = `linear-gradient(to right, ${brand.accentFrom}, ${brand.accentTo})`;
 
   // Primary CTA adapts to the viewer's state:
-  // - anonymous  → "Join the member club" → /onboarding?ref=<slug>
+  // - anonymous  → "Join the member club" → /signup?ref=<slug>
   // - signed in, no profile → "Complete profile" → /onboarding?ref=<slug>
   // - signed in, profile done → "Shop drops" → /marketplace
   const primaryCta = !isSignedIn
-    ? { label: "Join the member club", href: `/onboarding?ref=${brand.slug}` }
+    ? { label: "Join the member club", href: `/signup?ref=${brand.slug}` }
     : needsProfile
       ? { label: "Complete your profile", href: `/onboarding?ref=${brand.slug}` }
       : { label: "Shop drops", href: "/marketplace" };

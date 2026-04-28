@@ -47,7 +47,7 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
-                href="/onboarding"
+                href="/signup"
                 className="rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white shadow-glass transition hover:brightness-110"
               >
                 Create your member profile →
@@ -300,7 +300,7 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
           </p>
           <div className="relative mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
-              href="/onboarding"
+              href="/signup"
               className="rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white shadow-glass transition hover:brightness-110"
             >
               Create member profile →
