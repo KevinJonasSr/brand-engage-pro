@@ -75,7 +75,7 @@ export async function draftComment(
       postKind: postRow.kind,
       communityName: postRow.communities?.display_name,
       communityTagline: postRow.communities?.tagline ?? null,
-      communityGenres: postRow.artists?.genres ?? undefined,
+      communityGenres: postRow.brands?.genres ?? undefined,
       userPriorComments: (priorComments ?? [])
         .map((r) => String(r.body ?? "").trim())
         .filter((s) => s.length > 0),
@@ -122,9 +122,9 @@ async function draftCommentWithoutJoin(
       .eq("slug", post.brand_slug)
       .maybeSingle();
 
-    // Genres live on the legacy artists table.
-    const { data: artist } = await admin
-      .from("artists")
+    // Genres live on the legacy brands table.
+    const { data: brand } = await admin
+      .from("brands")
       .select("genres")
       .eq("slug", post.brand_slug)
       .maybeSingle();
@@ -143,7 +143,7 @@ async function draftCommentWithoutJoin(
       postKind: post.kind as string,
       communityName: (community?.display_name as string) ?? undefined,
       communityTagline: (community?.tagline as string | null) ?? null,
-      communityGenres: (artist?.genres as string[] | null) ?? undefined,
+      communityGenres: (brand?.genres as string[] | null) ?? undefined,
       userPriorComments: (priorComments ?? [])
         .map((r) => String(r.body ?? "").trim())
         .filter((s) => s.length > 0),

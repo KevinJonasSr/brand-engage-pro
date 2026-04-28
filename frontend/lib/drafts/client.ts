@@ -44,7 +44,7 @@ export interface DraftCommentInput {
   postTitle?: string | null;
   /** What kind of post — colors the prompt's tone advice. */
   postKind?: string;
-  /** Community context (the artist or brand). */
+  /** Community context (the brand). */
   communityName?: string;
   communityTagline?: string | null;
   communityGenres?: string[];
