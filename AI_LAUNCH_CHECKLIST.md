@@ -337,3 +337,81 @@ yet. When those land, each gets its own metrics + smoke test
 section. See `docs/AI_INFRASTRUCTURE.md` "What's NOT yet ported"
 for the deferred list.
 
+
+---
+
+## Post-launch cleanup — orphan brand_events (2026-04-28)
+
+The first prod run of `/api/cron/embeddings-backfill` indexed 16 of 20
+candidate rows successfully. The remaining 4 errored with:
+
+```
+insert or update on table "content_embeddings"
+violates foreign key constraint "content_embeddings_community_id_fkey"
+```
+
+Root cause: those 4 rows in `public.brand_events` have a `brand_slug`
+value that doesn't exist in `public.communities.slug`. The embeddings
+cron uses `brand_slug` as the `community_id` (FK'd to
+`public.communities.slug`), so any orphan event fails to embed.
+
+Affected row IDs (as of the 2026-04-28 cron run):
+
+- `cb240645-7246-4ba5-a8f5-2546997a5918`
+- `4eed44d4-0d2e-4fe0-b8e7-472fd63a3e8c`
+- `05fcb393-c0bc-4de0-b337-03434e4b097e`
+- `fb1c7d25-f821-4436-b99f-cded9d1d9365`
+
+### Diagnostic SQL
+
+Run in the Supabase SQL editor to see what's stale:
+
+```sql
+-- 1. The 4 orphan events with their brand_slug
+select id, brand_slug, title, active
+from public.brand_events
+where id in (
+  'cb240645-7246-4ba5-a8f5-2546997a5918',
+  '4eed44d4-0d2e-4fe0-b8e7-472fd63a3e8c',
+  '05fcb393-c0bc-4de0-b337-03434e4b097e',
+  'fb1c7d25-f821-4436-b99f-cded9d1d9365'
+);
+
+-- 2. All known communities for slug comparison
+select slug, display_name from public.communities order by slug;
+
+-- 3. Generic version — any active event whose brand_slug is missing from communities
+select distinct ev.brand_slug
+from public.brand_events ev
+left join public.communities c on c.slug = ev.brand_slug
+where ev.active = true
+  and c.slug is null;
+```
+
+### Fix paths (pick whichever applies)
+
+- **Slug mismatch** (e.g. `nellies-southern-kitchen` vs `nellies`):
+  `update public.brand_events set brand_slug = '<correct-slug>' where id in (...);`
+  then re-run the cron.
+
+- **Stale seed events for a brand that no longer exists**:
+  `update public.brand_events set active = false where id in (...);`
+  This silently drops them from the backfill candidate set.
+
+- **Brand exists but community row was never created**:
+  insert the missing row in `public.communities` with the matching slug,
+  then re-run the cron.
+
+### Re-run after fix
+
+```bash
+curl -i -H "Authorization: Bearer $CRON_SECRET" \
+  https://brand-engage-pro.vercel.app/api/cron/embeddings-backfill
+```
+
+Expected: `byStatus.error` drops to 0 and `byStatus.indexed` matches
+the new candidate count.
+
+### Hardening (future, not urgent)
+
+If orphans keep appearing, add a `where ev.brand_slug in (select slug from public.communities)` clause to the `brand_events` branch of `public.list_unembedded_rows()` in a future migration. Defers indexing of orphans cleanly instead of erroring on every cron tick.
