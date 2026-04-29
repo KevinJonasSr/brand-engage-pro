@@ -31,13 +31,22 @@ export default async function AdminLayout({
   // yet AND they're not already on the switcher page, bounce them there.
   const h = await headers();
   const pathname =
-    h.get("x-invoke-path") ?? h.get("next-url") ?? h.get("referer") ?? "";
+    h.get("x-pathname") ??
+    h.get("x-invoke-path") ??
+    h.get("next-url") ??
+    h.get("referer") ??
+    "";
   const isOnSwitcher = pathname.includes("/admin/communities");
   const needsToPick =
     (ctx.isSuperAdmin || ctx.communities.length > 1) &&
     !ctx.currentCommunityId &&
     !isOnSwitcher;
-  if (needsToPick) redirect("/admin/communities");
+  // Defensive guard: NEVER redirect away from /admin/communities,
+  // even if pathname detection somehow fails. Without this guard,
+  // a stale path header could re-trigger an infinite 307 loop.
+  if (needsToPick && !pathname.includes("/admin/communities")) {
+    redirect("/admin/communities");
+  }
 
   const currentCommunity = ctx.currentCommunityId
     ? await getCommunity(ctx.currentCommunityId)

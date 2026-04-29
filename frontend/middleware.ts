@@ -61,6 +61,11 @@ export async function middleware(request: NextRequest) {
   const communityId = resolveCommunityFromHost(request.headers.get("host"));
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-community-id", communityId);
+  // Stamp the request pathname so server components (e.g. admin
+  // layout) can do reliable path detection. Next.js 15 stopped
+  // setting x-invoke-path on direct navigations, so without this
+  // the admin layout falls into a redirect loop on /admin/communities.
+  requestHeaders.set("x-pathname", request.nextUrl.pathname);
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
