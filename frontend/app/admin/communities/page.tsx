@@ -24,9 +24,13 @@ export default async function AdminCommunitiesPage() {
   }
 
   const admin = createAdminClient();
+  // Only surface active communities. Deactivated ones (e.g. seed-data
+  // artists for a brand-only platform) stay in the DB but don't clutter
+  // the switcher. To re-enable one, flip active=true via SQL.
   const { data } = await admin
     .from("communities")
     .select("*")
+    .eq("active", true)
     .order("sort_order");
 
   const communities = (data ?? []) as Community[];
