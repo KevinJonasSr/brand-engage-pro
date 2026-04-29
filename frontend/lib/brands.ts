@@ -30,6 +30,44 @@ export type Brand = {
 // Placeholder content for each brand — swap when Box assets are delivered.
 // Keep keys stable; marketing can paste final copy here without touching layout.
 export const BRANDS: Record<string, Brand> = {
+  "jonas-group-ent": {
+    slug: "jonas-group-ent",
+    name: "Jonas Group Entertainment",
+    tagline: "Songwriters, artists, catalog. Music Row, Nashville.",
+    bio: [
+      "Jonas Group Entertainment is a full-service entertainment company on Nashville's historic Music Row, owned by the Jonas family. We are a label, a publisher, an artist-management group, and a steward of some of the most influential catalogs in country and pop.",
+      "Under our roof: Red Van Records (label), Jonas Group Publishing (songwriter representation and catalog), and a management roster that includes Rhett Akins, Aaron Gillespie, Levi Hummon, RaeLynn, Bailee Madison, Franklin Jonas, Justin Ebach, David Kalmusky, Hunter Hawkins, Amy Stroup, and Dan Marshall. Jonas Group Publishing champions Music Row catalogs through signings, acquisitions, and sync — including the acquired Jonas Brothers catalog.",
+      "This page is for the people who've been on our list for years — fans of the artists, friends of the family, and members of the broader Jonas universe. Members get early ticket access for roster shows, listening-party invites, and signed lyric sheets and catalog vinyl from the rewards store. Founders get a private guided tour of our Music Row house at 1600 17th Ave South.",
+    ].join("\n\n"),
+    heroImage: "/brands/jonas-group-ent/logo.png",
+    accentFrom: "#0a0a0a",
+    accentTo: "#525252",
+    genres: ["All genres", "Country", "Pop", "Rock", "Americana"],
+    upcoming: [
+      {
+        title: "New-Release Listening Party — Spring Drop",
+        detail: "Virtual listening party for an upcoming JGP release. Artist joins for Q&A.",
+        date: "Thursday, May 21 · 7 PM CT",
+        location: "Virtual (member-only link)",
+      },
+      {
+        title: "Songwriter Round at the Music Row House",
+        detail: "Three writers, acoustic guitars, the stories behind the cuts.",
+        date: "Saturday, June 20 · 7 PM CT",
+        location: "1600 17th Ave South, Nashville TN",
+        tier: "premium",
+      },
+    ],
+    merch: [
+      { title: "Signed Lyric Sheet (Roster Pick)", tier: "Bronze+", points: "1,800 pts" },
+      { title: "Catalog Vinyl Pressing", tier: "Silver+", points: "3,200 pts" },
+    ],
+    social: [
+      { label: "Instagram", href: "https://www.instagram.com/jonasgroupent/" },
+      { label: "Facebook", href: "https://www.facebook.com/jonasgroupent" },
+      { label: "Website", href: "https://www.jonasgroup.com/" },
+    ],
+  },
   nellies: {
     slug: "nellies",
     name: "Nellie's Southern Kitchen",
