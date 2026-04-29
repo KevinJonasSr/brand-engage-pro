@@ -108,7 +108,7 @@ export default async function BrandPage({
     <main className="mx-auto max-w-6xl space-y-10 px-6 py-12">
       {/* Hero */}
       <section
-        className="relative overflow-hidden rounded-3xl border border-white/10 p-10 min-h-[420px] md:min-h-[520px]"
+        className="relative flex flex-col justify-end overflow-hidden rounded-3xl border border-white/10 min-h-[420px] md:min-h-[520px]"
         style={!brand.heroImage ? { backgroundImage: heroGradient } : undefined}
       >
         {brand.heroImage && (
@@ -142,7 +142,7 @@ export default async function BrandPage({
         )}
 
         {/* Content layer — sits above image + overlay */}
-        <div className="relative">
+        <div className="relative p-10">
           <p className="text-xs uppercase tracking-[0.3em] text-white/70">
             {brand.genres.join(" · ")}
           </p>
