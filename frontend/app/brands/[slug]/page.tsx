@@ -18,6 +18,15 @@ import RsvpButton from "./rsvp-button";
 
 export const dynamic = "force-dynamic";
 
+// Per-brand hero focal-y overrides. The default (30%) is biased to keep
+// faces visible in portrait brand photos. Restaurants and product shots
+// often need a different anchor — Nellie's signage shot is bottom-heavy,
+// so anchor at the bottom to keep the sign above the title/CTA overlay.
+// Promote to a `hero_focal_y` column on brands when this list grows.
+const HERO_FOCAL_Y: Record<string, string> = {
+  nellies: "bottom",
+};
+
 export async function generateStaticParams() {
   // Static-params still uses the hardcoded list so builds don't need DB creds.
   // Runtime queries the DB and falls back to the same map on error.
@@ -126,7 +135,7 @@ export default async function BrandPage({
               // upper-mid of most portrait photos where faces sit. If a
               // specific brand's photo needs different framing, consider
               // adding a per-brand `hero_focal_y` column.
-              style={{ objectPosition: "center 30%" }}
+              style={{ objectPosition: `center ${HERO_FOCAL_Y[brand.slug] ?? "30%"}` }}
               className="absolute inset-0 h-full w-full object-cover"
               aria-hidden
             />
