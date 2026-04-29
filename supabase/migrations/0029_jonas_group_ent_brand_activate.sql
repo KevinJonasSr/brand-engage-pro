@@ -54,8 +54,12 @@ on conflict (slug) do update set
 -- visual identity. No "Music Row warm" gold treatment here — that's Nellie's
 -- territory; JGE is meant to read clean, label-like, contemporary.
 --
--- hero_image points at /brands/jonas-group-ent/logo.png (white-on-black
--- wordmark from JGE). Replace with proper Music Row HQ photography in V2.
+-- hero_image points at /brands/jonas-group-ent/hero.png — a 1920x1080
+-- composition: brand-palette dark gradient with the white JGE wordmark
+-- in the upper third. Sized for the page's object-fit:cover on a 520px
+-- min-height hero band, and the lower two-thirds is intentionally empty
+-- dark space for the page's title/tagline/CTA overlay to land on.
+-- Replace with proper Music Row HQ photography in V2.
 --
 -- cuisine column is repurposed as free-form sub-category per its 0024
 -- comment ("for retail — coffee, books, lifestyle; etc."). Using it to
@@ -75,7 +79,7 @@ insert into public.brands (
   'Jonas Group Entertainment',
   'Songwriters, artists, catalog. Music Row, Nashville.',
   E'Jonas Group Entertainment is a full-service entertainment company on Nashville''s historic Music Row, owned by the Jonas family. We are a label, a publisher, an artist-management group, and a steward of some of the most influential catalogs in country and pop.\n\nUnder our roof: Red Van Records (label), Jonas Group Publishing (songwriter representation and catalog), and a management roster that includes Rhett Akins, Aaron Gillespie, Levi Hummon, RaeLynn, Bailee Madison, Franklin Jonas, Justin Ebach, David Kalmusky, Hunter Hawkins, Amy Stroup, and Dan Marshall. Jonas Group Publishing champions Music Row catalogs through signings, acquisitions, and sync — including the acquired Jonas Brothers catalog.\n\nThis page is for the people who''ve been on our list for years — fans of the artists, friends of the family, and members of the broader Jonas universe. Members get early ticket access for roster shows, listening-party invites, and signed lyric sheets and catalog vinyl from the rewards store. Founders get a private guided tour of our Music Row house at 1600 17th Ave South.',
-  '/brands/jonas-group-ent/logo.png',
+  '/brands/jonas-group-ent/hero.png',
   '#0a0a0a', '#525252',
   array['All genres','Country','Pop','Rock','Americana']::text[],
   '[

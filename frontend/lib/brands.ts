@@ -39,7 +39,7 @@ export const BRANDS: Record<string, Brand> = {
       "Under our roof: Red Van Records (label), Jonas Group Publishing (songwriter representation and catalog), and a management roster that includes Rhett Akins, Aaron Gillespie, Levi Hummon, RaeLynn, Bailee Madison, Franklin Jonas, Justin Ebach, David Kalmusky, Hunter Hawkins, Amy Stroup, and Dan Marshall. Jonas Group Publishing champions Music Row catalogs through signings, acquisitions, and sync — including the acquired Jonas Brothers catalog.",
       "This page is for the people who've been on our list for years — fans of the artists, friends of the family, and members of the broader Jonas universe. Members get early ticket access for roster shows, listening-party invites, and signed lyric sheets and catalog vinyl from the rewards store. Founders get a private guided tour of our Music Row house at 1600 17th Ave South.",
     ].join("\n\n"),
-    heroImage: "/brands/jonas-group-ent/logo.png",
+    heroImage: "/brands/jonas-group-ent/hero.png",
     accentFrom: "#0a0a0a",
     accentTo: "#525252",
     genres: ["All genres", "Country", "Pop", "Rock", "Americana"],
