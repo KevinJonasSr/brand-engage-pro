@@ -64,6 +64,12 @@ export async function updateRewardAction(formData: FormData) {
   const active = formData.get("active") === "on";
   const requires_tier = (formData.get("requires_tier") as string) || null;
 
+  const is_drop = formData.get("is_drop") === "on";
+  const drops_at_raw = (formData.get("drops_at") as string) || "";
+  const expires_at_raw = (formData.get("expires_at") as string) || "";
+  const drops_at = is_drop && drops_at_raw ? new Date(drops_at_raw).toISOString() : null;
+  const expires_at = is_drop && expires_at_raw ? new Date(expires_at_raw).toISOString() : null;
+
   const supabase = createAdminClient();
   const { error } = await supabase
     .from("rewards_catalog")
