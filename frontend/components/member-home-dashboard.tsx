@@ -1,4 +1,6 @@
 import Link from "next/link";
+import WeeklyRecapTile from "@/components/weekly-recap-tile";
+import type { WeeklyRecap } from "@/lib/personal-recap/types";
 import PushOptInBanner from "@/components/push-opt-in-banner";
 import StreakTile from "@/components/streak-tile";
 import type { MemberHomeData, MemberHomeUpcomingEvent } from "@/lib/data/member-home";
@@ -8,7 +10,7 @@ import type { MemberHomeData, MemberHomeUpcomingEvent } from "@/lib/data/member-
  * above the existing marketing content. All data comes from getMemberHomeData()
  * so there are no client-side fetches here.
  */
-export default function MemberHomeDashboard({ data, streak }: { data: MemberHomeData; streak?: { currentStreakDays: number; longestStreakDays: number; pointsAwardedThisVisit: number; newMilestone: number | null; isNewToday: boolean; lastActiveDate: string | null } | null }) {
+export default function MemberHomeDashboard({ data, streak, recap }: { data: MemberHomeData; streak?: { currentStreakDays: number; longestStreakDays: number; pointsAwardedThisVisit: number; newMilestone: number | null; isNewToday: boolean; lastActiveDate: string | null } | null; recap?: WeeklyRecap | null }) {
   const {
     member,
     followedBrands,
@@ -48,6 +50,7 @@ export default function MemberHomeDashboard({ data, streak }: { data: MemberHome
         pointsAwardedThisVisit={streak.pointsAwardedThisVisit}
         newMilestone={streak.newMilestone}
       />}
+      {recap && <WeeklyRecapTile recap={recap} firstName={data.fan?.first_name ?? null} />}
       <FollowedBrandsStrip brands={followedBrands} />
 
       {/* Upcoming events — top 3 from any followed brand */}

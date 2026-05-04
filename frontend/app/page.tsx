@@ -12,6 +12,7 @@ import { getTiers, tierIcon } from "@/lib/data/tiers";
 import type { TierSlug } from "@/lib/data/types";
 
 import { touchStreak } from "@/lib/streaks/touch";
+import { gatherWeeklyRecap } from "@/lib/personal-recap/gather";
 // ─── Signed-in dashboard content ──────────────────────────────────────────
 // Signed-out visitors render <SignedOutLanding/> earlier and never see any
 // of this.
@@ -59,13 +60,16 @@ export default async function Home({
 
   // Signed-in path — parallel-fetch everything the dashboard needs. Each
   // gracefully returns null / empty on error so the page never breaks.
-  const [kpis, featured, tiers, streak, memberHome] = await Promise.all([
+  const [kpis, featured, tiers, streak, recap, memberHome] = await Promise.all([
     getCurrentMemberKpis(),
     getFeaturedOffers(3),
     getTiers(),
     // Touch streak before reading home data so the dashboard
     // sees the freshly-incremented streak counter on the same render.
     member?.id ? touchStreak(member.id) : Promise.resolve(null),
+      // Compute the past-7-day recap for the "Your week" tile. Returns a
+    // benign empty recap on error so Member Home never blocks.
+    member?.id ? gatherWeeklyRecap(member.id) : Promise.resolve(null),
       getMemberHomeData(),
   ]);
 
@@ -149,7 +153,7 @@ export default async function Home({
           {/* Personalized Member Home dashboard — only for members past
               onboarding. Still signed-in, so the marketing landing never
               appears here. */}
-          {!needsProfile && memberHome && <MemberHomeDashboard data={memberHome} streak={streak} />}
+          {!needsProfile && memberHome && <MemberHomeDashboard data={memberHome} streak={streak} recap={recap} />}
           <section className="glass-card p-6">
             <p className="flex items-center gap-2 text-sm uppercase tracking-wide text-white/60">
               <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-amber-500/20 text-amber-300">
