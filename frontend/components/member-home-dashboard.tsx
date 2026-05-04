@@ -1,4 +1,5 @@
 import Link from "next/link";
+import PushOptInBanner from "@/components/push-opt-in-banner";
 import StreakTile from "@/components/streak-tile";
 import type { MemberHomeData, MemberHomeUpcomingEvent } from "@/lib/data/member-home";
 
@@ -40,6 +41,7 @@ export default function MemberHomeDashboard({ data, streak }: { data: MemberHome
       </header>
 
       {/* Followed brands strip */}
+      <PushOptInBanner />
       {streak && <StreakTile
         currentStreakDays={streak.currentStreakDays}
         longestStreakDays={streak.longestStreakDays}
