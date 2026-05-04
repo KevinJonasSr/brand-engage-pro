@@ -42,7 +42,7 @@ export default async function LeaderboardMiniCard({
       <header className="flex items-center justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.25em] text-white/55">
-            Top fans · {board.monthLabel}
+            Top members · {board.monthLabel}
           </p>
           <p className="mt-1 text-base font-semibold text-white">
             This month&apos;s leaderboard
