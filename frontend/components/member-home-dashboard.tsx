@@ -1,4 +1,5 @@
 import Link from "next/link";
+import StreakTile from "@/components/streak-tile";
 import type { MemberHomeData, MemberHomeUpcomingEvent } from "@/lib/data/member-home";
 
 /**
@@ -6,7 +7,7 @@ import type { MemberHomeData, MemberHomeUpcomingEvent } from "@/lib/data/member-
  * above the existing marketing content. All data comes from getMemberHomeData()
  * so there are no client-side fetches here.
  */
-export default function MemberHomeDashboard({ data }: { data: MemberHomeData }) {
+export default function MemberHomeDashboard({ data, streak }: { data: MemberHomeData; streak?: { currentStreakDays: number; longestStreakDays: number; pointsAwardedThisVisit: number; newMilestone: number | null; isNewToday: boolean; lastActiveDate: string | null } | null }) {
   const {
     member,
     followedBrands,
@@ -39,6 +40,12 @@ export default function MemberHomeDashboard({ data }: { data: MemberHomeData }) 
       </header>
 
       {/* Followed brands strip */}
+      {streak && <StreakTile
+        currentStreakDays={streak.currentStreakDays}
+        longestStreakDays={streak.longestStreakDays}
+        pointsAwardedThisVisit={streak.pointsAwardedThisVisit}
+        newMilestone={streak.newMilestone}
+      />}
       <FollowedBrandsStrip brands={followedBrands} />
 
       {/* Upcoming events — top 3 from any followed brand */}

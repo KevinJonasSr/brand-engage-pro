@@ -128,8 +128,7 @@ export async function getMemberHomeData(): Promise<MemberHomeData | null> {
 
   // Member profile
   const { data: member } = await admin
-    .from("members")
-    .select("*")
+    .from("members").select("*, current_streak_days, longest_streak_days, last_active_date")
     .eq("id", user.id)
     .maybeSingle();
 
