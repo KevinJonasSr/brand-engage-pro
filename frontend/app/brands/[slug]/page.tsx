@@ -12,6 +12,7 @@ import { getCurrentMember } from "@/lib/data/member";
 import { canAccess, getViewerEntitlement } from "@/lib/entitlements";
 import { createAdminClient } from "@/lib/supabase/admin";
 import PremiumPaywall from "@/components/premium-paywall";
+import DropCountdown from "@/components/drop-countdown";
 import SocialIcon from "@/components/social-icon";
 import FollowButton from "./follow-button";
 import RsvpButton from "./rsvp-button";
@@ -268,6 +269,7 @@ export default async function BrandPage({
                         </p>
                       )}
                       <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]">
+                        <DropCountdown reward={s} />
                         {cadence && (
                           <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 uppercase tracking-wide text-white/70">
                             {cadence}

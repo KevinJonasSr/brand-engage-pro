@@ -30,6 +30,9 @@ export interface Special {
   tier: "public" | "premium" | "founder-only";
   sort_order: number;
   active: boolean;
+  is_drop: boolean;
+  drops_at: string | null;
+  expires_at: string | null;
 }
 
 /**
@@ -45,7 +48,7 @@ export async function listSpecialsForBrand(
     const { data, error } = await supabase
       .from("specials")
       .select(
-        "id, brand_slug, community_id, title, description, image_url, starts_at, ends_at, recurrence_rule, days_of_week, redemption_code, points_required, tier, sort_order, active",
+        "id, brand_slug, community_id, title, description, image_url, starts_at, ends_at, recurrence_rule, days_of_week, redemption_code, points_required, tier, sort_order, active, is_drop, drops_at, expires_at",
       )
       .eq("brand_slug", brandSlug.toLowerCase())
       .eq("active", true)
