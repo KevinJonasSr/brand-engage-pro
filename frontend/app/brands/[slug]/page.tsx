@@ -1,4 +1,5 @@
 import Link from "next/link";
+import LeaderboardMiniCard from "@/components/leaderboard-mini-card";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { listBrands } from "@/lib/brands";
@@ -229,6 +230,9 @@ export default async function BrandPage({
           </div>
         </div>
       </section>
+
+      {/* Top members leaderboard preview */}
+      <LeaderboardMiniCard brandSlug={slug} />
 
       {/* Specials — recurring offers a brand publishes to its members */}
       {specials.length > 0 && (
