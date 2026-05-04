@@ -13,6 +13,9 @@ export interface RewardRow {
   active: boolean;
   sort_order: number;
   requires_tier: "premium" | "founder-only" | null;
+  is_drop: boolean;
+  drops_at: string | null;
+  expires_at: string | null;
   created_at: string;
   updated_at: string;
 }

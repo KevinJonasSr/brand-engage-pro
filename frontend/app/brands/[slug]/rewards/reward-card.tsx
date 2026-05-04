@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import DropCountdown from "@/components/drop-countdown";
 import Image from "next/image";
 import { RedeemForm } from "./redeem-form";
 
@@ -21,6 +22,7 @@ export default function RewardCardWithForm({ reward }: { reward: any }) {
           </div>
         )}
 
+        <DropCountdown reward={reward} className="mb-2" />
         <h3 className="line-clamp-2 text-sm font-semibold">{reward.title}</h3>
 
         {reward.description && (

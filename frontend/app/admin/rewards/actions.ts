@@ -17,6 +17,12 @@ export async function createRewardAction(formData: FormData) {
   const stock = formData.get("stock") ? parseInt(formData.get("stock") as string) : null;
   const requires_tier = (formData.get("requires_tier") as string) || null;
 
+  const is_drop = formData.get("is_drop") === "on";
+  const drops_at_raw = (formData.get("drops_at") as string) || "";
+  const expires_at_raw = (formData.get("expires_at") as string) || "";
+  const drops_at = is_drop && drops_at_raw ? new Date(drops_at_raw).toISOString() : null;
+  const expires_at = is_drop && expires_at_raw ? new Date(expires_at_raw).toISOString() : null;
+
   const { data, error } = await supabase
     .from("rewards_catalog")
     .insert([
@@ -29,6 +35,9 @@ export async function createRewardAction(formData: FormData) {
         kind,
         stock,
         requires_tier,
+        is_drop,
+        drops_at,
+        expires_at,
       },
     ])
     .select()
@@ -67,6 +76,9 @@ export async function updateRewardAction(formData: FormData) {
       stock,
       active,
       requires_tier,
+      is_drop,
+      drops_at,
+      expires_at,
       updated_at: new Date().toISOString(),
     })
     .eq("id", rewardId);
