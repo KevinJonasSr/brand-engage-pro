@@ -131,8 +131,8 @@ export default function PushOptInPrompt({
               Get the drop the second it lands
             </p>
             <p className="mt-0.5 text-xs text-white/70">
-              Enable notifications to hear when an artist posts, opens a tour
-              date, or replies to you.
+              Enable notifications to hear when a brand posts, opens an
+              activation or offering, or replies to you.
             </p>
             {error && (
               <p className="mt-1 text-xs text-rose-300">{error}</p>
