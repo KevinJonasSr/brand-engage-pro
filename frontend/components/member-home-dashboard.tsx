@@ -50,7 +50,7 @@ export default function MemberHomeDashboard({ data, streak, recap }: { data: Mem
         pointsAwardedThisVisit={streak.pointsAwardedThisVisit}
         newMilestone={streak.newMilestone}
       />}
-      {recap && <WeeklyRecapTile recap={recap} firstName={null} />}
+      {recap && <WeeklyRecapTile recap={recap} firstName={data.member?.first_name ?? null} />}
       <FollowedBrandsStrip brands={followedBrands} />
 
       {/* Upcoming events — top 3 from any followed brand */}
