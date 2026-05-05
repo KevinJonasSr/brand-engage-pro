@@ -17,7 +17,7 @@ export default async function BrandsIndexPage() {
           Member clubs on Brand Engage Pro
         </h1>
         <p className="max-w-2xl text-sm text-white/70">
-          Each brand has a dedicated hub with rewards, drops, and backstage access for their supermembers.
+          Each brand has a dedicated hub with rewards, drops, and backstage access for their regulars.
         </p>
       </header>
 
@@ -66,7 +66,7 @@ export default async function BrandsIndexPage() {
               {/* Top-left genre chip */}
               {a.genres.length > 0 && (
                 <p className="absolute left-5 top-5 rounded-full border border-white/15 bg-black/45 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-white/85 backdrop-blur">
-                  {a.genres.join(" · ")}
+                  {a.genres.slice(0, 2).join(" · ")}{a.genres.length > 2 ? " +" + (a.genres.length - 2) : ""}
                 </p>
               )}
 
