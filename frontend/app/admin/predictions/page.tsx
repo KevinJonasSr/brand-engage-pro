@@ -20,6 +20,18 @@ export const metadata = { title: "Predictions · Admin · Brand Engage Pro" };
  *   - Open (still accepting votes)
  *   - Resolved (last 30 days)
  */
+interface PredictionQueueRow {
+  id: string;
+  brand_slug: string;
+  title: string;
+  prediction_type: PredictionType | null;
+  prediction_closes_at: string | null;
+  resolved_at: string | null;
+  points_for_correct: number | null;
+  visibility: string;
+  created_at: string;
+}
+
 export default async function AdminPredictionsPage() {
   const adminUser = await getAdminUser();
   if (!adminUser) redirect("/login");
@@ -35,7 +47,7 @@ export default async function AdminPredictionsPage() {
     .order("created_at", { ascending: false })
     .limit(200);
 
-  const all = rows ?? [];
+  const all = (rows ?? []) as PredictionQueueRow[];
   const now = new Date();
 
   const awaiting = all.filter(
