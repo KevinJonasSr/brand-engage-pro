@@ -97,23 +97,6 @@ export default async function MarketplacePage() {
           </section>
         </div>
 
-        <aside className="w-full max-w-sm space-y-6">
-          <section className="glass-card p-6">
-            <p className="text-sm uppercase tracking-wide text-white/60">Mobile view</p>
-            <div className="mt-4 space-y-4">
-              {products.slice(0, 3).map((item) => (
-                <div key={item.slug} className="rounded-2xl bg-black/30 p-4">
-                  <p className="text-xs uppercase tracking-wide text-white/50">{item.tier}</p>
-                  <p className="mt-1 text-sm font-semibold">{item.title}</p>
-                  <div className="mt-3 flex items-center justify-between">
-                    <span className="text-sm font-semibold text-emerald-300">{item.pts}</span>
-                    <button className="text-xs text-white/70">Reserve →</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        </aside>
       </main>
     </div>
   );
