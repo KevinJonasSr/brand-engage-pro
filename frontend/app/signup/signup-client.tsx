@@ -60,6 +60,12 @@ export default function SignupPage() {
           <p className="text-sm text-white/70">
             Create an account to earn points, unlock rewards, and get backstage access.
           </p>
+          {community && (
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-aurora/40 bg-aurora/10 px-3 py-1 text-xs text-aurora">
+              <span aria-hidden>·</span>
+              <span>Joining via @{community}</span>
+            </div>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
