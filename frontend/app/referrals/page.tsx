@@ -135,6 +135,9 @@ export default async function ReferralsPage() {
             <p className="mt-3 text-xs text-white/60">
               Scan to join via {possessive} invite.
             </p>
+            <code className="mt-2 block break-all rounded-xl bg-black/30 px-3 py-2 text-center text-[11px] text-white/60">
+              {inviteUrl}
+            </code>
           </section>
 
           <section className="glass-card p-6">
