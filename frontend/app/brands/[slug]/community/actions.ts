@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAdminUser } from "@/lib/admin";
 
+import { findNearestPost } from "@/lib/dedup/check";
 type Visibility = "public" | "premium" | "founder-only";
 
 async function requireUser() {
@@ -42,7 +43,9 @@ export async function createPostAction(formData: FormData) {
   const videoUrl = normalizeUrl(videoUrlRaw);
   const videoPosterUrl = normalizeUrl(videoPosterUrlRaw);
 
-  await supabase.from("community_posts").insert({
+  const { data: created } = await supabase
+    .from("community_posts")
+    .insert({
     brand_slug: brandSlug,
     author_id: userId,
     kind: "post",
@@ -50,7 +53,24 @@ export async function createPostAction(formData: FormData) {
     image_url: imageUrl,
     video_url: videoUrl,
     video_poster_url: videoPosterUrl,
-  });
+  })
+    .select("id")
+    .single();
+
+  // AI #20: dedupe — does this post nearly duplicate an existing one?
+  if (created) {
+    try {
+      const dup = await findNearestPost(body, created.id);
+      if (dup) {
+        await createAdminClient()
+          .from("community_posts")
+          .update({ duplicate_of: dup.postId })
+          .eq("id", created.id);
+      }
+    } catch (e) {
+      console.warn("[ai20] dedupe check failed", e);
+    }
+  }
 
   revalidatePath(`/brands/${brandSlug}/community`);
   revalidatePath(`/brands/${brandSlug}`);
