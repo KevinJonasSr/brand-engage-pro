@@ -73,11 +73,6 @@ export default async function MarketplacePage() {
                 </button>
               ))}
             </div>
-            {!usingDb && (
-              <p className="mt-4 text-xs text-white/40">
-                Preview data — add offers in /admin or via Supabase to populate real inventory.
-              </p>
-            )}
           </section>
 
           <section className="grid gap-4 md:grid-cols-2">
