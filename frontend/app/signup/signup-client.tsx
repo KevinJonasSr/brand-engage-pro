@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-export default function SignupPage() {
+export default function SignupPage({ referrerName }: { referrerName?: string | null }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const ref = searchParams.get("ref");
