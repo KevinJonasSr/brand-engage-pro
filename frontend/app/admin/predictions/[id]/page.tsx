@@ -45,7 +45,7 @@ interface PredictionRow {
 interface AwardRow {
   member_id: string;
   points: number;
-  created_at: string;
+  awarded_at: string;
 }
 
 export default async function ResolvePredictionPage({
@@ -94,7 +94,7 @@ export default async function ResolvePredictionPage({
   if (post.resolved_at) {
     const { data: awardRows } = await admin
       .from("prediction_award_log")
-      .select("member_id, points, created_at")
+      .select("member_id, points, awarded_at")
       .eq("post_id", id);
     awards = ((awardRows ?? []) as unknown as AwardRow[]) ?? [];
   }
