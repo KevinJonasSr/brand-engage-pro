@@ -81,7 +81,7 @@ export default async function MarketplacePage() {
             {products.map((item) => (
               <div key={item.slug} className="glass-card p-5">
                 <div className="flex items-center justify-between text-xs uppercase tracking-wide text-white/50">
-                  <span>{item.tier}</span>
+                  <span>{item.tier !== "Bronze" && item.tier !== "All tiers" && "🔒 "}{item.tier}</span>
                   <span className="rounded-full bg-white/10 px-3 py-1 text-white/70">{item.badge}</span>
                 </div>
                 <h3 className="mt-4 text-xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
