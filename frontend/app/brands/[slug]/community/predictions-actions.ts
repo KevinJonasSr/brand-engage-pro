@@ -228,7 +228,7 @@ export async function votePredictionAction(
   if (!allowChanges) {
     const { data: existing } = await supabase
       .from("community_poll_votes")
-      .select("id")
+      .select("post_id")
       .eq("post_id", postId)
       .eq("member_id", user.id)
       .maybeSingle();

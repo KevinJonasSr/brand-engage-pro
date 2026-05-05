@@ -174,7 +174,7 @@ export async function resolveAndAwardPrediction(opts: {
   // Load votes
   const { data: voteRows } = await admin
     .from("community_poll_votes")
-    .select("id, post_id, member_id, option_id, numeric_value, date_value, created_at")
+    .select("post_id, member_id, option_id, numeric_value, date_value, created_at")
     .eq("post_id", opts.postId);
 
   const votes = (voteRows ?? []) as PollVote[];
