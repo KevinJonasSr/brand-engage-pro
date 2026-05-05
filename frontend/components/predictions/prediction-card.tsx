@@ -183,6 +183,11 @@ export async function PredictionCard({
                 Resolved
               </span>
             )}
+            {phase === "resolved" && isWinner && (
+              <span className="rounded-full bg-emerald-500/25 px-2 py-1 font-semibold text-emerald-200">
+                🎉 You called it!
+              </span>
+            )}
             {(post.points_for_correct ?? 0) > 0 && (
               <span className="rounded-full bg-white/5 px-2 py-1 text-white/65">
                 {post.points_for_correct} pts
