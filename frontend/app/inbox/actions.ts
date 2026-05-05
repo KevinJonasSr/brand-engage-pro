@@ -56,3 +56,28 @@ export async function markAllReadAction() {
   revalidatePath("/inbox");
   revalidatePath("/", "layout");
 }
+
+
+/**
+ * Archive (delete) all read notifications for the signed-in user.
+ * Repo-agnostic: tries fan_id first (FE), falls back to member_id (BEP).
+ */
+export async function archiveReadAction() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  for (const col of ["fan_id", "member_id"]) {
+    const { error } = await supabase
+      .from("notifications")
+      .delete()
+      .eq(col, user.id)
+      .not("read_at", "is", null);
+    if (!error) break;
+  }
+
+  revalidatePath("/inbox");
+  revalidatePath("/", "layout");
+}

@@ -3,8 +3,9 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { listNotifications, type Notification } from "@/lib/data/notifications";
 import {
-  markNotificationReadAction,
+  archiveReadAction,
   markAllReadAction,
+  markNotificationReadAction,
 } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -92,16 +93,26 @@ export default async function InboxPage({
               : "You're all caught up."}
           </p>
         </div>
-        {unreadCount > 0 && (
-          <form action={markAllReadAction}>
-            <Link href="/me/notifications" className="rounded-full border border-white/10 px-3 py-1.5 text-sm text-white/70 transition hover:border-white/20 hover:text-white">Preferences</Link>
-          <button
-              type="submit"
-              className="rounded-full border border-white/20 px-4 py-2 text-xs font-medium text-white/80 hover:bg-white/10"
-            >
-              Mark all read
-            </button>
-          </form>
+        {all.length > 0 && (
+          <div className="flex items-center gap-2">
+            <Link href="/me/notifications" className="rounded-full border border-white/10 px-3 py-1.5 text-sm text-white/70 transition hover:border-white/20 hover:text-white">
+              Preferences
+            </Link>
+            {unreadCount > 0 && (
+              <form action={markAllReadAction}>
+                <button type="submit" className="rounded-full border border-white/20 px-4 py-2 text-xs font-medium text-white/80 hover:bg-white/10">
+                  Mark all read
+                </button>
+              </form>
+            )}
+            {all.length > unreadCount && (
+              <form action={archiveReadAction}>
+                <button type="submit" className="rounded-full border border-white/20 px-4 py-2 text-xs font-medium text-white/60 hover:bg-white/10">
+                  Archive read
+                </button>
+              </form>
+            )}
+          </div>
         )}
       </div>
 
