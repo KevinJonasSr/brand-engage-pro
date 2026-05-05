@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import ImageUploader from "@/components/image-uploader";
 import VideoUploader from "@/components/video-uploader";
 import { useFormSave, SaveStatusIndicator } from "@/lib/use-form-save";
+import TagSuggester from "@/components/community/tag-suggester";
 import {
   createAnnouncementAction,
   createChallengeAction,
@@ -27,6 +28,7 @@ export default function NewPostForm({
   // Bump this key to force-remount the ImageUploader after a submit (which
   // clears its internal state + hidden input).
   const [uploaderKey, setUploaderKey] = useState(0);
+  const [body, setBody] = useState<string>("");
   const formRef = useRef<HTMLFormElement>(null);
 
   const { status, invoke, submitting } = useFormSave();
@@ -36,6 +38,7 @@ export default function NewPostForm({
     setPollOptions(["", ""]);
     setVisibility("public");
     setUploaderKey((k) => k + 1);
+    setBody("");
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -175,6 +178,8 @@ export default function NewPostForm({
 
       <textarea
         name="body"
+        value={body}
+        onChange={(e) => setBody(e.target.value)}
         required
         maxLength={2000}
         placeholder={
@@ -189,6 +194,9 @@ export default function NewPostForm({
         rows={3}
         className="w-full resize-none rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-white/40 focus:outline-none"
       />
+
+      {/* AI #5 — TagSuggester (lights M-2 filter chips on submit) */}
+      <TagSuggester partialBody={body} brandSlug={brandSlug} />
 
       {kind === "poll" && (
         <div className="space-y-2">
