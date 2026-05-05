@@ -9,6 +9,8 @@ import SignupClient from "./signup-client";
  *
  * The actual client logic lives in ./signup-client.tsx.
  */
+export const metadata = { title: "Sign up · Brand Engage Pro" };
+
 export default async function SignupPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

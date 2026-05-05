@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 
+export const metadata = { title: "Anniversaries · Brand Engage Pro" };
+
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 

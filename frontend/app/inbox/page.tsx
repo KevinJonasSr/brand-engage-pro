@@ -8,6 +8,8 @@ import {
   markNotificationReadAction,
 } from "./actions";
 
+export const metadata = { title: "Inbox · Brand Engage Pro" };
+
 export const dynamic = "force-dynamic";
 
 function relativeTime(iso: string): string {

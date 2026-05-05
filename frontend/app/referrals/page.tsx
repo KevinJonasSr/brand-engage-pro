@@ -32,6 +32,8 @@ async function buildInviteUrl(code: string | null | undefined): Promise<string> 
   return `${origin}/invite/${code}`;
 }
 
+export const metadata = { title: "Referrals · Brand Engage Pro" };
+
 export default async function ReferralsPage() {
   const [member, myReferrals, leaderboard] = await Promise.all([
     getCurrentMember(),

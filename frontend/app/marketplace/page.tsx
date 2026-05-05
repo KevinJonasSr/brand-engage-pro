@@ -32,6 +32,8 @@ function formatCategory(cat: Offer["category"]): string {
   }[cat];
 }
 
+export const metadata = { title: "Marketplace · Brand Engage Pro" };
+
 export default async function MarketplacePage() {
   const dbOffers = await getActiveOffers();
   const usingDb = dbOffers.length > 0;

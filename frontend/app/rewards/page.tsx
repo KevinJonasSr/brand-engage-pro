@@ -51,6 +51,8 @@ function formatPts(n: number | null | undefined) {
   return new Intl.NumberFormat("en-US").format(n) + " pts";
 }
 
+export const metadata = { title: "Rewards · Brand Engage Pro" };
+
 export default async function RewardsPage() {
   const [member, kpis, tiers, dbBadges, breakdown] = await Promise.all([
     getCurrentMember(),
