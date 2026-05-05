@@ -19,6 +19,7 @@
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import { embedText, pgvectorLiteral, slugToSourceId, EmbeddingError } from "@/lib/embeddings";
+import { cachedEmbedQuery } from "./embed-cache";
 import type {
   SearchHit,
   SearchHitData,
@@ -62,7 +63,7 @@ export async function search(query: string): Promise<SearchResults> {
   // 1. Embed the query.
   let queryVector: number[] | null;
   try {
-    queryVector = await embedText(trimmed);
+    queryVector = await cachedEmbedQuery(trimmed);
   } catch (err) {
     if (err instanceof EmbeddingError) {
       // Bubble up — caller (the API route) decides whether to 503 or fail.
