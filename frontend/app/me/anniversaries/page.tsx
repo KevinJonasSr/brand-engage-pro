@@ -56,7 +56,7 @@ export default async function AnniversariesPage() {
       .eq(cfg.fkCol, user.id)
       .order("celebrated_at", { ascending: false });
     if (!error && data && data.length > 0) {
-      for (const r of data as Array<{
+      for (const r of data as unknown as Array<{
         id: string;
         milestone: string;
         celebrated_at: string;
