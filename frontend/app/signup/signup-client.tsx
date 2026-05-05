@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 export default function SignupPage({ referrerName }: { referrerName?: string | null }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const community = searchParams.get("community");
   const ref = searchParams.get("ref");
   // Where to send the user after a successful signup. Preserve any
   // ?ref=<brand-slug> attribution from the brand-page Join CTA.
