@@ -36,6 +36,11 @@ export default async function MeIndexPage() {
           body="Choose which drops, predictions, and milestones we ping you about."
         />
         <Row
+          href="/me/anniversaries"
+          title="Anniversaries"
+          body="Every milestone with a community you follow."
+        />
+        <Row
           href="/rewards"
           title="Rewards & tiers"
           body="Your tier, badges, and points history."
