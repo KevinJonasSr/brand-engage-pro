@@ -78,6 +78,15 @@ export default async function InboxPage({
   const items: Notification[] = filter === "unread" ? all.filter((n) => !n.read_at) : all;
   const unreadCount = all.filter((n) => !n.read_at).length;
 
+
+  // Group by kind for the section view (M-10).
+  const groupedKinds = new Map<string, typeof items>();
+  for (const n of items) {
+    const k = kindLabel(n.kind);
+    if (!groupedKinds.has(k)) groupedKinds.set(k, []);
+    groupedKinds.get(k)!.push(n);
+  }
+
   return (
     <main className="mx-auto max-w-2xl px-6 py-10">
       <div className="mb-8 flex items-end justify-between gap-4">
@@ -158,8 +167,14 @@ export default async function InboxPage({
           </p>
         </div>
       ) : (
-        <ul className="divide-y divide-white/10 overflow-hidden rounded-2xl border border-white/10 bg-black/30">
-          {items.map((n) => (
+        <div className="space-y-4">
+        {Array.from(groupedKinds.entries()).map(([groupName, groupItems]) => (
+          <section key={groupName}>
+            <h3 className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-white/40">
+              {groupName}
+            </h3>
+            <ul className="divide-y divide-white/10 overflow-hidden rounded-2xl border border-white/10 bg-black/30">
+              {groupItems.map((n) => (
             <li key={n.id}>
               <form action={markNotificationReadAction}>
                 <input type="hidden" name="id" value={n.id} />
@@ -199,8 +214,11 @@ export default async function InboxPage({
                 </button>
               </form>
             </li>
-          ))}
-        </ul>
+              ))}
+            </ul>
+          </section>
+        ))}
+        </div>
       )}
     </main>
   );
