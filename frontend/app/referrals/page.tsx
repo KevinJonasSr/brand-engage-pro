@@ -58,7 +58,7 @@ export default async function ReferralsPage() {
           <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-purple-800/30 via-slate-900 to-midnight p-6 shadow-glass">
             <p className="text-sm uppercase tracking-wide text-white/60">Referrals</p>
             <h1 className="mt-2 text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
-              Turn friends into supermembers
+              Bring the regulars in
             </h1>
             <p className="mt-4 text-sm text-white/70">
               {isSignedIn
