@@ -158,7 +158,7 @@ export default async function BrandPage({
         {/* Content layer — sits above image + overlay */}
         <div className="relative p-10">
           <p className="text-xs uppercase tracking-[0.3em] text-white/70">
-            {brand.genres.join(" · ")}
+            {brand.genres.slice(0, 2).join(" · ")}{brand.genres.length > 2 ? " +" + (brand.genres.length - 2) : ""}
           </p>
           <h1
             className="mt-3 text-5xl font-semibold leading-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]"
