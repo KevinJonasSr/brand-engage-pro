@@ -7,6 +7,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getAdminUser } from "@/lib/admin";
 
 import { findNearestPost } from "@/lib/dedup/check";
+import { moderateRowAsync } from "@/lib/moderation";
 type Visibility = "public" | "premium" | "founder-only";
 
 async function requireUser() {
@@ -72,6 +73,9 @@ export async function createPostAction(formData: FormData) {
     }
   }
 
+  // AI #2: moderation — fire-and-forget classify (cron picks up failures).
+  if (created) moderateRowAsync("community_posts", created.id);
+
   revalidatePath(`/brands/${brandSlug}/community`);
   revalidatePath(`/brands/${brandSlug}`);
 }
@@ -121,11 +125,18 @@ export async function addCommentAction(formData: FormData) {
 
   const { supabase, userId } = await requireUser();
 
-  await supabase.from("community_comments").insert({
+  const { data: created } = await supabase
+    .from("community_comments")
+    .insert({
     post_id: postId,
     author_id: userId,
     body,
-  });
+  })
+    .select("id")
+    .single();
+
+  // AI #2: moderation — fire-and-forget classify.
+  if (created) moderateRowAsync("community_comments", created.id);
 
   revalidatePath(`/brands/${brandSlug}/community`);
 }
