@@ -137,7 +137,7 @@ export function PreferencesForm({
     setError(null);
     startTransition(async () => {
       const res = await savePreferencesAction(prefs);
-      if (res?.error) {
+      if (res && 'error' in res) {
         setError(res.error);
       } else {
         setSavedAt(Date.now());
