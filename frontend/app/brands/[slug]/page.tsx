@@ -1,4 +1,3 @@
-// TODO(6.B): Place <BrandPredictionsSection /> above your Specials section.
 import Link from "next/link";
 import LeaderboardMiniCard from "@/components/leaderboard-mini-card";
 import { notFound } from "next/navigation";
@@ -236,6 +235,14 @@ export default async function BrandPage({
       {/* Top members leaderboard preview */}
       <LeaderboardMiniCard brandSlug={slug} />
 
+      {/* PREDICTIONS — Phase 6.B */}
+      <BrandPredictionsSection
+        brandSlug={slug}
+        viewerMemberId={member?.id ?? null}
+        viewerTier={
+          (member?.tier as "public" | "premium" | "founder-only") ?? "public"
+        }
+      />
       {/* Specials — recurring offers a brand publishes to its members */}
       {specials.length > 0 && (
         <section className="glass-card p-8">
