@@ -60,6 +60,12 @@ export default function SignupPage() {
           <p className="text-sm text-white/70">
             Create an account to earn points, unlock rewards, and get backstage access.
           </p>
+          {referrerName && (
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200">
+              <span aria-hidden>👋</span>
+              <span>Invited by {referrerName}</span>
+            </div>
+          )}
           {community && (
             <div className="inline-flex items-center gap-1.5 rounded-full border border-aurora/40 bg-aurora/10 px-3 py-1 text-xs text-aurora">
               <span aria-hidden>·</span>
