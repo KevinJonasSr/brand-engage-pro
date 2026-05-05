@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 import { Suspense } from "react";
 import SignupClient from "./signup-client";
 
@@ -7,7 +9,11 @@ import SignupClient from "./signup-client";
  *
  * The actual client logic lives in ./signup-client.tsx.
  */
-export default function SignupPage() {
+export default async function SignupPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) redirect("/");
+
   return (
     <Suspense
       fallback={
