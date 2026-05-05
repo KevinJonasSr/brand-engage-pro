@@ -7,8 +7,16 @@ export const metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default async function BrandsIndexPage() {
+export default async function BrandsIndexPage({ searchParams }: { searchParams?: Promise<{ genre?: string }> }) {
+  const sp = (await searchParams) ?? {};
+  const genreFilter = (sp.genre ?? null) as string | null;
+
   const brands = await listBrandsFromDb();
+  const allGenres = Array.from(new Set(brands.flatMap((a) => a.genres))).sort();
+  const filteredBrands = genreFilter
+    ? brands.filter((a) => a.genres.includes(genreFilter))
+    : brands;
+
 
   // Member counts per brand for social-proof display (M-14)
   const admin = createAdminClient();
@@ -32,8 +40,39 @@ export default async function BrandsIndexPage() {
         </p>
       </header>
 
+      
+      {allGenres.length > 0 && (
+        <div className="flex flex-wrap gap-2" aria-label="Filter by genre">
+          <a
+            href="/brands"
+            className={
+              "inline-flex items-center rounded-full border px-3 py-1 text-xs transition " +
+              (genreFilter === null
+                ? "border-white/40 bg-white/15 text-white"
+                : "border-white/10 bg-black/30 text-white/70 hover:border-white/30")
+            }
+          >
+            All
+          </a>
+          {allGenres.map((g) => (
+            <a
+              key={g}
+              href={`/brands?genre=${encodeURIComponent(g)}`}
+              className={
+                "inline-flex items-center rounded-full border px-3 py-1 text-xs transition " +
+                (genreFilter === g
+                  ? "border-white/40 bg-white/15 text-white"
+                  : "border-white/10 bg-black/30 text-white/70 hover:border-white/30")
+              }
+            >
+              {g}
+            </a>
+          ))}
+        </div>
+      )}
+
       <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {brands.map((a) => (
+        {filteredBrands.map((a) => (
           <Link
             key={a.slug}
             href={`/brands/${a.slug}`}
