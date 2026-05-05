@@ -25,7 +25,7 @@ export async function getPostsByBrand(
     const { data: posts, error: postsErr } = await supabase
       .from("community_posts")
       .select(
-        "id, brand_slug, author_id, kind, title, body, image_url, video_url, video_poster_url, pinned, visibility, created_at",
+        "id, brand_slug, author_id, kind, title, body, image_url, video_url, video_poster_url, pinned, visibility, created_at, thread_summary, thread_summary_count",
       )
       .eq("brand_slug", brandSlug)
       .order("pinned", { ascending: false })
@@ -107,6 +107,8 @@ export async function getPostsByBrand(
           reaction_counts: reactionsByPost.get(p.id as string) ?? {},
           my_reactions: myReactionsByPost.get(p.id as string) ?? [],
           comment_count: commentCountsByPost.get(p.id as string) ?? 0,
+          thread_summary: ((p as { thread_summary?: string | null }).thread_summary) ?? null,
+          thread_summary_count: ((p as { thread_summary_count?: number | null }).thread_summary_count) ?? null,
         }) as CommunityPost,
     );
   } catch {

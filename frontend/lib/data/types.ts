@@ -122,6 +122,8 @@ export interface CommunityPost {
   reaction_counts: Record<string, number>; // { "❤️": 3, "🔥": 2 }
   my_reactions: string[]; // emoji list the current member has already given
   comment_count: number;
+  thread_summary: string | null;
+  thread_summary_count: number | null;
 }
 
 export interface CommunityComment {

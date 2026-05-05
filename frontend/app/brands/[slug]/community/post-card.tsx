@@ -160,6 +160,16 @@ export default function PostCard({
         />
       )}
 
+      {/* AI #14: thread summary for posts with active discussion */}
+      {post.thread_summary && post.comment_count >= 8 && (
+        <div className="rounded-2xl border border-aurora/30 bg-aurora/5 p-3">
+          <p className="mb-1 flex items-center gap-1 text-[10px] uppercase tracking-[0.18em] text-aurora">
+            <span aria-hidden>✨</span> What people are saying
+          </p>
+          <p className="text-sm text-white/85">{post.thread_summary}</p>
+        </div>
+      )}
+
       {/* Reactions */}
       <div className="flex flex-wrap items-center gap-2 border-t border-white/5 pt-3">
         {REACTION_SET.map((emoji) => {
