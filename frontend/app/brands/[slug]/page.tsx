@@ -239,10 +239,7 @@ export default async function BrandPage({
       <BrandPredictionsSection
         brandSlug={slug}
         viewerMemberId={member?.id ?? null}
-        viewerTier={
-          (member?.tier as "public" | "premium" | "founder-only") ?? "public"
-        }
-      />
+        />
       {/* Specials — recurring offers a brand publishes to its members */}
       {specials.length > 0 && (
         <section className="glass-card p-8">
