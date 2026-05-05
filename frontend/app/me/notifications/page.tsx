@@ -43,7 +43,7 @@ export default async function NotificationPreferencesPage() {
       .eq(col, user.id)
       .maybeSingle();
     if (!error && data) {
-      prefs = { ...DEFAULTS, ...data } as Prefs;
+      prefs = { ...DEFAULTS, ...(data as Partial<Prefs>) } as Prefs;
       foundRow = true;
       break;
     }
