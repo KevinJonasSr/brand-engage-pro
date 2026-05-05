@@ -1,3 +1,4 @@
+// TODO(6.B): Place <BrandPredictionsSection /> above your Specials section.
 import Link from "next/link";
 import LeaderboardMiniCard from "@/components/leaderboard-mini-card";
 import { notFound } from "next/navigation";
@@ -18,6 +19,7 @@ import SocialIcon from "@/components/social-icon";
 import FollowButton from "./follow-button";
 import RsvpButton from "./rsvp-button";
 
+import { BrandPredictionsSection } from "@/components/predictions/brand-predictions-section";
 export const dynamic = "force-dynamic";
 
 // Per-brand hero focal-y overrides. The default (30%) is biased to keep
