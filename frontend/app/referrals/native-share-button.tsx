@@ -12,8 +12,9 @@ export default function NativeShareButton({ url, text, title }: Props) {
   const [shared, setShared] = useState(false);
 
   async function handleShare() {
+    if (typeof navigator === "undefined") return;
     // Prefer the native share sheet on supported platforms (mobile, Safari).
-    if (typeof navigator !== "undefined" && "share" in navigator) {
+    if ("share" in navigator) {
       try {
         await navigator.share({
           url,
