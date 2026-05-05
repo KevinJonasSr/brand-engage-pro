@@ -9,6 +9,17 @@ export const dynamic = "force-dynamic";
 
 export default async function BrandsIndexPage() {
   const brands = await listBrandsFromDb();
+
+  // Member counts per brand for social-proof display (M-14)
+  const admin = createAdminClient();
+  const { data: memberships } = await admin
+    .from("member_brand_following")
+    .select("brand_slug");
+  const memberCounts: Record<string, number> = {};
+  for (const m of (memberships ?? []) as Array<{ brand_slug: string }>) {
+    memberCounts[m.brand_slug] = (memberCounts[m.brand_slug] ?? 0) + 1;
+  }
+
   return (
     <main className="mx-auto max-w-6xl space-y-6 px-6 py-12">
       <header className="space-y-2">
@@ -67,6 +78,13 @@ export default async function BrandsIndexPage() {
               {a.genres.length > 0 && (
                 <p className="absolute left-5 top-5 rounded-full border border-white/15 bg-black/45 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-white/85 backdrop-blur">
                   {a.genres.slice(0, 2).join(" · ")}{a.genres.length > 2 ? " +" + (a.genres.length - 2) : ""}
+                </p>
+              )}
+
+              {/* Top-right member count chip (M-14) */}
+              {(memberCounts[a.slug] ?? 0) > 0 && (
+                <p className="absolute right-5 top-5 rounded-full border border-white/15 bg-black/45 px-3 py-1 text-[10px] uppercase tracking-[0.3em] text-white/85 backdrop-blur">
+                  {memberCounts[a.slug].toLocaleString()} {memberCounts[a.slug] === 1 ? "member" : "members"}
                 </p>
               )}
 
