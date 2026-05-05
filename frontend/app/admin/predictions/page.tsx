@@ -47,7 +47,7 @@ export default async function AdminPredictionsPage() {
     .order("created_at", { ascending: false })
     .limit(200);
 
-  const all = (rows ?? []) as PredictionQueueRow[];
+  const all = (rows ?? []) as unknown as PredictionQueueRow[];
   const now = new Date();
 
   const awaiting = all.filter(
