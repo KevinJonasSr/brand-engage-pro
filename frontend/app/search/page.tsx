@@ -216,7 +216,7 @@ function renderEvent(h: SearchHit) {
       ) : null}
       <p className="mt-2 text-[10px] uppercase tracking-wide text-white/40">
         {h.data.brand_slug}
-        {h.data.event_date ? ` · ${formatDate(h.data.event_date)}` : ""}
+        {(() => { const f = formatDate(h.data.event_date); return f ? ` · ${f}` : ""; })()}
       </p>
     </Link>
   );
@@ -257,15 +257,14 @@ function renderSpecial(h: SearchHit) {
   );
 }
 
-function formatDate(iso: string): string {
-  try {
-    return new Date(iso).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  } catch {
-    return iso;
-  }
+function formatDate(iso: string | null | undefined): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
