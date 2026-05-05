@@ -34,11 +34,12 @@ export async function gatherPredictionTally(
       ]);
 
     if (!post) return null;
+    const p = post as unknown as { id: string; prediction_type: PredictionType | null };
 
     const votes = (voteRows ?? []) as PollVote[];
     const options = (optionRows ?? []) as PollOption[];
     const total = votes.length;
-    const type = (post.prediction_type as PredictionType) ?? "multi";
+    const type = (p.prediction_type as PredictionType) ?? "multi";
 
     const empty: PredictionTally = {
       total_votes: total,

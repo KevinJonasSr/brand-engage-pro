@@ -178,18 +178,26 @@ export async function votePredictionAction(
     .eq("id", postId)
     .maybeSingle();
   if (!post) return { ok: false, error: "post_not_found" };
+  const p = post as unknown as {
+    id: string;
+    brand_slug: string;
+    prediction_type: PredictionType | null;
+    prediction_closes_at: string | null;
+    resolved_at: string | null;
+    allow_vote_changes: boolean | null;
+  };
 
   // Phase gate
-  if (post.resolved_at) return { ok: false, error: "already_resolved" };
+  if (p.resolved_at) return { ok: false, error: "already_resolved" };
   if (
-    post.prediction_closes_at &&
-    new Date(post.prediction_closes_at as string).getTime() <= Date.now()
+    p.prediction_closes_at &&
+    new Date(p.prediction_closes_at as string).getTime() <= Date.now()
   ) {
     return { ok: false, error: "voting_closed" };
   }
 
-  const ptype = post.prediction_type as PredictionType;
-  const allowChanges = !!post.allow_vote_changes;
+  const ptype = p.prediction_type as PredictionType;
+  const allowChanges = !!p.allow_vote_changes;
 
   // Build vote payload by type
   const payload: Record<string, unknown> = {
@@ -234,8 +242,8 @@ export async function votePredictionAction(
     .upsert(payload, { onConflict: "post_id,member_id" });
   if (voteErr) return { ok: false, error: voteErr.message };
 
-  revalidatePath(`/brands/${post.brand_slug}`);
-  revalidatePath(`/brands/${post.brand_slug}/community`);
+  revalidatePath(`/brands/${p.brand_slug}`);
+  revalidatePath(`/brands/${p.brand_slug}/community`);
 
   return { ok: true };
 }
@@ -295,14 +303,15 @@ export async function resolvePredictionAction(
     .maybeSingle();
 
   if (post) {
+    const rp = post as unknown as { brand_slug: string; title: string };
     notifyPredictionResolved({
       postId,
-      brandSlug: post.brand_slug as string,
-      title: post.title as string,
+      brandSlug: rp.brand_slug,
+      title: rp.title,
       winnerMemberIds: result.winners,
     }).catch(() => {});
-    revalidatePath(`/brands/${post.brand_slug}`);
-    revalidatePath(`/brands/${post.brand_slug}/community`);
+    revalidatePath(`/brands/${rp.brand_slug}`);
+    revalidatePath(`/brands/${rp.brand_slug}/community`);
   }
   revalidatePath(`/admin/predictions`);
 

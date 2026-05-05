@@ -124,6 +124,19 @@ function resolveDate(
  * Returns { winners, pointsAwarded } so the caller (admin UI) can show
  * a confirmation toast.
  */
+interface PredictionPostRow {
+  id: string;
+  brand_slug: string;
+  prediction_type: PredictionType | null;
+  points_for_correct: number | null;
+  correct_option_id: string | null;
+  correct_numeric_value: number | null;
+  correct_date_value: string | null;
+  numeric_tolerance: number | null;
+  award_strategy: AwardStrategy | null;
+  resolved_at: string | null;
+}
+
 export async function resolveAndAwardPrediction(opts: {
   postId: string;
   resolvedBy: string;
@@ -146,6 +159,7 @@ export async function resolveAndAwardPrediction(opts: {
     .maybeSingle();
 
   if (!post) return { winners: [], pointsAwarded: 0, error: "post_not_found" };
+  const p = post as unknown as PredictionPostRow;
 
   // Persist any overrides the admin passed in so the post row reflects truth.
   const updates: Record<string, unknown> = {
@@ -167,24 +181,24 @@ export async function resolveAndAwardPrediction(opts: {
 
   const winners = pickWinners({
     votes,
-    predictionType: (post.prediction_type as PredictionType) ?? "multi",
+    predictionType: (p.prediction_type as PredictionType) ?? "multi",
     correctOptionId:
       opts.correctOptionId !== undefined
         ? opts.correctOptionId
-        : (post.correct_option_id as string | null),
+        : (p.correct_option_id as string | null),
     correctNumeric:
       opts.correctNumeric !== undefined
         ? opts.correctNumeric
-        : (post.correct_numeric_value as number | null),
+        : (p.correct_numeric_value as number | null),
     correctDate:
       opts.correctDate !== undefined
         ? opts.correctDate
-        : (post.correct_date_value as string | null),
-    numericTolerance: (post.numeric_tolerance as number | null) ?? 0,
-    awardStrategy: (post.award_strategy as AwardStrategy) ?? "closest",
+        : (p.correct_date_value as string | null),
+    numericTolerance: (p.numeric_tolerance as number | null) ?? 0,
+    awardStrategy: (p.award_strategy as AwardStrategy) ?? "closest",
   });
 
-  const points = (post.points_for_correct as number | null) ?? 0;
+  const points = (p.points_for_correct as number | null) ?? 0;
   let pointsAwarded = 0;
 
   if (winners.length > 0 && points > 0) {
@@ -193,7 +207,7 @@ export async function resolveAndAwardPrediction(opts: {
       post_id: opts.postId,
       member_id,
       points,
-      metadata: { strategy: post.award_strategy ?? "closest" },
+      metadata: { strategy: p.award_strategy ?? "closest" },
     }));
     const { data: insertedAwards } = await admin
       .from("prediction_award_log")
