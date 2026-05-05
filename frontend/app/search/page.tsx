@@ -257,6 +257,3 @@ function renderSpecial(h: SearchHit) {
     </Link>
   );
 }
-
-);
-}
