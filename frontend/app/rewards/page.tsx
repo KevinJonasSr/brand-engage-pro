@@ -102,7 +102,7 @@ export default async function RewardsPage() {
             </h1>
             <p className="mt-4 text-sm text-white/70">
               Keep stacking points to unlock {nextTier?.display_name ?? "more"}-only experiences.
-              Your highest tier determines marketplace access, presales, and surprise drops.
+              Silver unlocks priority drops + 2× leaderboard multiplier. Gold adds early specials access + presale tickets. Platinum gives all-access + chef table windows.
             </p>
             <div className="mt-8 space-y-4">
               <div className="flex items-center justify-between text-sm text-white/70">
