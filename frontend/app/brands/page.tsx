@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { listBrandsFromDb } from "@/lib/data/brands";
 
 export const metadata = {
