@@ -87,6 +87,31 @@ export default function SignupPage() {
               className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-white/40 focus:outline-none"
               placeholder="at least 8 characters"
             />
+            {password && (() => {
+              let score = 0;
+              if (password.length >= 8) score += 1;
+              if (password.length >= 12) score += 1;
+              if (/[A-Z]/.test(password)) score += 1;
+              if (/\d/.test(password)) score += 1;
+              if (/[^A-Za-z0-9]/.test(password)) score += 1;
+              const tiers = [
+                { label: "Weak", color: "bg-rose-500", w: "20%" },
+                { label: "Weak", color: "bg-rose-500", w: "20%" },
+                { label: "Fair", color: "bg-amber-400", w: "45%" },
+                { label: "Good", color: "bg-emerald-400", w: "70%" },
+                { label: "Strong", color: "bg-emerald-500", w: "95%" },
+                { label: "Strong", color: "bg-emerald-500", w: "100%" },
+              ];
+              const t = tiers[score];
+              return (
+                <div className="mt-1 flex items-center gap-2">
+                  <span className="h-1 flex-1 overflow-hidden rounded bg-white/10">
+                    <span className={"block h-1 " + t.color} style={{ width: t.w }} />
+                  </span>
+                  <span className="text-[11px] text-white/50">{t.label}</span>
+                </div>
+              );
+            })()}
           </label>
 
           <button
