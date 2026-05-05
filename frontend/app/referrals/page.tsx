@@ -3,6 +3,7 @@ import { getCurrentMember } from "@/lib/data/member";
 import { getMyReferrals, getReferralLeaderboard } from "@/lib/data/referrals";
 import InviteQRCode from "@/components/invite-qr";
 import CopyLinkButton from "./copy-link-button";
+import NativeShareButton from "./native-share-button";
 
 const ladder = [
   { level: "1 referral", reward: "+150 pts" },
@@ -68,6 +69,7 @@ export default async function ReferralsPage() {
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <code className="flex-1 rounded-2xl bg-black/40 px-4 py-3 text-sm">{inviteUrl}</code>
               <CopyLinkButton url={inviteUrl} />
+              <NativeShareButton url={inviteUrl} />
             </div>
           </section>
 
