@@ -155,19 +155,21 @@ async function collect(slug: string): Promise<LatestCard[]> {
     }
   }
 
-  // ─── upcoming events (artist_events on FE, brand_events on BEP) ────
-  for (const tbl of ["artist_events", "brand_events"]) {
-    const fkCol = tbl === "artist_events" ? "artist_id" : "brand_slug";
-    const fkVal = tbl === "artist_events" ? scopeId : slug;
+  // ─── upcoming events ──────────────────────────────────────────────
+  // FE shape:  artist_events.starts_at (timestamptz) + .description
+  // BEP shape: brand_events.event_starts_at (timestamptz, may be null)
+  //            + .detail + .event_date (legacy text for display fallback)
+  let eventsAdded = false;
+
+  {
     const { data, error } = await supabase
-      .from(tbl)
+      .from("artist_events")
       .select("id, title, description, starts_at")
-      .eq(fkCol, fkVal)
+      .eq("artist_id", scopeId)
       .gte("starts_at", new Date().toISOString())
       .order("starts_at", { ascending: true })
       .limit(3);
-    if (error) continue;
-    if (data && data.length > 0) {
+    if (!error && data && data.length > 0) {
       for (const e of data as Array<{
         id: string;
         title: string;
@@ -183,7 +185,40 @@ async function collect(slug: string): Promise<LatestCard[]> {
           when: relTime(e.starts_at),
         });
       }
-      break;
+      eventsAdded = true;
+    }
+  }
+
+  if (!eventsAdded) {
+    const nowIso = new Date().toISOString();
+    const { data, error } = await supabase
+      .from("brand_events")
+      .select("id, title, detail, event_starts_at, event_date")
+      .eq("brand_slug", slug)
+      .or(`event_starts_at.gte.${nowIso},event_starts_at.is.null`)
+      .order("event_starts_at", { ascending: true, nullsFirst: false })
+      .limit(3);
+    if (!error && data && data.length > 0) {
+      for (const e of data as Array<{
+        id: string;
+        title: string;
+        detail: string | null;
+        event_starts_at: string | null;
+        event_date: string | null;
+      }>) {
+        const ts = e.event_starts_at ?? new Date().toISOString();
+        const when = e.event_starts_at
+          ? relTime(e.event_starts_at)
+          : (e.event_date ?? "");
+        cards.push({
+          kind: "event",
+          title: e.title,
+          body: truncate(e.detail, 120),
+          href: hrefForHub(slug),
+          ts,
+          when,
+        });
+      }
     }
   }
 
