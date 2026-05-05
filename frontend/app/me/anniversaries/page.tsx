@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { absoluteDate } from "@/lib/format/relative-time";
 
 export const metadata = { title: "Anniversaries · Brand Engage Pro" };
 
@@ -123,11 +124,7 @@ export default async function AnniversariesPage() {
               <div className="flex-1">
                 <div className="font-medium">{e.label}</div>
                 <p className="mt-0.5 text-sm text-white/60">
-                  {new Date(e.celebrated_at).toLocaleDateString(undefined, {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })}
+                  {absoluteDate(e.celebrated_at)}
                   {e.points_awarded > 0 && (
                     <>
                       {" · "}

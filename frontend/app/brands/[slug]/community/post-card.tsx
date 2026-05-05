@@ -15,22 +15,9 @@ import {
 } from "./actions";
 import PollBlock from "./poll-block";
 import ChallengeBlock from "./challenge-block";
+import { relativeTime } from "@/lib/format/relative-time";
 
 const REACTION_SET = ["❤️", "🔥", "👏", "💯", "😂"] as const;
-
-function timeAgo(iso: string): string {
-  const then = new Date(iso).getTime();
-  const now = Date.now();
-  const sec = Math.max(1, Math.floor((now - then) / 1000));
-  if (sec < 60) return `${sec}s ago`;
-  const min = Math.floor(sec / 60);
-  if (min < 60) return `${min}m ago`;
-  const hr = Math.floor(min / 60);
-  if (hr < 24) return `${hr}h ago`;
-  const days = Math.floor(hr / 24);
-  if (days < 7) return `${days}d ago`;
-  return new Date(iso).toLocaleDateString();
-}
 
 function KindBadge({ kind }: { kind: CommunityPost["kind"] }) {
   if (kind === "announcement") {
@@ -93,7 +80,7 @@ export default function PostCard({
             </p>
             <KindBadge kind={post.kind} />
           </div>
-          <p className="text-xs text-white/50">{timeAgo(post.created_at)}</p>
+          <p className="text-xs text-white/50">{relativeTime(post.created_at)}</p>
         </div>
         <div className="flex items-center gap-2">
           {post.pinned && (
@@ -220,7 +207,7 @@ export default function PostCard({
                   {c.author_first_name ?? "Anonymous member"}
                 </p>
                 <p className="text-[10px] uppercase tracking-wide text-white/40">
-                  {timeAgo(c.created_at)}
+                  {relativeTime(c.created_at)}
                 </p>
               </div>
               <p className="mt-1 whitespace-pre-wrap text-sm text-white/80">

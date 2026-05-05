@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { WeeklyRecap } from "@/lib/personal-recap/types";
+import { dateRange } from "@/lib/format/relative-time";
 
 /**
  * "Your week" tile on Member Home.
@@ -18,23 +19,6 @@ interface WeeklyRecapTileProps {
   recap: WeeklyRecap;
   /** Display name to lead with — usually the member's first name. */
   firstName?: string | null;
-}
-
-function formatRange(startIso: string, endIso: string): string {
-  if (!startIso || !endIso) return "This week";
-  try {
-    const start = new Date(startIso);
-    const end = new Date(endIso);
-    const sameMonth = start.getUTCMonth() === end.getUTCMonth();
-    const fmtDay = (d: Date) =>
-      d.toLocaleDateString("en-US", {
-        month: sameMonth ? undefined : "short",
-        day: "numeric",
-      });
-    return `${start.toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${fmtDay(end)}`;
-  } catch {
-    return "This week";
-  }
 }
 
 export default function WeeklyRecapTile({
@@ -129,7 +113,7 @@ export default function WeeklyRecapTile({
             Your week
           </p>
           <p className="mt-1 text-base font-semibold text-white">
-            {formatRange(recap.windowStart, recap.windowEnd)}
+            {dateRange(recap.windowStart, recap.windowEnd) || "This week"}
           </p>
         </div>
         <button

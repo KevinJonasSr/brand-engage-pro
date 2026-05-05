@@ -15,6 +15,7 @@ import { search } from "@/lib/search";
 import { EmbeddingError } from "@/lib/embeddings";
 import type { SearchHit, SearchResults } from "@/lib/search";
 import SearchInput from "@/components/search-input";
+import { absoluteDate } from "@/lib/format/relative-time";
 
 export const dynamic = "force-dynamic";
 
@@ -185,7 +186,7 @@ function renderPost(h: SearchHit) {
       ) : null}
       <p className="mt-1 line-clamp-3 text-xs text-white/70">{h.data.body}</p>
       <p className="mt-2 text-[10px] uppercase tracking-wide text-white/40">
-        in {h.data.brand_slug} · {formatDate(h.data.created_at)}
+        in {h.data.brand_slug} · {absoluteDate(h.data.created_at)}
       </p>
     </Link>
   );
@@ -200,7 +201,7 @@ function renderComment(h: SearchHit) {
     >
       <p className="line-clamp-3 text-xs text-white/80">{h.data.body}</p>
       <p className="mt-2 text-[10px] uppercase tracking-wide text-white/40">
-        comment in {h.data.brand_slug} · {formatDate(h.data.created_at)}
+        comment in {h.data.brand_slug} · {absoluteDate(h.data.created_at)}
       </p>
     </Link>
   );
@@ -216,7 +217,7 @@ function renderEvent(h: SearchHit) {
       ) : null}
       <p className="mt-2 text-[10px] uppercase tracking-wide text-white/40">
         {h.data.brand_slug}
-        {(() => { const f = formatDate(h.data.event_date); return f ? ` · ${f}` : ""; })()}
+        {(() => { const f = absoluteDate(h.data.event_date); return f ? ` · ${f}` : ""; })()}
       </p>
     </Link>
   );
@@ -257,7 +258,7 @@ function renderSpecial(h: SearchHit) {
   );
 }
 
-function formatDate(iso: string | null | undefined): string {
+function absoluteDate(iso: string | null | undefined): string {
   if (!iso) return "";
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { relativeTime } from "@/lib/format/relative-time";
 
 type CardKind = "post" | "event" | "drop" | "prediction";
 
@@ -148,7 +149,7 @@ async function collect(slug: string): Promise<LatestCard[]> {
           body: p.title ? truncate(p.body, 120) : null,
           href: hrefForCommunity(slug),
           ts: p.created_at,
-          when: relTime(p.created_at),
+          when: relativeTime(p.created_at),
         });
       }
       break;
@@ -182,7 +183,7 @@ async function collect(slug: string): Promise<LatestCard[]> {
           body: truncate(e.description, 120),
           href: hrefForHub(slug),
           ts: e.starts_at,
-          when: relTime(e.starts_at),
+          when: relativeTime(e.starts_at),
         });
       }
       eventsAdded = true;
@@ -208,7 +209,7 @@ async function collect(slug: string): Promise<LatestCard[]> {
       }>) {
         const ts = e.event_starts_at ?? new Date().toISOString();
         const when = e.event_starts_at
-          ? relTime(e.event_starts_at)
+          ? relativeTime(e.event_starts_at)
           : (e.event_date ?? "");
         cards.push({
           kind: "event",
@@ -248,7 +249,7 @@ async function collect(slug: string): Promise<LatestCard[]> {
           body: truncate(r.description, 120),
           href: hrefForRewards(slug),
           ts: r.drops_at,
-          when: relTime(r.drops_at),
+          when: relativeTime(r.drops_at),
         });
       }
       break;
@@ -265,34 +266,6 @@ function truncate(s: string | null | undefined, n: number): string | null {
   const trimmed = s.trim();
   if (!trimmed) return null;
   return trimmed.length > n ? trimmed.slice(0, n - 1) + "…" : trimmed;
-}
-
-function relTime(iso: string): string {
-  const t = new Date(iso).getTime();
-  if (Number.isNaN(t)) return "";
-  const now = Date.now();
-  const diff = t - now;
-  const ad = Math.abs(diff);
-  const min = 60_000,
-    hr = 60 * min,
-    day = 24 * hr;
-  if (ad < hr) {
-    const m = Math.max(1, Math.round(ad / min));
-    return diff > 0 ? `in ${m}m` : `${m}m ago`;
-  }
-  if (ad < day) {
-    const h = Math.round(ad / hr);
-    return diff > 0 ? `in ${h}h` : `${h}h ago`;
-  }
-  if (ad < 30 * day) {
-    const d = Math.round(ad / day);
-    return diff > 0 ? `in ${d}d` : `${d}d ago`;
-  }
-  // > 30 days — fall back to absolute
-  return new Date(iso).toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-  });
 }
 
 function hrefForHub(slug: string): string {
