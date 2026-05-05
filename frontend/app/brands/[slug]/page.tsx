@@ -1,5 +1,6 @@
 import Link from "next/link";
 import LeaderboardMiniCard from "@/components/leaderboard-mini-card";
+import { LatestStrip } from "@/components/latest-strip";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { listBrands } from "@/lib/brands";
@@ -213,6 +214,8 @@ export default async function BrandPage({
       )}
 
       {/* About */}
+      <LatestStrip slug={slug} />
+
       <section className="grid gap-6 lg:grid-cols-[2fr_1fr]">
         <div className="glass-card p-8">
           <p className="text-sm uppercase tracking-wide text-white/60">About</p>
