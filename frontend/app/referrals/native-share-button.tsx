@@ -8,33 +8,37 @@ interface Props {
   title?: string;
 }
 
+type ShareData = { url: string; text: string; title: string };
+type NavWithShare = Navigator & {
+  share?: (data: ShareData) => Promise<void>;
+};
+
 export default function NativeShareButton({ url, text, title }: Props) {
   const [shared, setShared] = useState(false);
 
   async function handleShare() {
     if (typeof navigator === "undefined") return;
+    const nav = navigator as NavWithShare;
+    const shareText = text ?? "Join me — first dibs on drops, surprises, and points.";
+    const shareTitle = title ?? "Come hang out";
+
     // Prefer the native share sheet on supported platforms (mobile, Safari).
-    if ("share" in navigator) {
+    if (typeof nav.share === "function") {
       try {
-        await navigator.share({
-          url,
-          text: text ?? "Join me — first dibs on drops, surprises, and points.",
-          title: title ?? "Come hang out",
-        });
+        await nav.share({ url, text: shareText, title: shareTitle });
         setShared(true);
         setTimeout(() => setShared(false), 2000);
         return;
       } catch (err) {
-        // User cancelled — silent fallthrough is fine.
-        if ((err as { name?: string })?.name !== "AbortError") {
-          console.warn("Native share failed:", err);
-        }
-        return;
+        if ((err as { name?: string })?.name === "AbortError") return;
+        console.warn("Native share failed:", err);
+        // fall through to clipboard
       }
     }
+
     // Fallback: copy to clipboard.
     try {
-      await navigator.clipboard.writeText(url);
+      await nav.clipboard.writeText(url);
       setShared(true);
       setTimeout(() => setShared(false), 2000);
     } catch (err) {
