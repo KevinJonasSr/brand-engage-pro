@@ -19,8 +19,8 @@ export default async function NewPredictionPage() {
   const admin = createAdminClient();
   const { data: brandRows } = await admin
     .from("brands")
-    .select("slug, name, is_active")
-    .eq("is_active", true)
+    .select("slug, name, active")
+    .eq("active", true)
     .order("name", { ascending: true });
 
   const brands = ((brandRows ?? []) as unknown as BrandRow[]).map((b) => ({
