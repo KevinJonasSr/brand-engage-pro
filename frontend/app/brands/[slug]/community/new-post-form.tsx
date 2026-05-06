@@ -244,13 +244,22 @@ export default function NewPostForm({
       )}
 
       {kind !== "poll" && (
-        <ImageUploader
-          key={uploaderKey}
-          bucket="community-uploads"
-          name="image_url"
-          label={kind === "challenge" ? "Add cover photo" : "Add photo"}
+        <>
+          <ImageUploader
+            key={uploaderKey}
+            bucket="community-uploads"
+            name="image_url"
+            label={kind === "challenge" ? "Add cover photo" : "Add photo"}
             onUploaded={(url) => setImageUrl(url)}
           />
+          {imageUrl && (
+            <AltTextSuggester
+              imageUrl={imageUrl}
+              brandSlug={brandSlug}
+              partialBody={body}
+            />
+          )}
+        </>
       )}
 
       {(kind === "post" || kind === "announcement") && (
