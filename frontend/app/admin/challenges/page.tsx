@@ -36,7 +36,7 @@ async function load(): Promise<ChallengeWithEntries[]> {
   const [{ data: entries }, { data: members }, { data: winners }] = await Promise.all([
     admin
       .from("community_challenge_entries")
-      .select("id,post_id,member_id,body,image_url,created_at")
+      .select("id,post_id,member_id,body,image_url, image_alt,created_at")
       .in("post_id", ids)
       .order("created_at", { ascending: false }),
     admin.from("members").select("id,first_name"),

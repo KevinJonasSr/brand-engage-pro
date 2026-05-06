@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import ImageUploader from "@/components/image-uploader";
 import VideoUploader from "@/components/video-uploader";
 import { useFormSave, SaveStatusIndicator } from "@/lib/use-form-save";
+import AltTextSuggester from "@/components/community/alt-text-suggester";
 import TagSuggester from "@/components/community/tag-suggester";
 import {
   createAnnouncementAction,
@@ -28,6 +29,7 @@ export default function NewPostForm({
   // Bump this key to force-remount the ImageUploader after a submit (which
   // clears its internal state + hidden input).
   const [uploaderKey, setUploaderKey] = useState(0);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [body, setBody] = useState<string>("");
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -38,6 +40,7 @@ export default function NewPostForm({
     setPollOptions(["", ""]);
     setVisibility("public");
     setUploaderKey((k) => k + 1);
+    setImageUrl(null);
     setBody("");
   }
 
@@ -246,7 +249,8 @@ export default function NewPostForm({
           bucket="community-uploads"
           name="image_url"
           label={kind === "challenge" ? "Add cover photo" : "Add photo"}
-        />
+            onUploaded={(url) => setImageUrl(url)}
+          />
       )}
 
       {(kind === "post" || kind === "announcement") && (

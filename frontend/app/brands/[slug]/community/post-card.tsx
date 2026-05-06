@@ -141,7 +141,7 @@ export default function PostCard({
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={post.image_url}
-            alt=""
+            alt={post.image_alt ?? ""}
             className="max-h-96 w-full rounded-2xl object-cover"
           />
         )

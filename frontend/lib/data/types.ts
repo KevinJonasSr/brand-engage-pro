@@ -64,6 +64,7 @@ export interface Offer {
   min_tier: TierSlug;
   inventory: number | null;
   image_url: string | null;
+  image_alt: string | null;
   moderation_status: string | null;
   moderation_user_message: string | null;
   active: boolean;
@@ -118,6 +119,7 @@ export interface CommunityPost {
   video_url: string | null;
   video_poster_url: string | null;
   image_url: string | null;
+  image_alt: string | null;
   moderation_status: string | null;
   moderation_user_message: string | null;
   pinned: boolean;
@@ -160,6 +162,7 @@ export interface ChallengeEntry {
   member_first_name: string | null;
   body: string | null;
   image_url: string | null;
+  image_alt: string | null;
   moderation_status: string | null;
   moderation_user_message: string | null;
   created_at: string;

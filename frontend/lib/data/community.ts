@@ -184,7 +184,7 @@ export async function getChallengeEntries(
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("community_challenge_entries")
-      .select("id, post_id, member_id, body, image_url, created_at")
+      .select("id, post_id, member_id, body, image_url, image_alt, created_at")
       .eq("post_id", postId)
       .order("created_at", { ascending: false });
     if (error) throw error;

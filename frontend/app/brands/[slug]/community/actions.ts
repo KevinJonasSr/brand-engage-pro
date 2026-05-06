@@ -34,6 +34,10 @@ export async function createPostAction(formData: FormData) {
   const brandSlug = String(formData.get("brand_slug") ?? "").trim();
   const body = String(formData.get("body") ?? "").trim();
 
+  // AI alt-text — capture member-edited image_alt
+  const imageAltRaw = String(formData.get("image_alt") ?? "").trim();
+  const imageAlt = imageAltRaw.length > 0 ? imageAltRaw.slice(0, 500) : null;
+
   // AI #5 — capture member-selected tags from TagSuggester
   const aiSuggestedTagsRaw = String(formData.get("ai_suggested_tags") ?? "");
   const aiSuggestedTags = aiSuggestedTagsRaw
@@ -59,7 +63,7 @@ export async function createPostAction(formData: FormData) {
     body,
     image_url: imageUrl,
     video_url: videoUrl,
-    video_poster_url: videoPosterUrl, tags: aiSuggestedTags.length > 0 ? aiSuggestedTags.slice(0, 6) : null})
+    video_poster_url: videoPosterUrl, tags: aiSuggestedTags.length > 0 ? aiSuggestedTags.slice(0, 6) : null, image_alt: imageAlt})
     .select("id")
     .single();
 
