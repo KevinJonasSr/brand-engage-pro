@@ -153,8 +153,8 @@ export default async function BrandCommunityPage({
                   feature="This post"
                   description={
                     post.title
-                      ? `"${post.title}" — Premium members see every backstage post, voice note, and work-in-progress.`
-                      : "Premium members see every backstage post, voice note, and work-in-progress."
+                      ? `"${post.title}" — Premium members see every behind-the-scenes post, voice note, and work-in-progress.`
+                      : "Premium members see every behind-the-scenes post, voice note, and work-in-progress."
                   }
                   communityId={slug}
                   accentFrom={brand.accentFrom}

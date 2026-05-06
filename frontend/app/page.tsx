@@ -18,8 +18,8 @@ import { gatherWeeklyRecap } from "@/lib/personal-recap/gather";
 // of this.
 
 const journeyCards = [
-  { title: "Complete Backstage Challenge", points: "+250 pts" },
-  { title: "Share Your Listening Story", points: "+150 pts" },
+  { title: "Complete Member Challenge", points: "+250 pts" },
+  { title: "Share Your Member Story", points: "+150 pts" },
   { title: "Vote in Today’s Poll", points: "+75 pts" },
 ];
 
@@ -206,7 +206,7 @@ export default async function Home({
                 <span>📅</span> Upcoming Events
               </p>
               <div className="rounded-2xl border border-dashed border-white/15 bg-black/20 p-6 text-center text-xs text-white/60">
-                No events scheduled yet. Brand drops and listening parties will show here.
+                No events scheduled yet. Brand drops and member events will show here.
               </div>
             </div>
             <div className="glass-card space-y-4 p-6">

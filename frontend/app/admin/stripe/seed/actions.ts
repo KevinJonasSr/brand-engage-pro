@@ -62,7 +62,7 @@ export async function seedStripeProductsAction(formData: FormData): Promise<void
       name: `${community.display_name} — Premium Member Club`,
       description:
         community.tagline ??
-        `Premium membership for ${community.display_name}. Includes exclusive drops, early event access, and backstage perks.`,
+        `Premium membership for ${community.display_name}. Includes exclusive drops, early event access, and behind-the-scenes perks.`,
       metadata: {
         community_slug: community.slug,
         community_type: community.type,

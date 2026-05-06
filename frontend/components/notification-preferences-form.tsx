@@ -34,7 +34,7 @@ const TRIGGER_FIELDS: Array<{
   },
   {
     key: "notify_event_match",
-    label: "Tour date in your city",
+    label: "Brand event in your city",
     description: "When an artist you follow plays near you.",
   },
   {
@@ -107,7 +107,7 @@ export default function NotificationPreferencesForm({
             label="SMS"
             description={
               smsAllowed
-                ? "Tour-date and high-priority alerts to your phone."
+                ? "Brand-event and high-priority alerts to your phone."
                 : (smsCopy ??
                     "Available at Gold and Platinum tiers. Keep climbing.")
             }

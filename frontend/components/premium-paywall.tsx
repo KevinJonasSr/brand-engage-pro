@@ -128,8 +128,8 @@ export default function PremiumPaywall({
                 Premium members get exclusive access to:
               </p>
               <ul className="space-y-1 text-xs text-white/70">
-                <li>✓ Backstage posts & voice notes</li>
-                <li>✓ Early event RSVPs & listening parties</li>
+                <li>✓ Behind-the-scenes posts & voice notes</li>
+                <li>✓ Early event RSVPs & member-only events</li>
                 <li>✓ Exclusive polls & challenges</li>
               </ul>
             </>

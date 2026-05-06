@@ -54,7 +54,7 @@ const TYPE_ROWS: Array<{
     key: "notify_drops",
     emoji: "🎁",
     title: "Drops & releases",
-    body: "Limited-edition merch, vinyl drops, and surprise releases.",
+    body: "Limited-edition merch, exclusive drops, and surprise releases.",
   },
   {
     key: "notify_predictions",
@@ -78,7 +78,7 @@ const TYPE_ROWS: Array<{
     key: "notify_event_match",
     emoji: "🎫",
     title: "Events near you",
-    body: "Tour stops, listening parties, and specials matching your area.",
+    body: "Brand events, member-only nights, and specials matching your area.",
   },
   {
     key: "notify_new_post",

@@ -331,7 +331,7 @@ export default async function BrandPage({
                 <PremiumPaywall
                   key={e.id ?? e.title}
                   feature={e.title}
-                  description="Premium members get access to intimate listening parties, early RSVPs, and backstage-only moments."
+                  description="Premium members get access to intimate member events, early RSVPs, and behind-the-scenes-only moments."
                   communityId={slug}
                   accentFrom={brand.accentFrom}
                   accentTo={brand.accentTo}

@@ -36,13 +36,13 @@ export default async function AdminOffersPage() {
         <form action={createOfferAction} className="mt-4 grid gap-3 md:grid-cols-2">
           <input
             name="title"
-            placeholder="Signed vinyl"
+            placeholder="Limited merch drop"
             required
             className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
           />
           <input
             name="slug"
-            placeholder="signed-vinyl"
+            placeholder="limited-merch-drop"
             required
             className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
           />

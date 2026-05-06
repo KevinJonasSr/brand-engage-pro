@@ -59,7 +59,7 @@ export default function SignupPage({ referrerName }: { referrerName?: string | n
             Join the inner circle
           </h1>
           <p className="text-sm text-white/70">
-            Create an account to earn points, unlock rewards, and get backstage access.
+            Create an account to earn points, unlock rewards, and get behind-the-scenes access.
           </p>
           {referrerName && (
             <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200">

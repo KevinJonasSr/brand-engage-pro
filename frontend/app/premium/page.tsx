@@ -79,14 +79,14 @@ export default async function PremiumPage({
   );
 
   const perks = [
-    { icon: "🎙️", title: "Backstage feed", body: "Posts only Premium members see — raw tour moments, works-in-progress, voice notes." },
-    { icon: "🎟️", title: "Early ticket access", body: "First crack at tour tickets, limited by venue capacity." },
-    { icon: "🎁", title: "Exclusive drops", body: "Premium-only signed merch, vinyl, limited runs." },
+    { icon: "🎙️", title: "Behind-the-scenes feed", body: "Posts only Premium members see — raw moments, works-in-progress, voice notes." },
+    { icon: "🎟️", title: "Early ticket access", body: "First crack at event tickets, limited by venue capacity." },
+    { icon: "🎁", title: "Exclusive drops", body: "Premium-only exclusive merch, signed gear, limited runs." },
     { icon: "💬", title: "Monthly AMA", body: "Live Q&A with the brand — ask anything." },
     { icon: "🏆", title: "Premium badges", body: "The full status ladder — Silver, Gold, Platinum, and event badges." },
     { icon: "⚡", title: "1.5× points", body: "Every member action earns 1.5× more toward rewards." },
     { icon: "💸", title: "$5/mo store credit", body: "Refreshed monthly — spend on merch, events, or bank it up." },
-    { icon: "🎧", title: "VIP parties", body: "Listening parties and soundchecks reserved for Premium." },
+    { icon: "🎧", title: "VIP events", body: "Member-only events and previews reserved for Premium." },
   ];
 
   return (

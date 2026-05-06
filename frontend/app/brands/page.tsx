@@ -37,7 +37,7 @@ export default async function BrandsIndexPage({ searchParams }: { searchParams?:
           Member clubs on Brand Engage Pro
         </h1>
         <p className="max-w-2xl text-sm text-white/70">
-          Each brand has a dedicated hub with rewards, drops, and backstage access for their regulars.
+          Each brand has a dedicated hub with rewards, drops, and behind-the-scenes access for their regulars.
         </p>
       </header>
 

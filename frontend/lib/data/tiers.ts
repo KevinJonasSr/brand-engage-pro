@@ -5,7 +5,7 @@ const FALLBACK: Tier[] = [
   { slug: "bronze",   display_name: "Bronze",    min_points: 0,     perks: ["Welcome badge", "Access to member home"], sort_order: 1 },
   { slug: "silver",   display_name: "Silver",    min_points: 2500,  perks: ["Priority merch drops", "Monthly livestream"], sort_order: 2 },
   { slug: "gold",     display_name: "Gold",      min_points: 10000, perks: ["VIP soundcheck access", "Signed merch eligibility"], sort_order: 3 },
-  { slug: "platinum", display_name: "Platinum",  min_points: 25000, perks: ["Backstage experiences", "Meet & greet slots"], sort_order: 4 },
+  { slug: "platinum", display_name: "Platinum",  min_points: 25000, perks: ["Behind-the-scenes experiences", "Meet & greet slots"], sort_order: 4 },
 ];
 
 /**
