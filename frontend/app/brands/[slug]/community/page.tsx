@@ -17,6 +17,7 @@ import PremiumPaywall from "@/components/premium-paywall";
 import MemberCtaBlock from "./member-cta-block";
 import NewPostForm from "./new-post-form";
 import PostCard from "./post-card";
+import PickedForYou from "@/components/personal/picked-for-you";
 
 export async function generateStaticParams() {
   return listBrands().map((a) => ({ slug: a.slug }));
@@ -72,6 +73,10 @@ export default async function BrandCommunityPage({
 
   return (
     <main className="mx-auto max-w-3xl space-y-6 px-6 py-10">
+
+      {member?.id && (
+        <PickedForYou memberId={member.id} brandSlug={slug} />
+      )}
       <section
         className="rounded-3xl border border-white/10 p-8"
         style={{ backgroundImage: heroGradient }}
