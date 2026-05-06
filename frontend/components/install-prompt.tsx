@@ -1,12 +1,18 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 /**
- * Tasteful "Install Brand Engage Pro" prompt that appears after a member engages for
- * a bit (not immediately on first visit). Registers the service worker and
- * listens for the browser's `beforeinstallprompt` event so we can offer our
- * own button instead of relying on the browser's mini-infobar.
+ * Tasteful "Install Brand Engage Pro" prompt that appears after a member
+ * engages for a bit (not immediately on first visit). Registers the service
+ * worker and listens for the browser's `beforeinstallprompt` event so we can
+ * offer our own button instead of relying on the browser's mini-infobar.
+ *
+ * Gated on the member having at least one brand follow — anonymous visitors
+ * and brand-new sign-ups shouldn't see the install banner before they've
+ * actually engaged with the product. This avoids competing with the
+ * conversion path on first impression.
  *
  * Works on Chromium browsers and Android Chrome. iOS Safari has no
  * programmatic install event — we show a text tip there instead.
@@ -33,6 +39,10 @@ export default function InstallPrompt() {
 
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [show, setShow] = useState(false);
+  // Gate: only show the install prompt once the member has skin in the game
+  // (i.e. has followed at least one brand). Avoids prompting visitors who
+  // haven't signed up yet — those should be converted to members first.
+  const [hasFollows, setHasFollows] = useState(false);
 
   // Read userAgent via a store so we can use it in render without
   // triggering setState-in-effect lint.
@@ -43,8 +53,31 @@ export default function InstallPrompt() {
   );
   const isIos = /iPad|iPhone|iPod/.test(ua);
 
+  // Check whether the signed-in member has at least one follow before we
+  // arm the install-prompt timer.
   useEffect(() => {
     if (dismissed) return;
+    const supabase = createClient();
+    let mounted = true;
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user || !mounted) return;
+      supabase
+        .from("member_brand_following")
+        .select("member_id", { count: "exact", head: true })
+        .eq("member_id", user.id)
+        .then(({ count }) => {
+          if (mounted && count && count > 0) {
+            setHasFollows(true);
+          }
+        });
+    });
+    return () => {
+      mounted = false;
+    };
+  }, [dismissed]);
+
+  useEffect(() => {
+    if (dismissed || !hasFollows) return;
 
     // Register SW — ignored on http: (localhost works because it's treated
     // as secure).
@@ -77,7 +110,7 @@ export default function InstallPrompt() {
       window.removeEventListener("beforeinstallprompt", handler);
       if (iosTimer) clearTimeout(iosTimer);
     };
-  }, [dismissed, isIos]);
+  }, [dismissed, hasFollows, isIos]);
 
   function dismiss() {
     try {

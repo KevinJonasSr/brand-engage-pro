@@ -14,6 +14,9 @@ type Field = {
   otherOptionLabel?: string;
   otherFieldName?: string;
   otherPlaceholder?: string;
+  required?: boolean;
+  readOnly?: boolean;
+  hint?: string;
 };
 
 const FAVORITE_BRAND_OPTIONS = [
@@ -32,16 +35,40 @@ const steps: { title: string; description: string; fields: Field[] }[] = [
     title: "Member Profile",
     description: "Capture the basics so the experience can personalize immediately.",
     fields: [
-      { label: "Preferred name", name: "firstName", placeholder: "Taylor", type: "text" },
-      { label: "Email", name: "email", placeholder: "taylor@email.com", type: "email" },
-      { label: "City & state", name: "city", placeholder: "Austin, TX", type: "text" },
+      {
+        label: "Preferred name",
+        name: "firstName",
+        placeholder: "Taylor",
+        type: "text",
+        required: true,
+      },
+      {
+        label: "Email",
+        name: "email",
+        placeholder: "taylor@email.com",
+        type: "email",
+        readOnly: true,
+        hint: "From your account.",
+      },
+      {
+        label: "City & state",
+        name: "city",
+        placeholder: "Austin, TX",
+        type: "text",
+      },
     ],
   },
   {
     title: "Interests",
     description: "Members choose what they care about—rewards, marketplace drops, live moments.",
     fields: [
-      { label: "Pick a lane", name: "interest", placeholder: "Rewards, VIP, Marketplace", type: "text" },
+      {
+        label: "Pick a lane",
+        name: "interest",
+        placeholder: "Rewards, VIP, Marketplace",
+        type: "text",
+        required: true,
+      },
       {
         label: "What are your favorite Brands?",
         name: "favoriteBrand",
@@ -57,8 +84,19 @@ const steps: { title: string; description: string; fields: Field[] }[] = [
     title: "Access & Loyalty",
     description: "Tie their phone and socials to automate points + referrals.",
     fields: [
-      { label: "Phone number", name: "phone", placeholder: "+1 (615) 555-0123", type: "tel" },
-      { label: "TikTok or Instagram handle", name: "handle", placeholder: "@supermember", type: "text" },
+      {
+        label: "Phone number",
+        name: "phone",
+        placeholder: "+1 (615) 555-0123",
+        type: "tel",
+        hint: "Recommended — unlocks SMS perks for brand drops, events, and rewards.",
+      },
+      {
+        label: "TikTok or Instagram handle",
+        name: "handle",
+        placeholder: "@supermember",
+        type: "text",
+      },
     ],
   },
 ];
@@ -89,11 +127,11 @@ export default function OnboardingWizard() {
   const currentStep = steps[stepIndex];
   const progress = useMemo(() => ((stepIndex + 1) / steps.length) * 100, [stepIndex]);
 
-  // Auth guard: /onboarding is the profile-completion wizard; it expects
-  // the visitor to already have a Supabase auth session. Anyone who lands
-  // here unauthenticated would dead-end at the Finish button (the backend
-  // /api/member-engage/onboard endpoint 401s without a session). Bounce
-  // them to /signup with the same ?ref= attribution preserved.
+  // Auth guard + email prefill: /onboarding is the profile-completion wizard;
+  // by the time someone lands here they should already have a Supabase auth
+  // session. Bounce unauthenticated visitors to /signup (preserving any
+  // ?ref= attribution); for signed-in members, prefill the email field
+  // from auth.users.email so they don't have to retype it.
   const searchParams = useSearchParams();
   useEffect(() => {
     const supabase = createClient();
@@ -102,6 +140,10 @@ export default function OnboardingWizard() {
         const ref = searchParams.get("ref");
         const next = ref ? `/signup?ref=${encodeURIComponent(ref)}` : "/signup";
         router.replace(next);
+        return;
+      }
+      if (user.email) {
+        setFormState((prev) => ({ ...prev, email: user.email ?? "" }));
       }
     });
   }, [router, searchParams]);
@@ -123,6 +165,25 @@ export default function OnboardingWizard() {
       return other && other.length > 0 ? other : "Other";
     }
     return sel;
+  };
+
+  /**
+   * Returns true if all required fields in the current step are filled.
+   * Drives the disabled state of the "Continue" button.
+   */
+  const canAdvanceCurrentStep = (): boolean => {
+    return currentStep.fields.every((field) => {
+      if (!field.required) return true;
+      if (field.type === "radio") {
+        const sel = formState[field.name];
+        if (!sel) return false;
+        if (sel === field.otherOptionLabel) {
+          return Boolean(field.otherFieldName && formState[field.otherFieldName]?.trim());
+        }
+        return true;
+      }
+      return Boolean(formState[field.name]?.trim());
+    });
   };
 
   const nextStep = () => setStepIndex((prev) => Math.min(prev + 1, steps.length - 1));
@@ -155,8 +216,6 @@ export default function OnboardingWizard() {
       setSmsStatus("success");
       setSmsMessage("Confirmation text delivered. Member is live in the journey.");
 
-      // Fire-and-forget Mailchimp subscribe — don't block the SMS success path
-      // if Mailchimp isn't configured yet or the audience ID is missing.
       if (formState.email) {
         fetch("/api/member-engage/mailchimp", {
           method: "POST",
@@ -171,9 +230,6 @@ export default function OnboardingWizard() {
         });
       }
 
-      // Fire-and-forget backend onboarding completion. Requires a Supabase
-      // session — if the user isn't signed in, the endpoint returns 401 and
-      // we ignore it (preview flow still works).
       const refCode =
         typeof window !== "undefined"
           ? new URLSearchParams(window.location.search).get("ref") ?? undefined
@@ -202,19 +258,10 @@ export default function OnboardingWizard() {
     }
   };
 
-  /**
-   * Final-step submit: persists the profile, awards the signup bonus, sends
-   * the Twilio SMS (if a phone is provided), fires Mailchimp, and routes
-   * home. Doesn't require a phone — the wizard shouldn't dead-end on an
-   * optional field.
-   */
   const handleFinish = async () => {
     try {
       setFinishStatus("saving");
 
-      // 1. Persist the profile + award signup bonus + record any ?ref= code.
-      // Fallback to the memberengage_ref cookie that /invite/[code] sets so the
-      // attribution survives the auth round-trip.
       const refFromUrl =
         typeof window !== "undefined"
           ? new URLSearchParams(window.location.search).get("ref") ?? undefined
@@ -249,14 +296,10 @@ export default function OnboardingWizard() {
         throw new Error(`Onboarding save failed (${onboardRes.status})`);
       }
 
-      // Clear the referral cookie — attribution is now recorded in the DB.
       if (refFromCookie && typeof document !== "undefined") {
         document.cookie = "memberengage_ref=; path=/; max-age=0";
       }
 
-      // 2. Mailchimp subscribe (fire-and-forget). Adds a "welcome" tag so
-      //    Kevin can wire a Mailchimp Automation that fires the welcome email
-      //    as soon as the tag is applied — zero extra code on our side.
       if (formState.email) {
         const tags = ["welcome"];
         if (formState.interest) tags.push(formState.interest);
@@ -271,7 +314,6 @@ export default function OnboardingWizard() {
         }).catch((err) => console.warn("Mailchimp subscribe did not complete:", err));
       }
 
-      // 3. Twilio SMS confirmation (fire-and-forget; only if phone given)
       if (formState.phone) {
         fetch("/api/member-engage/sms", {
           method: "POST",
@@ -284,7 +326,6 @@ export default function OnboardingWizard() {
         }).catch((err) => console.warn("Twilio SMS did not complete:", err));
       }
 
-      // 4. Route home so the updated profile renders with real data
       router.push("/");
       router.refresh();
     } catch (error) {
@@ -294,6 +335,7 @@ export default function OnboardingWizard() {
   };
 
   const isLastStep = stepIndex === steps.length - 1;
+  const stepValid = canAdvanceCurrentStep();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black text-white">
@@ -323,7 +365,10 @@ export default function OnboardingWizard() {
                   const isOther = selected === field.otherOptionLabel;
                   return (
                     <div key={field.name} className="block text-sm text-white/80">
-                      <p>{field.label}</p>
+                      <p>
+                        {field.label}
+                        {field.required && <span className="ml-1 text-rose-300">*</span>}
+                      </p>
                       <div className="mt-2 space-y-2">
                         {field.options.map((opt) => (
                           <label
@@ -358,14 +403,23 @@ export default function OnboardingWizard() {
                 }
                 return (
                   <label key={field.name} className="block text-sm text-white/80">
-                    {field.label}
+                    <span>
+                      {field.label}
+                      {field.required && <span className="ml-1 text-rose-300">*</span>}
+                    </span>
                     <input
                       type={field.type}
                       value={formState[field.name] ?? ""}
                       onChange={(event) => handleInput(field.name, event.target.value)}
                       placeholder={field.placeholder}
-                      className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 focus:border-white/40 focus:outline-none"
+                      readOnly={field.readOnly}
+                      className={`mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 focus:border-white/40 focus:outline-none ${
+                        field.readOnly ? "cursor-not-allowed text-white/60" : ""
+                      }`}
                     />
+                    {field.hint && (
+                      <span className="mt-1 block text-xs text-white/50">{field.hint}</span>
+                    )}
                   </label>
                 );
               })}
@@ -419,34 +473,43 @@ export default function OnboardingWizard() {
               </div>
             )}
 
-            <div className="flex items-center justify-between gap-4 pt-4">
-              <button
-                className="text-sm text-white/60 disabled:opacity-30"
-                disabled={stepIndex === 0}
-                onClick={prevStep}
-              >
-                Back
-              </button>
-              {isLastStep ? (
+            <div className="flex flex-col gap-2 pt-4">
+              <div className="flex items-center justify-between gap-4">
                 <button
-                  onClick={handleFinish}
-                  disabled={
-                    finishStatus === "saving" ||
-                    !tosConsent ||
-                    (Boolean(formState.phone) && !smsConsent)
-                  }
-                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white shadow-glass transition hover:brightness-110 disabled:opacity-50"
+                  className="text-sm text-white/60 disabled:opacity-30"
+                  disabled={stepIndex === 0}
+                  onClick={prevStep}
                 >
-                  {finishStatus === "saving" ? "Saving…" : "Finish onboarding"}
-                  <ArrowRight size={16} />
+                  Back
                 </button>
-              ) : (
-                <button
-                  onClick={nextStep}
-                  className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-900"
-                >
-                  Continue <ArrowRight size={16} />
-                </button>
+                {isLastStep ? (
+                  <button
+                    onClick={handleFinish}
+                    disabled={
+                      finishStatus === "saving" ||
+                      !tosConsent ||
+                      (Boolean(formState.phone) && !smsConsent)
+                    }
+                    className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white shadow-glass transition hover:brightness-110 disabled:opacity-50"
+                  >
+                    {finishStatus === "saving" ? "Saving…" : "Finish onboarding"}
+                    <ArrowRight size={16} />
+                  </button>
+                ) : (
+                  <button
+                    onClick={nextStep}
+                    disabled={!stepValid}
+                    className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Continue <ArrowRight size={16} />
+                  </button>
+                )}
+              </div>
+              {!isLastStep && !stepValid && (
+                <p className="text-right text-xs text-white/50">
+                  Fill in the required fields (
+                  <span className="text-rose-300">*</span>) to continue.
+                </p>
               )}
             </div>
             {finishStatus === "error" && (
