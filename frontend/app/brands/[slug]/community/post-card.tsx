@@ -16,6 +16,7 @@ import {
 import PollBlock from "./poll-block";
 import ChallengeBlock from "./challenge-block";
 import { relativeTime } from "@/lib/format/relative-time";
+import ModerationChip from "@/components/community/moderation-chip";
 
 const REACTION_SET = ["❤️", "🔥", "👏", "💯", "😂"] as const;
 
@@ -72,6 +73,10 @@ export default function PostCard({
 
   return (
     <article className={`glass-card space-y-3 p-5 ${accentRing}`}>
+
+      {post.moderation_status === "auto_hide" && (
+        <ModerationChip message={post.moderation_user_message ?? null} />
+      )}
       <header className="flex items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
