@@ -5,7 +5,29 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, CheckCircle2, Star, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
-const steps = [
+type Field = {
+  label: string;
+  name: string;
+  placeholder?: string;
+  type: "text" | "email" | "tel" | "radio";
+  options?: string[];
+  otherOptionLabel?: string;
+  otherFieldName?: string;
+  otherPlaceholder?: string;
+};
+
+const FAVORITE_BRAND_OPTIONS = [
+  "Restaurants & Food",
+  "Retail & Apparel",
+  "Fitness & Wellness",
+  "Beauty & Personal Care",
+  "Entertainment & Media",
+  "Travel & Hospitality",
+  "Tech & Gadgets",
+  "Other",
+];
+
+const steps: { title: string; description: string; fields: Field[] }[] = [
   {
     title: "Member Profile",
     description: "Capture the basics so the experience can personalize immediately.",
@@ -20,7 +42,15 @@ const steps = [
     description: "Members choose what they care about—rewards, marketplace drops, live moments.",
     fields: [
       { label: "Pick a lane", name: "interest", placeholder: "Rewards, VIP, Marketplace", type: "text" },
-      { label: "Favorite song", name: "favoriteSong", placeholder: "Keep Up", type: "text" },
+      {
+        label: "What are your favorite Brands?",
+        name: "favoriteBrand",
+        type: "radio",
+        options: FAVORITE_BRAND_OPTIONS,
+        otherOptionLabel: "Other",
+        otherFieldName: "favoriteBrandOther",
+        otherPlaceholder: "Tell us your favorite brand or category",
+      },
     ],
   },
   {
@@ -78,6 +108,21 @@ export default function OnboardingWizard() {
 
   const handleInput = (name: string, value: string) => {
     setFormState((prev) => ({ ...prev, [name]: value }));
+  };
+
+  /**
+   * Resolves the favorite-brand selection. If the user picked "Other" and
+   * filled in the freeform text, returns that text; otherwise returns the
+   * selected option (or null if nothing was picked).
+   */
+  const resolveFavoriteBrand = (): string | null => {
+    const sel = formState.favoriteBrand;
+    if (!sel) return null;
+    if (sel === "Other") {
+      const other = formState.favoriteBrandOther?.trim();
+      return other && other.length > 0 ? other : "Other";
+    }
+    return sel;
   };
 
   const nextStep = () => setStepIndex((prev) => Math.min(prev + 1, steps.length - 1));
@@ -141,7 +186,7 @@ export default function OnboardingWizard() {
           city: formState.city,
           phone: formState.phone,
           handle: formState.handle,
-          favoriteSong: formState.favoriteSong,
+          favoriteBrand: resolveFavoriteBrand(),
           interest: formState.interest,
           referralCode: refCode,
           smsOptedIn: true,
@@ -190,7 +235,7 @@ export default function OnboardingWizard() {
           city: formState.city,
           phone: formState.phone,
           handle: formState.handle,
-          favoriteSong: formState.favoriteSong,
+          favoriteBrand: resolveFavoriteBrand(),
           interest: formState.interest,
           referralCode: refCode,
           smsOptedIn: Boolean(formState.phone) && smsConsent,
@@ -272,18 +317,58 @@ export default function OnboardingWizard() {
             </div>
 
             <div className="space-y-4">
-              {currentStep.fields.map((field) => (
-                <label key={field.name} className="block text-sm text-white/80">
-                  {field.label}
-                  <input
-                    type={field.type}
-                    value={formState[field.name] ?? ""}
-                    onChange={(event) => handleInput(field.name, event.target.value)}
-                    placeholder={field.placeholder}
-                    className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 focus:border-white/40 focus:outline-none"
-                  />
-                </label>
-              ))}
+              {currentStep.fields.map((field) => {
+                if (field.type === "radio" && field.options) {
+                  const selected = formState[field.name] ?? "";
+                  const isOther = selected === field.otherOptionLabel;
+                  return (
+                    <div key={field.name} className="block text-sm text-white/80">
+                      <p>{field.label}</p>
+                      <div className="mt-2 space-y-2">
+                        {field.options.map((opt) => (
+                          <label
+                            key={opt}
+                            className="flex cursor-pointer items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 hover:bg-white/10"
+                          >
+                            <input
+                              type="radio"
+                              name={field.name}
+                              value={opt}
+                              checked={selected === opt}
+                              onChange={() => handleInput(field.name, opt)}
+                              className="h-4 w-4 accent-aurora"
+                            />
+                            <span className="text-white/90">{opt}</span>
+                          </label>
+                        ))}
+                        {isOther && field.otherFieldName && (
+                          <input
+                            type="text"
+                            value={formState[field.otherFieldName] ?? ""}
+                            onChange={(event) =>
+                              handleInput(field.otherFieldName!, event.target.value)
+                            }
+                            placeholder={field.otherPlaceholder ?? "Other"}
+                            className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 focus:border-white/40 focus:outline-none"
+                          />
+                        )}
+                      </div>
+                    </div>
+                  );
+                }
+                return (
+                  <label key={field.name} className="block text-sm text-white/80">
+                    {field.label}
+                    <input
+                      type={field.type}
+                      value={formState[field.name] ?? ""}
+                      onChange={(event) => handleInput(field.name, event.target.value)}
+                      placeholder={field.placeholder}
+                      className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 focus:border-white/40 focus:outline-none"
+                    />
+                  </label>
+                );
+              })}
             </div>
 
             {isLastStep && (

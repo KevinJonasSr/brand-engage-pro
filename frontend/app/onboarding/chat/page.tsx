@@ -42,7 +42,7 @@ export default async function OnboardingChatPage() {
         </h1>
         <p className="max-w-xl text-sm text-white/70">
           Chat with Claude for a minute so we know who you are — city,
-          favorite items, why you're here. You can skip and finish later
+          favorite brand, why you're here. You can skip and finish later
           from your profile.
         </p>
       </header>

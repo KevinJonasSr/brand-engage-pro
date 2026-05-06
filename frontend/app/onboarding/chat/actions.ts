@@ -37,7 +37,7 @@ export async function finishAction(history: ChatMessage[]): Promise<void> {
 
   const updates: Record<string, unknown> = {};
   if (fields.city) updates.city = fields.city;
-  if (fields.favorite_song) updates.favorite_song = fields.favorite_song;
+  if (fields.favorite_brand) updates.favorite_brand = fields.favorite_brand;
   if (fields.interest) updates.interest = fields.interest;
   if (typeof fields.sms_opted_in === "boolean") {
     updates.sms_opted_in = fields.sms_opted_in;

@@ -11,7 +11,7 @@ const EXTRACTION_MODEL = "claude-haiku-4-5";
 
 export type ExtractedFields = {
   city: string | null;
-  favorite_song: string | null;
+  favorite_brand: string | null;
   interest: string | null;
   sms_opted_in: boolean | null;
 };
@@ -22,7 +22,7 @@ interface AnthropicMessageResponse {
 
 const EMPTY: ExtractedFields = {
   city: null,
-  favorite_song: null,
+  favorite_brand: null,
   interest: null,
   sms_opted_in: null,
 };
@@ -72,7 +72,7 @@ export async function extractFields(
 
   return {
     city: stringOrNull(r.city, 80),
-    favorite_song: stringOrNull(r.favorite_song, 200),
+    favorite_brand: stringOrNull(r.favorite_brand, 200),
     interest: stringOrNull(r.interest, 400),
     sms_opted_in: typeof r.sms_opted_in === "boolean" ? r.sms_opted_in : null,
   };
@@ -90,14 +90,14 @@ const SYSTEM_PROMPT = `Extract structured member-profile fields from this onboar
 Schema:
   {
     "city": string | null,
-    "favorite_song": string | null,    // Used for "favorite item / product / thing about the brand". Stored in members.favorite_song column.
+    "favorite_brand": string | null,    // Used for "favorite item / product / thing about the brand". Stored in members.favorite_brand column.
     "interest": string | null,
     "sms_opted_in": boolean | null
   }
 
 Rules:
   * city: city name only (no state). Null if not mentioned.
-  * favorite_song: their favorite item/product/thing from the brand (the column is named favorite_song for legacy reasons but used for any "favorite thing" answer). Null if not mentioned.
+  * favorite_brand: their favorite item/product/thing from the brand (the column is named favorite_brand for legacy reasons but used for any "favorite thing" answer). Null if not mentioned.
   * interest: 1-2 sentence summary of what the member said about the brand or what they're hoping for from membership. Null if nothing substantive.
   * sms_opted_in: true if they clearly said yes to SMS. false if they declined. Null if not asked.
   * Don't infer beyond what the member actually said. Empty answers → null.
