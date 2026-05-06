@@ -8,8 +8,10 @@ Living guide for collaborators (humans and Claude agents). Last refreshed 2026-0
 
 | Product | Repo | Prod URL | Audience | Focus |
 |---|---|---|---|---|
-| **Fan Engage (FE)** | `git@github.com:jonas-group/fan-engage.git` | https://fan-engage-pearl.vercel.app | Music + entertainment fans | Artists, performers, comedians, podcasts |
-| **Brand Engage Pro (BEP)** | `git@github.com:jonas-group/brand-engage-pro.git` | https://brand-engage-pro-jonas-group.vercel.app | B2C consumer member-club | Restaurant brands (Nellie's), Jonas Group brand entertainment |
+| **Fan Engage (FE)** | `git@github.com:KevinJonasSr/Superfan-platform.git` | https://fan-engage-pearl.vercel.app | Music + entertainment fans | Artists, performers, comedians, podcasts |
+| **Brand Engage Pro (BEP)** | `git@github.com:KevinJonasSr/brand-engage-pro.git` | https://brand-engage-pro-jonas-group.vercel.app | B2C consumer member-club | Restaurant brands (Nellie's), Jonas Group brand entertainment |
+
+> **Naming note:** the FE GitHub repo is named `Superfan-platform` for historical reasons. The Vercel project is `jonas-group/fan-engage`. The local folder Kevin uses is `~/fan-engage`. All three refer to the same codebase.
 
 Both ship from the `main` branch through Vercel auto-deploy. Both run on Next.js 16 App Router, Supabase Postgres + Auth + Storage, Tailwind, shadcn/ui. BEP started as a fork of FE and went through a full `artist→brand` / `fan→member` rename; the schemas now diverge in many small ways (see §7).
 
@@ -19,7 +21,7 @@ Both ship from the `main` branch through Vercel auto-deploy. Both run on Next.js
 
 If anything below is missing, ping Kevin (kevinjonassr@gmail.com).
 
-- **GitHub** — write access to both repos under `jonas-group` org.
+- **GitHub** — write access to both repos under Kevin's `KevinJonasSr` account (`Superfan-platform` for FE, `brand-engage-pro` for BEP).
 - **Vercel** — `jonas-group` team, Developer role on both `fan-engage` and `brand-engage-pro`.
 - **Supabase** — KevinJonasSr's Org. Project IDs:
   - FE: `uhovonrljcauaoctypbg`
@@ -34,8 +36,8 @@ If anything below is missing, ping Kevin (kevinjonassr@gmail.com).
 
 ```bash
 # Clone
-git clone git@github.com:jonas-group/fan-engage.git ~/fan-engage
-git clone git@github.com:jonas-group/brand-engage-pro.git ~/brand-engage-pro
+git clone git@github.com:KevinJonasSr/Superfan-platform.git ~/fan-engage
+git clone git@github.com:KevinJonasSr/brand-engage-pro.git ~/brand-engage-pro
 
 # Per repo
 cd ~/fan-engage/frontend         # or ~/brand-engage-pro/frontend
