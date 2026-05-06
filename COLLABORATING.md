@@ -1,323 +1,255 @@
-# Brand Engage Pro — Collaborator Guide
+# Collaborating on Fan Engage + Brand Engage Pro
 
-Welcome. This is the working manual for engineers contributing to the Brand Engage Pro / Supermember Platform. It covers what the project is, how to get access, how to run the code locally, and the conventions we follow. Treat this as a living doc — update it whenever a setup step or convention changes.
-
----
-
-## What this is
-
-Brand Engage Pro is the multi-tenant member-club platform powering Jonas Group brand communities. Today it serves:
-
-- **RaeLynn** (live community, real members, real Stripe subscriptions in test mode)
-- **Danger Twins**, **Dan Marshall**, **Hunter Hawkins** (activated, content + heroes still being filled in)
-
-It's pre-public-launch. The single source of truth for what's done and what's left is `LAUNCH_CHECKLIST.md` at the repo root — read that before anything else.
-
-**Live URLs**
-
-- Public app: <https://brand-engage-pro.vercel.app/>
-- Admin: <https://brand-engage-pro.vercel.app/admin> (HTTP Basic Auth + email allowlist)
-- GitHub repo: <https://github.com/KevinJonasSr/brand-engage-pro>
-- Vercel project: <https://vercel.com/jonas-group/member-engage>
-- Supabase project: <https://supabase.com/dashboard/project/uhovonrljcauaoctypbg>
+Living guide for collaborators (humans and Claude agents). Last refreshed 2026-05-06 after the G.3 Mailchimp follow-through shipped.
 
 ---
 
-## Access checklist
+## 1. The two products
 
-Walk through these before writing any code. Kevin (kevinjonassr@gmail.com) grants access on each platform.
+| Product | Repo | Prod URL | Audience | Focus |
+|---|---|---|---|---|
+| **Fan Engage (FE)** | `git@github.com:jonas-group/fan-engage.git` | https://fan-engage-pearl.vercel.app | Music + entertainment fans | Artists, performers, comedians, podcasts |
+| **Brand Engage Pro (BEP)** | `git@github.com:jonas-group/brand-engage-pro.git` | https://brand-engage-pro-jonas-group.vercel.app | B2C consumer member-club | Restaurant brands (Nellie's), Jonas Group brand entertainment |
 
-| # | Platform | What you need | How |
-|---|---|---|---|
-| 1 | **GitHub** | Push access to `KevinJonasSr/brand-engage-pro` (full collaborator) | Kevin → Repo → Settings → Collaborators → Add collaborator → your GitHub username → Write role |
-| 2 | **Vercel** | Member of the `jonas-group` team with access to the `member-engage` project | Kevin → Vercel Dashboard → jonas-group → Settings → Members → Invite Member → your email |
-| 3 | **Supabase** | Member of `KevinJonasSr's Org` with access to the `Brand Engage Pro` project | Kevin → Supabase Dashboard → Organization → Team → Invite member → your email → Developer role |
-| 4 | **Stripe (test)** | Optional — only if you'll work on subscriptions / webhooks | Kevin → Stripe Dashboard → Settings → Team → Invite member |
-| 5 | **Mailchimp** | Optional — only if you'll work on email campaigns | Kevin → Mailchimp → Account → Users → Invite user |
-| 6 | **Twilio** | Optional — only if you'll work on SMS / reminders | Kevin → Twilio Console → Admin → Manage users |
-
-Once you accept the GitHub, Vercel, and Supabase invites, you can do most day-to-day work. Stripe, Mailchimp, and Twilio are read-only for most contributors.
+Both ship from the `main` branch through Vercel auto-deploy. Both run on Next.js 16 App Router, Supabase Postgres + Auth + Storage, Tailwind, shadcn/ui. BEP started as a fork of FE and went through a full `artist→brand` / `fan→member` rename; the schemas now diverge in many small ways (see §7).
 
 ---
 
-## Tech stack
+## 2. Access matrix (refresh — assumes you're already onboarded)
 
-| Layer | What | Notes |
-|---|---|---|
-| App framework | **Next.js 16 (App Router)** | Server Components by default; `"use client"` only for interactivity |
-| Language | **TypeScript** | Strict mode |
-| Styling | **Tailwind CSS** | Utility classes only — no CSS modules |
-| DB / Auth / Storage | **Supabase** (Postgres + Auth + Storage) | Service-role admin client for server-side writes |
-| Payments | **Stripe** (test mode until launch) | Subscriptions, webhooks, founder slots |
-| Email | **Mailchimp** | Audience tagging, automation triggers |
-| SMS | **Twilio** | Per-event reminders, STOP/HELP compliance |
-| Hosting | **Vercel** | Auto-deploy on push to `main`, Vercel Crons for the reminder cron |
+If anything below is missing, ping Kevin (kevinjonassr@gmail.com).
 
----
-
-## Repo layout
-
-```
-brand-engage-pro/
-├── frontend/                    Next.js app (the only app right now)
-│   ├── app/                     Routes (App Router)
-│   │   ├── admin/               Admin surfaces (gated by ADMIN_EMAILS + Basic Auth)
-│   │   ├── brands/[slug]/      Public brand pages, community, events, rewards, founders
-│   │   ├── api/                 Route handlers (cron, twilio webhook, stripe webhook, upload)
-│   │   ├── onboarding/          Profile creation flow
-│   │   └── page.tsx             Member Home (the / route)
-│   ├── components/              Shared components (MemberHomeDashboard, PremiumPaywall, etc.)
-│   ├── lib/                     Server-side data layer + helpers
-│   │   ├── data/                One file per domain: brands, member, member-home, events, etc.
-│   │   ├── supabase/            Server + admin client factories
-│   │   ├── use-form-save.tsx    Retry-on-503 hook (read this!)
-│   │   ├── reminders.ts         Event reminder send logic
-│   │   ├── stripe.ts            Stripe helpers
-│   │   └── ...
-│   └── package.json
-├── supabase/
-│   └── migrations/              Numbered SQL files (0001..0022 today)
-├── LAUNCH_CHECKLIST.md          Read this first
-├── CLAUDE.md                    Notes for the AI agent (optional reading)
-└── COLLABORATING.md             You are here
-```
+- **GitHub** — write access to both repos under `jonas-group` org.
+- **Vercel** — `jonas-group` team, Developer role on both `fan-engage` and `brand-engage-pro`.
+- **Supabase** — KevinJonasSr's Org. Project IDs:
+  - FE: `uhovonrljcauaoctypbg`
+  - BEP: `enfpviapxvqyoarwwsuf`
+- **Database admin** — `super_admin` role granted via `admin_users` table on both projects (so admin pages render). Your email also lives in `ADMIN_EMAILS` env var on both Vercel projects.
+- **Mailchimp** — FE only, audience `554139`. DIGESTHTML and DIGESTTEXT merge fields are live; the weekly-digest cron pushes per-fan content into them.
+- **Stripe** — read access on both Stripe accounts. Stripe Connect for FE artist payouts is the G.6 work, still pending.
 
 ---
 
-## Local dev setup
-
-You can do most work via the GitHub web editor + Vercel preview deploys (zero local setup), but a local environment is faster.
-
-### Prerequisites
-
-- **Node 20+** (recommended via [nvm](https://github.com/nvm-sh/nvm) or [fnm](https://github.com/Schniz/fnm))
-- **npm** (ships with Node) or **pnpm** if you prefer
-- **Git**
-
-### Steps
+## 3. Local setup
 
 ```bash
-# 1. Clone
-git clone https://github.com/KevinJonasSr/brand-engage-pro.git
-cd brand-engage-pro/frontend
+# Clone
+git clone git@github.com:jonas-group/fan-engage.git ~/fan-engage
+git clone git@github.com:jonas-group/brand-engage-pro.git ~/brand-engage-pro
 
-# 2. Install
+# Per repo
+cd ~/fan-engage/frontend         # or ~/brand-engage-pro/frontend
 npm install
-
-# 3. Create .env.local — copy values from Vercel
-#    Dashboard → member-engage → Settings → Environment Variables → reveal each
-cp .env.example .env.local   # if there's a template; otherwise create it
-# Fill in the values listed in the next section
-
-# 4. Run
+npx vercel link                   # pick jonas-group/<repo>
+npx vercel env pull .env.local --environment=development
 npm run dev
-# Open http://localhost:3000
 ```
 
-### Required env vars (copy from Vercel)
-
-| Variable | Source | Purpose |
-|---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project → Settings → API | Browser-safe DB URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase project → Settings → API | Browser-safe anon key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase project → Settings → API | Server-only admin key (do not expose) |
-| `MAILCHIMP_API_KEY` | Mailchimp → Account → Extras → API keys | Email subscribe + broadcast |
-| `MAILCHIMP_SERVER_PREFIX` | Mailchimp dashboard URL prefix (`us21`, etc.) | Server region |
-| `MAILCHIMP_AUDIENCE_ID` | Mailchimp → Audience → Settings | Default audience |
-| `TWILIO_ACCOUNT_SID` | Twilio Console → Account info | SMS auth |
-| `TWILIO_AUTH_TOKEN` | Twilio Console → Account info | SMS auth |
-| `TWILIO_MESSAGING_SERVICE_SID` | Twilio Console → Messaging → Services | Outbound sender pool |
-| `ADMIN_EMAILS` | Comma-separated list (yours should be in it) | Allowlist for `/admin/*` |
-| `CRON_SECRET` | Random string in Vercel | Protects `/api/cron/*` |
-| `ADMIN_BASIC_USER` / `ADMIN_BASIC_PASS` | Set by Kevin | Extra HTTP auth on `/admin/*` |
-| `STRIPE_SECRET_KEY` | Stripe → Developers → API keys (test) | Stripe server-side |
-| `STRIPE_SEED_SECRET` | Random string | Bootstrap endpoint guard |
-| `STRIPE_WEBHOOK_SECRET` | Stripe → Developers → Webhooks → endpoint | Verifies webhook signatures |
-| `NEXT_PUBLIC_APP_URL` | Optional; defaults to the Vercel URL | Used in unsubscribe links |
-
-To grab them quickly: Vercel project → Settings → Environment Variables → click the eye icon on each → copy. Or use the Vercel CLI: `vercel env pull .env.local`.
+**Sensitive env var gotcha** (saved us 30 minutes during the G.3 smoke test): `vercel env pull` returns empty strings for variables flagged "Sensitive" in the Vercel dashboard. They live encrypted at rest and intentionally don't ship to your laptop. To use one locally, either rotate it (generate a new value, paste it into Vercel, save, redeploy, use the same value locally) or pull it from the dashboard manually. **Use `openssl rand -hex 32` for new secrets** — base64's `+` and `/` chars get mangled in copy-paste between terminal and Vercel form.
 
 ---
 
-## Deployment workflow
+## 4. The bundle workflow (how every multi-file change ships)
 
-1. **Push to `main` → Vercel auto-deploys** in ~60–90 seconds. There's no PR review gate (full-trust collaboration model). Use clear commit messages.
-2. **Migrations run via Supabase SQL Editor**, not via the app: open the project → SQL Editor → New query → paste the contents of the next `supabase/migrations/00XX_*.sql` file → Run. Migrations are idempotent (`drop policy if exists` / `create table if not exists` patterns).
-3. **No staging environment** today. Vercel preview deploys exist for every branch but they share the production Supabase. Be careful with destructive changes.
+Built around the constraint that the agent does not have direct write access to Kevin's working tree, plus the desire to keep `git push` a human decision.
 
-### Commit message convention
+1. **Agent writes a self-contained bundle** in its sandbox at `outputs/_<bundle_name>/`:
+   - `apply.sh` — bash script that patches `~/<repo>` files in place
+   - any auxiliary files referenced by `apply.sh` (e.g., a new component file copied verbatim)
+2. **Kevin runs the bundle locally:**
+   ```bash
+   bash "/path/to/outputs/_<bundle_name>/apply.sh"
+   ```
+3. The bundle:
+   - Edits files via Python `replace`/anchor matching (idempotent — anchors check both `old` and `new` so re-runs don't double-apply)
+   - Runs `npm run typecheck`
+   - Stages and commits with a descriptive message
+   - Prints `Push: git push` and stops
+4. **Kevin pushes** (`git push`) when ready. Vercel auto-deploys.
+5. **Smoke test the deploy.** A pattern we use a lot for crons:
+   ```bash
+   curl -sI https://<repo>.vercel.app/<route> | head -1   # is it up?
+   ```
 
-We use conventional commits where they help:
+This pattern is tolerant of drift — apply.sh prints `! anchor not found` warnings rather than aborting if a single file diverged. The bundle keeps doing the rest of the work.
 
-```
-feat(member-home): broaden upcoming-events query
-fix(admin/events): EditEventForm now refreshes after save
-docs: bump checklist for Phase 8 work
-```
-
-Not strictly enforced, but it makes the commit log scannable.
-
----
-
-## Code conventions
-
-### Server Components by default
-
-Files in `app/` and `components/` are server-rendered unless you add `"use client"` at the top. Reach for client components only when you need:
-
-- Interactivity (state, event handlers, refs)
-- Browser APIs
-- React hooks like `useState`, `useEffect`, `useFormSave`
-
-### Server Actions: return `{success}` / `{error}`, not `redirect()`
-
-Cold-start 503s on Vercel intermittently kill Server Action POSTs, and React silently swallows the failure. We added a `useFormSave` hook (`frontend/lib/use-form-save.tsx`) that retries with a fetch probe and surfaces real errors. **Server actions called from `useFormSave` must NOT call `redirect()`** — that throws `NEXT_REDIRECT`, which the hook treats as a failure and retries. Instead, return `{ success: true, ...payload }` and let the client handle navigation.
-
-```ts
-// ✅ DO
-export async function updateThingAction(formData: FormData) {
-  await requireAdmin();
-  const { error } = await supa.from("things").update(...);
-  if (error) return { error: error.message };
-  revalidatePath("/admin/things");
-  return { success: true as const };
-}
-
-// ❌ DON'T
-export async function updateThingAction(formData: FormData) {
-  await supa.from("things").update(...);
-  redirect("/admin/things"); // breaks retry loops in useFormSave
-}
-```
-
-Action that just `revalidatePath()` and return `void` are fine for fire-and-forget click buttons (use `<ModerationButton>` for those).
-
-### Form pattern
-
-Use `<form onSubmit={handler}>` not `<form action={handler}>` — the `action` prop has hydration quirks in Next.js 16 that can produce a `javascript:throw` sentinel. The `onSubmit` pattern works reliably with `useFormSave`:
-
-```tsx
-"use client";
-import { useFormSave, SaveStatusIndicator } from "@/lib/use-form-save";
-
-export default function MyForm() {
-  const router = useRouter();
-  const { status, submit, submitting } = useFormSave({
-    onSuccess: () => router.refresh(),
-  });
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const result = await submit(myServerAction, fd);
-    if (result?.success) router.push("/somewhere");
-    else if (result?.error) /* show inline error */;
-  }
-
-  return (
-    <form onSubmit={handleSubmit}>
-      {/* fields */}
-      <button disabled={submitting}>{submitting ? "Saving…" : "Save"}</button>
-      <SaveStatusIndicator status={status} />
-    </form>
-  );
-}
-```
-
-### Click-action buttons (delete, suspend, pin)
-
-Use the `<ModerationButton>` wrapper at `frontend/app/admin/community/moderation-button.tsx` — it covers typed-arg actions with the same retry + status pattern:
-
-```tsx
-<ModerationButton
-  action={someAction}
-  fields={{ id: someId }}
-  label="Delete"
-  variant="delete"
-  confirmMessage="Are you sure?"
-/>
-```
-
-### Multi-tenancy
-
-Every member-scoped table has a `community_id text not null default 'raelynn'` column (added in `0011_multi_tenant.sql`). When inserting new rows, include `community_id`. When querying, filter by it. Right now `community_id` always equals `brand_slug` for tenant rows, but they're separate columns by design.
-
-### Image uploads
-
-`/api/upload` accepts files up to 4 MB (Vercel body limit). The `image-uploader.tsx` component compresses client-side. Don't bypass either — the server caps and the client compress are belt-and-braces.
-
-### Datetime handling
-
-`<input type="datetime-local">` does NOT carry a timezone. The browser displays whatever time string is supplied as if it's local. We currently store `starts_at` as a `timestamptz` and the form round-trips ISO strings. If you change a show time in the UI, double-check the saved value matches expectations.
+**Don't auto-push.** The bundle's job ends at "committed." Kevin pushes intentionally.
 
 ---
 
-## Key files / patterns to know
+## 5. Database changes — Supabase SQL editor
 
-| File | Why it matters |
+Migrations live at `frontend/supabase/migrations/0001_*.sql` upward. To run a migration in production:
+
+1. Open the Supabase SQL editor for the right project (FE or BEP).
+2. Paste the migration SQL.
+3. Click Run.
+
+**Multi-statement gotcha:** Supabase's SQL editor sometimes only runs the LAST statement in a multi-statement script. We hit this hard during the founder-member badge backfill. **Workaround:** run `INSERT` statements alone. If you need to verify, use `RETURNING` in the same INSERT rather than a separate `SELECT`.
+
+For more complex changes (data backfills, function updates), the agent can drive the editor via Chrome MCP — see §10.
+
+---
+
+## 6. Current state snapshot (as of 2026-05-06)
+
+### Fan Engage
+- **AI roadmap:** 9 of 20 features live (embeddings, moderation, AI-drafted comments, weekly digest, tagging, semantic search, event matching, reward recs, image captions, daily admin brief, alt-text Phase 1+2, moderation explainer, personalized feed, fraud detection, smart reminder timing, dedupe submissions, AI-suggested tags, nightly auto-draft generator).
+- **Stickiness Phase 1–7:** all shipped (daily streaks, web push + SMS, weekly recap tile, drops/specials with countdown, leaderboard, predictions/polls, anniversaries).
+- **Audit punch list:** 33 of 38 items shipped (all H/M items closed except a handful in M-1, M-2, M-3, M-11, M-16 — see `project_audit_remaining.md` if you have access).
+- **Lead-agent 5-tier rollout:** all five tiers shipped (validation + email auth-prefill, public preview pages, founding-fan badge auto-award, hero rewrite + live proof tiles).
+- **G-series:** G.1 ✅ artists Danger Twins / Dan Marshall / Hunter Hawkins activated. G.2 ✅ application approve/reject + Slack + invite. G.3 ✅ Mailchimp DIGESTHTML/DIGESTTEXT merge fields + smoke-safe `?testEmail=` mode + stranded-draft cleanup. **G.4 pending** (custom domain). **G.5 effectively shipped** (onboarding wizard at `/admin/<slug>/setup` is live, just hasn't been formally checked off). **G.6 pending** (Stripe Connect for artist payouts).
+
+### Brand Engage Pro
+- All FE AI features ported. Stickiness Phase 1–7 ported. Predictions UI, leaderboard, anniversaries — live.
+- B2C consumer rebrand (Tier 4 + 4.5) shipped: 17 files swept of music-coded copy. Hero is `"Skip the line. Earn the perks. Become a regular."`
+- Premium pillars, marketplace placeholders, signup pitch, notification preferences — all sound like a member-loyalty product, not a music platform.
+- Jonas Group brand seed kept its music-y copy on purpose (it IS a music brand inside the platform).
+
+### Active customers
+- **Nellie's Experience** (BEP) — restaurant member-club, primary BEP design driver.
+- **RaeLynn** (FE) — country artist, primary FE launch artist (18 tour dates loaded, leopard accent palette, Luke Bryan tour mention live).
+- **Jonas Group** (BEP) — entertainment brand seeded.
+
+---
+
+## 7. Schema divergences FE → BEP
+
+When porting an FE feature to BEP, expect renames. The big ones:
+
+| FE | BEP |
 |---|---|
-| `LAUNCH_CHECKLIST.md` | Source of truth for launch state. Update when you ship. |
-| `frontend/lib/use-form-save.tsx` | Retry-on-503 hook for Server Action POSTs. |
-| `frontend/app/admin/community/moderation-button.tsx` | Reusable typed-arg click action. |
-| `frontend/lib/data/member-home.ts` | The whole `/` data layer in one file. |
-| `frontend/lib/data/brands.ts` | Brand + events queries used across public + admin. |
-| `frontend/lib/reminders.ts` | Reminder send logic invoked by the cron. |
-| `frontend/app/admin/brands/[slug]/page.tsx` | Reference example of admin CRUD with EditableEventRow + CreateEventForm. |
-| `supabase/migrations/0011_multi_tenant.sql` | The community_id model — read before touching schema. |
-| `supabase/migrations/0015_premium_gating.sql` | `community_posts.visibility` + `brand_events.tier`. |
+| `artists` | `brands` |
+| `artist_slug` (FK column) | `brand_slug` |
+| `fans` | `members` |
+| `fan_id` | `member_id` |
+| `fan_badges` | `member_badges` |
+| `artist_events` | `brand_events` |
+| `artist_events.event_date` (timestamptz) | `brand_events.event_date` (text — be careful) and `brand_events.event_starts_at` (timestamptz, added in F-2) |
+| `artist_events.description` | `brand_events.detail` |
+| `notify_comments_my_post` (plural columns) | `notify_comment_my_post` (singular — bit me twice) |
+| `notification_preferences.fan_id` | `notification_preferences.member_id` |
+| `rewards` table | `offers` table |
+
+**FE-only quirks worth knowing:**
+- `artists.slug` is the **primary key** (no `id` column). All dependents reference via `artist_slug`. Don't write `delete from artists where id = ...` — you'll get a 42703.
+- `fans.id == auth.uid()`. The fan's primary key IS the Supabase auth user id. RLS policies depend on this.
+- The `nellies` community slug exists on FE but **belongs to BEP**. Do NOT flip it active on FE.
+- `community_posts.tags` is a `text[]` column with a GIN index (Phase 5).
+- `last_digest_sent_at` is on `fans`. The weekly cron filters fans where it's NULL or older than 6 days.
+
+**FE/BEP signup component divergence (gotcha that cost 4 hotfix commits):**
+- FE: `frontend/components/signup/signup-form.tsx` exports `SignupForm` (named export).
+- BEP: `frontend/app/signup/signup-client.tsx` exports `SignupPage` (default export).
+- When porting signup-related changes, do NOT blind copy — adapt to each repo's component shape.
 
 ---
 
-## Known issues / gotchas
+## 8. Key files and endpoints
 
-- **Cold-start 503s on Server Action POSTs** — mitigated by `useFormSave`, but root cause still open (see Observability in `LAUNCH_CHECKLIST.md`). Symptom: form looks like it saved but the data wasn't persisted.
-- **Image upload limit is really 4 MB**, not 8 MB — Vercel rejects bodies >4.5 MB before the function runs. The `/api/upload` cap of 8 MB is moot.
-- **Datetime-local inputs don't carry timezone** — see code conventions above.
-- **`active=false` events still show in admin** — set the flag to hide from the public brand page without deleting (the public query filters; the admin query doesn't).
-- **Migrations are run by hand** in the Supabase SQL Editor. There's no migration runner. If you add a migration file, ship the file in a commit AND apply it manually before any code that depends on it goes live.
-- **Bandsintown affiliate links get stripped** by the security filter in our test environment. Real ticket URLs work in production fetches.
+### Source of truth for what's pending
+- `LAUNCH_CHECKLIST.md` (root of each repo) — every open item lives here. Check this BEFORE suggesting new work.
+- `AI_LAUNCH_CHECKLIST.md` — AI roadmap status.
 
----
+### Cron routes (FE)
+| Route | Schedule | Purpose |
+|---|---|---|
+| `/api/cron/weekly-digest` | Sundays 09:00 UTC | Mailchimp DIGESTHTML push + campaign send |
+| `/api/cron/event-match-prepare` | Daily | Pre-compute fan↔event match scores |
+| `/api/cron/embeddings-backfill` | Daily | Backfill missing pgvector embeddings |
+| `/api/cron/moderation-backfill` | Daily | Re-run moderation classifier on pending posts |
+| `/api/cron/admin-brief` | Daily | Slack delivery of admin engagement brief |
+| `/api/cron/anniversaries` | Daily | Member-brand anniversary notifications |
+| `/api/cron/auto-draft` | Nightly | AI-generated draft posts for inactive artists |
 
-## Quick wins to onboard
+All crons share the same auth pattern: `Authorization: Bearer $CRON_SECRET`.
 
-Pick something small to get the workflow muscle memory:
+### Smoke test pattern (added in G.3)
+The weekly-digest cron now accepts `?testEmail=foo@bar.com` to filter recipients to a single fan. Use it instead of running the cron raw on Tuesday — without the filter you'd blast everyone whose `last_digest_sent_at` is >6 days old.
 
-1. Read `LAUNCH_CHECKLIST.md` end to end. ~10 min.
-2. Run the app locally and sign in with your jonasgroup.com email (you should land in `/admin` thanks to the allowlist).
-3. Pick an item from the **Save reliability — useFormSave hook rollout** section's "Remaining unprotected" list and apply the pattern. Each is ~30 minutes once you've seen one example. Reference: any of the `useFormSave`-using forms (e.g. `frontend/app/admin/brands/[slug]/edit-form.tsx`).
-4. Or pick a **Nice-to-have** item — they're all scoped and have rough estimates.
+```bash
+curl -X GET "https://fan-engage-pearl.vercel.app/api/cron/weekly-digest?testEmail=YOUR@EMAIL" \
+  -H "Authorization: Bearer $CRON_SECRET" -i
+```
 
----
+The response tells you `totalCandidates`, `prepared`, `preparedWithMailchimp`, `skipped`, `errors`, `campaignId`. Walk that summary back through the pipeline if anything looks off.
 
-## How we collaborate
-
-- **Push directly to `main`** — full-trust model, no PR gate. Read your diff before pushing.
-- **Update `LAUNCH_CHECKLIST.md`** when you ship something user-visible or change the launch readiness.
-- **Coordinate before schema changes** — migrations are sensitive. Ping Kevin/the team before adding `00XX_*.sql` files.
-- **Coordinate before deleting data** — DELETEs in production go through Supabase SQL Editor with `RETURNING *` so we can see what came out.
-- **Pair on tricky areas** — the multi-tenant model, premium gating, and the Stripe webhook are the three places where a wrong move can corrupt state. Loop someone in.
-
----
-
-## Communication channels
-
-_Kevin to fill in:_
-
-- Slack / iMessage thread:
-- Standup cadence:
-- Async update channel:
-- Emergency / on-call:
+### Mailchimp wiring (FE)
+- Audience: `554139`
+- Merge fields: `DIGESTHTML` (rich HTML body), `DIGESTTEXT` (plaintext fallback). Both >1000 char limit.
+- Sender: `lib/digest/send.ts`. The `prepareDigestForFan` function returns `{ status: "rendered" | "merge_fields_updated" | "skipped_no_payload" | "error" }`. The route only fires the campaign if at least one recipient hit `merge_fields_updated`.
+- **Stranded-draft cleanup** (G.3 follow-through): `broadcast.ts` now deletes the draft Mailchimp campaign on content/send failure so we don't accumulate orphans.
 
 ---
 
-## Resources
+## 9. Tribal knowledge / gotchas
 
-- Next.js App Router docs: <https://nextjs.org/docs/app>
-- Supabase docs: <https://supabase.com/docs>
-- Tailwind docs: <https://tailwindcss.com/docs>
-- Stripe docs (subscriptions): <https://stripe.com/docs/billing/subscriptions/overview>
-- Twilio Programmable Messaging: <https://www.twilio.com/docs/messaging>
-- Mailchimp Marketing API: <https://mailchimp.com/developer/marketing/api/>
+1. **Vercel Sensitive env vars** don't pull. See §3 fix.
+2. **Supabase SQL editor** can drop multi-statement scripts. See §5.
+3. **FE `artists.slug` is the PK.** No id column.
+4. **FE signup component vs BEP** — different exports. See §7.
+5. **`nellies` community slug belongs to BEP.** Never activate on FE.
+6. **fans.id == auth.uid().** Treat them as the same value.
+7. **Don't auto-push.** The bundle workflow stops at commit. Kevin pushes.
+8. **Don't blind-copy bundle Python anchors between repos.** FE/BEP files diverge subtly.
+9. **Use `openssl rand -hex 32` for new secrets.** Base64 chars (`+`, `/`) get mangled in copy-paste.
+10. **Smoke-test crons with `?testEmail=` mode** before production cutover. The G.3 fix exists for this exact reason.
 
-Welcome to the team — let's ship.
+---
+
+## 10. For Claude agents working on this codebase
+
+If you are an agent invoked by Raymond (or any collaborator) on this codebase:
+
+### Before suggesting any change
+- Read `LAUNCH_CHECKLIST.md` to see what's already pending.
+- Read `AI_LAUNCH_CHECKLIST.md` for AI features.
+- Skim recent `git log --oneline -30` to see what landed in the last week.
+
+### Workflow
+- Use the bundle pattern (§4). Write `apply.sh` files into your `outputs/` working directory; have your human run them.
+- Edit via Python anchor-replace, not full-file rewrite, when patching existing files. Print "anchor not found" warnings rather than aborting.
+- Run `npm run typecheck` inside `apply.sh` so type breakage gets caught before commit.
+- Commit messages: descriptive subject + body explaining the motivation. We reference task IDs (G.3, F.1.B, M-14, etc.) where relevant.
+- Stop at `git commit`. Do not push.
+
+### Database changes
+- Prefer migrations (`frontend/supabase/migrations/00NN_<name>.sql`) over ad-hoc SQL editor edits — they survive future restores.
+- When you must run ad-hoc SQL via the Supabase editor (data backfills, one-off fixes), keep it single-statement or use `RETURNING` in the same statement. Multi-statement scripts can drop earlier statements silently.
+- The agent can drive the SQL editor via Chrome MCP if browser tools are connected. Use Monaco's `setValue` API to inject SQL, then Cmd+Return to run.
+
+### Verification
+- Smoke test crons with `?testEmail=` mode (FE) — never run a real cron with full audience in non-Sunday windows.
+- For UI changes, take a screenshot through Chrome MCP and view it before declaring done.
+- For RPC/schema changes, run a `select … where …` against the affected row and confirm shape.
+
+### Tribal-knowledge files (if you have access to your principal's memory)
+- `project_fan_engage.md`, `project_fan_engage_dont_touch.md`
+- `project_lead_agent_rollout.md` (locks decisions on positioning + required fields)
+- `reference_bep_schema_map.md`
+- `reference_fe_artists_pk.md`
+- `reference_signup_component_shapes.md`
+- `feedback_workflow_bundle.md`
+- `feedback_vercel_sensitive_secrets.md`
+
+If you don't have access, this document is a reasonable substitute.
+
+---
+
+## 11. Things still pending
+
+- **G.4** Custom domain (fanengage.com or similar) — not started.
+- **G.5** onboarding wizard polish — wizard is live at `/admin/<slug>/setup`; remaining work is content/QA.
+- **G.6** Stripe Connect for artist payouts — not started.
+- **Audit M-1, M-2, M-3, M-11, M-16** — partial; specific notes in `project_audit_remaining.md`.
+- **AI features 11–20** beyond what's shipped — see `AI_LAUNCH_CHECKLIST.md`.
+
+---
+
+## 12. People
+
+- **Kevin Jonas Sr.** (kevinjonassr@gmail.com) — owner, runs the bundles, pushes commits.
+- **Raymond Boyd** (raymond@jonasgroup.com / raymond@lyvcreative.com) — collaborator, primary work on Mailchimp + cron pipelines, Texas-based.
+- **Carla** — collaborator, super-admin grant + Vercel Developer role.
+
+When you commit, use the email tied to your GitHub account. Raymond's last known commit was 2026-04-07 from `raymond@jonasgroup.com`.
