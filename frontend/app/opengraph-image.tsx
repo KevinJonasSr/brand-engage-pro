@@ -5,7 +5,7 @@ import { ImageResponse } from "next/og";
 // request time via Next's ImageResponse so we don't have to ship a binary.
 
 export const runtime = "edge";
-export const alt = "Brand Engage Pro — the supermember platform";
+export const alt = "Brand Engage Pro — the member-loyalty platform";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -83,7 +83,7 @@ export default async function OpengraphImage() {
               color: "transparent",
             }}
           >
-            Your front-row seat.
+            Your member&apos;s table.
           </div>
         </div>
 
@@ -97,7 +97,7 @@ export default async function OpengraphImage() {
             color: "rgba(255,255,255,0.7)",
           }}
         >
-          <div>The supermember platform — rewards, community, drops.</div>
+          <div>The member-loyalty platform — rewards, community, drops.</div>
           <div
             style={{
               display: "flex",

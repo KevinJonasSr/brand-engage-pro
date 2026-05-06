@@ -28,22 +28,23 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
           <div className="flex flex-col justify-center">
             <p className="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs uppercase tracking-widest text-white/70">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              The supermember platform
+              The member-loyalty platform
             </p>
             <h1
               className="text-5xl font-semibold leading-[1.05] md:text-6xl"
               style={{ fontFamily: "var(--font-display)" }}
             >
-              Your favorite brands.
+              Skip the line. Earn the perks.
               <br />
               <span className="bg-gradient-to-r from-aurora via-fuchsia-400 to-ember bg-clip-text text-transparent">
-                Your front-row seat.
+                Become a regular.
               </span>
             </h1>
             <p className="mt-6 max-w-xl text-lg text-white/70">
-              Follow the brands you love, earn points for every member move, and
-              unlock real drops — signed vinyl, backstage access, listening
-              parties. Built for the members who actually show up.
+              Follow the brands you love, earn points for every visit and
+              every engagement, and unlock real perks — exclusive drops,
+              members-only events, and first access casual customers never
+              get.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
@@ -75,7 +76,7 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
                       Next Event
                     </p>
                     <p className="mt-2 text-sm font-semibold text-white">
-                      Nashville Listening Party
+                      Members&apos; Tasting Night
                     </p>
                     <p className="mt-1 text-xs text-white/60">
                       Thu · 8pm · +25 pts for RSVP
@@ -105,7 +106,7 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
                       <span className="text-emerald-300">+250</span>
                     </div>
                     <div className="flex items-center justify-between rounded-xl bg-black/30 px-3 py-2 text-xs">
-                      <span>🎟️ Austin Listening Party</span>
+                      <span>🎟️ Spring Tasting Night</span>
                       <span className="text-emerald-300">+25</span>
                     </div>
                     <div className="flex items-center justify-between rounded-xl bg-black/30 px-3 py-2 text-xs">
@@ -129,7 +130,7 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
           className="mt-2 max-w-2xl text-3xl font-semibold md:text-4xl"
           style={{ fontFamily: "var(--font-display)" }}
         >
-          Three steps from lurker to supermember.
+          Three steps from casual visitor to regular.
         </h2>
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {[
@@ -137,18 +138,18 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
               n: "01",
               title: "Follow your brands",
               body: "Pick the brands you love. You'll get their drops, events, polls, and challenges in one feed.",
-              icon: "🎧",
+              icon: "🤝",
             },
             {
               n: "02",
-              title: "Earn points for every member move",
-              body: "RSVPing an event, voting in a poll, commenting, sharing your referral code — all of it earns points.",
+              title: "Earn points for every visit",
+              body: "Showing up to events, RSVPing, voting in polls, commenting, sharing your referral code — all of it earns points.",
               icon: "⚡",
             },
             {
               n: "03",
-              title: "Unlock real drops + access",
-              body: "Signed vinyl, backstage soundchecks, VIP listening parties, limited merch. Points cash in for the real thing.",
+              title: "Unlock real perks + access",
+              body: "Exclusive merch, members-only events, behind-the-scenes content, limited drops. Points cash in for the real thing.",
               icon: "🎁",
             },
           ].map((step) => (
@@ -187,7 +188,7 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
               </h2>
               <p className="mt-6 max-w-md text-white/70">
                 Everything in one place — events, community, rewards, and the
-                stuff the casuals never see.
+                stuff casual customers never see.
               </p>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -203,13 +204,13 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
                   icon: "💬",
                 },
                 {
-                  title: "Event RSVPs",
-                  body: "Capacity-limited listening parties, soundchecks, meet-ups. Reminders included.",
+                  title: "Member Events",
+                  body: "Capacity-limited tastings, previews, meet-ups. Reminders included.",
                   icon: "🎟️",
                 },
                 {
                   title: "Rewards Marketplace",
-                  body: "Redeem points for signed gear, backstage access, or merch exclusives.",
+                  body: "Redeem points for exclusive merch, behind-the-scenes access, or members-only experiences.",
                   icon: "🎁",
                 },
               ].map((f) => (
@@ -295,8 +296,8 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
             Join free in under a minute.
           </h2>
           <p className="relative mt-4 text-white/70">
-            No credit card. No spam. Just your favorite brands and the perks
-            they reserve for real members.
+            No credit card. No spam. Just the brands you love and the perks
+            they reserve for the regulars.
           </p>
           <div className="relative mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link

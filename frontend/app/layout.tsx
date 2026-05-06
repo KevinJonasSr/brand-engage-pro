@@ -27,18 +27,18 @@ const appUrl =
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
   title: {
-    default: "Brand Engage Pro — your front-row seat",
+    default: "Brand Engage Pro — become a regular",
     template: "%s · Brand Engage Pro",
   },
   description:
-    "The supermember platform. Follow brands, earn points for every member move, and unlock real drops — signed vinyl, backstage access, listening parties.",
+    "The member-loyalty platform. Follow the brands you love, earn points for every visit, and unlock real perks — exclusive drops, members-only events, and first access casual customers never get.",
   applicationName: "Brand Engage Pro",
   keywords: [
-    "supermember",
+    "member loyalty",
     "member club",
     "brand community",
     "member rewards",
-    "listening party",
+    "members-only events",
     "VIP access",
   ],
   manifest: "/manifest.json",
@@ -48,15 +48,15 @@ export const metadata: Metadata = {
     type: "website",
     url: "/",
     siteName: "Brand Engage Pro",
-    title: "Brand Engage Pro — your front-row seat",
+    title: "Brand Engage Pro — become a regular",
     description:
-      "Follow brands, earn points, unlock real drops. The supermember platform built for members who actually show up.",
+      "Follow brands, earn points, unlock real perks. The member-loyalty platform built for the people who actually show up.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Brand Engage Pro — your front-row seat",
+    title: "Brand Engage Pro — become a regular",
     description:
-      "Follow brands, earn points, unlock real drops. Built for the members who actually show up.",
+      "Follow brands, earn points, unlock real perks. Built for the people who actually show up.",
   },
   appleWebApp: {
     capable: true,
