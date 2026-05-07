@@ -61,6 +61,9 @@ export default function SignupPage({ referrerName }: { referrerName?: string | n
           <p className="text-sm text-white/70">
             Create an account to earn points, unlock rewards, and get behind-the-scenes access.
           </p>
+          <p className="inline-flex items-center gap-1.5 rounded-full border border-aurora/30 bg-aurora/10 px-3 py-1 text-xs font-medium text-aurora">
+            🎁 Join free and unlock your first member perk today.
+          </p>
           {referrerName && (
             <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200">
               <span aria-hidden>👋</span>
