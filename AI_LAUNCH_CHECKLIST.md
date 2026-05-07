@@ -514,3 +514,36 @@ Also extended metadata for `/for-brands`, `/for-brands/apply`, and `/brands` (ca
 - Replace Featured Brands tagline strings with real testimonial pull-quotes (TODO comment in the source).
 - Tighten data-ownership copy once the brand agreement lands legal review.
 
+## 🪶 Post-launch polish — May 6 sprint smoke test
+
+Two cosmetic / structural items surfaced during the prod smoke pass after the handle/socials refactor + Bundle 4 deploys. Neither is blocking.
+
+### 1. Page-title doubling (`X · Brand Engage Pro · Brand Engage Pro`)
+
+Every page that supplies a `title` in its `metadata` block currently renders as `"<Page> · Brand Engage Pro · Brand Engage Pro"` in the browser tab. Cause: `app/layout.tsx` exports a `metadata.title.template` like `"%s · Brand Engage Pro"` and the page-level metadata strings also already include `· Brand Engage Pro`. Next.js applies the template to whatever the page returns, so the suffix gets appended twice.
+
+**Fix options (pick one):**
+- (a) Remove the trailing `· Brand Engage Pro` from every page-level `title` string and let the layout template add it. Cleanest, requires touching: `/for-brands`, `/for-brands/apply`, `/brands`, `/members/[slug]`, `/share/founder/[slug]/[number]`, etc.
+- (b) Drop the `template` from layout and let each page own its full title. Less coupling but more boilerplate per page.
+
+**Where:** `frontend/app/layout.tsx` + each page-level `metadata.title`.
+
+### 2. Migration broader-update would re-leak socials on a fresh DB
+
+The conservative `where (handle ~ '[^a-z0-9-]' or handle ~ '^@')` filter in `0033_socials_and_profile_slug.sql` correctly caught Kevin's `@papakjonas` as a social handle. BEP only had 1 row, so no follow-up cleanup was needed — but the FE side surfaced an instructive failure mode worth documenting here.
+
+In FE, the same regex only caught 1 of 8 fans (the one with `@`-prefixed Instagram). A broader `where handle is not null` update was run as a follow-up to move the rest. That broader update was correct in FE production *because* the source values were the onboarding wizard's social-handle inputs — but the same logic applied to a fresh DB where `handle` already holds the auto-generated slugs from the prior migration's backfill would incorrectly stuff slugs into `socials.instagram_or_tiktok`.
+
+If BEP ever needs a similar cleanup (e.g., after seeing real onboarding traffic), use this discriminator after the move:
+```sql
+update public.members
+  set socials = socials - 'instagram_or_tiktok'
+where socials->>'instagram_or_tiktok' = profile_slug;
+```
+…which preserves real social handles and strips any auto-generated `kevin-75e4`-style values.
+
+**Hardening for future re-runs:**
+- Keep the `0033` source migration's conservative regex as-is.
+- Document the broader cleanup as a manual step run only when the source population is confirmed to be from an onboarding social-handle field.
+- Add the discriminator query above as a verification step in the migration comments so anyone re-running can confirm before/after.
+
