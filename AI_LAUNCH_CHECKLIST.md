@@ -481,3 +481,17 @@ The previous `members.handle` column was overloaded — onboarding wizard wrote 
 **Run**: `supabase/migrations/0033_socials_and_profile_slug.sql` in BEP Supabase project `enfpviapxvqyoarwwsuf`.
 **Verify**: `select count(*) filter (where profile_slug is null), count(*) from public.members;` → expect (0, total).
 
+## 🎉 Bundle 4 — celebration-moment share triggers
+
+Mirrors FE's celebration-moment share buttons:
+
+- [x] `/premium/welcome` — `<ShareButton />` rendered when the member is a Founding Member with a known founder number, plus a "View your profile →" link to `/members/<slug>`. Both are gated on the same conditions as the existing founder celebration block.
+- [x] `/brands/<slug>/rewards/redeem-form.tsx` — the modal now renders a success state (instead of closing silently) with: 🎉 confirmation, a `<ShareButton />` ("Share this perk"), and a "View your updated profile →" link to `/members/<slug>`. The existing notification trigger still fires server-side via `redeemRewardAction`.
+- [x] `reward-card.tsx` and `page.tsx` updated to thread `brandSlug` / `brandName` / `memberSlug` props through.
+
+### Manual smoke test after deploy
+
+1. Sign in. Open a brand's rewards page; redeem a low-cost reward → modal flips to success state with share + profile link.
+2. Complete a fresh founder checkout → `/premium/welcome` shows founder number, and CTA row has Share + View profile.
+3. Click Share on mobile → native sheet appears with brand-club share text.
+

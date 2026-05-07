@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ShareButton from "@/components/share-button";
 import { redirect } from "next/navigation";
 import { getStripe } from "@/lib/stripe";
 import { getCurrentCommunity } from "@/lib/community";
@@ -58,6 +59,7 @@ export default async function PremiumWelcomePage({
   // hasn't run yet, founder_number is null and we show a pending state.
   let founderNumber: number | null = null;
   let memberFirstName: string | null = null;
+  let memberSlug: string | null = null;
   if (isFounder && status === "complete" && community) {
     try {
       const supabase = await createClient();
@@ -84,10 +86,11 @@ export default async function PremiumWelcomePage({
         }
         const { data: member } = await admin
           .from("members")
-          .select("first_name")
+          .select("first_name, profile_slug")
           .eq("id", user.id)
           .maybeSingle();
         memberFirstName = (member?.first_name as string | null) ?? null;
+        memberSlug = (member?.profile_slug as string | null) ?? null;
       }
     } catch (err) {
       console.warn("PremiumWelcomePage: founder lookup failed", err);
@@ -263,6 +266,23 @@ export default async function PremiumWelcomePage({
           >
             Go to community →
           </Link>
+          {isFounder && status === "complete" && founderNumber !== null && community?.slug && (
+            <ShareButton
+              title={`I'm Founding Member #${founderNumber} of ${community.display_name ?? community.slug}`}
+              text={`Just claimed Founding Member #${founderNumber} on Brand Engage Pro. One of 100. ${process.env.NEXT_PUBLIC_APP_URL ?? "https://brand-engage-pro.vercel.app"}/share/founder/${community.slug}/${founderNumber}`}
+              url={`${process.env.NEXT_PUBLIC_APP_URL ?? "https://brand-engage-pro.vercel.app"}/share/founder/${community.slug}/${founderNumber}`}
+              label="Share my badge"
+              variant="ghost"
+            />
+          )}
+          {memberSlug && (
+            <Link
+              href={`/members/${memberSlug}`}
+              className="rounded-full border border-white/25 px-5 py-3 text-sm font-medium text-white/80 hover:bg-white/10"
+            >
+              View your profile →
+            </Link>
+          )}
           <Link
             href="/inbox"
             className="rounded-full border border-white/25 px-5 py-3 text-sm font-medium text-white/80 hover:bg-white/10"

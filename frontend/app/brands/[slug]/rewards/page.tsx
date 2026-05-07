@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getBrandFromDb } from "@/lib/data/brands";
+import { getMemberProfileSlug } from "@/lib/data/member-profile";
 import { listRewardsForCommunity, listMyRedemptions } from "@/lib/data/rewards";
 import Image from "next/image";
 import RewardCardWithForm from "./reward-card";
@@ -49,9 +50,10 @@ export default async function RewardsPage({
   const brand = await getBrandFromDb(slug);
   if (!brand) return notFound();
 
-  const [rewards, myRedemptions] = await Promise.all([
+  const [rewards, myRedemptions, memberSlug] = await Promise.all([
     listRewardsForCommunity(slug),
     listMyRedemptions(user.id),
+    getMemberProfileSlug(user.id).catch(() => null),
   ]);
 
   const recentRedemptions = myRedemptions.slice(0, 5);
@@ -76,7 +78,13 @@ export default async function RewardsPage({
         {rewards.length > 0 ? (
           <div className="mb-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {rewards.map((reward) => (
-              <RewardCardWithForm key={reward.id} reward={reward} />
+              <RewardCardWithForm
+                key={reward.id}
+                reward={reward}
+                brandSlug={slug}
+                brandName={brand.name}
+                memberSlug={memberSlug}
+              />
             ))}
           </div>
         ) : (

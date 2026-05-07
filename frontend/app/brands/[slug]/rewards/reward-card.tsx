@@ -5,7 +5,19 @@ import DropCountdown from "@/components/drop-countdown";
 import Image from "next/image";
 import { RedeemForm } from "./redeem-form";
 
-export default function RewardCardWithForm({ reward }: { reward: any }) {
+interface RewardCardProps {
+  reward: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  brandSlug: string;
+  brandName: string;
+  memberSlug?: string | null;
+}
+
+export default function RewardCardWithForm({
+  reward,
+  brandSlug,
+  brandName,
+  memberSlug,
+}: RewardCardProps) {
   const [showForm, setShowForm] = useState(false);
 
   return (
@@ -57,6 +69,9 @@ export default function RewardCardWithForm({ reward }: { reward: any }) {
           rewardId={reward.id}
           rewardTitle={reward.title}
           pointCost={reward.point_cost}
+          brandSlug={brandSlug}
+          brandName={brandName}
+          memberSlug={memberSlug}
           onSuccess={() => {
             setShowForm(false);
             // TODO: trigger toast/refresh
