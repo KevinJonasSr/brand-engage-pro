@@ -205,6 +205,11 @@ export default async function BrandPage({
               {secondaryCta.label}
             </Link>
           </div>
+          {!isSignedIn && (
+            <p className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-aurora/30 bg-aurora/10 px-3 py-1 text-xs font-medium text-aurora">
+              🎁 Join free and unlock your first member perk today.
+            </p>
+          )}
           {!brand.heroImage && (
             <p className="mt-6 text-xs text-white/40">
               Hero imagery pending Box asset drop.
@@ -220,7 +225,9 @@ export default async function BrandPage({
             href={`/brands/${slug}/founders`}
             className="inline-flex items-center gap-2 text-sm font-medium text-white/80 hover:text-white transition"
           >
-            👑 See the {founderData!.count} Founding {(founderData?.count ?? 0) === 1 ? "Member" : "Members"} →
+            👑 {(founderData?.count ?? 0) === 0
+              ? "Be one of the first 100 Founding Members"
+              : `See the ${founderData!.count} Founding ${founderData!.count === 1 ? "Member" : "Members"}`}{" "}→
           </Link>
         </section>
       )}

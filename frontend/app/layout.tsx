@@ -152,8 +152,8 @@ export default async function RootLayout({
         <header className="sticky top-0 z-40 border-b border-white/10 bg-midnight/80 backdrop-blur">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
             <Link href="/" className="flex items-center gap-2">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-aurora to-ember text-sm font-bold">
-                FE
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-aurora to-ember text-[10px] font-bold tracking-wider">
+                BEP
               </span>
               <span
                 className="text-lg font-semibold"
