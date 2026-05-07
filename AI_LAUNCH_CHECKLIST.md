@@ -495,3 +495,22 @@ Mirrors FE's celebration-moment share buttons:
 2. Complete a fresh founder checkout → `/premium/welcome` shows founder number, and CTA row has Share + View profile.
 3. Click Share on mobile → native sheet appears with brand-club share text.
 
+## 🏗️ /for-brands rebuild (Tier B audit mirror)
+
+Mirrors FE /for-artists Tier B audit content to BEP /for-brands. Replaces the simple 3-card landing with the full operator-acquisition page:
+
+- [x] Hero with "Already approved? Sign in →" breadcrumb to `/login`.
+- [x] Proof section ("Already live on Brand Engage Pro") + "Browse all member clubs →" CTA.
+- [x] Featured Brands strip — Nellie's, RaeLynn, Jonas Group Entertainment. Cards link to `/brands/<slug>`.
+- [x] 6-card "What you can launch" grid (Specials & founder tiers, AI-drafted replies, Rewards & redemptions, Weekly member digest, Referrals & predictions, Weekly admin brief).
+- [x] Data ownership block with interim "confirmed during onboarding" copy.
+- [x] 4-step "How launch works" (Apply → Review → Build → Launch).
+- [x] 7-question operator-grade FAQ.
+- [x] Closing CTA + free-apply microcopy.
+
+Also extended metadata for `/for-brands`, `/for-brands/apply`, and `/brands` (canonical + openGraph + twitter).
+
+**Open follow-ups when content is ready:**
+- Replace Featured Brands tagline strings with real testimonial pull-quotes (TODO comment in the source).
+- Tighten data-ownership copy once the brand agreement lands legal review.
+

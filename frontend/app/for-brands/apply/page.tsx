@@ -1,7 +1,26 @@
 import ApplyForm from "./apply-form";
 
-export const metadata = {
-  title: "Apply · Brand Engage Pro",
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Apply to launch your member club · Brand Engage Pro",
+  description:
+    "Apply to launch a Brand Engage Pro member club. We review applications within 48 hours. No payment or contract required to apply.",
+  alternates: { canonical: "/for-brands/apply" },
+  openGraph: {
+    type: "website",
+    url: "/for-brands/apply",
+    siteName: "Brand Engage Pro",
+    title: "Apply to launch your member club · Brand Engage Pro",
+    description:
+      "Tell us about your brand and your members. We review every application within 48 hours.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Apply to launch your member club · Brand Engage Pro",
+    description:
+      "Tell us about your brand and your members. We review every application within 48 hours.",
+  },
 };
 
 export const dynamic = "force-dynamic";
