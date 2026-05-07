@@ -17,7 +17,7 @@ import type {
 import { ResolvePredictionForm } from "./resolve-form";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Resolve prediction · Admin · Brand Engage Pro" };
+export const metadata = { title: "Resolve prediction · Admin" };
 
 interface PredictionRow {
   id: string;

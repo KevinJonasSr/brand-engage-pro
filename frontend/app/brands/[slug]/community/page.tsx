@@ -30,8 +30,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const brand = await getBrandFromDb(slug);
-  if (!brand) return { title: "Community · Brand Engage Pro" };
-  return { title: `${brand.name} Community · Brand Engage Pro` };
+  if (!brand) return { title: "Community" };
+  return { title: `${brand.name} Community` };
 }
 
 export default async function BrandCommunityPage({

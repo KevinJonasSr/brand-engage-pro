@@ -10,7 +10,7 @@ import {
 import type { PredictionType } from "@/lib/predictions/types";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Predictions · Admin · Brand Engage Pro" };
+export const metadata = { title: "Predictions · Admin" };
 
 /**
  * Admin queue: all predictions across all brands, grouped by phase.

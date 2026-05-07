@@ -3,7 +3,7 @@ import Link from "next/link";
 import { listPolicies } from "@/lib/data/policies";
 
 export const metadata: Metadata = {
-  title: "Legal & Privacy · Brand Engage Pro",
+  title: "Legal & Privacy",
 };
 
 export const dynamic = "force-dynamic";

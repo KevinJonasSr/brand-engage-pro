@@ -3,7 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { PreferencesForm, type Prefs } from "./preferences-form";
 
-export const metadata = { title: "Notifications · Brand Engage Pro" };
+export const metadata = { title: "Notifications" };
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;

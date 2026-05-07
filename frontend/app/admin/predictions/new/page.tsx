@@ -5,7 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { CreatePredictionForm } from "./create-form";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "New prediction · Admin · Brand Engage Pro" };
+export const metadata = { title: "New prediction · Admin" };
 
 interface BrandRow {
   slug: string;

@@ -3,6 +3,7 @@ import { getCurrentMember } from "@/lib/data/member";
 import { getMyReferrals, getReferralLeaderboard } from "@/lib/data/referrals";
 import InviteQRCode from "@/components/invite-qr";
 import CopyLinkButton from "./copy-link-button";
+import PreviewSignupBanner from "@/components/preview-signup-banner";
 import NativeShareButton from "./native-share-button";
 
 const ladder = [
@@ -32,7 +33,7 @@ async function buildInviteUrl(code: string | null | undefined): Promise<string> 
   return `${origin}/invite/${code}`;
 }
 
-export const metadata = { title: "Referrals · Brand Engage Pro" };
+export const metadata = { title: "Referrals" };
 
 export default async function ReferralsPage() {
   const [member, myReferrals, leaderboard] = await Promise.all([
@@ -58,6 +59,21 @@ export default async function ReferralsPage() {
     <div className="min-h-screen bg-midnight">
       <main className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-12 lg:flex-row">
         <div className="flex-1 space-y-6">
+          {!isSignedIn && (
+            <PreviewSignupBanner
+              eyebrow="🎟️ Preview"
+              headline="Sign up to get your invite link"
+              body="Members earn 150 bonus points every time a friend joins. Hit milestones and the rewards stack: signed postcards at 3 referrals, exclusive merch at 5, VIP livestream access at 10."
+              bullets={[
+                "+150 pts every verified signup",
+                "Milestones unlock real merch and experiences",
+                "Top referrers get the kind of access nobody else does",
+              ]}
+              primaryCta="Sign up to get my link →"
+              nextPath="/referrals"
+            />
+          )}
+
           <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-purple-800/30 via-slate-900 to-midnight p-6 shadow-glass">
             <p className="text-sm uppercase tracking-wide text-white/60">Referrals</p>
             <h1 className="mt-2 text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>

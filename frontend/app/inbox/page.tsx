@@ -9,7 +9,7 @@ import {
   markNotificationReadAction,
 } from "./actions";
 
-export const metadata = { title: "Inbox · Brand Engage Pro" };
+export const metadata = { title: "Inbox" };
 
 export const dynamic = "force-dynamic";
 

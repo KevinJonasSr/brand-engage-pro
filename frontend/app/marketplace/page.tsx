@@ -1,5 +1,7 @@
 import { getActiveOffers } from "@/lib/data/offers";
+import { getCurrentMember } from "@/lib/data/member";
 import type { Offer } from "@/lib/data/types";
+import PreviewSignupBanner from "@/components/preview-signup-banner";
 
 const tabs = ["Featured", "Merch", "Experiences", "Collectibles", "Member-Exclusive"];
 
@@ -32,10 +34,14 @@ function formatCategory(cat: Offer["category"]): string {
   }[cat];
 }
 
-export const metadata = { title: "Marketplace · Brand Engage Pro" };
+export const metadata = { title: "Marketplace" };
 
 export default async function MarketplacePage() {
-  const dbOffers = await getActiveOffers();
+  const [dbOffers, member] = await Promise.all([
+    getActiveOffers(),
+    getCurrentMember(),
+  ]);
+  const isSignedIn = member !== null;
   const usingDb = dbOffers.length > 0;
 
   const products = usingDb
@@ -53,6 +59,21 @@ export default async function MarketplacePage() {
     <div className="min-h-screen bg-midnight">
       <main className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-12 lg:flex-row">
         <div className="flex-1 space-y-6">
+          {!isSignedIn && (
+            <PreviewSignupBanner
+              eyebrow="🛍️ Preview"
+              headline="Sign up to redeem these drops"
+              body="Members earn points by showing up — visits, posts, referrals — then trade them for the merch, experiences, and collectibles below. Drops are tier-locked so the regulars who care the most get first crack."
+              bullets={[
+                "Real merch + experiences from your favorite brands",
+                "Points-only or member-priority pricing",
+                "Tier-locked so casual visitors don't outbid regulars",
+              ]}
+              primaryCta="Sign up to redeem →"
+              nextPath="/marketplace"
+            />
+          )}
+
           <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-purple-800/30 via-slate-900 to-midnight p-6 shadow-glass">
             <p className="text-sm uppercase tracking-wide text-white/60">Marketplace</p>
             <h1 className="mt-2 text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>

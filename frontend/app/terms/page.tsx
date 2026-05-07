@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import PolicyPage from "@/app/(legal)/policy-page";
 
 export const metadata: Metadata = {
-  title: "Terms of Service · Brand Engage Pro",
+  title: "Terms of Service",
 };
 
 export const dynamic = "force-dynamic";

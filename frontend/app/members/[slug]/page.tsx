@@ -30,7 +30,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const profile = await getMemberProfileBySlug(slug);
-  if (!profile) return { title: "Member profile · Brand Engage Pro" };
+  if (!profile) return { title: "Member profile" };
 
   const name = profile.firstName ?? profile.profileSlug;
   const founderCount = profile.founderBadges.length;
@@ -41,19 +41,19 @@ export async function generateMetadata({
     : `${name}'s member profile · ${getTierStyle(profile.tier).label} tier · ${profile.totalPoints.toLocaleString()} perks`;
 
   return {
-    title: `${name} · Brand Engage Pro`,
+    title: `${name}`,
     description: desc,
     alternates: { canonical: `/members/${profile.profileSlug}` },
     openGraph: {
       type: "profile",
       url: `/members/${profile.profileSlug}`,
       siteName: "Brand Engage Pro",
-      title: `${name}'s member profile · Brand Engage Pro`,
+      title: `${name}'s member profile`,
       description: desc,
     },
     twitter: {
       card: "summary_large_image",
-      title: `${name}'s member profile · Brand Engage Pro`,
+      title: `${name}'s member profile`,
       description: desc,
     },
   };

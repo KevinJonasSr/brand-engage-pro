@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import SignupClient, { type ReferrerBrand } from "./signup-client";
 
-export const metadata = { title: "Sign up · Brand Engage Pro" };
+export const metadata = { title: "Sign up" };
 
 async function getReferrerName(): Promise<string | null> {
   const cookieStore = await cookies();

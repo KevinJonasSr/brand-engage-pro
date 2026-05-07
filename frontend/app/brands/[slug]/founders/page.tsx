@@ -25,9 +25,9 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { slug } = await params;
   const brand = await getBrandFromDb(slug);
-  if (!brand) return { title: "Founder Wall · Brand Engage Pro" };
+  if (!brand) return { title: "Founder Wall" };
   return {
-    title: `Founding Members · ${brand.name} · Brand Engage Pro`,
+    title: `Founding Members · ${brand.name}`,
     description: `See the founding members of ${brand.name} — the first paying community members with locked-in pricing for life.`,
   };
 }

@@ -43,9 +43,9 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { slug } = await params;
   const brand = await getBrandFromDb(slug);
-  if (!brand) return { title: "Brand · Brand Engage Pro" };
+  if (!brand) return { title: "Brand" };
   return {
-    title: `${brand.name} · Brand Engage Pro`,
+    title: `${brand.name}`,
     description: brand.tagline,
   };
 }
@@ -204,7 +204,7 @@ export default async function BrandPage({
               <FollowButton brandSlug={brand.slug} initialFollowing={isFollowing} />
             )}
             <ShareButton
-              title={`${brand.name} · Brand Engage Pro`}
+              title={`${brand.name}`}
               text={`Check out ${brand.name} — ${brand.tagline}`}
               url={
                 typeof process.env.NEXT_PUBLIC_APP_URL === "string"

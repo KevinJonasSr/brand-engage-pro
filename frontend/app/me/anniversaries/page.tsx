@@ -3,7 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { absoluteDate } from "@/lib/format/relative-time";
 
-export const metadata = { title: "Anniversaries · Brand Engage Pro" };
+export const metadata = { title: "Anniversaries" };
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;

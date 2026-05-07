@@ -21,7 +21,7 @@ export async function generateMetadata({
   const { slug, number } = await params;
   const brand = await getBrandFromDb(slug).catch(() => null);
   const brandName = brand?.name ?? "Brand Engage Pro";
-  const title = `Founding Member #${number} of ${brandName} · Brand Engage Pro`;
+  const title = `Founding Member #${number} of ${brandName}`;
   const description = `One of 100 founding members of ${brandName} on Brand Engage Pro. Founder tier — perks multiplier, early specials access, members-only experiences.`;
   return {
     title,

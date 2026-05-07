@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "For Brands · Brand Engage Pro",
+  title: "For Brands",
   description:
     "Launch a member club on Brand Engage Pro. Reward your regulars, run member-only specials, fulfill perks, and turn customer activity into a community — without renting attention from social platforms.",
   alternates: { canonical: "/for-brands" },
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Loyalty that actually rewards your regulars · Brand Engage Pro",
+    title: "Loyalty that actually rewards your regulars",
     description:
       "Direct member relationships, real perks, specials, predictions, and a weekly admin brief — built for restaurants, retailers, and entertainment companies.",
   },

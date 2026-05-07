@@ -2,7 +2,7 @@ import { listApplications } from "@/lib/data/applications";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "Applications · Admin · Brand Engage Pro" };
+export const metadata = { title: "Applications · Admin" };
 
 const STATUS_BADGE: Record<string, string> = {
   pending: "bg-amber-500/20 text-amber-300",

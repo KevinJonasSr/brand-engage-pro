@@ -3,7 +3,7 @@ import ApplyForm from "./apply-form";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Apply to launch your member club · Brand Engage Pro",
+  title: "Apply to launch your member club",
   description:
     "Apply to launch a Brand Engage Pro member club. We review applications within 48 hours. No payment or contract required to apply.",
   alternates: { canonical: "/for-brands/apply" },
@@ -11,13 +11,13 @@ export const metadata: Metadata = {
     type: "website",
     url: "/for-brands/apply",
     siteName: "Brand Engage Pro",
-    title: "Apply to launch your member club · Brand Engage Pro",
+    title: "Apply to launch your member club",
     description:
       "Tell us about your brand and your members. We review every application within 48 hours.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Apply to launch your member club · Brand Engage Pro",
+    title: "Apply to launch your member club",
     description:
       "Tell us about your brand and your members. We review every application within 48 hours.",
   },

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import AvatarUploadCard from "./avatar-upload-card";
+import PreviewSignupBanner from "@/components/preview-signup-banner";
 import { getBadgesWithEarnedStatus } from "@/lib/data/badges";
 import {
   getCurrentMember,
@@ -51,7 +52,7 @@ function formatPts(n: number | null | undefined) {
   return new Intl.NumberFormat("en-US").format(n) + " pts";
 }
 
-export const metadata = { title: "Rewards · Brand Engage Pro" };
+export const metadata = { title: "Rewards" };
 
 export default async function RewardsPage() {
   const [member, kpis, tiers, dbBadges, breakdown] = await Promise.all([
@@ -95,6 +96,21 @@ export default async function RewardsPage() {
     <div className="min-h-screen bg-midnight">
       <main className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-12 lg:flex-row">
         <div className="flex-1 space-y-6">
+          {!isSignedIn && (
+            <PreviewSignupBanner
+              eyebrow="🎁 Preview"
+              headline="Sign up to start earning real points + climbing real tiers"
+              body="The badges, points, and tier progress below are a preview of what members see once they join. Members earn points by showing up — visits, posts, referrals — and trade them for member-only perks the casual crowd never gets."
+              bullets={[
+                "Real points the moment you sign up — no minimum to start",
+                "Badges that climb tiers and unlock member-only perks",
+                "First access to drops, presales, and event RSVPs",
+              ]}
+              primaryCta="Sign up free →"
+              nextPath="/rewards"
+            />
+          )}
+
           <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-purple-800/30 via-slate-900 to-midnight p-6 shadow-glass">
             <p className="text-sm uppercase tracking-wide text-white/60">Rewards & Tiers</p>
             <h1 className="mt-2 text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>

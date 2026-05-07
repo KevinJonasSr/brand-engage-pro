@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export const metadata = { title: "Application received · Brand Engage Pro" };
+export const metadata = { title: "Application received" };
 
 export default function ThanksPage() {
   return (

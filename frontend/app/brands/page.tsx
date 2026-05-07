@@ -5,7 +5,7 @@ import { listBrandsFromDb } from "@/lib/data/brands";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Brands · Brand Engage Pro",
+  title: "Brands",
   description:
     "Browse the active member clubs on Brand Engage Pro. Restaurants, retailers, and entertainment companies rewarding their regulars.",
   alternates: { canonical: "/brands" },
@@ -13,13 +13,13 @@ export const metadata: Metadata = {
     type: "website",
     url: "/brands",
     siteName: "Brand Engage Pro",
-    title: "Active member clubs · Brand Engage Pro",
+    title: "Active member clubs",
     description:
       "Browse the brands building member clubs on Brand Engage Pro. Click any brand to see what their hub looks like.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Active member clubs · Brand Engage Pro",
+    title: "Active member clubs",
     description:
       "Browse the brands building member clubs on Brand Engage Pro.",
   },
