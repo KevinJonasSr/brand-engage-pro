@@ -5,8 +5,14 @@ import { resolveCommunityFromHost } from "@/lib/community";
 /**
  * Routes a signed-in user must be able to reach.
  * Everything else under /app that's not here or public is open.
+ *
+ * Note: /rewards, /marketplace, /referrals are intentionally NOT in this
+ * list — those pages render a public-preview marketing variant for
+ * anonymous visitors (with a sign-in CTA) and the full app variant for
+ * signed-in members. Removing them from the gate is what enables the
+ * preview pattern; the pages themselves do their own auth-aware render.
  */
-const PROTECTED_PREFIXES = ["/rewards", "/marketplace", "/referrals", "/admin", "/inbox"] as const;
+const PROTECTED_PREFIXES = ["/admin", "/inbox"] as const;
 
 /**
  * Optional extra protection: a second HTTP Basic Auth layer on /admin/*.
