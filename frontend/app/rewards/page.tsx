@@ -108,6 +108,7 @@ export default async function RewardsPage() {
               ]}
               primaryCta="Sign up free →"
               nextPath="/rewards"
+              firstRewardLine="🎁 Unlock your first member perk the day you join."
             />
           )}
 

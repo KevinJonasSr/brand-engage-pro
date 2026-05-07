@@ -71,6 +71,7 @@ export default async function MarketplacePage() {
               ]}
               primaryCta="Sign up to redeem →"
               nextPath="/marketplace"
+              firstRewardLine="🎁 Unlock your first member perk the day you join."
             />
           )}
 
