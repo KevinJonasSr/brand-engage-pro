@@ -428,3 +428,24 @@ Mirror of the FE-side OAuth gate. Real-user testing on FE surfaced the Google co
 
 Until all of the above are done, signup is email-only.
 
+## 📣 Shareability infrastructure (mirrored from Fan Engage)
+
+- [x] **`<ShareButton />`** component at `frontend/components/share-button.tsx` — Web Share API on mobile, clipboard fallback on desktop.
+- [x] **Per-brand OG card** at `frontend/app/brands/[slug]/opengraph-image.tsx` — generates beautiful preview when /brands/<slug> URLs are shared.
+- [x] **Founding Member share page** at `frontend/app/share/founder/[slug]/[number]/page.tsx` plus matching OG card. Counts are public, member identity not exposed.
+- [x] **Hero share button** wired into `/brands/<slug>` next to FollowButton. Anonymous-friendly (outside `isSignedIn` conditional).
+
+### Manual smoke test after deploy
+
+1. Open `/brands/raelynn` (or any active brand) on mobile → tap Share → verify native sheet opens with brand name + tagline.
+2. Open `/brands/raelynn` on desktop → click Share → verify "Link copied" toast.
+3. Visit `/share/founder/raelynn/1` directly → verify certificate page renders.
+4. Visit OG card at `/brands/raelynn/opengraph-image` and `/share/founder/raelynn/1/opengraph-image` → verify both render to PNG without error.
+5. Paste `/brands/raelynn` URL in iMessage/Slack → verify the per-brand card appears in the unfurl.
+
+### Future wiring (Bundle 4)
+
+- [ ] Profile-discovery share moments on `/premium/welcome` (member's founder share entry point).
+- [ ] Share trigger on rewards redeem success state.
+- [ ] Award founder-member badge using `award_badge` RPC with `p_member_id` (BEP) — confirm slug `founder-member` exists in BEP `badges` table.
+

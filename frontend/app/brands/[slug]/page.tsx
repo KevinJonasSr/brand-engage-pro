@@ -17,6 +17,7 @@ import PremiumPaywall from "@/components/premium-paywall";
 import DropCountdown from "@/components/drop-countdown";
 import SocialIcon from "@/components/social-icon";
 import FollowButton from "./follow-button";
+import ShareButton from "@/components/share-button";
 import RsvpButton from "./rsvp-button";
 
 import { BrandPredictionsSection } from "@/components/predictions/brand-predictions-section";
@@ -180,6 +181,17 @@ export default async function BrandPage({
             {isSignedIn && (
               <FollowButton brandSlug={brand.slug} initialFollowing={isFollowing} />
             )}
+            <ShareButton
+              title={`${brand.name} · Brand Engage Pro`}
+              text={`Check out ${brand.name} — ${brand.tagline}`}
+              url={
+                typeof process.env.NEXT_PUBLIC_APP_URL === "string"
+                  ? `${process.env.NEXT_PUBLIC_APP_URL}/brands/${brand.slug}`
+                  : `https://brand-engage-pro.vercel.app/brands/${brand.slug}`
+              }
+              variant="ghost"
+              label="Share"
+            />
             <Link
               href={`/brands/${slug}/community`}
               className="rounded-full border border-white/30 bg-black/30 px-6 py-3 text-sm font-medium text-white/90 backdrop-blur hover:bg-white/10"
