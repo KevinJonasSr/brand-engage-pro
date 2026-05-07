@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useSyncExternalStore, useState } from "react";
+import { usePathname } from "next/navigation";
 
 const STORAGE_KEY = "memberengage_cookie_consent";
 
@@ -25,7 +26,17 @@ function getServerSnapshot(): string | null {
 export default function CookieBanner() {
   const stored = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const [dismissed, setDismissed] = useState(false);
-  const shown = stored === null && !dismissed;
+  const pathname = usePathname() ?? "";
+
+  // Don't compete with primary CTAs on form-heavy routes. Banner is
+  // anchored at the bottom of the viewport on mobile (full-width) and
+  // can cover Submit buttons on /onboarding, /signup, /login. Suppress
+  // there; banner still fires on every other page so consent capture
+  // isn't lost permanently.
+  const HIDE_ON = ["/onboarding", "/signup", "/login"];
+  const hiddenForRoute = HIDE_ON.some((prefix) => pathname.startsWith(prefix));
+
+  const shown = stored === null && !dismissed && !hiddenForRoute;
 
   function save(choice: "accept" | "decline") {
     try {

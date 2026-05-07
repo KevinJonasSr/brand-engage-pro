@@ -76,67 +76,17 @@ export default function SignupPage({ referrerName }: { referrerName?: string | n
         </div>
 
 
-        <div className="space-y-2">
-          <button
-            type="button"
-            disabled={status === "loading"}
-            onClick={async () => {
-              setMessage("");
-              const supabase = createClient();
-              const { error } = await supabase.auth.signInWithOAuth({
-                provider: "google",
-                options: {
-                  redirectTo: `${window.location.origin}/auth/callback?next=/`,
-                },
-              });
-              if (error) {
-                setStatus("error");
-                setMessage(error.message);
-              }
-            }}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-medium text-white transition hover:bg-white/10 disabled:opacity-50"
-          >
-            <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden>
-              <path fill="currentColor" d="M21.35 11.1H12v3.4h5.36c-.46 2.42-2.5 4.18-5.36 4.18a5.68 5.68 0 1 1 0-11.36c1.46 0 2.79.5 3.84 1.34l2.55-2.55A9.13 9.13 0 0 0 12 3a9 9 0 1 0 0 18c5.21 0 8.65-3.66 8.65-8.81 0-.59-.06-1.16-.16-1.66l-.14-.43z" />
-            </svg>
-            Continue with Google
-          </button>
-          <button
-            type="button"
-            disabled={status === "loading"}
-            onClick={async () => {
-              setMessage("");
-              const supabase = createClient();
-              const { error } = await supabase.auth.signInWithOAuth({
-                provider: "apple",
-                options: {
-                  redirectTo: `${window.location.origin}/auth/callback?next=/`,
-                },
-              });
-              if (error) {
-                setStatus("error");
-                setMessage(error.message);
-              }
-            }}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-sm font-medium text-white transition hover:bg-white/10 disabled:opacity-50"
-          >
-            <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden>
-              <path fill="currentColor" d="M16.5 12.5c0-2.6 2.1-3.8 2.2-3.9-1.2-1.7-3-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.4 1-4.3 2.6-1.8 3.2-.5 7.9 1.3 10.4.9 1.3 1.9 2.7 3.3 2.6 1.3-.1 1.9-.9 3.5-.9 1.6 0 2.2.9 3.6.8 1.5 0 2.4-1.3 3.3-2.5 1-1.5 1.5-2.9 1.5-3-.1 0-2.9-1.1-2.9-4.1zm-2.6-7.6c.7-.9 1.2-2.1 1.1-3.3-1 0-2.3.7-3 1.5-.7.8-1.3 2-1.1 3.2 1.2.1 2.4-.6 3-1.4z" />
-            </svg>
-            Continue with Apple
-          </button>
-        </div>
+        {/* OAuth temporarily hidden — Google + Apple SSO buttons removed
+            until BEP's custom auth domain ships. The Supabase project
+            URL (enfpviapxvqyoarwwsuf.supabase.co) currently appears in
+            the Google consent screen's "to continue to" line, which
+            reads as phishy to real users.
 
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center" aria-hidden>
-            <div className="w-full border-t border-white/10" />
-          </div>
-          <div className="relative flex justify-center">
-            <span className="bg-midnight px-2 text-[10px] uppercase tracking-widest text-white/40">
-              Or sign up with email
-            </span>
-          </div>
-        </div>
+            Re-enable by reverting this comment block to the original
+            JSX once Supabase Pro custom auth domain is configured
+            (e.g. auth.brandengagepro.com or similar) and the Google
+            OAuth client's redirect URIs point at the new domain. The
+            original block in git history at the commit before this one. */}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <label className="block space-y-1">

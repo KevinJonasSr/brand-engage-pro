@@ -122,6 +122,11 @@ export default function OnboardingWizard() {
   const [smsMessage, setSmsMessage] = useState("Ready to send the confirmation text.");
   const [finishStatus, setFinishStatus] = useState<"idle" | "saving" | "error">("idle");
   const [tosConsent, setTosConsent] = useState(false);
+  // Tracks whether the email field was successfully auto-prefilled
+  // from auth.users. When true, the field stays readOnly. When false
+  // (anonymous, expired, OAuth without email scope), the field is
+  // editable AND required so onboarding doesn't dead-end.
+  const [emailAutoFilled, setEmailAutoFilled] = useState(false);
   const [smsConsent, setSmsConsent] = useState(false);
 
   const currentStep = steps[stepIndex];
@@ -144,6 +149,7 @@ export default function OnboardingWizard() {
       }
       if (user.email) {
         setFormState((prev) => ({ ...prev, email: user.email ?? "" }));
+        setEmailAutoFilled(true);
       }
     });
   }, [router, searchParams]);
@@ -173,6 +179,14 @@ export default function OnboardingWizard() {
    */
   const canAdvanceCurrentStep = (): boolean => {
     return currentStep.fields.every((field) => {
+      // Email needs to be effectively-required when editable
+      // (i.e. auth prefill failed). Field's `required` flag stays
+      // false in the steps array so the * doesn't render in the
+      // prefilled case; we gate Continue here instead.
+      if (field.name === "email" && !emailAutoFilled) {
+        const v = formState.email?.trim() ?? "";
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+      }
       if (!field.required) return true;
       if (field.type === "radio") {
         const sel = formState[field.name];
@@ -407,18 +421,36 @@ export default function OnboardingWizard() {
                       {field.label}
                       {field.required && <span className="ml-1 text-rose-300">*</span>}
                     </span>
-                    <input
-                      type={field.type}
-                      value={formState[field.name] ?? ""}
-                      onChange={(event) => handleInput(field.name, event.target.value)}
-                      placeholder={field.placeholder}
-                      readOnly={field.readOnly}
-                      className={`mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 focus:border-white/40 focus:outline-none ${
-                        field.readOnly ? "cursor-not-allowed text-white/60" : ""
-                      }`}
-                    />
+                    {(() => {
+                      // Email is the only field with a runtime-overridable
+                      // readOnly. Lock it when prefilled, leave it
+                      // editable + required when not.
+                      const fieldReadOnly =
+                        field.readOnly &&
+                        (field.name !== "email" || emailAutoFilled);
+                      return (
+                        <input
+                          type={field.type}
+                          value={formState[field.name] ?? ""}
+                          onChange={(event) => handleInput(field.name, event.target.value)}
+                          placeholder={field.placeholder}
+                          readOnly={fieldReadOnly}
+                          required={
+                            field.required ||
+                            (field.name === "email" && !emailAutoFilled)
+                          }
+                          className={`mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 focus:border-white/40 focus:outline-none ${
+                            fieldReadOnly ? "cursor-not-allowed text-white/60" : ""
+                          }`}
+                        />
+                      );
+                    })()}
                     {field.hint && (
-                      <span className="mt-1 block text-xs text-white/50">{field.hint}</span>
+                      <span className="mt-1 block text-xs text-white/50">
+                        {field.name === "email" && !emailAutoFilled
+                          ? "We'll use this to send your weekly digest and confirmations."
+                          : field.hint}
+                      </span>
                     )}
                   </label>
                 );
@@ -473,6 +505,29 @@ export default function OnboardingWizard() {
               </div>
             )}
 
+            {isLastStep && (
+          <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-4">
+            <div className="flex items-center gap-3 text-sm text-white/70">
+              <Star className="text-amber-300" size={18} />
+              <p>SMS double opt-in</p>
+            </div>
+            <p className="mt-3 text-sm text-white/60">{smsMessage}</p>
+            <button
+              onClick={handleSmsOptIn}
+              className="mt-4 rounded-full border border-white/30 px-4 py-2 text-sm text-white/80 disabled:opacity-40"
+              disabled={smsStatus === "loading"}
+            >
+              {smsStatus === "loading" ? "Sending..." : "Send confirmation text"}
+            </button>
+            {smsStatus === "success" && (
+              <p className="mt-2 text-sm text-emerald-300">Opt-in confirmed via Twilio.</p>
+            )}
+            {smsStatus === "error" && (
+              <p className="mt-2 text-sm text-rose-300">Issue sending SMS. Try again.</p>
+            )}
+          </div>
+            )}
+
             <div className="flex flex-col gap-2 pt-4">
               <div className="flex items-center justify-between gap-4">
                 <button
@@ -520,26 +575,6 @@ export default function OnboardingWizard() {
             )}
           </div>
 
-          <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-4">
-            <div className="flex items-center gap-3 text-sm text-white/70">
-              <Star className="text-amber-300" size={18} />
-              <p>SMS double opt-in</p>
-            </div>
-            <p className="mt-3 text-sm text-white/60">{smsMessage}</p>
-            <button
-              onClick={handleSmsOptIn}
-              className="mt-4 rounded-full border border-white/30 px-4 py-2 text-sm text-white/80 disabled:opacity-40"
-              disabled={smsStatus === "loading"}
-            >
-              {smsStatus === "loading" ? "Sending..." : "Send confirmation text"}
-            </button>
-            {smsStatus === "success" && (
-              <p className="mt-2 text-sm text-emerald-300">Opt-in confirmed via Twilio.</p>
-            )}
-            {smsStatus === "error" && (
-              <p className="mt-2 text-sm text-rose-300">Issue sending SMS. Try again.</p>
-            )}
-          </div>
         </section>
 
         <aside className="flex-1 space-y-6">

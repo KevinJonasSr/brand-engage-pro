@@ -415,3 +415,16 @@ the new candidate count.
 ### Hardening (future, not urgent)
 
 If orphans keep appearing, add a `where ev.brand_slug in (select slug from public.communities)` clause to the `brand_events` branch of `public.list_unembedded_rows()` in a future migration. Defers indexing of orphans cleanly instead of erroring on every cron tick.
+
+## 🔐 BEP OAuth re-enable (post custom auth domain)
+
+Mirror of the FE-side OAuth gate. Real-user testing on FE surfaced the Google consent screen showing the raw Supabase project URL — same issue applies to BEP. OAuth buttons hidden on /signup until BEP has a custom auth domain.
+
+- [ ] **Configure BEP Supabase custom auth domain** — Supabase Pro setting; e.g. `auth.brandengagepro.com` or `auth.<custom>.com`. Without this, the Google consent screen shows the raw BEP Supabase project URL (`enfpviapxvqyoarwwsuf.supabase.co`).
+- [ ] **Update BEP Google OAuth client redirect URIs** in Cloud Console to point at the custom auth domain.
+- [ ] **Update Apple OAuth Service ID redirect** to match (if/when Apple SSO is wired up; currently deferred per the FE-side memory).
+- [ ] **Submit BEP Google OAuth consent screen for verification** so 'Brand Engage Pro' appears prominently instead of the redirect host.
+- [ ] **Restore OAuth buttons** in `frontend/app/signup/signup-client.tsx` — git history has the original block at the commit before this gate landed. Revert that hunk to bring them back.
+
+Until all of the above are done, signup is email-only.
+
