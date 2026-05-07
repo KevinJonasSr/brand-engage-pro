@@ -62,7 +62,7 @@ export default async function BrandsIndexPage({ searchParams }: { searchParams?:
 
       
       {allGenres.length > 0 && (
-        <div className="flex flex-wrap gap-2" aria-label="Filter by genre">
+        <div className="flex flex-wrap gap-2" aria-label="Filter by category">
           <a
             href="/brands"
             className={

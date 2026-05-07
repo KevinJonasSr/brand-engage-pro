@@ -5,7 +5,21 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-export default function SignupPage({ referrerName }: { referrerName?: string | null }) {
+export type ReferrerBrand = {
+  slug: string;
+  name: string;
+  tagline: string | null;
+  accentFrom: string;
+  accentTo: string;
+};
+
+export default function SignupPage({
+  referrerName,
+  referrerBrand,
+}: {
+  referrerName?: string | null;
+  referrerBrand?: ReferrerBrand | null;
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const community = searchParams.get("community");
@@ -15,11 +29,44 @@ export default function SignupPage({ referrerName }: { referrerName?: string | n
   const onboardingHref = ref ? `/onboarding?ref=${encodeURIComponent(ref)}` : "/onboarding";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "error" | "confirm">("idle");
   const [message, setMessage] = useState("");
 
+  // Email regex — pragmatic, not RFC-perfect. Catches the common typos
+  // (missing @, missing TLD, trailing space) without rejecting odd-but-
+  // valid addresses.
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  function validateEmail(value: string): string | null {
+    if (!value.trim()) return "Email is required.";
+    if (!EMAIL_RE.test(value.trim())) return "Enter a valid email address.";
+    return null;
+  }
+
+  function validatePassword(value: string): string | null {
+    if (!value) return "Password is required.";
+    if (value.length < 8) return "Password must be at least 8 characters.";
+    return null;
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    // Inline validation BEFORE we hit Supabase. Surface field-specific
+    // errors so a 6-char password isn't silently rejected as a generic
+    // "Unable to create account."
+    const eErr = validateEmail(email);
+    const pErr = validatePassword(password);
+    setEmailError(eErr);
+    setPasswordError(pErr);
+    if (eErr || pErr) {
+      setStatus("error");
+      setMessage("");
+      return;
+    }
+
     setStatus("loading");
     setMessage("");
     try {
@@ -50,20 +97,77 @@ export default function SignupPage({ referrerName }: { referrerName?: string | n
     }
   }
 
+  // Contextual hero: when a visitor arrives via /signup?ref=<brand-slug>
+  // and we successfully resolved that brand server-side, lead with the
+  // brand's name + accent gradient + 2-3 perks instead of generic "Join
+  // the inner circle" copy. Falls through to the generic header below
+  // when there's no referrer brand.
+  const showContextualHero = !!referrerBrand;
+  const ctaGradient = referrerBrand
+    ? `linear-gradient(90deg, ${referrerBrand.accentFrom}, ${referrerBrand.accentTo})`
+    : null;
+
   return (
     <main className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center gap-6 px-6 py-12">
+      {showContextualHero && referrerBrand && ctaGradient && (
+        <section
+          className="relative overflow-hidden rounded-3xl border border-white/10 p-6"
+          style={{
+            backgroundImage: `linear-gradient(135deg, ${referrerBrand.accentFrom}33, #0f172a 60%, #000000)`,
+          }}
+        >
+          <p className="text-xs uppercase tracking-[0.3em] text-white/70">
+            Member club
+          </p>
+          <h2
+            className="mt-2 text-2xl font-semibold"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            Join {referrerBrand.name}&apos;s
+            {" "}
+            <span
+              className="bg-clip-text text-transparent"
+              style={{ backgroundImage: ctaGradient }}
+            >
+              member club
+            </span>
+          </h2>
+          {referrerBrand.tagline && (
+            <p className="mt-2 text-sm text-white/75">{referrerBrand.tagline}</p>
+          )}
+          <ul className="mt-4 space-y-1.5 text-sm text-white/80">
+            <li className="flex items-start gap-2">
+              <span aria-hidden>🎁</span>
+              <span>Member-only perks, drops, and behind-the-scenes access</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span aria-hidden>⭐</span>
+              <span>Earn points on every visit and unlock rewards</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span aria-hidden>👋</span>
+              <span>Free · 60 seconds · No credit card</span>
+            </li>
+          </ul>
+        </section>
+      )}
+
       <div className="glass-card space-y-6 p-8">
         <div className="space-y-2">
           <p className="text-sm uppercase tracking-wide text-white/60">Brand Engage Pro</p>
           <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
-            Join the inner circle
+            {showContextualHero ? "Create your account" : "Join the inner circle"}
           </h1>
-          <p className="text-sm text-white/70">
-            Create an account to earn points, unlock rewards, and get behind-the-scenes access.
-          </p>
-          <p className="inline-flex items-center gap-1.5 rounded-full border border-aurora/30 bg-aurora/10 px-3 py-1 text-xs font-medium text-aurora">
-            🎁 Join free and unlock your first member perk today.
-          </p>
+          {!showContextualHero && (
+            <p className="text-sm text-white/70">
+              Create an account to earn points, unlock rewards, and get behind-the-scenes access.
+            </p>
+          )}
+          {!showContextualHero && (
+            <p className="inline-flex items-center gap-1.5 rounded-full border border-aurora/30 bg-aurora/10 px-3 py-1 text-xs font-medium text-aurora">
+              🎁 Join free and unlock your first member perk today.
+            </p>
+          )}
           {referrerName && (
             <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200">
               <span aria-hidden>👋</span>
@@ -91,7 +195,7 @@ export default function SignupPage({ referrerName }: { referrerName?: string | n
             OAuth client's redirect URIs point at the new domain. The
             original block in git history at the commit before this one. */}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <label className="block space-y-1">
             <span className="text-xs uppercase tracking-wide text-white/60">Email</span>
             <input
@@ -99,10 +203,23 @@ export default function SignupPage({ referrerName }: { referrerName?: string | n
               required
               autoComplete="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-white/40 focus:outline-none"
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (emailError) setEmailError(validateEmail(e.target.value));
+              }}
+              onBlur={() => setEmailError(validateEmail(email))}
+              aria-invalid={!!emailError}
+              className={
+                "w-full rounded-2xl border bg-black/40 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:outline-none " +
+                (emailError
+                  ? "border-rose-500/60 focus:border-rose-400"
+                  : "border-white/10 focus:border-white/40")
+              }
               placeholder="you@email.com"
             />
+            {emailError && (
+              <span className="text-[11px] text-rose-300">{emailError}</span>
+            )}
           </label>
           <label className="block space-y-1">
             <span className="text-xs uppercase tracking-wide text-white/60">Password</span>
@@ -112,11 +229,24 @@ export default function SignupPage({ referrerName }: { referrerName?: string | n
               minLength={8}
               autoComplete="new-password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-white/40 focus:outline-none"
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (passwordError) setPasswordError(validatePassword(e.target.value));
+              }}
+              onBlur={() => setPasswordError(validatePassword(password))}
+              aria-invalid={!!passwordError}
+              className={
+                "w-full rounded-2xl border bg-black/40 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:outline-none " +
+                (passwordError
+                  ? "border-rose-500/60 focus:border-rose-400"
+                  : "border-white/10 focus:border-white/40")
+              }
               placeholder="at least 8 characters"
             />
-            {password && (() => {
+            {passwordError && (
+              <span className="text-[11px] text-rose-300">{passwordError}</span>
+            )}
+            {password && !passwordError && (() => {
               let score = 0;
               if (password.length >= 8) score += 1;
               if (password.length >= 12) score += 1;

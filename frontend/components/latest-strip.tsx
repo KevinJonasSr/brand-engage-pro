@@ -181,7 +181,7 @@ async function collect(slug: string): Promise<LatestCard[]> {
           kind: "event",
           title: e.title,
           body: truncate(e.description, 120),
-          href: hrefForHub(slug),
+          href: hrefForEventHub(slug),
           ts: e.starts_at,
           when: relativeTime(e.starts_at),
         });
@@ -215,7 +215,7 @@ async function collect(slug: string): Promise<LatestCard[]> {
           kind: "event",
           title: e.title,
           body: truncate(e.detail, 120),
-          href: hrefForHub(slug),
+          href: hrefForEventHub(slug),
           ts,
           when,
         });
@@ -274,6 +274,13 @@ function hrefForHub(slug: string): string {
   // FE matches /artists/<slug> and on BEP matches /brands/<slug>. We bet
   // on /artists for FE and re-write at the page layer if needed.)
   return `/brands/${slug}`;
+}
+
+function hrefForEventHub(slug: string): string {
+  // Event cards on the brand hub link back to /brands/<slug>#upcoming so
+  // the click jumps to the event list section instead of bouncing the
+  // visitor back to the top of the same page they're already on.
+  return `/brands/${slug}#upcoming`;
 }
 
 function hrefForCommunity(slug: string): string {

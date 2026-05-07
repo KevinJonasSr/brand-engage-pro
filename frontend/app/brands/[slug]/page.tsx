@@ -101,6 +101,28 @@ export default async function BrandPage({
   const { counts: rsvpCounts, mine: myRsvps } = await getRsvpMetaForEvents(eventIds);
 
   const heroGradient = `linear-gradient(to bottom right, ${brand.accentFrom}66, #0f172a, #000000)`;
+
+  // Brand-type-aware premium paywall copy. Restaurants get food/drink
+  // language; music/entertainment brands get listening-party / drop
+  // language; everything else gets generic member-club copy.
+  const isRestaurant = brand.genres.some((g) =>
+    ["Restaurants", "Hospitality", "Southern", "Soul food", "Family-style"].includes(g),
+  );
+  const isMusic = brand.genres.some((g) =>
+    ["Music & Entertainment", "Country", "Pop", "Rock", "Americana", "Indie"].includes(g),
+  );
+  const premiumDescriptionForBrand = {
+    specials: isRestaurant
+      ? "Premium members get access to off-menu specials, member-only pours, and the small-batch stuff we don\u2019t put on the regular menu."
+      : isMusic
+        ? "Premium members get access to limited drops, member-only releases, and the behind-the-scenes recordings we don\u2019t put out everywhere else."
+        : "Premium members get access to member-only perks, exclusive drops, and the things we save for the inner circle.",
+    events: isRestaurant
+      ? "Premium members get access to intimate member events, early RSVPs, and behind-the-scenes-only moments."
+      : isMusic
+        ? "Premium members get access to intimate listening parties, early ticket access, and backstage-only moments."
+        : "Premium members get access to member-only events, early RSVPs, and behind-the-scenes-only moments.",
+  };
   const ctaGradient = `linear-gradient(to right, ${brand.accentFrom}, ${brand.accentTo})`;
 
   // Primary CTA adapts to the viewer's state:
@@ -274,7 +296,7 @@ export default async function BrandPage({
                   <PremiumPaywall
                     key={s.id}
                     feature={s.title}
-                    description="Premium members get access to off-menu specials, member-only pours, and the small-batch stuff we don’t put on the regular menu."
+                    description={premiumDescriptionForBrand.specials}
                     communityId={slug}
                     accentFrom={brand.accentFrom}
                     accentTo={brand.accentTo}
@@ -337,7 +359,7 @@ export default async function BrandPage({
       )}
 
       {/* Upcoming */}
-      <section className="glass-card p-8">
+      <section id="upcoming" className="glass-card p-8 scroll-mt-24">
         <p className="text-sm uppercase tracking-wide text-white/60">Upcoming</p>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           {brand.upcoming.map((e) => {
@@ -350,7 +372,7 @@ export default async function BrandPage({
                 <PremiumPaywall
                   key={e.id ?? e.title}
                   feature={e.title}
-                  description="Premium members get access to intimate member events, early RSVPs, and behind-the-scenes-only moments."
+                  description={premiumDescriptionForBrand.events}
                   communityId={slug}
                   accentFrom={brand.accentFrom}
                   accentTo={brand.accentTo}
