@@ -1,10 +1,5 @@
 import { ImageResponse } from "next/og";
-import { getMemberProfileByHandle } from "@/lib/data/member-profile";
-
-// ─── Per-member OG card ─────────────────────────────────────────────
-// "[Name]'s member profile" share preview. Keeps the same visual
-// language as brand + founder OG cards so links from a single member's
-// network feel like one ecosystem. 1200x630.
+import { getMemberProfileBySlug } from "@/lib/data/member-profile";
 
 export const runtime = "edge";
 export const size = { width: 1200, height: 630 };
@@ -21,13 +16,12 @@ const TIER_COLORS: Record<string, { from: string; to: string; label: string }> =
 export default async function MemberProfileOpengraphImage({
   params,
 }: {
-  params: { handle: string };
+  params: { slug: string };
 }) {
-  const profile = await getMemberProfileByHandle(params.handle).catch(() => null);
+  const profile = await getMemberProfileBySlug(params.slug).catch(() => null);
 
-  // Friendly fallback so a stale-cached share preview never 500s.
   const displayName = profile?.firstName ?? "Member";
-  const handle = profile?.handle ?? params.handle;
+  const slug = profile?.profileSlug ?? params.slug;
   const tier = TIER_COLORS[(profile?.tier ?? "bronze").toLowerCase()] ?? TIER_COLORS.bronze;
   const points = profile?.totalPoints ?? 0;
   const founderCount = profile?.founderBadges.length ?? 0;
@@ -52,7 +46,6 @@ export default async function MemberProfileOpengraphImage({
           position: "relative",
         }}
       >
-        {/* Tier-colored corner glow */}
         <div
           style={{
             position: "absolute",
@@ -65,68 +58,38 @@ export default async function MemberProfileOpengraphImage({
           }}
         />
 
-        {/* Top — brand pill */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 14,
-            position: "relative",
-          }}
-        >
+        <div style={{ display: "flex", alignItems: "center", gap: 14, position: "relative" }}>
           <div
             style={{
               display: "flex",
-              width: 52,
-              height: 52,
-              alignItems: "center",
-              justifyContent: "center",
+              width: 52, height: 52,
+              alignItems: "center", justifyContent: "center",
               borderRadius: 999,
               background: `linear-gradient(135deg, ${tier.from}, ${tier.to})`,
-              fontSize: 20,
-              fontWeight: 700,
+              fontSize: 20, fontWeight: 700,
             }}
           >
             BEP
           </div>
-          <div
-            style={{
-              fontSize: 24,
-              fontWeight: 600,
-              opacity: 0.85,
-            }}
-          >
+          <div style={{ fontSize: 24, fontWeight: 600, opacity: 0.85 }}>
             Brand Engage Pro
           </div>
         </div>
 
-        {/* Center — name + tier badge */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 14,
-            position: "relative",
-          }}
-        >
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, position: "relative" }}>
           <div
             style={{
-              fontSize: 24,
-              fontWeight: 500,
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
+              fontSize: 24, fontWeight: 500,
+              letterSpacing: "0.2em", textTransform: "uppercase",
               color: "rgba(255,255,255,0.7)",
             }}
           >
-            {tier.label} tier · @{handle}
+            {tier.label} tier · @{slug}
           </div>
           <div
             style={{
-              fontSize: 110,
-              fontWeight: 700,
-              lineHeight: 0.98,
-              letterSpacing: "-0.04em",
-              maxWidth: 1040,
+              fontSize: 110, fontWeight: 700, lineHeight: 0.98,
+              letterSpacing: "-0.04em", maxWidth: 1040,
             }}
           >
             {displayName}&apos;s member profile
@@ -134,11 +97,8 @@ export default async function MemberProfileOpengraphImage({
           {founderCount > 0 ? (
             <div
               style={{
-                display: "flex",
-                fontSize: 28,
-                fontWeight: 500,
-                color: "rgba(255,255,255,0.88)",
-                marginTop: 6,
+                display: "flex", fontSize: 28, fontWeight: 500,
+                color: "rgba(255,255,255,0.88)", marginTop: 6,
               }}
             >
               🌟 Founding Member · {founderForLine}
@@ -147,11 +107,8 @@ export default async function MemberProfileOpengraphImage({
           ) : (
             <div
               style={{
-                display: "flex",
-                fontSize: 28,
-                fontWeight: 500,
-                color: "rgba(255,255,255,0.78)",
-                marginTop: 6,
+                display: "flex", fontSize: 28, fontWeight: 500,
+                color: "rgba(255,255,255,0.78)", marginTop: 6,
               }}
             >
               Skip the line. Earn the perks. Become a regular.
@@ -159,39 +116,22 @@ export default async function MemberProfileOpengraphImage({
           )}
         </div>
 
-        {/* Bottom — points + claim CTA */}
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            fontSize: 22,
-            color: "rgba(255,255,255,0.85)",
-            position: "relative",
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            fontSize: 22, color: "rgba(255,255,255,0.85)", position: "relative",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "baseline",
-              gap: 12,
-            }}
-          >
-            <span style={{ fontSize: 40, fontWeight: 700 }}>
-              {points.toLocaleString()}
-            </span>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
+            <span style={{ fontSize: 40, fontWeight: 700 }}>{points.toLocaleString()}</span>
             <span style={{ fontSize: 22, opacity: 0.7 }}>points earned</span>
           </div>
           <div
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "12px 22px",
-              borderRadius: 999,
+              display: "flex", alignItems: "center", gap: 8,
+              padding: "12px 22px", borderRadius: 999,
               background: `linear-gradient(135deg, ${tier.from}, ${tier.to})`,
-              fontWeight: 600,
-              color: "#050b1f",
+              fontWeight: 600, color: "#050b1f",
             }}
           >
             Build yours →

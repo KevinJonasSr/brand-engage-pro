@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getMemberProfileByHandle } from "@/lib/data/member-profile";
+import { getMemberProfileBySlug } from "@/lib/data/member-profile";
 import ShareButton from "@/components/share-button";
 
 export const dynamic = "force-dynamic";
@@ -26,13 +26,13 @@ function formatMemberSince(iso: string): string {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ handle: string }>;
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const { handle } = await params;
-  const profile = await getMemberProfileByHandle(handle);
+  const { slug } = await params;
+  const profile = await getMemberProfileBySlug(slug);
   if (!profile) return { title: "Member profile · Brand Engage Pro" };
 
-  const name = profile.firstName ?? profile.handle;
+  const name = profile.firstName ?? profile.profileSlug;
   const founderCount = profile.founderBadges.length;
   const desc = founderCount
     ? `${name}'s member profile · ${getTierStyle(profile.tier).label} tier · Founding Member of ${profile.founderBadges
@@ -43,10 +43,10 @@ export async function generateMetadata({
   return {
     title: `${name} · Brand Engage Pro`,
     description: desc,
-    alternates: { canonical: `/members/${profile.handle}` },
+    alternates: { canonical: `/members/${profile.profileSlug}` },
     openGraph: {
       type: "profile",
-      url: `/members/${profile.handle}`,
+      url: `/members/${profile.profileSlug}`,
       siteName: "Brand Engage Pro",
       title: `${name}'s member profile · Brand Engage Pro`,
       description: desc,
@@ -62,23 +62,28 @@ export async function generateMetadata({
 export default async function MemberProfilePage({
   params,
 }: {
-  params: Promise<{ handle: string }>;
+  params: Promise<{ slug: string }>;
 }) {
-  const { handle } = await params;
-  const profile = await getMemberProfileByHandle(handle);
+  const { slug } = await params;
+  const profile = await getMemberProfileBySlug(slug);
   if (!profile) notFound();
 
   const tier = getTierStyle(profile.tier);
   const initial = (profile.firstName?.[0] ?? "M").toUpperCase();
-  const displayName = profile.firstName ?? profile.handle;
+  const displayName = profile.firstName ?? profile.profileSlug;
   const appUrl =
     process.env.NEXT_PUBLIC_APP_URL ?? "https://brand-engage-pro.vercel.app";
-  const profileUrl = `${appUrl}/members/${profile.handle}`;
+  const profileUrl = `${appUrl}/members/${profile.profileSlug}`;
   const shareTitle = `${displayName}'s member profile on Brand Engage Pro`;
   const founderLine = profile.founderBadges.length
     ? `Founding Member of ${profile.founderBadges.map((f) => f.communityName).join(", ")}.`
     : "";
   const shareText = `${shareTitle}. ${founderLine} ${profile.totalPoints.toLocaleString()} pts · ${tier.label} tier. ${profileUrl}`;
+
+  // Pretty-print social handles (currently the onboarding wizard
+  // collects one combined "TikTok or Instagram" value; future fields
+  // can drop into this same block).
+  const socialHandle = profile.socials.instagram_or_tiktok?.trim();
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-12">
@@ -122,8 +127,13 @@ export default async function MemberProfilePage({
               {displayName}
             </h1>
             <p className="mt-2 text-sm text-white/65">
-              @{profile.handle} · Member since {formatMemberSince(profile.memberSince)}
+              @{profile.profileSlug} · Member since {formatMemberSince(profile.memberSince)}
             </p>
+            {socialHandle && (
+              <p className="mt-1 text-xs text-white/55">
+                Find them on TikTok/Instagram: {socialHandle}
+              </p>
+            )}
           </div>
         </div>
 
@@ -160,7 +170,6 @@ export default async function MemberProfilePage({
         </div>
       </section>
 
-      {/* ─── Founder badges (most-shareable, surfaced first) ──────── */}
       {profile.founderBadges.length > 0 && (
         <section className="mt-12 space-y-4">
           <h2
@@ -205,7 +214,6 @@ export default async function MemberProfilePage({
         </section>
       )}
 
-      {/* ─── All badges grid ─────────────────────────────────────────── */}
       {profile.badges.length > 0 && (
         <section className="mt-12 space-y-4">
           <h2
@@ -240,7 +248,6 @@ export default async function MemberProfilePage({
         </section>
       )}
 
-      {/* ─── Brands followed ─────────────────────────────────────────── */}
       {profile.brands.length > 0 && (
         <section className="mt-12 space-y-4">
           <h2
@@ -263,7 +270,6 @@ export default async function MemberProfilePage({
         </section>
       )}
 
-      {/* ─── Empty state if there's truly nothing to show ────────────── */}
       {profile.founderBadges.length === 0 &&
         profile.badges.length === 0 &&
         profile.brands.length === 0 && (
@@ -281,7 +287,6 @@ export default async function MemberProfilePage({
           </section>
         )}
 
-      {/* ─── Closing CTA ─────────────────────────────────────────────── */}
       <section className="mt-16 rounded-3xl border border-white/10 bg-white/5 p-6 text-center">
         <p className="text-sm font-medium text-white/85">
           Want a profile of your own?

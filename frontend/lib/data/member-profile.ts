@@ -5,23 +5,21 @@ import { createAdminClient } from "@/lib/supabase/admin";
  *
  * Returns ONLY public-safe fields — never email, phone, stripe ids,
  * last login, moderation flags, or anything else that could be used
- * for harassment, account discovery, or impersonation. The list of
- * what's safe is intentionally short:
+ * for harassment, account discovery, or impersonation.
  *
- *   - handle (the URL slug — public by definition)
- *   - first name (no last name unless they explicitly add one later)
- *   - avatar
- *   - tier
- *   - total points
- *   - member-since date
- *   - founder badges with founder number + community
- *   - regular badges with award date
- *   - brands they follow
+ * Schema notes (post 0033):
+ *   - profile_slug    URL-safe slug used by /members/<slug>
+ *   - socials (jsonb) social handles, e.g. {"instagram_or_tiktok": "@x"}
+ *   - handle (legacy) deprecated; null for new rows after 0033 trigger
  *
- * If public_profile_enabled is false the function returns null and the
- * route should 404 — opt-out support without leaking that the handle
- * exists.
+ * If public_profile_enabled is false the function returns null and
+ * the route 404s — opt-out without leaking that the slug exists.
  */
+
+export interface MemberSocials {
+  instagram_or_tiktok?: string | null;
+  // future: instagram, tiktok, twitter, threads, youtube, etc.
+}
 
 export interface PublicFounderBadge {
   communitySlug: string;
@@ -44,42 +42,35 @@ export interface PublicBrand {
 }
 
 export interface PublicMemberProfile {
-  handle: string;
+  profileSlug: string;
   firstName: string | null;
   avatarUrl: string | null;
   tier: string;
   totalPoints: number;
   memberSince: string;
+  socials: MemberSocials;
   founderBadges: PublicFounderBadge[];
   badges: PublicBadge[];
   brands: PublicBrand[];
 }
 
-export async function getMemberProfileByHandle(
-  handle: string,
+export async function getMemberProfileBySlug(
+  slug: string,
 ): Promise<PublicMemberProfile | null> {
   const admin = createAdminClient();
-  const normalized = handle.toLowerCase();
+  const normalized = slug.toLowerCase();
 
-  // 1. Resolve handle → member. ilike covers case variation; the unique
-  //    index added in 0032 is already lower(handle) so this is fast.
   const { data: member, error: memberError } = await admin
     .from("members")
     .select(
-      "id, handle, first_name, avatar_url, current_tier, total_points, created_at, public_profile_enabled",
+      "id, profile_slug, first_name, avatar_url, current_tier, total_points, created_at, public_profile_enabled, socials",
     )
-    .ilike("handle", normalized)
+    .ilike("profile_slug", normalized)
     .maybeSingle();
 
   if (memberError || !member) return null;
-  // Opt-out: treat as 404 from the caller's perspective.
   if (member.public_profile_enabled === false) return null;
 
-  // Run the three follow-up queries in parallel.
-  // Note BEP schema differences from FE:
-  //   - member_community_memberships.community_id references communities.slug (text)
-  //   - member_brand_following keys on brand_slug (text), joins brands directly
-  //   - member_badges joins badges via badge_slug
   const [founderRes, badgesRes, followingRes] = await Promise.all([
     admin
       .from("member_community_memberships")
@@ -100,9 +91,6 @@ export async function getMemberProfileByHandle(
       .eq("member_id", member.id),
   ]);
 
-  // Supabase's typed select inference for nested !inner joins can be
-  // wonky depending on table relations metadata; we narrow with an
-  // explicit cast so the rest of the function stays clean.
   type FounderRow = {
     community_id: string;
     founder_number: number;
@@ -117,21 +105,20 @@ export async function getMemberProfileByHandle(
     earned_at: string;
     badges: { slug: string; name: string; description: string | null };
   };
-  type FollowRow = {
-    brands: { slug: string; name: string };
-  };
+  type FollowRow = { brands: { slug: string; name: string } };
 
   const founders = (founderRes.data ?? []) as unknown as FounderRow[];
   const badges = (badgesRes.data ?? []) as unknown as BadgeRow[];
   const following = (followingRes.data ?? []) as unknown as FollowRow[];
 
   return {
-    handle: member.handle,
+    profileSlug: member.profile_slug as string,
     firstName: member.first_name as string | null,
     avatarUrl: member.avatar_url as string | null,
     tier: (member.current_tier as string | null) ?? "bronze",
     totalPoints: (member.total_points as number | null) ?? 0,
     memberSince: member.created_at as string,
+    socials: ((member.socials as MemberSocials | null) ?? {}) as MemberSocials,
     founderBadges: founders.map((m) => ({
       communitySlug: m.communities.slug,
       communityName: m.communities.display_name,
@@ -154,18 +141,16 @@ export async function getMemberProfileByHandle(
 
 /**
  * Lookup helper for the user menu. Given a member id, return their
- * current handle so the dropdown can link to /members/<handle>. Cheap
- * single-row lookup; falls back to null if the member isn't in the
- * members table yet (e.g. mid-signup race).
+ * current profile_slug so the dropdown can link to /members/<slug>.
  */
-export async function getMemberHandle(
+export async function getMemberProfileSlug(
   memberId: string,
 ): Promise<string | null> {
   const admin = createAdminClient();
   const { data } = await admin
     .from("members")
-    .select("handle")
+    .select("profile_slug")
     .eq("id", memberId)
     .maybeSingle();
-  return (data?.handle as string | null) ?? null;
+  return (data?.profile_slug as string | null) ?? null;
 }

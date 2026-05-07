@@ -39,21 +39,42 @@ export async function POST(request: Request) {
     const payload = (await request.json()) as OnboardPayload;
 
     // 1. Update the member's profile row (created by the auth trigger).
+    //
+    // The onboarding wizard's "TikTok or Instagram handle" field arrives
+    // as payload.handle. We do NOT write that to members.handle (legacy)
+    // — instead we merge it into the socials jsonb column so social
+    // identifiers stay in their own field. The URL slug column,
+    // members.profile_slug, is owned by the BEFORE INSERT trigger.
+    let socialsMerge: Record<string, unknown> | undefined = undefined;
+    if (typeof payload.handle === "string" && payload.handle.trim()) {
+      const { data: existing } = await supabase
+        .from("members")
+        .select("socials")
+        .eq("id", user.id)
+        .maybeSingle();
+      socialsMerge = {
+        ...((existing?.socials as Record<string, unknown> | null) ?? {}),
+        instagram_or_tiktok: payload.handle.trim(),
+      };
+    }
+
+    const updates: Record<string, unknown> = {
+      first_name: payload.firstName ?? null,
+      last_name: payload.lastName ?? null,
+      city: payload.city ?? null,
+      phone: payload.phone ?? null,
+      favorite_brand: payload.favoriteBrand ?? null,
+      interest: payload.interest ?? null,
+      sms_opted_in: Boolean(payload.smsOptedIn),
+      email_opted_in: Boolean(payload.emailOptedIn),
+      consent_accepted_at: payload.consentAcceptedAt ?? new Date().toISOString(),
+      consent_version: payload.consentVersion ?? null,
+    };
+    if (socialsMerge !== undefined) updates.socials = socialsMerge;
+
     const { data: member, error: updateErr } = await supabase
       .from("members")
-      .update({
-        first_name: payload.firstName ?? null,
-        last_name: payload.lastName ?? null,
-        city: payload.city ?? null,
-        phone: payload.phone ?? null,
-        handle: payload.handle ?? null,
-        favorite_brand: payload.favoriteBrand ?? null,
-        interest: payload.interest ?? null,
-        sms_opted_in: Boolean(payload.smsOptedIn),
-        email_opted_in: Boolean(payload.emailOptedIn),
-        consent_accepted_at: payload.consentAcceptedAt ?? new Date().toISOString(),
-        consent_version: payload.consentVersion ?? null,
-      })
+      .update(updates)
       .eq("id", user.id)
       .select()
       .single();

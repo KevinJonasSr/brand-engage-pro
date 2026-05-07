@@ -470,3 +470,14 @@ Until all of the above are done, signup is email-only.
 
 The DB-side opt-out works (set `public_profile_enabled = false`) but no UI exists yet. Add a toggle on `/me` or `/me/settings` in a follow-up bundle.
 
+## 🔧 Handle / socials refactor (Bundle 2.5)
+
+The previous `members.handle` column was overloaded — onboarding wizard wrote a TikTok/Instagram handle to it, AND the public profile feature used it as a URL slug. Migration 0033 splits the two:
+
+- **`members.socials`** (jsonb) — social handles. Onboarding's "TikTok or Instagram handle" field now lands at `socials.instagram_or_tiktok`.
+- **`members.profile_slug`** (text) — URL slug for `/members/<slug>`. Trigger generates `firstname-XXXX` on insert.
+- **`members.handle`** (legacy) — kept as a deprecated column. Values that looked like social handles (started with `@` or had non-slug characters) were moved to socials and the source nulled. Drop after the next clean release.
+
+**Run**: `supabase/migrations/0033_socials_and_profile_slug.sql` in BEP Supabase project `enfpviapxvqyoarwwsuf`.
+**Verify**: `select count(*) filter (where profile_slug is null), count(*) from public.members;` → expect (0, total).
+
