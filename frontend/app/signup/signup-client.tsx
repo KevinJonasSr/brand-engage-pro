@@ -282,7 +282,28 @@ export default function SignupPage({
           </button>
         </form>
 
-        {message && (
+        {status === "confirm" && (
+          <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4">
+            <p className="text-sm font-semibold text-emerald-200">
+              Almost there — what happens next:
+            </p>
+            <ol className="mt-3 space-y-2 text-xs text-emerald-100/90">
+              <li className="flex gap-2">
+                <span className="font-mono text-emerald-300/70">1.</span>
+                <span>Check your email and click the confirmation link we just sent.</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="font-mono text-emerald-300/70">2.</span>
+                <span>Set up your member profile — 60 seconds, no credit card.</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="font-mono text-emerald-300/70">3.</span>
+                <span>Unlock your first member perk and start earning points.</span>
+              </li>
+            </ol>
+          </div>
+        )}
+        {message && status !== "confirm" && (
           <p
             className={`text-sm ${
               status === "error" ? "text-red-300" : "text-emerald-300"
@@ -292,6 +313,17 @@ export default function SignupPage({
           </p>
         )}
 
+        <p className="text-center text-[11px] text-white/40">
+          By creating an account, you agree to our{" "}
+          <Link href="/terms" className="underline-offset-4 hover:underline hover:text-white/60">
+            Terms
+          </Link>{" "}
+          and{" "}
+          <Link href="/privacy" className="underline-offset-4 hover:underline hover:text-white/60">
+            Privacy Policy
+          </Link>
+          .
+        </p>
         <p className="text-center text-sm text-white/60">
           Already have an account?{" "}
           <Link href="/login" className="text-white underline-offset-4 hover:underline">

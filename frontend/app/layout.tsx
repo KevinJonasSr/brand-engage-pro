@@ -8,6 +8,7 @@ import InstallPrompt from "@/components/install-prompt";
 import PremiumBadge from "@/components/premium-badge";
 import AdminPill from "@/components/admin-pill";
 import UserMenu from "@/components/user-menu";
+import { MobileNav } from "@/components/mobile-nav";
 import { getMemberProfileSlug } from "@/lib/data/member-profile";
 import { createClient } from "@/lib/supabase/server";
 import { getUnreadCount } from "@/lib/data/notifications";
@@ -150,18 +151,21 @@ export default async function RootLayout({
     >
       <body className="min-h-full bg-midnight text-white">
         <header className="sticky top-0 z-40 border-b border-white/10 bg-midnight/80 backdrop-blur">
-          <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
-            <Link href="/" className="flex items-center gap-2">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-aurora to-ember text-[10px] font-bold tracking-wider">
-                BEP
-              </span>
-              <span
-                className="text-lg font-semibold"
-                style={{ fontFamily: "var(--font-display)" }}
-              >
-                Brand Engage Pro
-              </span>
-            </Link>
+          <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
+            <div className="flex items-center gap-3">
+              <Link href="/" className="flex items-center gap-2">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-aurora to-ember text-[10px] font-bold tracking-wider">
+                  BEP
+                </span>
+                <span
+                  className="text-lg font-semibold"
+                  style={{ fontFamily: "var(--font-display)" }}
+                >
+                  Brand Engage Pro
+                </span>
+              </Link>
+              <MobileNav navItems={navItems} />
+            </div>
             <nav className="hidden items-center gap-1 text-sm text-white/70 md:flex">
               {navItems.map((item) => (
                 <Link

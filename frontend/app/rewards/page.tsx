@@ -100,7 +100,9 @@ export default async function RewardsPage() {
             <h1 className="mt-2 text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
               {nextTier
                 ? `${formatPts(toNext)} away from ${nextTier.display_name}`
-                : "You're at max tier"}
+                : isSignedIn
+                  ? "You're at max tier"
+                  : "Preview the member tier journey"}
             </h1>
             <p className="mt-4 text-sm text-white/70">
               Keep stacking points to unlock {nextTier?.display_name ?? "more"}-only experiences.
