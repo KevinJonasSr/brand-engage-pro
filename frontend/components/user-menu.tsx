@@ -9,6 +9,7 @@ interface UserMenuProps {
     email: string | null | undefined;
     first_name: string | null;
     avatar_url: string | null;
+    handle: string | null;
   } | null;
   isAdmin: boolean;
   unreadCount?: number;
@@ -110,6 +111,18 @@ export default function UserMenu({ member, isAdmin, unreadCount = 0 }: UserMenuP
             >
               Member home
             </Link>
+
+            {/* My Profile */}
+            {member.handle && (
+              <Link
+                href={`/members/${member.handle}`}
+                className="block px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition"
+                role="menuitem"
+                onClick={() => setIsOpen(false)}
+              >
+                My profile
+              </Link>
+            )}
 
             {/* My Rewards */}
             <Link

@@ -8,6 +8,7 @@ import InstallPrompt from "@/components/install-prompt";
 import PremiumBadge from "@/components/premium-badge";
 import AdminPill from "@/components/admin-pill";
 import UserMenu from "@/components/user-menu";
+import { getMemberHandle } from "@/lib/data/member-profile";
 import { createClient } from "@/lib/supabase/server";
 import { getUnreadCount } from "@/lib/data/notifications";
 import { getCurrentCommunityId } from "@/lib/community";
@@ -109,7 +110,9 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = await getCurrentUserSafe();
+  const userBase = await getCurrentUserSafe();
+  const memberHandle = userBase ? await getMemberHandle(userBase.id) : null;
+  const user = userBase ? { ...userBase, handle: memberHandle } : null;
   // Unread inbox count + premium entitlement are only meaningful for
   // signed-in members. Both are wrapped so a transient DB hiccup never
   // breaks the header render.

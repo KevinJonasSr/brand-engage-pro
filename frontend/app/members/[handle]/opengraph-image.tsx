@@ -1,0 +1,204 @@
+import { ImageResponse } from "next/og";
+import { getMemberProfileByHandle } from "@/lib/data/member-profile";
+
+// ─── Per-member OG card ─────────────────────────────────────────────
+// "[Name]'s member profile" share preview. Keeps the same visual
+// language as brand + founder OG cards so links from a single member's
+// network feel like one ecosystem. 1200x630.
+
+export const runtime = "edge";
+export const size = { width: 1200, height: 630 };
+export const contentType = "image/png";
+export const alt = "Member profile on Brand Engage Pro";
+
+const TIER_COLORS: Record<string, { from: string; to: string; label: string }> = {
+  bronze: { from: "#a16207", to: "#fbbf24", label: "Bronze" },
+  silver: { from: "#94a3b8", to: "#e2e8f0", label: "Silver" },
+  gold: { from: "#ca8a04", to: "#fde68a", label: "Gold" },
+  platinum: { from: "#e0e7ff", to: "#c7d2fe", label: "Platinum" },
+};
+
+export default async function MemberProfileOpengraphImage({
+  params,
+}: {
+  params: { handle: string };
+}) {
+  const profile = await getMemberProfileByHandle(params.handle).catch(() => null);
+
+  // Friendly fallback so a stale-cached share preview never 500s.
+  const displayName = profile?.firstName ?? "Member";
+  const handle = profile?.handle ?? params.handle;
+  const tier = TIER_COLORS[(profile?.tier ?? "bronze").toLowerCase()] ?? TIER_COLORS.bronze;
+  const points = profile?.totalPoints ?? 0;
+  const founderCount = profile?.founderBadges.length ?? 0;
+  const founderForLine = profile?.founderBadges
+    .slice(0, 3)
+    .map((f) => f.communityName)
+    .join(" · ");
+
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          width: "100%",
+          height: "100%",
+          padding: "70px",
+          background: "#050b1f",
+          color: "white",
+          fontFamily: "sans-serif",
+          position: "relative",
+        }}
+      >
+        {/* Tier-colored corner glow */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            background:
+              `radial-gradient(circle at 18% 12%, ${tier.from}aa, transparent 55%), ` +
+              `radial-gradient(circle at 82% 90%, ${tier.to}aa, transparent 60%), ` +
+              "linear-gradient(180deg, rgba(5,11,31,0.4), rgba(5,11,31,0.85))",
+          }}
+        />
+
+        {/* Top — brand pill */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 14,
+            position: "relative",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              width: 52,
+              height: 52,
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 999,
+              background: `linear-gradient(135deg, ${tier.from}, ${tier.to})`,
+              fontSize: 20,
+              fontWeight: 700,
+            }}
+          >
+            BEP
+          </div>
+          <div
+            style={{
+              fontSize: 24,
+              fontWeight: 600,
+              opacity: 0.85,
+            }}
+          >
+            Brand Engage Pro
+          </div>
+        </div>
+
+        {/* Center — name + tier badge */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 14,
+            position: "relative",
+          }}
+        >
+          <div
+            style={{
+              fontSize: 24,
+              fontWeight: 500,
+              letterSpacing: "0.2em",
+              textTransform: "uppercase",
+              color: "rgba(255,255,255,0.7)",
+            }}
+          >
+            {tier.label} tier · @{handle}
+          </div>
+          <div
+            style={{
+              fontSize: 110,
+              fontWeight: 700,
+              lineHeight: 0.98,
+              letterSpacing: "-0.04em",
+              maxWidth: 1040,
+            }}
+          >
+            {displayName}&apos;s member profile
+          </div>
+          {founderCount > 0 ? (
+            <div
+              style={{
+                display: "flex",
+                fontSize: 28,
+                fontWeight: 500,
+                color: "rgba(255,255,255,0.88)",
+                marginTop: 6,
+              }}
+            >
+              🌟 Founding Member · {founderForLine}
+              {founderCount > 3 ? ` · +${founderCount - 3} more` : ""}
+            </div>
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                fontSize: 28,
+                fontWeight: 500,
+                color: "rgba(255,255,255,0.78)",
+                marginTop: 6,
+              }}
+            >
+              Skip the line. Earn the perks. Become a regular.
+            </div>
+          )}
+        </div>
+
+        {/* Bottom — points + claim CTA */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            fontSize: 22,
+            color: "rgba(255,255,255,0.85)",
+            position: "relative",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "baseline",
+              gap: 12,
+            }}
+          >
+            <span style={{ fontSize: 40, fontWeight: 700 }}>
+              {points.toLocaleString()}
+            </span>
+            <span style={{ fontSize: 22, opacity: 0.7 }}>points earned</span>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "12px 22px",
+              borderRadius: 999,
+              background: `linear-gradient(135deg, ${tier.from}, ${tier.to})`,
+              fontWeight: 600,
+              color: "#050b1f",
+            }}
+          >
+            Build yours →
+          </div>
+        </div>
+      </div>
+    ),
+    { ...size },
+  );
+}

@@ -449,3 +449,24 @@ Until all of the above are done, signup is email-only.
 - [ ] Share trigger on rewards redeem success state.
 - [ ] Award founder-member badge using `award_badge` RPC with `p_member_id` (BEP) — confirm slug `founder-member` exists in BEP `badges` table.
 
+## 👤 Public member profile pages (mirrored from Fan Engage)
+
+- [x] Migration 0032 — adds `handle` + `public_profile_enabled` to `members`, with backfill + unique index + BEFORE INSERT trigger.
+- [ ] **Run 0032 in BEP Supabase** (project `enfpviapxvqyoarwwsuf`). Verify with: `select count(*) filter (where handle is null), count(*) from public.members;` → expect (0, total).
+- [x] `lib/data/member-profile.ts` — public-only data fetcher. Strips email, phone, stripe ids, last login, moderation flags. Returns `null` on opt-out so the route 404s without confirming handle existence.
+- [x] `/members/[handle]/page.tsx` — header, stats, founder badges, regular badges, brands followed, ShareButton.
+- [x] `/members/[handle]/opengraph-image.tsx` — tier-colored 1200x630 OG card with founder count.
+- [x] UserMenu — "My profile" link wired up when `member.handle` is set.
+
+### Manual smoke test after deploy
+
+1. Sign in as a real member.
+2. Open the user menu → click "My profile" → verify the page renders.
+3. Visit `/members/<your-handle>/opengraph-image` → verify PNG renders with tier color.
+4. Toggle `public_profile_enabled = false` for a test member in Supabase → reload `/members/<that-handle>` → expect 404.
+5. Paste `/members/<your-handle>` in iMessage/Slack → verify member-profile preview unfurls.
+
+### Future opt-out UI
+
+The DB-side opt-out works (set `public_profile_enabled = false`) but no UI exists yet. Add a toggle on `/me` or `/me/settings` in a follow-up bundle.
+
