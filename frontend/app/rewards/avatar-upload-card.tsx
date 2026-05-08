@@ -7,11 +7,9 @@ import ImageUploader from "@/components/image-uploader";
 export default function AvatarUploadCard({
   initialUrl,
   firstName,
-  email,
 }: {
   initialUrl: string | null;
   firstName: string | null;
-  email: string | null;
 }) {
   const router = useRouter();
   const [url, setUrl] = useState<string | null>(initialUrl);
@@ -29,12 +27,16 @@ export default function AvatarUploadCard({
           />
         ) : (
           <span className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-aurora to-ember text-lg font-bold">
-            {(firstName?.[0] ?? email?.[0] ?? "F").toUpperCase()}
+            {(firstName?.[0] ?? "F").toUpperCase()}
           </span>
         )}
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold">{firstName ?? "Member"}</p>
-          <p className="truncate text-xs text-white/60">{email ?? ""}</p>
+          <p className="truncate text-xs text-white/50">
+            <a href="/me/privacy" className="hover:text-white/80 underline-offset-2 hover:underline">
+              Privacy settings →
+            </a>
+          </p>
         </div>
       </div>
       <div className="mt-4">
