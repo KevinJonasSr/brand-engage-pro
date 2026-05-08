@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAdminUser } from "@/lib/admin";
 import { sendEventReminder, type ReminderWindowEvent } from "@/lib/reminders";
+import { parseSocialLines } from "@/lib/socials/parse";
 
 async function requireAdmin() {
   const admin = await getAdminUser();
@@ -62,16 +63,10 @@ export async function updateBrandAction(formData: FormData) {
         .map((g) => g.trim())
         .filter(Boolean)
     : [];
-  // Social is two parallel text areas in the form: one per "label|href" line.
-  const social = socialRaw
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const [label, ...rest] = line.split("|");
-      return { label: (label ?? "").trim(), href: rest.join("|").trim() };
-    })
-    .filter((s) => s.label && s.href);
+  // Social is one entry per textarea line. parseSocialLines accepts both
+  // "Label | URL" (legacy explicit) and bare URLs (auto-detects label from
+  // domain). See lib/socials/parse.ts for the full format spec.
+  const social = parseSocialLines(socialRaw);
   const supa = createAdminClient();
   await supa
     .from("brands")

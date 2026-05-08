@@ -160,11 +160,18 @@ export default function BrandEditForm({
       <Field label="Social links">
         <textarea
           name="social"
-          rows={3}
+          rows={4}
           defaultValue={initial.socialText}
-          placeholder="Format: Label | URL (one per line)&#10;Instagram | https://instagram.com/brand&#10;TikTok | https://tiktok.com/@brand"
+          placeholder="One link per line. Paste full URLs — labels auto-detect:&#10;https://instagram.com/brand&#10;https://tiktok.com/@brand&#10;https://facebook.com/brand"
           className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
         />
+        <p className="mt-1 text-[11px] text-white/50">
+          Recognized brands: Instagram, TikTok, Facebook, YouTube, X / Twitter,
+          Threads, Spotify, Apple Music, SoundCloud, LinkedIn, Pinterest,
+          Snapchat. Other URLs render as a labeled pill. Explicit format
+          <code className="mx-1 rounded bg-white/10 px-1">Label | URL</code>
+          still works.
+        </p>
       </Field>
       <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
         <label className="flex items-center gap-2 text-xs text-white/70">
