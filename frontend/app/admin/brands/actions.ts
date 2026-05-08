@@ -46,6 +46,10 @@ export async function updateBrandAction(formData: FormData) {
   const tagline = String(formData.get("tagline") ?? "").trim();
   const bio = String(formData.get("bio") ?? "").trim();
   const heroImage = String(formData.get("hero_image") ?? "").trim();
+  const heroFocalX = parseInt(String(formData.get("hero_focal_x") ?? "50"), 10);
+  const heroFocalY = parseInt(String(formData.get("hero_focal_y") ?? "50"), 10);
+  const clampFocal = (n: number) =>
+    Math.max(0, Math.min(100, Number.isFinite(n) ? n : 50));
   const accentFrom = String(formData.get("accent_from") ?? "#7c3aed").trim();
   const accentTo = String(formData.get("accent_to") ?? "#f97316").trim();
   const genresRaw = String(formData.get("genres") ?? "").trim();
@@ -76,6 +80,8 @@ export async function updateBrandAction(formData: FormData) {
       tagline: tagline || null,
       bio: bio || null,
       hero_image: heroImage || null,
+      hero_focal_x: clampFocal(heroFocalX),
+      hero_focal_y: clampFocal(heroFocalY),
       accent_from: accentFrom,
       accent_to: accentTo,
       genres,

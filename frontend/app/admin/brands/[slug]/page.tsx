@@ -31,7 +31,7 @@ export default async function AdminBrandEditPage({
   const admin = createAdminClient();
   const { data: brand } = await admin
     .from("brands")
-    .select("slug, name, tagline, bio, hero_image, accent_from, accent_to, genres, social, active, sort_order")
+    .select("slug, name, tagline, bio, hero_image, hero_focal_x, hero_focal_y, accent_from, accent_to, genres, social, active, sort_order")
     .eq("slug", slug)
     .maybeSingle();
 
@@ -92,6 +92,8 @@ export default async function AdminBrandEditPage({
           tagline: (brand.tagline as string | null) ?? "",
           bio: (brand.bio as string | null) ?? "",
           heroImage: (brand.hero_image as string | null) ?? null,
+          heroFocalX: (brand.hero_focal_x as number | null) ?? 50,
+          heroFocalY: (brand.hero_focal_y as number | null) ?? 50,
           accentFrom: (brand.accent_from as string) ?? "#7c3aed",
           accentTo: (brand.accent_to as string) ?? "#f97316",
           genresText,

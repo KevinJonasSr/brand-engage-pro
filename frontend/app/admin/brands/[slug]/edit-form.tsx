@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ImageUploader from "@/components/image-uploader";
+import FocalPointPicker from "@/components/focal-point-picker";
 import { useFormSave, SaveStatusIndicator } from "@/lib/use-form-save";
 import { updateBrandAction } from "../actions";
 
@@ -11,6 +12,8 @@ type InitialValues = {
   tagline: string;
   bio: string;
   heroImage: string | null;
+  heroFocalX: number;
+  heroFocalY: number;
   accentFrom: string;
   accentTo: string;
   genresText: string;
@@ -28,6 +31,8 @@ export default function BrandEditForm({
 }) {
   const router = useRouter();
   const [heroImage, setHeroImage] = useState<string | null>(initial.heroImage);
+  const [focalX, setFocalX] = useState(initial.heroFocalX);
+  const [focalY, setFocalY] = useState(initial.heroFocalY);
   const [accentFrom, setAccentFrom] = useState(initial.accentFrom);
   const [accentTo, setAccentTo] = useState(initial.accentTo);
 
@@ -39,6 +44,8 @@ export default function BrandEditForm({
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     formData.set("hero_image", heroImage ?? "");
+    formData.set("hero_focal_x", String(focalX));
+    formData.set("hero_focal_y", String(focalY));
     formData.set("accent_from", accentFrom);
     formData.set("accent_to", accentTo);
     await submit(updateBrandAction, formData);
@@ -81,6 +88,17 @@ export default function BrandEditForm({
           initialUrl={heroImage}
           label={heroImage ? "Replace hero" : "Upload hero image"}
           onUploaded={setHeroImage}
+        />
+      </Field>
+      <Field label="Focal point">
+        <FocalPointPicker
+          imageUrl={heroImage}
+          focalX={focalX}
+          focalY={focalY}
+          onChange={(x, y) => {
+            setFocalX(x);
+            setFocalY(y);
+          }}
         />
       </Field>
       <div className="grid gap-3 md:grid-cols-4">
