@@ -19,18 +19,14 @@ import SocialIcon from "@/components/social-icon";
 import FollowButton from "./follow-button";
 import ShareButton from "@/components/share-button";
 import RsvpButton from "./rsvp-button";
+import { focalPointStyle } from "@/lib/images/focal-point";
 
 import { BrandPredictionsSection } from "@/components/predictions/brand-predictions-section";
 export const dynamic = "force-dynamic";
 
-// Per-brand hero focal-y overrides. The default (30%) is biased to keep
-// faces visible in portrait brand photos. Restaurants and product shots
-// often need a different anchor — Nellie's signage shot is bottom-heavy,
-// so anchor at the bottom to keep the sign above the title/CTA overlay.
-// Promote to a `hero_focal_y` column on brands when this list grows.
-const HERO_FOCAL_Y: Record<string, string> = {
-  nellies: "bottom",
-};
+// Per-brand hero focal-point now comes from brands.hero_focal_x /
+// .hero_focal_y (migration 0034), exposed on Brand via heroFocalX /
+// heroFocalY. focalPointStyle() falls back to 50/50 when not set.
 
 export async function generateStaticParams() {
   // Static-params still uses the hardcoded list so builds don't need DB creds.
@@ -154,15 +150,10 @@ export default async function BrandPage({
             <img
               src={brand.heroImage}
               alt=""
-              // Bias the focal point to ~30% from the top so portrait brand
-              // photos keep the face visible in this wide hero. The default
-              // `object-position: center` (50%) crops too low (slices heads
-              // off the top); `object-top` (0%) crops too high (shows only
-              // sky/background above the subject). 30% lands around the
-              // upper-mid of most portrait photos where faces sit. If a
-              // specific brand's photo needs different framing, consider
-              // adding a per-brand `hero_focal_y` column.
-              style={{ objectPosition: `center ${HERO_FOCAL_Y[brand.slug] ?? "30%"}` }}
+              // Focal point comes from brands.hero_focal_x / .hero_focal_y.
+              // Default 50/50 (centered) when not set. Tweak via Supabase
+              // SQL editor or (Phase 2) the admin focal-point picker.
+              style={focalPointStyle(brand)}
               className="absolute inset-0 h-full w-full object-cover"
               aria-hidden
             />

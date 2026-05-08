@@ -4,6 +4,10 @@ export type Brand = {
   tagline: string;
   bio: string;
   heroImage: string | null; // fill when Box assets land
+  /** Focal-point x coord 0..100; falls back to 50 when not set. */
+  heroFocalX?: number;
+  /** Focal-point y coord 0..100; falls back to 50 when not set. */
+  heroFocalY?: number;
   accentFrom: string; // CSS color literal (e.g. "#f43f5e")
   accentTo: string; // CSS color literal (e.g. "#fbbf24")
   genres: string[];
