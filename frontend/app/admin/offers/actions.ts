@@ -25,6 +25,7 @@ export async function createOfferAction(formData: FormData) {
   const minTierRaw = String(formData.get("min_tier") ?? "bronze");
   const pricePointsRaw = formData.get("price_points");
   const inventoryRaw = formData.get("inventory");
+  const imageUrl = String(formData.get("image_url") ?? "").trim();
 
   if (!title || !slug) return;
 
@@ -44,8 +45,31 @@ export async function createOfferAction(formData: FormData) {
     min_tier,
     price_points: pricePointsRaw ? Number(pricePointsRaw) : null,
     inventory: inventoryRaw ? Number(inventoryRaw) : null,
+    image_url: imageUrl || null,
     active: true,
   });
+
+  revalidatePath("/admin/offers");
+  revalidatePath("/marketplace");
+  revalidatePath("/");
+}
+
+/**
+ * Update the image_url on an existing offer. Called by the inline
+ * OfferImageEditor on each row in /admin/offers — the form auto-submits
+ * once the upload completes.
+ */
+export async function updateOfferImageAction(formData: FormData) {
+  await requireAdmin();
+  const id = String(formData.get("id") ?? "");
+  const imageUrl = String(formData.get("image_url") ?? "").trim();
+  if (!id) return;
+
+  const admin = createAdminClient();
+  await admin
+    .from("offers")
+    .update({ image_url: imageUrl || null })
+    .eq("id", id);
 
   revalidatePath("/admin/offers");
   revalidatePath("/marketplace");

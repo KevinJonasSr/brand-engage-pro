@@ -1,6 +1,8 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Offer } from "@/lib/data/types";
+import ImageUploader from "@/components/image-uploader";
 import { createOfferAction, toggleOfferActiveAction } from "./actions";
+import OfferImageEditor from "./offer-image-editor";
 
 async function listAllOffers(): Promise<Offer[]> {
   try {
@@ -89,6 +91,19 @@ export default async function AdminOffersPage() {
             rows={2}
             className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm md:col-span-2"
           />
+          <div className="md:col-span-2">
+            <p className="mb-2 text-xs uppercase tracking-wide text-white/60">
+              Image / ad mat (optional)
+            </p>
+            <ImageUploader
+              bucket="community-uploads"
+              name="image_url"
+              label="Add image or ad mat"
+            />
+            <p className="mt-1 text-[11px] text-white/50">
+              Recommended: landscape, 1200×800 or larger. JPEG, PNG, WebP, or GIF.
+            </p>
+          </div>
           <button
             type="submit"
             className="rounded-full bg-gradient-to-r from-aurora to-ember px-4 py-2 text-sm font-semibold text-white md:col-span-2"
@@ -102,6 +117,7 @@ export default async function AdminOffersPage() {
         <table className="w-full text-sm">
           <thead className="bg-black/40 text-left text-xs uppercase tracking-wide text-white/50">
             <tr>
+              <th className="px-4 py-3">Image</th>
               <th className="px-4 py-3">Title</th>
               <th className="px-4 py-3">Category</th>
               <th className="px-4 py-3">Min tier</th>
@@ -113,13 +129,18 @@ export default async function AdminOffersPage() {
           <tbody>
             {offers.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-center text-white/50">
+                <td colSpan={7} className="px-4 py-6 text-center text-white/50">
                   No offers yet — create one above.
                 </td>
               </tr>
             )}
             {offers.map((o) => (
-              <tr key={o.id} className="border-t border-white/5">
+              <tr key={o.id} className="border-t border-white/5 align-top">
+                <td className="px-4 py-3">
+                  <div className="w-32">
+                    <OfferImageEditor offerId={o.id} initialUrl={o.image_url ?? null} />
+                  </div>
+                </td>
                 <td className="px-4 py-3">{o.title}</td>
                 <td className="px-4 py-3 capitalize">{o.category}</td>
                 <td className="px-4 py-3 capitalize">{o.min_tier}</td>
