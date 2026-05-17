@@ -47,13 +47,13 @@ export default function RewardCardWithForm({
         </div>
 
         {reward.requires_tier && (
-          <div className="mt-2 inline-flex rounded-full bg-amber-500/20 px-2 py-1 text-[10px] uppercase tracking-wide text-amber-300">
+          <div className="mt-2 inline-flex rounded-full bg-amber-500/20 px-2 py-1 text-xs uppercase tracking-wide text-amber-300">
             {reward.requires_tier}
           </div>
         )}
 
         {reward.stock !== null && (
-          <p className="mt-2 text-[10px] text-white/50">Only {reward.stock} left</p>
+          <p className="mt-2 text-xs text-white/50">Only {reward.stock} left</p>
         )}
 
         <button

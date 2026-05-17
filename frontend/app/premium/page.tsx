@@ -252,7 +252,7 @@ export default async function PremiumPage({
                 disabled={!user || !community.stripe_product_id}
                 className="group relative flex flex-col items-start rounded-3xl border-2 border-white/20 bg-gradient-to-br from-white/8 to-black/40 p-6 text-left transition hover:border-white/35 disabled:opacity-50"
               >
-                <span className="absolute right-4 top-4 rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+                <span className="absolute right-4 top-4 rounded-full bg-white/15 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-white">
                   Save {annualSavingsPct}%
                 </span>
                 <p className="text-xs uppercase tracking-widest text-white/50">

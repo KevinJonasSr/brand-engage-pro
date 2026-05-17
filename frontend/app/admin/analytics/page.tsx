@@ -90,7 +90,7 @@ function KpiCard({ label, value, sub }: { label: string; value: string | number;
       <p className="mt-1 text-2xl font-semibold">
         {typeof value === "number" ? value.toLocaleString() : value}
       </p>
-      {sub && <p className="mt-1 text-[11px] text-white/50">{sub}</p>}
+      {sub && <p className="mt-1 text-xs text-white/50">{sub}</p>}
     </div>
   );
 }

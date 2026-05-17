@@ -107,7 +107,7 @@ export default function ChallengeBlock({
       )}
 
       {!currentUserId && (
-        <p className="text-[11px] text-white/50">
+        <p className="text-xs text-white/50">
           Sign in to submit an entry (+3 pts).
         </p>
       )}
@@ -120,7 +120,7 @@ export default function ChallengeBlock({
                 <p className="text-xs font-semibold">
                   {e.member_first_name ?? "Anonymous member"}
                 </p>
-                <p className="text-[10px] uppercase tracking-wide text-white/40">
+                <p className="text-xs uppercase tracking-wide text-white/40">
                   {timeAgo(e.created_at)}
                 </p>
               </div>
@@ -140,7 +140,7 @@ export default function ChallengeBlock({
             </div>
           ))}
           {entries.length > 6 && (
-            <p className="text-[11px] text-white/50">
+            <p className="text-xs text-white/50">
               + {entries.length - 6} more{" "}
               {entries.length - 6 === 1 ? "entry" : "entries"}
             </p>

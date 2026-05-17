@@ -62,7 +62,7 @@ function itemBadge(kind: string, count: number) {
   };
   const tone = toneMap[kind] ?? "bg-white/10 text-white/70";
   return (
-    <span key={kind} className={`rounded-full px-2 py-0.5 text-[10px] uppercase tracking-wide ${tone}`}>
+    <span key={kind} className={`rounded-full px-2 py-0.5 text-xs uppercase tracking-wide ${tone}`}>
       {kind}
       {count > 1 && <span className="ml-1">·{count}</span>}
     </span>
@@ -110,15 +110,15 @@ export default async function AdminCampaignsPage() {
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/70">
+                      <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs uppercase tracking-wide text-white/70">
                         /{c.brand_slug as string}
                       </span>
                       {active ? (
-                        <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] uppercase tracking-wide text-emerald-200">
+                        <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs uppercase tracking-wide text-emerald-200">
                           Live
                         </span>
                       ) : (
-                        <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/50">
+                        <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs uppercase tracking-wide text-white/50">
                           Ended
                         </span>
                       )}
@@ -129,18 +129,18 @@ export default async function AdminCampaignsPage() {
                     )}
                     <div className="mt-3 flex flex-wrap gap-1.5">
                       {Object.entries(c.items).length === 0 ? (
-                        <span className="text-[11px] text-white/40">No items</span>
+                        <span className="text-xs text-white/40">No items</span>
                       ) : (
                         Object.entries(c.items).map(([kind, count]) => itemBadge(kind, count))
                       )}
                     </div>
-                    <p className="mt-2 text-[11px] text-white/40">
+                    <p className="mt-2 text-xs text-white/40">
                       {c.published_at
                         ? `Published ${new Date(c.published_at as string).toLocaleString()}`
                         : "Draft"}
                     </p>
                     {(c.broadcast.emailSent != null || c.broadcast.smsSent != null) && (
-                      <div className="mt-2 flex flex-wrap gap-3 text-[11px]">
+                      <div className="mt-2 flex flex-wrap gap-3 text-xs">
                         {c.broadcast.emailSent != null && (
                           <span className={c.broadcast.emailFailed ? "text-rose-300" : "text-emerald-300"}>
                             ✉️ {c.broadcast.emailFailed ? `failed: ${c.broadcast.emailFailed.slice(0, 60)}` : `sent · ${c.broadcast.emailSent} recipients`}

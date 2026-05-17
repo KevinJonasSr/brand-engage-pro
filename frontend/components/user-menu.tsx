@@ -79,7 +79,7 @@ export default function UserMenu({ member, isAdmin, unreadCount = 0 }: UserMenuP
             className="h-6 w-6 rounded-full object-cover"
           />
         ) : (
-          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-aurora to-ember text-[10px] font-bold">
+          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-aurora to-ember text-xs font-bold">
             {initial}
           </span>
         )}
@@ -143,7 +143,7 @@ export default function UserMenu({ member, isAdmin, unreadCount = 0 }: UserMenuP
             >
               Inbox
               {unreadCount > 0 && (
-                <span className="ml-2 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-gradient-to-r from-aurora to-ember px-1 text-[11px] font-semibold text-white">
+                <span className="ml-2 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-gradient-to-r from-aurora to-ember px-1 text-xs font-semibold text-white">
                   {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
               )}

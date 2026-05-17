@@ -165,7 +165,7 @@ export default function BrandEditForm({
           placeholder="One link per line. Paste full URLs — labels auto-detect:&#10;https://instagram.com/brand&#10;https://tiktok.com/@brand&#10;https://facebook.com/brand"
           className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
         />
-        <p className="mt-1 text-[11px] text-white/50">
+        <p className="mt-1 text-xs text-white/50">
           Recognized brands: Instagram, TikTok, Facebook, YouTube, X / Twitter,
           Threads, Spotify, Apple Music, SoundCloud, LinkedIn, Pinterest,
           Snapchat. Other URLs render as a labeled pill. Explicit format

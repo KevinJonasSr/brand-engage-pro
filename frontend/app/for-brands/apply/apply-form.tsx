@@ -214,7 +214,7 @@ function Field({
     <label htmlFor={id} className="block">
       <span className="block text-sm font-medium text-white/85">{label}</span>
       {hint && (
-        <span className="mt-0.5 block text-[11px] text-white/45">{hint}</span>
+        <span className="mt-0.5 block text-xs text-white/45">{hint}</span>
       )}
       {textarea ? (
         <textarea

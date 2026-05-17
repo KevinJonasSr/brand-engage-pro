@@ -23,21 +23,21 @@ const REACTION_SET = ["❤️", "🔥", "👏", "💯", "😂"] as const;
 function KindBadge({ kind }: { kind: CommunityPost["kind"] }) {
   if (kind === "announcement") {
     return (
-      <span className="rounded-full bg-sky-500/20 px-2 py-0.5 text-[10px] uppercase tracking-wide text-sky-200">
+      <span className="rounded-full bg-sky-500/20 px-2 py-0.5 text-xs uppercase tracking-wide text-sky-200">
         📢 Announcement
       </span>
     );
   }
   if (kind === "poll") {
     return (
-      <span className="rounded-full bg-fuchsia-500/20 px-2 py-0.5 text-[10px] uppercase tracking-wide text-fuchsia-200">
+      <span className="rounded-full bg-fuchsia-500/20 px-2 py-0.5 text-xs uppercase tracking-wide text-fuchsia-200">
         📊 Poll
       </span>
     );
   }
   if (kind === "challenge") {
     return (
-      <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] uppercase tracking-wide text-amber-200">
+      <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs uppercase tracking-wide text-amber-200">
         🏆 Challenge
       </span>
     );
@@ -89,7 +89,7 @@ export default function PostCard({
         </div>
         <div className="flex items-center gap-2">
           {post.pinned && (
-            <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] uppercase tracking-wide text-amber-200">
+            <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs uppercase tracking-wide text-amber-200">
               Pinned
             </span>
           )}
@@ -168,7 +168,7 @@ export default function PostCard({
       {/* AI #14: thread summary for posts with active discussion */}
       {post.thread_summary && post.comment_count >= 8 && (
         <div className="rounded-2xl border border-aurora/30 bg-aurora/5 p-3">
-          <p className="mb-1 flex items-center gap-1 text-[10px] uppercase tracking-[0.18em] text-aurora">
+          <p className="mb-1 flex items-center gap-1 text-xs uppercase tracking-[0.18em] text-aurora">
             <span aria-hidden>✨</span> What people are saying
           </p>
           <p className="text-sm text-white/85">{post.thread_summary}</p>
@@ -221,7 +221,7 @@ export default function PostCard({
                 <p className="text-xs font-semibold">
                   {c.author_first_name ?? "Anonymous member"}
                 </p>
-                <p className="text-[10px] uppercase tracking-wide text-white/40">
+                <p className="text-xs uppercase tracking-wide text-white/40">
                   {relativeTime(c.created_at)}
                 </p>
               </div>

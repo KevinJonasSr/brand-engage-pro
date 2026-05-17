@@ -212,7 +212,7 @@ export default async function RewardsPage() {
                                 </span>
                                 <div className="min-w-0 flex-1">
                                   <p className="text-sm font-semibold leading-tight">{badge.name}</p>
-                                  <p className="mt-0.5 text-[11px] text-white/60">
+                                  <p className="mt-0.5 text-xs text-white/60">
                                     {badge.earned ? "Unlocked" : "Locked"}
                                     {badge.point_value > 0 && ` · +${badge.point_value} pts`}
                                   </p>
@@ -229,7 +229,7 @@ export default async function RewardsPage() {
                                       style={{ width: `${pct}%` }}
                                     />
                                   </div>
-                                  <p className="text-[10px] text-white/50">
+                                  <p className="text-xs text-white/50">
                                     {progress} / {badge.threshold}
                                   </p>
                                 </div>

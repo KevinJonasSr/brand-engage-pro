@@ -75,10 +75,10 @@ export default function AltTextSuggester({
   return (
     <div className="space-y-1.5 rounded-2xl border border-white/10 bg-black/30 p-3">
       <div className="flex items-center justify-between gap-2">
-        <label className="text-[10px] uppercase tracking-wide text-white/50">
+        <label className="text-xs uppercase tracking-wide text-white/50">
           Alt text {aiGenerated && <span className="text-aurora">· AI-suggested, edit if you'd like</span>}
         </label>
-        {loading && <span className="text-[10px] text-white/40">Thinking…</span>}
+        {loading && <span className="text-xs text-white/40">Thinking…</span>}
       </div>
       <input
         type="text"
@@ -97,7 +97,7 @@ export default function AltTextSuggester({
         className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-1.5 text-xs text-white placeholder:text-white/40 focus:border-white/40 focus:outline-none"
       />
       {error && (
-        <p className="text-[10px] text-rose-300/70">
+        <p className="text-xs text-rose-300/70">
           {error} You can type your own description above.
         </p>
       )}

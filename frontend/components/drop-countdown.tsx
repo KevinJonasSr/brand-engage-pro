@@ -69,7 +69,7 @@ export default function DropCountdown({
   if (phase === "expired") {
     return (
       <span
-        className={`inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 text-[10px] uppercase tracking-wide text-white/45 ${className}`}
+        className={`inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 text-xs uppercase tracking-wide text-white/45 ${className}`}
       >
         Expired
       </span>
@@ -79,7 +79,7 @@ export default function DropCountdown({
   if (phase === "upcoming" && secondsLeft !== null) {
     return (
       <span
-        className={`inline-flex items-center gap-1.5 rounded-full border border-aurora/30 bg-aurora/10 px-2.5 py-1 text-[11px] font-semibold text-aurora ${className}`}
+        className={`inline-flex items-center gap-1.5 rounded-full border border-aurora/30 bg-aurora/10 px-2.5 py-1 text-xs font-semibold text-aurora ${className}`}
       >
         <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-aurora" aria-hidden />
         Drops in {formatCountdown(secondsLeft)}
@@ -91,7 +91,7 @@ export default function DropCountdown({
     if (isInFinalHour(reward, now)) {
       return (
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full border border-rose-400/40 bg-rose-500/15 px-2.5 py-1 text-[11px] font-semibold text-rose-200 ${className}`}
+          className={`inline-flex items-center gap-1.5 rounded-full border border-rose-400/40 bg-rose-500/15 px-2.5 py-1 text-xs font-semibold text-rose-200 ${className}`}
         >
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-rose-400" aria-hidden />
           {formatCountdown(secondsLeft)} left
@@ -100,7 +100,7 @@ export default function DropCountdown({
     }
     return (
       <span
-        className={`inline-flex items-center gap-1.5 rounded-full border border-amber-300/30 bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold text-amber-200 ${className}`}
+        className={`inline-flex items-center gap-1.5 rounded-full border border-amber-300/30 bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-200 ${className}`}
       >
         <span className="h-1.5 w-1.5 rounded-full bg-amber-300" aria-hidden />
         Ends in {formatCountdown(secondsLeft)}

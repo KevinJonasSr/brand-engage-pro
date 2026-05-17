@@ -103,11 +103,11 @@ export default async function StripeSeedPage() {
                     <div className="text-xs text-white/50">{c.slug}</div>
                   </td>
                   <td className="px-4 py-4">
-                    <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wide">
+                    <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs uppercase tracking-wide">
                       {c.type.replace("_", " ")}
                     </span>
                     {!c.active && (
-                      <span className="ml-2 rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-white/50">
+                      <span className="ml-2 rounded-full bg-white/5 px-2 py-0.5 text-xs text-white/50">
                         inactive
                       </span>
                     )}
@@ -116,7 +116,7 @@ export default async function StripeSeedPage() {
                     {fmtUSD(c.monthly_price_cents)}/mo ·{" "}
                     {fmtUSD(c.annual_price_cents)}/yr
                   </td>
-                  <td className="px-4 py-4 font-mono text-[11px] leading-5">
+                  <td className="px-4 py-4 font-mono text-xs leading-5">
                     {seeded ? (
                       <div className="space-y-0.5 text-white/70">
                         <div className="text-white">

@@ -105,10 +105,10 @@ export default function RedemptionAction({
           </button>
         </>
       )}
-      <SaveStatusIndicator status={status} className="text-[11px]" />
+      <SaveStatusIndicator status={status} className="text-xs" />
       {businessError && (
         <span
-          className="text-[11px] text-rose-300"
+          className="text-xs text-rose-300"
           title={businessError}
         >
           ✗ {businessError}

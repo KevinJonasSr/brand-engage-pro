@@ -154,7 +154,7 @@ export default async function RootLayout({
           <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
             <div className="flex items-center gap-3">
               <Link href="/" className="flex items-center gap-2">
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-aurora to-ember text-[10px] font-bold tracking-wider">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-aurora to-ember text-xs font-bold tracking-wider">
                   BEP
                 </span>
                 <span
@@ -197,7 +197,7 @@ export default async function RootLayout({
                 >
                   <span aria-hidden>🔔</span>
                   {unread > 0 && (
-                    <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-gradient-to-r from-aurora to-ember px-1 text-[10px] font-semibold text-white shadow">
+                    <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-gradient-to-r from-aurora to-ember px-1 text-xs font-semibold text-white shadow">
                       {unread > 9 ? "9+" : unread}
                     </span>
                   )}

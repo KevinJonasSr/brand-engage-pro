@@ -342,7 +342,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
                 key={k}
                 type="button"
                 onClick={() => addCTA(k)}
-                className="rounded-full border border-white/15 bg-white/5 px-2 py-1 text-[10px] text-white/80 hover:bg-white/10"
+                className="rounded-full border border-white/15 bg-white/5 px-2 py-1 text-xs text-white/80 hover:bg-white/10"
               >
                 + {CTA_KIND_LABELS[k]}
               </button>
@@ -358,7 +358,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
             {ctas.map((c, i) => (
               <div key={i} className="rounded-2xl border border-white/10 bg-black/30 p-3">
                 <div className="mb-2 flex items-center justify-between">
-                  <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-[10px] uppercase tracking-wide text-purple-200">
+                  <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-xs uppercase tracking-wide text-purple-200">
                     {CTA_KIND_LABELS[c.kind]}
                   </span>
                   <button
@@ -495,7 +495,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
           placeholder="Email body"
           className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
         />
-        <p className="text-[11px] text-white/50">
+        <p className="text-xs text-white/50">
           Recorded as a campaign item; final send handled via Mailchimp.
         </p>
       </Section>
@@ -511,7 +511,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
           placeholder="Short SMS (160 char max)"
           className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
         />
-        <p className="text-[11px] text-white/50">
+        <p className="text-xs text-white/50">
           Recorded as a campaign item; sends via Twilio to opted-in members.
         </p>
       </Section>

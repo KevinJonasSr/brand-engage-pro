@@ -138,7 +138,7 @@ export default function StreakTile({
 
         {nextMilestone && currentStreakDays > 0 && (
           <div className="text-right">
-            <p className="text-[10px] uppercase tracking-wide text-white/55">
+            <p className="text-xs uppercase tracking-wide text-white/55">
               Next milestone
             </p>
             <p className="mt-1 text-sm font-semibold text-white">

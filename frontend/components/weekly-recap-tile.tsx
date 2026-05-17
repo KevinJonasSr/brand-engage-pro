@@ -140,7 +140,7 @@ export default function WeeklyRecapTile({
                 ? `+${s.value.toLocaleString()}`
                 : s.value.toLocaleString()}
             </p>
-            <p className="mt-1 text-[10px] uppercase tracking-wide text-white/55">
+            <p className="mt-1 text-xs uppercase tracking-wide text-white/55">
               {s.label}
             </p>
           </div>

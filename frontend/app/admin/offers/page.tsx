@@ -100,7 +100,7 @@ export default async function AdminOffersPage() {
               name="image_url"
               label="Add image or ad mat"
             />
-            <p className="mt-1 text-[11px] text-white/50">
+            <p className="mt-1 text-xs text-white/50">
               Recommended: landscape, 1200×800 or larger. JPEG, PNG, WebP, or GIF.
             </p>
           </div>

@@ -4,6 +4,19 @@
   color-scheme: dark;
 }
 
+/*
+ * Bump base font-size 16px → 17px to address member feedback that text is
+ * hard to read. Tailwind's text-* utilities use rem, so this scales
+ * every text-xs / text-sm / text-base / text-lg etc. proportionally
+ * (~6% bigger). Also scales padding / margin / sizing that uses rem.
+ *
+ * If we need to dial this back, lower the value here. If individual
+ * spots feel too big now, override locally with text-[NNpx].
+ */
+html {
+  font-size: 17px;
+}
+
 @theme inline {
   --color-midnight: #050b1f;
   --color-aurora: #7c3aed;

@@ -103,7 +103,7 @@ export default function FocalPointPicker({
 
         <div className="mt-3 flex flex-wrap items-end gap-3">
           <label className="block">
-            <span className="text-[10px] uppercase tracking-wide text-white/50">x %</span>
+            <span className="text-xs uppercase tracking-wide text-white/50">x %</span>
             <input
               type="number"
               min={0}
@@ -116,7 +116,7 @@ export default function FocalPointPicker({
             />
           </label>
           <label className="block">
-            <span className="text-[10px] uppercase tracking-wide text-white/50">y %</span>
+            <span className="text-xs uppercase tracking-wide text-white/50">y %</span>
             <input
               type="number"
               min={0}
@@ -135,7 +135,7 @@ export default function FocalPointPicker({
           >
             Reset to center
           </button>
-          <p className="ml-auto text-[10px] text-white/40">
+          <p className="ml-auto text-xs text-white/40">
             Saves with the rest of the form.
           </p>
         </div>
@@ -178,7 +178,7 @@ function PreviewTile({
           aria-hidden
         />
       </div>
-      <p className="text-center text-[10px] uppercase tracking-wide text-white/50">
+      <p className="text-center text-xs uppercase tracking-wide text-white/50">
         {label}
       </p>
     </div>

@@ -236,7 +236,7 @@ export function CreatePredictionForm({ brands }: Props) {
                     {s.body && (
                       <p className="mt-0.5 text-xs text-white/65">{s.body}</p>
                     )}
-                    <p className="mt-1 text-[10px] uppercase tracking-wider text-white/40">
+                    <p className="mt-1 text-xs uppercase tracking-wider text-white/40">
                       {s.prediction_type} ·{" "}
                       {s.suggested_close_in_hours ?? 72}h ·{" "}
                       {s.suggested_points ?? 50}pts
@@ -485,7 +485,7 @@ function Field({
         {label}
       </span>
       {children}
-      {hint && <span className="mt-1 block text-[11px] text-white/40">{hint}</span>}
+      {hint && <span className="mt-1 block text-xs text-white/40">{hint}</span>}
     </label>
   );
 }

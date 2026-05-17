@@ -92,16 +92,16 @@ export default async function AdminCommunitiesPage() {
                     }}
                   />
                   <div className="mt-2 flex items-baseline justify-between gap-3">
-                    <span className="text-[10px] uppercase tracking-widest text-white/40">
+                    <span className="text-xs uppercase tracking-widest text-white/40">
                       {c.type.replace("_", " ")}
                     </span>
                     {!c.active && (
-                      <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/60">
+                      <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-white/60">
                         Inactive
                       </span>
                     )}
                     {isCurrent && (
-                      <span className="rounded-full bg-aurora/30 px-2 py-0.5 text-[10px] text-white">
+                      <span className="rounded-full bg-aurora/30 px-2 py-0.5 text-xs text-white">
                         Current
                       </span>
                     )}

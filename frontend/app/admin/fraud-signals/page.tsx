@@ -190,7 +190,7 @@ function PendingFlagCard({
   return (
     <li className="glass-card p-5">
       <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2 text-[11px]">
+        <div className="flex flex-wrap items-center gap-2 text-xs">
           <span
             className={`rounded-full border px-2 py-0.5 uppercase tracking-wide ${
               signal.verdict === "suspicious"
@@ -215,7 +215,7 @@ function PendingFlagCard({
 
         <div className="grid gap-3 text-xs sm:grid-cols-2">
           <div>
-            <p className="text-[10px] uppercase tracking-wide text-white/50">
+            <p className="text-xs uppercase tracking-wide text-white/50">
               Member
             </p>
             <p className="text-white/85">
@@ -229,7 +229,7 @@ function PendingFlagCard({
             </p>
           </div>
           <div>
-            <p className="text-[10px] uppercase tracking-wide text-white/50">
+            <p className="text-xs uppercase tracking-wide text-white/50">
               Activity (24h)
             </p>
             <p className="text-white/85">
@@ -241,7 +241,7 @@ function PendingFlagCard({
 
         {signal.reasons.length > 0 && (
           <div>
-            <p className="text-[10px] uppercase tracking-wide text-white/50">
+            <p className="text-xs uppercase tracking-wide text-white/50">
               Claude's reasons
             </p>
             <ul className="mt-1 list-disc space-y-1 pl-5 text-xs text-white/80">

@@ -75,7 +75,7 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
                 {/* Back card */}
                 <div className="absolute left-8 top-12 h-[380px] w-[320px] rotate-3 rounded-3xl border border-white/10 bg-gradient-to-br from-ember/25 via-slate-900 to-aurora/25 shadow-glass">
                   <div className="p-6 text-white/70">
-                    <p className="text-[10px] uppercase tracking-widest">
+                    <p className="text-xs uppercase tracking-widest">
                       Next Event
                     </p>
                     <p className="mt-2 text-sm font-semibold text-white">
@@ -89,10 +89,10 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
                 {/* Front card */}
                 <div className="absolute left-0 top-0 h-[380px] w-[320px] -rotate-2 rounded-3xl border border-white/10 bg-gradient-to-br from-aurora/40 via-slate-900 to-black p-6 shadow-glass">
                   <div className="flex items-center justify-between">
-                    <p className="text-[10px] uppercase tracking-widest text-white/60">
+                    <p className="text-xs uppercase tracking-widest text-white/60">
                       Member Profile
                     </p>
-                    <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/80">
+                    <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-white/80">
                       Gold tier
                     </span>
                   </div>

@@ -38,7 +38,7 @@ export function PredictionTallyView({
                 <span className={isHighlight ? "font-semibold text-white" : "text-white/85"}>
                   {row.label}
                   {isHighlight && (
-                    <span className="ml-2 rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-emerald-200">
+                    <span className="ml-2 rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-medium uppercase tracking-wider text-emerald-200">
                       ✓
                     </span>
                   )}
@@ -102,7 +102,7 @@ export function PredictionTallyView({
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-[10px] uppercase tracking-wider text-white/45">
+      <dt className="text-xs uppercase tracking-wider text-white/45">
         {label}
       </dt>
       <dd className="text-base font-semibold text-white">{value}</dd>

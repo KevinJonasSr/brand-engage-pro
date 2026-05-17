@@ -47,7 +47,7 @@ export default function PremiumBadge({
       href="/account/billing"
       aria-label={tooltip}
       title={tooltip}
-      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-white shadow-glass transition hover:brightness-110"
+      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-white shadow-glass transition hover:brightness-110"
       style={{ backgroundImage: `linear-gradient(90deg, ${from}, ${to})` }}
     >
       <span aria-hidden>{icon}</span>

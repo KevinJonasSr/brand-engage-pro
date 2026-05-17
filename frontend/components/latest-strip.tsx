@@ -79,7 +79,7 @@ export async function LatestStrip({ slug }: { slug: string }) {
             <div className="mb-2 flex items-center justify-between">
               <span
                 className={
-                  "inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] tracking-widest " +
+                  "inline-flex items-center rounded-full border px-2 py-0.5 text-xs tracking-widest " +
                   KIND_COLOR[c.kind]
                 }
               >

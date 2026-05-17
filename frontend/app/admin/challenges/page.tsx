@@ -106,11 +106,11 @@ export default async function AdminChallengesPage() {
               <header className="flex flex-wrap items-start justify-between gap-2">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/70">
+                    <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs uppercase tracking-wide text-white/70">
                       /{c.brand_slug}
                     </span>
                     {c.winner_id && (
-                      <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] uppercase tracking-wide text-emerald-200">
+                      <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs uppercase tracking-wide text-emerald-200">
                         Winner picked
                       </span>
                     )}
@@ -149,7 +149,7 @@ export default async function AdminChallengesPage() {
                             {e.member_first_name ?? "Anonymous"}
                             {isWinner && " 🏆"}
                           </Link>
-                          <span className="text-[10px] text-white/40">
+                          <span className="text-xs text-white/40">
                             {new Date(e.created_at).toLocaleString()}
                           </span>
                         </div>
@@ -170,7 +170,7 @@ export default async function AdminChallengesPage() {
                               <input type="hidden" name="post_id" value={c.id} />
                               <input type="hidden" name="entry_id" value={e.id} />
                               <input type="hidden" name="member_id" value={e.member_id} />
-                              <button className="rounded-full bg-gradient-to-r from-aurora to-ember px-3 py-1 text-[11px] font-semibold text-white">
+                              <button className="rounded-full bg-gradient-to-r from-aurora to-ember px-3 py-1 text-xs font-semibold text-white">
                                 Pick winner · +200 pts
                               </button>
                             </form>
@@ -179,7 +179,7 @@ export default async function AdminChallengesPage() {
                           )}
                           <form action={adminDeleteEntryAction}>
                             <input type="hidden" name="entry_id" value={e.id} />
-                            <button className="text-[11px] text-rose-300/80 hover:text-rose-300">
+                            <button className="text-xs text-rose-300/80 hover:text-rose-300">
                               Delete
                             </button>
                           </form>

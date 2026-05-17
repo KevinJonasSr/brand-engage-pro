@@ -47,7 +47,7 @@ export default function RsvpButton({
         type="button"
         onClick={handleClick}
         disabled={disabled}
-        className={`rounded-full px-3 py-1 text-[11px] font-semibold transition disabled:opacity-50 ${
+        className={`rounded-full px-3 py-1 text-xs font-semibold transition disabled:opacity-50 ${
           rsvped
             ? "bg-emerald-500/20 text-emerald-200 hover:bg-emerald-500/30"
             : "bg-gradient-to-r from-aurora to-ember text-white"
@@ -55,7 +55,7 @@ export default function RsvpButton({
       >
         {rsvped ? "✓ RSVPed" : atCapacity ? "Full" : "RSVP · +10 pts"}
       </button>
-      {error && <p className="text-[10px] text-rose-300">{error}</p>}
+      {error && <p className="text-xs text-rose-300">{error}</p>}
     </div>
   );
 }

@@ -96,7 +96,7 @@ export default function TagSuggester({
 
       {suggestions && suggestions.length > 0 && (
         <div className="space-y-2">
-          <p className="text-[10px] uppercase tracking-wide text-white/50">
+          <p className="text-xs uppercase tracking-wide text-white/50">
             Tap to toggle:
           </p>
           <div className="flex flex-wrap gap-1.5">
@@ -123,7 +123,7 @@ export default function TagSuggester({
             type="button"
             onClick={handleSuggest}
             disabled={loading}
-            className="text-[10px] text-white/50 hover:text-white"
+            className="text-xs text-white/50 hover:text-white"
           >
             {loading ? "Refreshing…" : "↻ Refresh suggestions"}
           </button>

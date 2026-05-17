@@ -103,7 +103,7 @@ function KindChip({ kind }: { kind: string }) {
           ? "bg-amber-500/20 text-amber-200"
           : "bg-white/10 text-white/70";
   return (
-    <span className={`rounded-full px-2 py-0.5 text-[10px] uppercase tracking-wide ${tone}`}>
+    <span className={`rounded-full px-2 py-0.5 text-xs uppercase tracking-wide ${tone}`}>
       {kind}
     </span>
   );

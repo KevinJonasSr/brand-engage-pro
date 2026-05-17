@@ -18,7 +18,7 @@ export default function AdminPill({ show = true }: AdminPillProps) {
       href="/admin"
       aria-label="Admin dashboard"
       title="Admin dashboard"
-      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-300 shadow-glass transition hover:brightness-110"
+      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-amber-300 shadow-glass transition hover:brightness-110"
       style={{
         backgroundImage: "linear-gradient(90deg, rgba(217, 119, 6, 0.2), rgba(217, 119, 6, 0.15))",
       }}

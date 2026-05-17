@@ -94,7 +94,7 @@ export default async function AdminLayout({
             )}
             <span className="text-white/60">{ctx.user.email}</span>
             {ctx.isSuperAdmin && (
-              <span className="rounded-full bg-aurora/20 px-2 py-0.5 text-[10px] uppercase tracking-wide text-aurora">
+              <span className="rounded-full bg-aurora/20 px-2 py-0.5 text-xs uppercase tracking-wide text-aurora">
                 Super-admin
               </span>
             )}
@@ -116,7 +116,7 @@ export default async function AdminLayout({
             >
               {item.label}
               {item.href === "/admin/redemptions" && pendingCount > 0 && (
-                <span className="absolute right-0 top-0 inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white translate-x-1 -translate-y-1">
+                <span className="absolute right-0 top-0 inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white translate-x-1 -translate-y-1">
                   {pendingCount > 9 ? "9+" : pendingCount}
                 </span>
               )}

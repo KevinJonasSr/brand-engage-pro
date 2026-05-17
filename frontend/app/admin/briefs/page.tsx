@@ -103,7 +103,7 @@ function BriefCard({ brief, defaultOpen }: { brief: BriefRow; defaultOpen: boole
       <summary className="flex cursor-pointer items-center justify-between gap-3 px-5 py-4 text-sm">
         <div>
           <p className="font-semibold text-white">{created}</p>
-          <p className="text-[11px] text-white/50">
+          <p className="text-xs text-white/50">
             {brief.metrics.platform.posts} posts ·{" "}
             {brief.metrics.platform.reactions} reactions ·{" "}
             {brief.metrics.platform.signups} signups
@@ -114,7 +114,7 @@ function BriefCard({ brief, defaultOpen }: { brief: BriefRow; defaultOpen: boole
             )}
           </p>
         </div>
-        <span className="text-[10px] uppercase tracking-wide text-white/40">
+        <span className="text-xs uppercase tracking-wide text-white/40">
           {brief.model.replace("claude-", "")}
         </span>
       </summary>
@@ -125,24 +125,24 @@ function BriefCard({ brief, defaultOpen }: { brief: BriefRow; defaultOpen: boole
         </pre>
 
         <details className="rounded-xl border border-white/10 bg-black/40">
-          <summary className="cursor-pointer px-3 py-2 text-[11px] uppercase tracking-wide text-white/50">
+          <summary className="cursor-pointer px-3 py-2 text-xs uppercase tracking-wide text-white/50">
             Raw metrics (jsonb)
           </summary>
-          <pre className="overflow-x-auto px-3 py-2 text-[10px] leading-relaxed text-white/70">
+          <pre className="overflow-x-auto px-3 py-2 text-xs leading-relaxed text-white/70">
             {JSON.stringify(brief.metrics, null, 2)}
           </pre>
         </details>
 
         {brief.metrics.anomalies.length > 0 && (
           <div className="space-y-1">
-            <p className="text-[10px] uppercase tracking-wide text-white/50">
+            <p className="text-xs uppercase tracking-wide text-white/50">
               Anomalies (rule-based)
             </p>
             <ul className="space-y-1">
               {brief.metrics.anomalies.map((a, i) => (
                 <li
                   key={i}
-                  className={`rounded-md px-2 py-1 text-[11px] ${
+                  className={`rounded-md px-2 py-1 text-xs ${
                     a.severity === "warn"
                       ? "bg-amber-500/15 text-amber-200"
                       : "bg-white/10 text-white/80"

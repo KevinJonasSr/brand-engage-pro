@@ -160,7 +160,7 @@ function PendingDraftCard({ draft }: { draft: DraftRow }) {
   return (
     <li className="glass-card p-5">
       <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2 text-[11px]">
+        <div className="flex flex-wrap items-center gap-2 text-xs">
           <span className="rounded-full border border-aurora/30 bg-aurora/10 px-2 py-0.5 uppercase tracking-wide text-aurora">
             {draft.kind === "announcement" ? "📢 Announcement" : "Post"}
           </span>
@@ -180,7 +180,7 @@ function PendingDraftCard({ draft }: { draft: DraftRow }) {
           <input type="hidden" name="draft_id" value={draft.id} />
 
           <div>
-            <label className="mb-1 block text-[10px] uppercase tracking-wide text-white/50">
+            <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
               Title (optional)
             </label>
             <input
@@ -194,7 +194,7 @@ function PendingDraftCard({ draft }: { draft: DraftRow }) {
           </div>
 
           <div>
-            <label className="mb-1 block text-[10px] uppercase tracking-wide text-white/50">
+            <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
               Body
             </label>
             <textarea

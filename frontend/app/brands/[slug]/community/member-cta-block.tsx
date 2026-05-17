@@ -56,7 +56,7 @@ export default function MemberCtaBlock({
                 {a.description && (
                   <p className="mt-0.5 text-xs text-white/70">{a.description}</p>
                 )}
-                <p className="mt-1 text-[11px] text-emerald-300">
+                <p className="mt-1 text-xs text-emerald-300">
                   +{a.point_value} pts on completion
                 </p>
               </div>

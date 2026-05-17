@@ -81,7 +81,7 @@ export default function LeaderboardList({
                 )}
               </p>
               {showBreakdown && (
-                <p className="mt-0.5 text-[11px] text-white/55">
+                <p className="mt-0.5 text-xs text-white/55">
                   {entry.reactions > 0 && `${entry.reactions} reactions`}
                   {entry.comments > 0 && ` · ${entry.comments} comments`}
                   {entry.rsvps > 0 && ` · ${entry.rsvps} RSVPs`}
@@ -94,7 +94,7 @@ export default function LeaderboardList({
               <p className="text-sm font-semibold tabular-nums text-white">
                 {entry.score.toLocaleString()}
               </p>
-              <p className="text-[10px] uppercase tracking-wide text-white/45">
+              <p className="text-xs uppercase tracking-wide text-white/45">
                 pts
               </p>
             </div>

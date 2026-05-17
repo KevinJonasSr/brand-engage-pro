@@ -281,7 +281,7 @@ function KpiCard({
       <p className="mt-1 font-mono text-2xl font-semibold tabular-nums">
         {typeof value === "number" ? value.toLocaleString() : value}
       </p>
-      {sub && <p className="mt-1 text-[11px] text-white/50">{sub}</p>}
+      {sub && <p className="mt-1 text-xs text-white/50">{sub}</p>}
     </div>
   );
 }
@@ -460,7 +460,7 @@ export default async function AdminCommunityAnalyticsPage({
                       <p className="text-xs text-white/50 mt-0.5">
                         {sub.subscription_tier}
                         {sub.is_founder && (
-                          <span className="ml-1 inline-block rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-amber-300">
+                          <span className="ml-1 inline-block rounded bg-amber-500/20 px-1.5 py-0.5 text-xs font-semibold text-amber-300">
                             Founder #{sub.founder_number}
                           </span>
                         )}

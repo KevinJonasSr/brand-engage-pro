@@ -113,7 +113,7 @@ export default function LeaderboardPodium({
                     </span>
                   )}
                 </p>
-                <p className="mt-0.5 text-[10px] uppercase tracking-wide text-white/55">
+                <p className="mt-0.5 text-xs uppercase tracking-wide text-white/55">
                   {entry.score.toLocaleString()} pts
                 </p>
               </>
@@ -145,7 +145,7 @@ export default function LeaderboardPodium({
               }}
             >
               <p className="text-2xl">{theme.medal}</p>
-              <p className="mt-0.5 text-[10px] font-bold uppercase tracking-widest text-white/75">
+              <p className="mt-0.5 text-xs font-bold uppercase tracking-widest text-white/75">
                 {theme.label}
               </p>
             </div>

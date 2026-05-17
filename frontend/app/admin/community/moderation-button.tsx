@@ -59,8 +59,8 @@ export default function ModerationButton({
   const baseClassName =
     className ??
     (variant === "delete"
-      ? "text-[11px] text-rose-300/80 hover:text-rose-300 disabled:opacity-50"
-      : "text-[11px] text-white/60 hover:text-white disabled:opacity-50");
+      ? "text-xs text-rose-300/80 hover:text-rose-300 disabled:opacity-50"
+      : "text-xs text-white/60 hover:text-white disabled:opacity-50");
 
   return (
     <span className="inline-flex items-center gap-1.5">
@@ -72,10 +72,10 @@ export default function ModerationButton({
       >
         {submitting ? "…" : label}
       </button>
-      <SaveStatusIndicator status={status} className="text-[10px]" />
+      <SaveStatusIndicator status={status} className="text-xs" />
       {bizError && (
         <span
-          className="text-[10px] text-rose-300"
+          className="text-xs text-rose-300"
           title={bizError}
         >
           ✗

@@ -313,7 +313,7 @@ export default async function BrandPage({
                           {s.description}
                         </p>
                       )}
-                      <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]">
+                      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
                         <DropCountdown reward={s} />
                         {cadence && (
                           <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 uppercase tracking-wide text-white/70">
@@ -332,7 +332,7 @@ export default async function BrandPage({
                         ) : null}
                       </div>
                       {s.redemption_code && (
-                        <p className="mt-3 text-[11px] text-white/50">
+                        <p className="mt-3 text-xs text-white/50">
                           Show code{" "}
                           <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-white/90">
                             {s.redemption_code}
@@ -399,7 +399,7 @@ export default async function BrandPage({
                       {e.date}
                     </p>
                     {eventId && (
-                      <p className="mt-1 text-[11px] text-white/50">
+                      <p className="mt-1 text-xs text-white/50">
                         {count}
                         {e.capacity ? ` / ${e.capacity}` : ""} RSVPed
                       </p>
@@ -415,7 +415,7 @@ export default async function BrandPage({
                   )}
                 </div>
                 {eventId && (
-                  <div className="mt-3 flex items-center gap-3 text-[11px]">
+                  <div className="mt-3 flex items-center gap-3 text-xs">
                     <a
                       href={`/api/events/${eventId}/ics`}
                       className="text-white/60 hover:text-white"

@@ -185,7 +185,7 @@ function QueueCard({ row }: { row: QueueRow }) {
     <li className="glass-card p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 space-y-2">
-          <div className="flex flex-wrap items-center gap-2 text-[11px]">
+          <div className="flex flex-wrap items-center gap-2 text-xs">
             <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 uppercase tracking-wide text-white/70">
               {row.source_table === "community_posts" ? "Post" : "Comment"}
             </span>
@@ -245,7 +245,7 @@ function QueueCard({ row }: { row: QueueRow }) {
             </p>
           )}
 
-          <p className="text-[10px] text-white/40">
+          <p className="text-xs text-white/40">
             Classified{" "}
             {row.classified_at
               ? new Date(row.classified_at).toLocaleString()

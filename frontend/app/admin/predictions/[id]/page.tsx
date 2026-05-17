@@ -297,7 +297,7 @@ function PhaseChip({
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-[10px] uppercase tracking-wider text-white/45">
+      <dt className="text-xs uppercase tracking-wider text-white/45">
         {label}
       </dt>
       <dd className="text-base font-semibold text-white">{value}</dd>

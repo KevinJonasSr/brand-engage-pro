@@ -142,12 +142,12 @@ export default async function AdminBrandEditPage({
                     <p className="text-sm font-semibold">
                       {e.title}
                       {!e.active && (
-                        <span className="ml-2 rounded-full bg-white/10 px-2 py-0.5 text-[10px] uppercase text-white/50">
+                        <span className="ml-2 rounded-full bg-white/10 px-2 py-0.5 text-xs uppercase text-white/50">
                           Inactive
                         </span>
                       )}
                       {atCap && (
-                        <span className="ml-2 rounded-full bg-rose-500/20 px-2 py-0.5 text-[10px] uppercase text-rose-200">
+                        <span className="ml-2 rounded-full bg-rose-500/20 px-2 py-0.5 text-xs uppercase text-rose-200">
                           Full
                         </span>
                       )}
@@ -156,24 +156,24 @@ export default async function AdminBrandEditPage({
                       {e.detail ?? "—"} · {e.event_date ?? "—"}
                       {e.location ? ` · 📍 ${e.location}` : ""}
                     </p>
-                    <p className="mt-1 text-[11px] text-white/50">
+                    <p className="mt-1 text-xs text-white/50">
                       {rsvps.length}
                       {e.capacity ? ` / ${e.capacity}` : ""} RSVPed
                     </p>
                     {/* Reminder status */}
                     {(rem24 || rem1h || remindersScheduled) && (
-                      <div className="mt-2 flex flex-wrap items-center gap-2 text-[10px]">
+                      <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
                         <ReminderChip label="24h" row={rem24} scheduled={remindersScheduled} />
                         <ReminderChip label="1h" row={rem1h} scheduled={remindersScheduled} />
                       </div>
                     )}
-                    {e.url && <p className="mt-1 text-[10px] text-white/50 truncate">{e.url}</p>}
+                    {e.url && <p className="mt-1 text-xs text-white/50 truncate">{e.url}</p>}
                   </div>
                   <div className="flex flex-col items-end gap-1">
                     <form action={sendReminderNowAction}>
                       <input type="hidden" name="event_id" value={e.id} />
                       <input type="hidden" name="brand_slug" value={slug} />
-                      <button className="rounded-full bg-white/10 px-2 py-0.5 text-[11px] text-white/80 hover:bg-white/20">
+                      <button className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-white/80 hover:bg-white/20">
                         📣 Send reminder now
                       </button>
                     </form>
@@ -188,7 +188,7 @@ export default async function AdminBrandEditPage({
                 </div>
                 {rsvps.length > 0 && (
                   <details className="mt-2">
-                    <summary className="cursor-pointer text-[11px] text-white/60 hover:text-white">
+                    <summary className="cursor-pointer text-xs text-white/60 hover:text-white">
                       View RSVPs ({rsvps.length})
                     </summary>
                     <div className="mt-2 flex flex-wrap gap-2">
@@ -196,7 +196,7 @@ export default async function AdminBrandEditPage({
                         <Link
                           key={r.member_id}
                           href={`/admin/members/${r.member_id}`}
-                          className="inline-flex items-center gap-2 rounded-full bg-white/5 px-2 py-1 text-[11px] hover:bg-white/10"
+                          className="inline-flex items-center gap-2 rounded-full bg-white/5 px-2 py-1 text-xs hover:bg-white/10"
                         >
                           {r.member?.avatar_url ? (
                             // eslint-disable-next-line @next/next/no-img-element
@@ -239,20 +239,20 @@ function ReminderChip({
   if (row) {
     if (row.error) {
       return (
-        <span className="rounded-full bg-rose-500/20 px-2 py-0.5 text-[10px] text-rose-200">
+        <span className="rounded-full bg-rose-500/20 px-2 py-0.5 text-xs text-rose-200">
           {label}: failed · {row.error.slice(0, 40)}
         </span>
       );
     }
     return (
-      <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] text-emerald-200">
+      <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs text-emerald-200">
         {label}: ✓ sent · {row.recipients_sms} sms · {row.recipients_email} email
       </span>
     );
   }
   if (!scheduled) return null;
   return (
-    <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/60">
+    <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-white/60">
       {label}: scheduled
     </span>
   );

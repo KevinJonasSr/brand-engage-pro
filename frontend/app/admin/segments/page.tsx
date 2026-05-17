@@ -94,7 +94,7 @@ export default async function AdminSegmentsPage() {
               placeholder="super-engaged gold/platinum members in Tennessee who've posted in the last month"
               className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm placeholder-white/40 outline-none focus:border-aurora/40"
             />
-            <p className="mt-1 text-[11px] text-white/40">
+            <p className="mt-1 text-xs text-white/40">
               Examples: &quot;new bronze members this month&quot;, &quot;loyal
               members willing to receive SMS&quot;, &quot;high-points members
               in California&quot;.
@@ -156,10 +156,10 @@ function SegmentCard({ segment }: { segment: SegmentRow }) {
           </p>
           <FilterChips filter={segment.filter_json} />
           <details>
-            <summary className="cursor-pointer text-[10px] uppercase tracking-wide text-white/40">
+            <summary className="cursor-pointer text-xs uppercase tracking-wide text-white/40">
               Filter JSON
             </summary>
-            <pre className="mt-2 overflow-x-auto rounded-xl bg-black/50 p-3 text-[10px] text-white/70">
+            <pre className="mt-2 overflow-x-auto rounded-xl bg-black/50 p-3 text-xs text-white/70">
               {JSON.stringify(segment.filter_json, null, 2)}
             </pre>
           </details>
@@ -211,7 +211,7 @@ function FilterChips({ filter }: { filter: SegmentFilter }) {
 
   if (chips.length === 0) {
     return (
-      <p className="text-[11px] text-white/40">(no filters — matches all members)</p>
+      <p className="text-xs text-white/40">(no filters — matches all members)</p>
     );
   }
 
@@ -220,7 +220,7 @@ function FilterChips({ filter }: { filter: SegmentFilter }) {
       {chips.map((c) => (
         <span
           key={c}
-          className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] text-white/70"
+          className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-xs text-white/70"
         >
           {c}
         </span>

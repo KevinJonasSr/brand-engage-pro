@@ -121,7 +121,7 @@ export default async function LeaderboardPage({
         </>
       )}
 
-      <footer className="mt-10 rounded-xl border border-white/5 bg-white/3 p-4 text-[11px] text-white/55">
+      <footer className="mt-10 rounded-xl border border-white/5 bg-white/3 p-4 text-xs text-white/55">
         <p className="font-semibold uppercase tracking-wide text-white/65">
           How points are scored
         </p>

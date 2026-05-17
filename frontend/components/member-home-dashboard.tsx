@@ -161,7 +161,7 @@ function FollowedBrandsStrip({
                   {a.name}
                 </p>
                 {a.tagline && (
-                  <p className="mt-0.5 line-clamp-1 text-[10px] text-white/80 drop-shadow-[0_1px_6px_rgba(0,0,0,0.6)]">
+                  <p className="mt-0.5 line-clamp-1 text-xs text-white/80 drop-shadow-[0_1px_6px_rgba(0,0,0,0.6)]">
                     {a.tagline}
                   </p>
                 )}
@@ -218,7 +218,7 @@ function UpcomingEventsList({
               className="group flex items-start justify-between gap-3 rounded-xl bg-black/20 p-3 transition hover:bg-black/30"
             >
               <div className="min-w-0 flex-1">
-                <p className="text-[11px] uppercase tracking-wide text-white/50">
+                <p className="text-xs uppercase tracking-wide text-white/50">
                   {e.event_date ?? "Date TBD"}
                 </p>
                 <p className="mt-1 line-clamp-2 text-sm font-semibold text-white">
@@ -231,11 +231,11 @@ function UpcomingEventsList({
               </div>
               <div className="shrink-0 text-right">
                 {e.rsvped ? (
-                  <span className="inline-flex rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-medium text-emerald-300">
+                  <span className="inline-flex rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-medium text-emerald-300">
                     ✓ Going
                   </span>
                 ) : (
-                  <span className="inline-flex text-[10px] text-white/50 group-hover:text-white/80">
+                  <span className="inline-flex text-xs text-white/50 group-hover:text-white/80">
                     RSVP →
                   </span>
                 )}
@@ -336,7 +336,7 @@ function RecentActivityFeed({
                 href={`/brands/${post.brand_slug}/community`}
                 className="group block"
               >
-                <p className="text-[10px] uppercase tracking-wide text-white/50">
+                <p className="text-xs uppercase tracking-wide text-white/50">
                   {badge.icon} {badge.label}
                   {post.pinned && (
                     <span className="ml-2 rounded-full bg-white/10 px-1.5 py-0.5 text-[9px] text-white/60">
@@ -347,7 +347,7 @@ function RecentActivityFeed({
                 <p className="mt-1 line-clamp-2 text-xs font-semibold text-white group-hover:text-white">
                   {display}
                 </p>
-                <p className="mt-1 text-[10px] text-white/40">
+                <p className="mt-1 text-xs text-white/40">
                   {post.brand_name ?? post.brand_slug}
                   {post.author_first_name ? ` · ${post.author_first_name}` : ""}
                   {" · "}
@@ -444,7 +444,7 @@ function BadgesInProgressPanel({ items }: { items: MemberHomeData["badgesInProgr
                         style={{ width: `${pct}%` }}
                       />
                     </div>
-                    <span className="text-[10px] uppercase tracking-wide text-white/50">
+                    <span className="text-xs uppercase tracking-wide text-white/50">
                       {badge.progress}/{badge.threshold}
                     </span>
                   </>

@@ -51,7 +51,7 @@ export default async function AdminBrandsPage() {
                   <span>{a.event_count} events</span>
                   <span>{a.follower_count} followers</span>
                   {!a.active && (
-                    <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wide">Inactive</span>
+                    <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs uppercase tracking-wide">Inactive</span>
                   )}
                 </div>
               </div>
