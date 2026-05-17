@@ -14,7 +14,7 @@
  * spots feel too big now, override locally with text-[NNpx].
  */
 html {
-  font-size: 17px;
+  font-size: 18px;
 }
 
 @theme inline {
