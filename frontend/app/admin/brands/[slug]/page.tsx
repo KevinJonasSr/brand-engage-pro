@@ -6,6 +6,7 @@ import { listRsvpsForEvent } from "@/lib/data/events";
 import BrandEditForm from "./edit-form";
 import CreateEventForm from "./create-event-form";
 import EditableEventRow from "./editable-event-row";
+import CheckinQrCard from "@/components/checkin-qr-card";
 import {
   deleteEventAction,
   sendReminderNowAction,
@@ -223,6 +224,12 @@ export default async function AdminBrandEditPage({
 
         <CreateEventForm slug={slug} />
       </section>
+
+      {/* Check-in QR — print or display at the register / entrance */}
+      <CheckinQrCard
+        brandSlug={brand.slug as string}
+        brandName={brand.name as string}
+      />
     </div>
   );
 }

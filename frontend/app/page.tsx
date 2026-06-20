@@ -17,12 +17,6 @@ import { gatherWeeklyRecap } from "@/lib/personal-recap/gather";
 // Signed-out visitors render <SignedOutLanding/> earlier and never see any
 // of this.
 
-const journeyCards = [
-  { title: "Complete Member Challenge", points: "+250 pts" },
-  { title: "Share Your Member Story", points: "+150 pts" },
-  { title: "Vote in Today’s Poll", points: "+75 pts" },
-];
-
 const quickActions: { label: string; href: string }[] = [
   { label: "Share referral link", href: "/referrals" },
   { label: "Browse marketplace", href: "/marketplace" },
@@ -172,34 +166,6 @@ export default async function Home({
             </div>
           </section>
 
-          <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-purple-800/30 via-slate-900 to-midnight p-6 shadow-glass">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <p className="text-sm uppercase tracking-wide text-white/60">Continue Your Journey</p>
-                <h2 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
-                  Keep the momentum going
-                </h2>
-              </div>
-              <Link
-                href="/rewards"
-                className="inline-flex items-center gap-2 rounded-full border border-white/30 px-4 py-2 text-sm font-medium text-white/80 hover:bg-white/10"
-              >
-                View Missions <span>➜</span>
-              </Link>
-            </div>
-            <div className="mt-6 grid gap-4 md:grid-cols-3">
-              {journeyCards.map((card) => (
-                <article key={card.title} className="rounded-2xl bg-white/10 p-4">
-                  <p className="text-sm text-white/70">{card.title}</p>
-                  <p className="mt-3 text-lg font-semibold text-emerald-300">{card.points}</p>
-                  <button className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-white">
-                    Start <span>→</span>
-                  </button>
-                </article>
-              ))}
-            </div>
-          </section>
-
           <section className="grid gap-6 lg:grid-cols-2">
             <div className="glass-card space-y-4 p-6">
               <p className="flex items-center gap-2 text-sm uppercase tracking-wide text-white/60">
@@ -260,7 +226,7 @@ export default async function Home({
 
           <section className="glass-card p-6">
             <p className="flex items-center gap-2 text-sm uppercase tracking-wide text-white/60">
-              <span>🏆</span> Quick Actions
+              <span>⚡</span> Quick Actions
             </p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {quickActions.map((action) => (

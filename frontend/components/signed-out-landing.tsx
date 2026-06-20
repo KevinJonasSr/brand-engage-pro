@@ -68,7 +68,31 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
             </p>
           </div>
 
-          {/* Hero visual — stylized preview card stack */}
+          {/* Mobile preview card — single, no rotation */}
+          <div className="lg:hidden mt-8 rounded-3xl border border-white/10 bg-gradient-to-br from-aurora/40 via-slate-900 to-black p-6 shadow-glass">
+            <div className="flex items-center justify-between">
+              <p className="text-xs uppercase tracking-widest text-white/60">Member Profile</p>
+              <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-white/80">Gold tier</span>
+            </div>
+            <p className="mt-4 text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>11,420</p>
+            <p className="text-xs text-white/50">total points</p>
+            <div className="mt-4 space-y-2">
+              <div className="flex items-center justify-between rounded-xl bg-black/30 px-3 py-2 text-xs">
+                <span>🏆 Challenge crasher</span>
+                <span className="text-emerald-300">+250</span>
+              </div>
+              <div className="flex items-center justify-between rounded-xl bg-black/30 px-3 py-2 text-xs">
+                <span>🎟️ Spring Tasting Night</span>
+                <span className="text-emerald-300">+25</span>
+              </div>
+              <div className="flex items-center justify-between rounded-xl bg-black/30 px-3 py-2 text-xs">
+                <span>🤝 Invited 3 friends</span>
+                <span className="text-emerald-300">+450</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Hero visual — stylized preview card stack (desktop) */}
           <div className="relative hidden lg:block">
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="relative h-[440px] w-[360px]">

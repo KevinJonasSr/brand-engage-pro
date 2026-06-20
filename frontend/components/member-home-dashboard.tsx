@@ -22,8 +22,7 @@ export default function MemberHomeDashboard({ data, streak, recap }: { data: Mem
     founderCommunities,
   } = data;
 
-  // Pick the first community for the rewards link (or fallback)
-  const primaryCommunity = followedBrands[0]?.slug || "raelynn";
+  const primaryCommunity = followedBrands[0]?.slug ?? null;
 
   return (
     <section className="space-y-6">
@@ -466,9 +465,10 @@ function SpendPointsCard({
   primaryCommunity,
   points,
 }: {
-  primaryCommunity: string;
+  primaryCommunity: string | null;
   points: number;
 }) {
+  const rewardsHref = primaryCommunity ? `/brands/${primaryCommunity}/rewards` : "/rewards";
   return (
     <div className="glass-card rounded-2xl p-5 border border-gradient-to-r from-purple-500/30 to-blue-500/30">
       <div className="flex items-center justify-between">
@@ -477,7 +477,7 @@ function SpendPointsCard({
           <p className="mt-1 text-sm font-semibold">{points.toLocaleString()} available</p>
         </div>
         <Link
-          href={`/brands/${primaryCommunity}/rewards`}
+          href={rewardsHref}
           className="inline-flex rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 px-4 py-2 text-xs font-medium text-white hover:opacity-90"
         >
           Browse rewards →

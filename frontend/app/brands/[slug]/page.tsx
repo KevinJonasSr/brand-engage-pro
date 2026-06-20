@@ -22,6 +22,10 @@ import RsvpButton from "./rsvp-button";
 import { focalPointStyle } from "@/lib/images/focal-point";
 
 import { BrandPredictionsSection } from "@/components/predictions/brand-predictions-section";
+import ActivityPulseStrip from "@/components/activity-pulse";
+import { getActivityPulse } from "@/lib/data/activity-pulse";
+import StampCard from "@/components/stamp-card";
+import { getStampCardData } from "@/lib/data/stamp-card";
 export const dynamic = "force-dynamic";
 
 // Per-brand hero focal-point now comes from brands.hero_focal_x /
@@ -90,10 +94,14 @@ export default async function BrandPage({
   const isSignedIn = member !== null;
   const needsProfile = isSignedIn && !member.first_name;
 
+  // Fetch activity pulse + stamp card in parallel (non-blocking — both fail gracefully)
+  const [pulse, stampCardData, eventIds] = await Promise.all([
+    getActivityPulse(slug).catch(() => null),
+    member ? getStampCardData(slug, member.id).catch(() => null) : Promise.resolve(null),
+    Promise.resolve(brand.upcoming.filter((e) => !!e.id).map((e) => e.id as string)),
+  ]);
+
   // RSVP meta: counts + whether the current member has RSVPed to each event.
-  // Only events with a real DB id participate; fallback hardcoded events
-  // (no id) remain read-only.
-  const eventIds = brand.upcoming.filter((e) => !!e.id).map((e) => e.id as string);
   const { counts: rsvpCounts, mine: myRsvps } = await getRsvpMetaForEvents(eventIds);
 
   const heroGradient = `linear-gradient(to bottom right, ${brand.accentFrom}66, #0f172a, #000000)`;
@@ -191,6 +199,15 @@ export default async function BrandPage({
             >
               {primaryCta.label}
             </Link>
+            <Link
+              href={`/brands/${slug}/community`}
+              className="rounded-full border border-white/30 bg-black/30 px-6 py-3 text-sm font-medium text-white/90 backdrop-blur hover:bg-white/10"
+            >
+              Community →
+            </Link>
+          </div>
+          {/* Secondary row: follow + share — less prominent so primary CTAs stay clear */}
+          <div className="mt-3 flex flex-wrap gap-2">
             {isSignedIn && (
               <FollowButton brandSlug={brand.slug} initialFollowing={isFollowing} />
             )}
@@ -205,27 +222,10 @@ export default async function BrandPage({
               variant="ghost"
               label="Share"
             />
-            <Link
-              href={`/brands/${slug}/community`}
-              className="rounded-full border border-white/30 bg-black/30 px-6 py-3 text-sm font-medium text-white/90 backdrop-blur hover:bg-white/10"
-            >
-              Community →
-            </Link>
-            <Link
-              href={secondaryCta.href}
-              className="rounded-full border border-white/30 bg-black/30 px-6 py-3 text-sm font-medium text-white/90 backdrop-blur hover:bg-white/10"
-            >
-              {secondaryCta.label}
-            </Link>
           </div>
           {!isSignedIn && (
             <p className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-aurora/30 bg-aurora/10 px-3 py-1 text-xs font-medium text-aurora">
               🎁 Join free and unlock your first member perk today.
-            </p>
-          )}
-          {!brand.heroImage && (
-            <p className="mt-6 text-xs text-white/40">
-              Hero imagery pending Box asset drop.
             </p>
           )}
         </div>
@@ -245,10 +245,14 @@ export default async function BrandPage({
         </section>
       )}
 
+      {/* Activity pulse — anonymized social proof */}
+      {pulse && <ActivityPulseStrip pulse={pulse} />}
+
       {/* About */}
       <LatestStrip slug={slug} />
 
       <section className="grid gap-6 lg:grid-cols-[2fr_1fr]">
+
         <div className="glass-card p-8">
           <p className="text-sm uppercase tracking-wide text-white/60">About</p>
           <p className="mt-4 text-base leading-relaxed text-white/80 whitespace-pre-line">{brand.bio}</p>
@@ -269,6 +273,16 @@ export default async function BrandPage({
 
       {/* Top members leaderboard preview */}
       <LeaderboardMiniCard brandSlug={slug} />
+
+      {/* Stamp card — only shown when config exists and member is signed in */}
+      {isSignedIn && stampCardData && (
+        <StampCard
+          data={stampCardData}
+          brandSlug={slug}
+          accentFrom={brand.accentFrom}
+          accentTo={brand.accentTo}
+        />
+      )}
 
       {/* PREDICTIONS — Phase 6.B */}
       <BrandPredictionsSection

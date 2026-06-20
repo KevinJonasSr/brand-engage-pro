@@ -1,5 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { listBrandsFromDb } from "@/lib/data/brands";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "For Brands",
@@ -41,7 +44,9 @@ export const metadata: Metadata = {
  * performance metrics — uses qualitative proof and "confirmed in
  * onboarding" language until the Brand Agreement is finalized.
  */
-export default function ForBrandsPage() {
+export default async function ForBrandsPage() {
+  const brands = await listBrandsFromDb();
+
   return (
     <main className="mx-auto max-w-5xl space-y-20 px-6 py-16">
       {/* ─── Hero ──────────────────────────────────────────────────────────── */}
@@ -140,29 +145,7 @@ export default function ForBrandsPage() {
           </p>
         </div>
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {[
-            {
-              slug: "nellies",
-              name: "Nellie's Southern Kitchen",
-              tagline:
-                "Comfort food + tier perks for the regulars who keep coming back.",
-              accent: "#fbbf24",
-            },
-            {
-              slug: "raelynn",
-              name: "RaeLynn",
-              tagline:
-                "Country, heart-first. On tour with Luke Bryan — members get first listen.",
-              accent: "#fde68a",
-            },
-            {
-              slug: "jonas-group-ent",
-              name: "Jonas Group Entertainment",
-              tagline:
-                "Entertainment company. Member access to the talent ecosystem.",
-              accent: "#a78bfa",
-            },
-          ].map((b) => (
+          {brands.map((b) => (
             <Link
               key={b.slug}
               href={`/brands/${b.slug}`}
@@ -170,8 +153,8 @@ export default function ForBrandsPage() {
             >
               <div
                 aria-hidden
-                className="absolute inset-x-0 top-0 h-1"
-                style={{ backgroundColor: b.accent }}
+                className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r"
+                style={{ backgroundImage: `linear-gradient(90deg, ${b.accentFrom}, ${b.accentTo})` }}
               />
               <p className="mt-2 text-base font-semibold">{b.name}</p>
               <p className="mt-2 text-xs text-white/60 line-clamp-3">

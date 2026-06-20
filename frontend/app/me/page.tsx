@@ -53,6 +53,11 @@ export default async function MeIndexPage() {
           body="Your tier, badges, and points history."
         />
         <Row
+          href="/me/card"
+          title="Member card"
+          body="Your shareable loyalty card — tier, points, and streak at a glance."
+        />
+        <Row
           href="/referrals"
           title="Referrals"
           body="Invite friends — earn points when they join."
