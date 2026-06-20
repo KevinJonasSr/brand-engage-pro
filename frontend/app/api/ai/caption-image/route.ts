@@ -40,11 +40,24 @@ export async function POST(request: Request) {
   }
 
   const imageUrl = (body?.imageUrl ?? "").trim();
-  if (!imageUrl || !/^https?:\/\//i.test(imageUrl)) {
+  if (!imageUrl || !/^https?\/\//i.test(imageUrl)) {
     return NextResponse.json(
       { error: "imageUrl is required and must be http(s)." },
       { status: 400 },
     );
+  }
+  // Restrict fetches to trusted storage/CDN hosts to prevent SSRF
+  try {
+    const { hostname } = new URL(imageUrl);
+    const allowed = /\.(supabase\.co|supabase\.in|cloudinary\.com|imgix\.net|brand-engage-pro\.vercel\.app)$/i;
+    if (!allowed.test(hostname)) {
+      return NextResponse.json(
+        { error: "imageUrl host is not allowed." },
+        { status: 400 },
+      );
+    }
+  } catch {
+    return NextResponse.json({ error: "Invalid imageUrl." }, { status: 400 });
   }
 
   if (!process.env.ANTHROPIC_API_KEY) {

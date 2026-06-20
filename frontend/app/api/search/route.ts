@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { search } from "@/lib/search";
 import { EmbeddingError } from "@/lib/embeddings";
+import { apiRateLimiter, getClientIp } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -19,7 +20,15 @@ export const dynamic = "force-dynamic";
  * Caching: no-store. The query results are too varied + cheap to cache
  * meaningfully, and we want fresh moderation/visibility filters.
  */
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
+  const rl = apiRateLimiter.check(getClientIp(request.headers));
+  if (!rl.success) {
+    return NextResponse.json(
+      { error: "Too many search requests. Please try again later." },
+      { status: 429, headers: { "Retry-After": Math.ceil((rl.resetTime.getTime() - Date.now()) / 1000).toString() } },
+    );
+  }
+
   const url = new URL(request.url);
   const query = (url.searchParams.get("q") ?? "").trim();
 

@@ -76,7 +76,7 @@ export async function POST(request: Request) {
       .from("members")
       .update(updates)
       .eq("id", user.id)
-      .select()
+      .select("id, first_name, current_tier, total_points, profile_slug")
       .single();
 
     if (updateErr) {
@@ -184,7 +184,7 @@ export async function POST(request: Request) {
       }
     }
 
-    return NextResponse.json({ success: true, member });
+    return NextResponse.json({ success: true, member: { id: member?.id, first_name: member?.first_name, current_tier: member?.current_tier, total_points: member?.total_points, profile_slug: member?.profile_slug } });
   } catch (err) {
     console.error("onboard route error:", err);
     return NextResponse.json(

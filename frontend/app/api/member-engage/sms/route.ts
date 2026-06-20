@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import twilio from "twilio";
+import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -15,6 +16,12 @@ const messagingServiceSid = process.env.TWILIO_MESSAGING_SERVICE_SID;
 const defaultFrom = process.env.TWILIO_DEFAULT_FROM;
 
 export async function POST(request: Request) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   if (!accountSid || !authToken || (!messagingServiceSid && !defaultFrom)) {
     return NextResponse.json(
       { error: "Twilio credentials are not configured" },
@@ -27,6 +34,9 @@ export async function POST(request: Request) {
 
     if (!phone) {
       return NextResponse.json({ error: "Phone number required" }, { status: 400 });
+    }
+    if (!/^\+[1-9]\d{7,14}$/.test(phone)) {
+      return NextResponse.json({ error: "Invalid phone number format" }, { status: 400 });
     }
 
     const client = twilio(accountSid, authToken);

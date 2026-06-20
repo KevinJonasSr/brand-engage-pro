@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { memberDataRateLimiter, getClientIp } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
+
+const ALLOWED_TAGS = ["member", "early-access", "vip", "newsletter"] as const;
+type AllowedTag = (typeof ALLOWED_TAGS)[number];
 
 type SubscribePayload = {
   email: string;
@@ -16,6 +21,18 @@ type SubscribePayload = {
  * calling it twice with the same email is safe.
  */
 export async function POST(request: Request) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const clientIp = getClientIp(request.headers as unknown as Headers);
+  const rl = memberDataRateLimiter.check(clientIp);
+  if (!rl.success) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
+
   const apiKey = process.env.MAILCHIMP_API_KEY;
   const server = process.env.MAILCHIMP_SERVER_PREFIX;
   const listId = process.env.MAILCHIMP_AUDIENCE_ID;
@@ -49,7 +66,10 @@ export async function POST(request: Request) {
         ...(lastName ? { LNAME: lastName } : {}),
       },
     };
-    if (tags && tags.length > 0) body.tags = tags;
+    const safeTags: AllowedTag[] = (tags ?? []).filter((t): t is AllowedTag =>
+      ALLOWED_TAGS.includes(t as AllowedTag)
+    );
+    if (safeTags.length > 0) body.tags = safeTags;
 
     const authHeader = `Basic ${Buffer.from(`anystring:${apiKey}`).toString("base64")}`;
 

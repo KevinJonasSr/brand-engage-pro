@@ -26,7 +26,9 @@ function renderInline(md: string): string {
   // Links
   out = out.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_m, text, href) => {
     const safeHref = /^(https?:|mailto:|tel:|\/)/i.test(href) ? href : "#";
-    return `<a href="${safeHref}" class="text-aurora underline underline-offset-2 hover:text-white">${text}</a>`;
+    // Encode quotes to prevent attribute injection
+    const encodedHref = safeHref.replace(/"/g, "%22").replace(/'/g, "%27");
+    return `<a href="${encodedHref}" class="text-aurora underline underline-offset-2 hover:text-white">${text}</a>`;
   });
   // Bold (before italic so it takes precedence)
   out = out.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");

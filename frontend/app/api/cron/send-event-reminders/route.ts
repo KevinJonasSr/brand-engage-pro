@@ -1,3 +1,4 @@
+import { verifyCronAuth } from "@/lib/cron-auth";
 import { NextResponse } from "next/server";
 import {
   loadEventsInReminderWindow,
@@ -19,13 +20,8 @@ export const dynamic = "force-dynamic";
  * so one bad event doesn't crash the cron and stall the rest.
  */
 export async function GET(request: Request) {
-  const expected = process.env.CRON_SECRET;
-  if (expected) {
-    const auth = request.headers.get("authorization") ?? "";
-    if (auth !== `Bearer ${expected}`) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-  }
+  const authErr = verifyCronAuth(request);
+  if (authErr) return authErr;
 
   const started = Date.now();
   const kinds = ["reminder_24h", "reminder_1h"] as const;
