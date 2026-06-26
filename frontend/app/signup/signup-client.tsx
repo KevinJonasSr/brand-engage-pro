@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { TurnstileWidget, verifyTurnstileToken } from "@/components/turnstile-widget";
 
 export type ReferrerBrand = {
   slug: string;
@@ -33,6 +34,9 @@ export default function SignupPage({
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "error" | "confirm">("idle");
   const [message, setMessage] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const handleTurnstileSuccess = useCallback((token: string) => setTurnstileToken(token), []);
+  const handleTurnstileExpire = useCallback(() => setTurnstileToken(null), []);
 
   // Email regex — pragmatic, not RFC-perfect. Catches the common typos
   // (missing @, missing TLD, trailing space) without rejecting odd-but-
@@ -64,6 +68,13 @@ export default function SignupPage({
     if (eErr || pErr) {
       setStatus("error");
       setMessage("");
+      return;
+    }
+
+    const captchaOk = await verifyTurnstileToken(turnstileToken);
+    if (!captchaOk) {
+      setStatus("error");
+      setMessage("Please complete the security check before continuing.");
       return;
     }
 
@@ -272,6 +283,12 @@ export default function SignupPage({
               );
             })()}
           </label>
+
+          <TurnstileWidget
+            onSuccess={handleTurnstileSuccess}
+            onExpire={handleTurnstileExpire}
+            theme="dark"
+          />
 
           <button
             type="submit"
