@@ -134,6 +134,27 @@ export async function getAdminContext(): Promise<AdminContext | null> {
   };
 }
 
+export type AdminRole = "owner" | "admin" | "editor" | "viewer";
+
+const ADMIN_ROLE_WEIGHT: Record<AdminRole, number> = {
+  owner: 4,
+  admin: 3,
+  editor: 2,
+  viewer: 1,
+};
+
+/** True when `role` is at least as privileged as `minimum`. Super-admins
+ *  already carry role 'owner' via their '*' grant. */
+export function roleAtLeast(
+  role: string | null | undefined,
+  minimum: AdminRole,
+): boolean {
+  if (!role) return false;
+  return (
+    (ADMIN_ROLE_WEIGHT[role as AdminRole] ?? 0) >= ADMIN_ROLE_WEIGHT[minimum]
+  );
+}
+
 /**
  * Backward-compat shim for pages that still call getAdminUser(). Returns
  * the Supabase user if the caller has any admin grant; returns null

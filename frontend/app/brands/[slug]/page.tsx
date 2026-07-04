@@ -26,6 +26,7 @@ import ActivityPulseStrip from "@/components/activity-pulse";
 import { getActivityPulse } from "@/lib/data/activity-pulse";
 import StampCard from "@/components/stamp-card";
 import { getStampCardData } from "@/lib/data/stamp-card";
+import { getActiveGoalsWithProgress } from "@/lib/goals/progress";
 export const dynamic = "force-dynamic";
 
 // Per-brand hero focal-point now comes from brands.hero_focal_x /
@@ -95,10 +96,11 @@ export default async function BrandPage({
   const needsProfile = isSignedIn && !member.first_name;
 
   // Fetch activity pulse + stamp card in parallel (non-blocking — both fail gracefully)
-  const [pulse, stampCardData, eventIds] = await Promise.all([
+  const [pulse, stampCardData, eventIds, goals] = await Promise.all([
     getActivityPulse(slug).catch(() => null),
     member ? getStampCardData(slug, member.id).catch(() => null) : Promise.resolve(null),
     Promise.resolve(brand.upcoming.filter((e) => !!e.id).map((e) => e.id as string)),
+    getActiveGoalsWithProgress(slug),
   ]);
 
   // RSVP meta: counts + whether the current member has RSVPed to each event.
@@ -247,6 +249,51 @@ export default async function BrandPage({
 
       {/* Activity pulse — anonymized social proof */}
       {pulse && <ActivityPulseStrip pulse={pulse} />}
+
+      {/* Community goals — shared targets with live progress */}
+      {goals.length > 0 && (
+        <section className="glass-card p-8">
+          <p className="text-sm uppercase tracking-wide text-white/60">
+            Community goals
+          </p>
+          <div className="mt-4 space-y-5">
+            {goals.map((g) => (
+              <div key={g.id}>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="font-semibold text-white">
+                    {g.title}
+                    {g.completed && <span className="ml-2">🏆</span>}
+                  </p>
+                  <p className="text-sm text-white/60">
+                    {g.current.toLocaleString()} / {g.target.toLocaleString()}{" "}
+                    · {g.pct}%
+                  </p>
+                </div>
+                {g.description && (
+                  <p className="mt-1 text-sm text-white/60">{g.description}</p>
+                )}
+                <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/10">
+                  <div
+                    className="h-full rounded-full"
+                    style={{
+                      width: `${Math.max(2, g.pct)}%`,
+                      backgroundImage: ctaGradient,
+                    }}
+                  />
+                </div>
+                <div className="mt-2">
+                  <Link
+                    href={`/share/goal/${brand.slug}/${g.id}`}
+                    className="text-xs text-white/50 hover:text-white"
+                  >
+                    Share this goal →
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* About */}
       <LatestStrip slug={slug} />
