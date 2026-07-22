@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { emitNetworkEvent } from "@/lib/network";
 
 export const runtime = "nodejs";
 
@@ -126,6 +127,21 @@ export async function POST(request: Request) {
             .from("members")
             .update({ referred_by: referrer.id })
             .eq("id", user.id);
+
+          // Jonas Network: the referrer converted a new member. One event
+          // per referred member (upsert above is keyed the same way).
+          emitNetworkEvent({
+            event_type: "referral.converted",
+            local_actor_id: referrer.id,
+            entity_type: "member",
+            entity_id: user.id,
+            dedupe_key: `be:referral:${referrer.id}:${user.id}`,
+            metadata: {
+              referred_member_id: user.id,
+              referral_code: payload.referralCode,
+              points_awarded: 150,
+            },
+          });
         }
       } catch (err) {
         console.warn("onboard: referral handling failed", err);

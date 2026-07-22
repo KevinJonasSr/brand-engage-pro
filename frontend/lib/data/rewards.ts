@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { emitNetworkEvent } from "@/lib/network";
 
 export interface RewardRow {
   id: string;
@@ -166,7 +167,36 @@ export async function redeemReward({
       return { ok: false, error: error.message };
     }
 
-    return { ok: true, redemptionId: data as string };
+    const redemptionId = data as string;
+
+    // Jonas Network: report the redemption. The reward row is re-read for
+    // community/points context (the redeem_reward RPC doesn't return them);
+    // a failed read still emits, just with sparser metadata.
+    try {
+      const { data: reward } = await supabase
+        .from("rewards_catalog")
+        .select("community_id, point_cost, title")
+        .eq("id", rewardId)
+        .maybeSingle();
+      emitNetworkEvent({
+        event_type: "reward.redeemed",
+        local_actor_id: memberId,
+        artist_slug: reward?.community_id ?? undefined,
+        entity_type: "reward",
+        entity_id: rewardId,
+        dedupe_key: `be:redeem:${redemptionId}`,
+        metadata: {
+          redemption_id: redemptionId,
+          community_id: reward?.community_id ?? null,
+          points_spent: reward?.point_cost ?? null,
+          reward_title: reward?.title ?? null,
+        },
+      });
+    } catch {
+      // Never let reporting break a redemption.
+    }
+
+    return { ok: true, redemptionId };
   } catch (err) {
     return {
       ok: false,

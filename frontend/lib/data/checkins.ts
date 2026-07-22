@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { emitNetworkEvent } from "@/lib/network";
 
 export const CHECKIN_POINTS = 25;
 
@@ -87,6 +88,17 @@ export async function recordCheckin(
         .eq("member_id", memberId)
         .eq("community_id", brandSlug);
     }
+    // Jonas Network: report the check-in. Day-scoped dedupe mirrors the
+    // app's own one-per-day idempotency above.
+    emitNetworkEvent({
+      event_type: "event.checkin",
+      local_actor_id: memberId,
+      artist_slug: brandSlug,
+      entity_type: "community",
+      entity_id: brandSlug,
+      dedupe_key: `be:checkin:${brandSlug}:${memberId}:${todayET}`,
+      metadata: { community_id: brandSlug, points_awarded: CHECKIN_POINTS },
+    });
   }
 
   return { ok: true, alreadyCheckedIn: false, pointsAwarded: CHECKIN_POINTS };
