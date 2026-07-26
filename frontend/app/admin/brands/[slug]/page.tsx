@@ -76,14 +76,22 @@ export default async function AdminBrandEditPage({
           </h1>
           <p className="mt-1 text-xs text-white/60">/{brand.slug as string}</p>
         </div>
-        <Link
-          href={`/brands/${brand.slug as string}`}
-          target="_blank"
-          rel="noreferrer"
-          className="rounded-full border border-white/20 px-4 py-2 text-xs text-white/80 hover:bg-white/10"
-        >
-          View public page ↗
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/admin/brands/${brand.slug as string}/super-fans`}
+            className="rounded-full border border-white/20 px-4 py-2 text-xs text-white/80 hover:bg-white/10"
+          >
+            Super Fans
+          </Link>
+          <Link
+            href={`/brands/${brand.slug as string}`}
+            target="_blank"
+            rel="noreferrer"
+            className="rounded-full border border-white/20 px-4 py-2 text-xs text-white/80 hover:bg-white/10"
+          >
+            View public page ↗
+          </Link>
+        </div>
       </div>
 
       <BrandEditForm
