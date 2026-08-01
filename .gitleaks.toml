@@ -1,0 +1,24 @@
+# Gitleaks configuration for Brand-engage-pro
+# https://github.com/gitleaks/gitleaks#configuration
+
+title = "Brand-engage-pro gitleaks config"
+
+[extend]
+# Use the default ruleset as a base
+useDefault = true
+
+[allowlist]
+description = "Allow placeholder and example values"
+paths = [
+  # Example/template files with placeholder values
+  '''^frontend/\.env\.example$''',
+]
+regexes = [
+  # Twilio placeholder SID/token patterns in .env.example
+  '''ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX''',
+  '''xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx''',
+  '''MGXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX''',
+  # Supabase placeholder (empty assignments are not secrets)
+  '''NEXT_PUBLIC_SUPABASE_ANON_KEY=$''',
+  '''SUPABASE_SERVICE_ROLE_KEY=$''',
+]

@@ -1,8 +1,44 @@
 import type { NextConfig } from "next";
 
+const authSensitiveHeaders = [
+  { key: "Cache-Control", value: "private, no-store, no-cache, max-age=0, must-revalidate, no-transform" },
+  { key: "CDN-Cache-Control", value: "no-store" },
+  { key: "Vercel-CDN-Cache-Control", value: "no-store" },
+];
+
+const authSensitiveRoutes = [
+  "/auth/:path*",
+  "/login",
+  "/signup",
+  "/forgot-password",
+  "/reset-password",
+  "/onboarding",
+  "/onboarding/:path*",
+  "/premium",
+  "/premium/:path*",
+  "/settings/:path*",
+  "/me/:path*",
+  "/admin/:path*",
+  "/inbox/:path*",
+  "/api/stripe/:path*",
+];
+
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "enfpviapxvqyoarwwsuf.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
+    ],
+  },
   async headers() {
     return [
+      ...authSensitiveRoutes.map((source) => ({
+        source,
+        headers: authSensitiveHeaders,
+      })),
       {
         source: "/api/:path*",
         headers: [
@@ -29,7 +65,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Content-Security-Policy",
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; frame-ancestors 'none';",
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; frame-src https://challenges.cloudflare.com; frame-ancestors 'none';",
           },
           {
             key: "X-Frame-Options",
