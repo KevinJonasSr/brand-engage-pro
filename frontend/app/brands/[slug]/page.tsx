@@ -193,7 +193,7 @@ export default async function BrandPage({
           <p className="mt-3 max-w-xl text-lg text-white/85 drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)]">
             {brand.tagline}
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link
               href={primaryCta.href}
               className="rounded-full px-6 py-3 text-sm font-semibold text-white transition hover:brightness-110"
@@ -207,9 +207,6 @@ export default async function BrandPage({
             >
               Community →
             </Link>
-          </div>
-          {/* Secondary row: follow + share — less prominent so primary CTAs stay clear */}
-          <div className="mt-3 flex flex-wrap gap-2">
             {isSignedIn && (
               <FollowButton brandSlug={brand.slug} initialFollowing={isFollowing} />
             )}
@@ -222,7 +219,7 @@ export default async function BrandPage({
                   : `https://brand-engage-pro.vercel.app/brands/${brand.slug}`
               }
               variant="ghost"
-              label="Share"
+              label=""
             />
           </div>
           {!isSignedIn && (

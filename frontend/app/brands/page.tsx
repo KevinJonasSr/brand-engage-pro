@@ -150,7 +150,7 @@ export default async function BrandsIndexPage({ searchParams }: { searchParams?:
               {/* Bottom-left content: name + tagline + CTA arrow */}
               <div className="absolute inset-x-0 bottom-0 p-5">
                 <h2
-                  className="text-2xl font-semibold text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]"
+                  className="truncate text-2xl font-semibold text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]"
                   style={{ fontFamily: "var(--font-display)" }}
                 >
                   {a.name}

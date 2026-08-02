@@ -62,28 +62,28 @@ export default function ShareButton({
     }
   }
 
-  const baseClass =
-    "inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition disabled:opacity-60";
+  const iconOnly = !label;
+  const baseClass = iconOnly
+    ? "inline-flex h-[46px] w-[46px] items-center justify-center rounded-full text-sm font-medium transition disabled:opacity-60"
+    : "inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition disabled:opacity-60";
   const styleClass =
     variant === "primary"
       ? "bg-gradient-to-r from-aurora to-ember text-white shadow-glass hover:brightness-110"
       : "border border-white/25 text-white/85 hover:bg-white/10";
+
+  const feedbackLabel =
+    state === "copied" ? "Copied" : state === "error" ? "Error" : label;
 
   return (
     <button
       type="button"
       onClick={handleShare}
       className={`${baseClass} ${styleClass}`}
-      aria-label={label}
+      aria-label={iconOnly ? (state === "copied" ? "Link copied" : "Share") : undefined}
+      title={iconOnly ? "Share" : undefined}
     >
       <ShareIcon />
-      <span>
-        {state === "copied"
-          ? "Link copied"
-          : state === "error"
-            ? "Couldn't share"
-            : label}
-      </span>
+      {!iconOnly && <span>{feedbackLabel}</span>}
     </button>
   );
 }

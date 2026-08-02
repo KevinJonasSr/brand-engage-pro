@@ -24,7 +24,7 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
           <div className="absolute -top-24 left-1/2 h-[420px] w-[820px] -translate-x-1/2 rounded-full bg-gradient-to-br from-aurora/40 via-ember/20 to-transparent blur-3xl" />
         </div>
 
-        <div className="relative mx-auto grid max-w-6xl gap-10 px-6 py-20 lg:grid-cols-[1.15fr_1fr] lg:py-28">
+        <div className="relative mx-auto grid max-w-6xl gap-10 px-6 pt-12 pb-20 lg:grid-cols-[1.15fr_1fr] lg:pt-16 lg:pb-28">
           <div className="flex flex-col justify-center">
             <p className="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs uppercase tracking-widest text-white/70">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
