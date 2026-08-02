@@ -28,15 +28,12 @@ export default function CookieBanner() {
   const [dismissed, setDismissed] = useState(false);
   const pathname = usePathname() ?? "";
 
-  // Don't compete with primary CTAs on form-heavy routes. Banner is
-  // anchored at the bottom of the viewport on mobile (full-width) and
-  // can cover Submit buttons on /onboarding, /signup, /login. Suppress
-  // there; banner still fires on every other page so consent capture
-  // isn't lost permanently.
-  const HIDE_ON = ["/onboarding", "/signup", "/login"];
-  const hiddenForRoute = HIDE_ON.some((prefix) => pathname.startsWith(prefix));
+  // Form-heavy routes get the banner anchored at the top instead of the
+  // bottom, so it doesn't cover Submit buttons on mobile.
+  const TOP_ON = ["/onboarding", "/signup", "/login"];
+  const topForRoute = TOP_ON.some((prefix) => pathname.startsWith(prefix));
 
-  const shown = stored === null && !dismissed && !hiddenForRoute;
+  const shown = stored === null && !dismissed;
 
   function save(choice: "accept" | "decline") {
     try {
@@ -53,7 +50,11 @@ export default function CookieBanner() {
   if (!shown) return null;
 
   return (
-    <div className="fixed inset-x-4 bottom-4 z-50 rounded-2xl border border-white/15 bg-slate-950/95 p-4 shadow-xl backdrop-blur md:inset-x-auto md:right-4 md:max-w-sm">
+    <div
+      className={`fixed inset-x-4 z-50 rounded-2xl border border-white/15 bg-slate-950/95 p-4 shadow-xl backdrop-blur md:inset-x-auto md:max-w-sm ${
+        topForRoute ? "top-4 md:right-4" : "bottom-4 md:right-4"
+      }`}
+    >
       <p className="text-sm text-white/90">
         Brand Engage Pro uses cookies for sign-in and basic platform features. See our{" "}
         <Link href="/cookie-policy" className="text-aurora underline">
