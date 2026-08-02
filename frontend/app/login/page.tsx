@@ -25,7 +25,15 @@ function LoginFallback() {
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const next = searchParams.get("next") ?? "/";
+  const rawNext = searchParams.get("next");
+  const next = rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//")
+    ? rawNext
+    : "/";
+  const ref = searchParams.get("ref");
+  const signupParams = new URLSearchParams();
+  if (next !== "/") signupParams.set("next", next);
+  if (ref) signupParams.set("ref", ref);
+  const signupHref = `/signup${signupParams.size ? `?${signupParams.toString()}` : ""}`;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -162,7 +170,7 @@ function LoginForm() {
 
         <p className="text-center text-sm text-white/60">
           New member?{" "}
-          <Link href="/signup" className="text-white underline-offset-4 hover:underline">
+          <Link href={signupHref} className="text-white underline-offset-4 hover:underline">
             Create an account
           </Link>
         </p>

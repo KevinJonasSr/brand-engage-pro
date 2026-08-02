@@ -115,13 +115,13 @@ export default async function BrandCommunityPage({
           </p>
           <div className="mt-3 flex gap-2">
             <Link
-              href={`/login?next=/brands/${slug}/community`}
+              href={`/login?next=${encodeURIComponent(`/brands/${slug}/community`)}`}
               className="rounded-full border border-white/20 px-4 py-2 text-xs text-white/80 hover:bg-white/10"
             >
               Sign in
             </Link>
             <Link
-              href={`/signup`}
+              href={`/signup?ref=${encodeURIComponent(slug)}&next=${encodeURIComponent(`/brands/${slug}/community`)}`}
               className="rounded-full bg-gradient-to-r from-aurora to-ember px-4 py-2 text-xs font-semibold text-white shadow-glass"
             >
               Create account

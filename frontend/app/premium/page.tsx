@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getCurrentCommunityId } from "@/lib/community";
+import { getCurrentCommunityId, normalizeCommunitySlug } from "@/lib/community";
 import { getFounderState, fmtPrice } from "@/lib/stripe-helpers";
 import { createCheckoutSessionAction } from "./actions";
 
@@ -24,6 +24,8 @@ export default async function PremiumPage({
   searchParams,
 }: {
   searchParams?: Promise<{
+    c?: string;
+    ref?: string;
     canceled?: string;
     already_active?: string;
   }>;
@@ -36,7 +38,12 @@ export default async function PremiumPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  const communityId = await getCurrentCommunityId();
+  const requestedCommunityId =
+    normalizeCommunitySlug(params.c) ?? normalizeCommunitySlug(params.ref);
+  const communityId = requestedCommunityId ?? (await getCurrentCommunityId());
+  const premiumPath = `/premium?c=${encodeURIComponent(communityId)}`;
+  const signupHref = `/signup?ref=${encodeURIComponent(communityId)}&next=${encodeURIComponent(premiumPath)}`;
+  const loginHref = `/login?next=${encodeURIComponent(premiumPath)}`;
   const admin = createAdminClient();
   const { data: row } = await admin
     .from("communities")
@@ -79,10 +86,10 @@ export default async function PremiumPage({
   );
 
   const perks = [
-    { icon: "🎙️", title: "Behind-the-scenes feed", body: "Posts only Premium members see — raw moments, works-in-progress, voice notes." },
+    { icon: "✨", title: "Member-only feed", body: "Premium updates, first looks, and offers only members see." },
     { icon: "🎟️", title: "Early ticket access", body: "First crack at event tickets, limited by venue capacity." },
-    { icon: "🎁", title: "Exclusive drops", body: "Premium-only exclusive merch, signed gear, limited runs." },
-    { icon: "💬", title: "Monthly AMA", body: "Live Q&A with the brand — ask anything." },
+    { icon: "🎁", title: "Exclusive drops", body: "Premium-only merch, limited runs, and brand perks." },
+    { icon: "💬", title: "Member Q&A", body: "Live Q&A with the brand — ask anything." },
     { icon: "🏆", title: "Premium badges", body: "The full status ladder — Silver, Gold, Platinum, and event badges." },
     { icon: "⚡", title: "1.5× points", body: "Every member action earns 1.5× more toward rewards." },
     { icon: "💸", title: "$5/mo store credit", body: "Refreshed monthly — spend on merch, events, or bank it up." },
@@ -189,10 +196,10 @@ export default async function PremiumPage({
                   : "All perks below are unlocked. Thanks for being one of us."}
             </p>
             <div className="mt-4 flex gap-3">
-              <Link
-                href="/"
-                className="rounded-full bg-white/10 px-4 py-2 text-sm text-white hover:bg-white/15"
-              >
+            <Link
+              href={`/brands/${communityId}`}
+              className="rounded-full bg-white/10 px-4 py-2 text-sm text-white hover:bg-white/15"
+            >
                 Back to community
               </Link>
               {tier !== "comped" && (
@@ -213,9 +220,10 @@ export default async function PremiumPage({
             {/* Monthly */}
             <form action={createCheckoutSessionAction} className="contents">
               <input type="hidden" name="billing_period" value="monthly" />
+              <input type="hidden" name="community_id" value={communityId} />
               <button
                 type="submit"
-                disabled={!user || !community.stripe_product_id}
+                disabled={!community.stripe_product_id}
                 className="group flex flex-col items-start rounded-3xl border border-white/10 bg-black/40 p-6 text-left transition hover:border-white/25 hover:bg-white/5 disabled:opacity-50"
               >
                 <p className="text-xs uppercase tracking-widest text-white/50">
@@ -239,7 +247,7 @@ export default async function PremiumPage({
                     backgroundImage: `linear-gradient(90deg, ${community.accent_from}, ${community.accent_to})`,
                   }}
                 >
-                  Choose monthly →
+                  {user ? "Choose monthly →" : "Create profile for monthly →"}
                 </span>
               </button>
             </form>
@@ -247,9 +255,10 @@ export default async function PremiumPage({
             {/* Annual */}
             <form action={createCheckoutSessionAction} className="contents">
               <input type="hidden" name="billing_period" value="annual" />
+              <input type="hidden" name="community_id" value={communityId} />
               <button
                 type="submit"
-                disabled={!user || !community.stripe_product_id}
+                disabled={!community.stripe_product_id}
                 className="group relative flex flex-col items-start rounded-3xl border-2 border-white/20 bg-gradient-to-br from-white/8 to-black/40 p-6 text-left transition hover:border-white/35 disabled:opacity-50"
               >
                 <span className="absolute right-4 top-4 rounded-full bg-white/15 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-white">
@@ -276,7 +285,7 @@ export default async function PremiumPage({
                     backgroundImage: `linear-gradient(90deg, ${community.accent_from}, ${community.accent_to})`,
                   }}
                 >
-                  Choose annual →
+                  {user ? "Choose annual →" : "Create profile for annual →"}
                 </span>
               </button>
             </form>
@@ -287,11 +296,11 @@ export default async function PremiumPage({
         {!user && (
           <p className="mt-4 text-sm text-white/60">
             You&apos;ll need to{" "}
-            <Link href={`/onboarding?next=${encodeURIComponent("/premium")}`} className="underline hover:text-white">
-              create a member profile
+            <Link href={signupHref} className="underline hover:text-white">
+              create a free member profile
             </Link>{" "}
             or{" "}
-            <Link href={`/login?next=${encodeURIComponent("/premium")}`} className="underline hover:text-white">
+            <Link href={loginHref} className="underline hover:text-white">
               sign in
             </Link>{" "}
             before you can subscribe. It takes 60 seconds.

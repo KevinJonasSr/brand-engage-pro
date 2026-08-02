@@ -2,7 +2,7 @@ import Link from "next/link";
 import ShareButton from "@/components/share-button";
 import { redirect } from "next/navigation";
 import { getStripe } from "@/lib/stripe";
-import { getCurrentCommunity } from "@/lib/community";
+import { getCommunity, getCurrentCommunityId, normalizeCommunitySlug } from "@/lib/community";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -20,17 +20,19 @@ export const dynamic = "force-dynamic";
 export default async function PremiumWelcomePage({
   searchParams,
 }: {
-  searchParams?: Promise<{ session_id?: string }>;
+  searchParams?: Promise<{ session_id?: string; c?: string }>;
 }) {
   const params = (await searchParams) ?? {};
-  if (!params.session_id) redirect("/premium");
-
-  const community = await getCurrentCommunity();
+  const requestedCommunityId = normalizeCommunitySlug(params.c);
+  if (!params.session_id) {
+    redirect(requestedCommunityId ? `/premium?c=${requestedCommunityId}` : "/premium");
+  }
 
   let status: "complete" | "pending" | "unknown" = "unknown";
   let customerEmail: string | null = null;
   let billingPeriod: string | null = null;
   let isFounder = false;
+  let communityId = requestedCommunityId ?? (await getCurrentCommunityId());
 
   try {
     const stripe = getStripe();
@@ -47,11 +49,14 @@ export default async function PremiumWelcomePage({
 
     customerEmail = session.customer_details?.email ?? null;
     const meta = session.metadata ?? {};
+    communityId = normalizeCommunitySlug(meta.community_id as string | undefined) ?? communityId;
     billingPeriod = (meta.billing_period as string | undefined) ?? null;
     isFounder = meta.tier === "founder";
   } catch (err) {
     console.warn("PremiumWelcomePage: failed to fetch session", err);
   }
+
+  const community = await getCommunity(communityId);
 
   // Phase 5e: for founder checkouts, fetch founder_number from the
   // membership so we can celebrate with their actual slot (e.g. "#47").
@@ -258,7 +263,7 @@ export default async function PremiumWelcomePage({
 
         <div className="mt-10 flex flex-wrap justify-center gap-3">
           <Link
-            href="/"
+            href={community?.slug ? `/brands/${community.slug}` : "/"}
             className="rounded-full px-6 py-3 text-sm font-semibold text-white shadow-glass transition hover:brightness-110"
             style={{
               backgroundImage: `linear-gradient(90deg, ${accentFrom}, ${accentTo})`,

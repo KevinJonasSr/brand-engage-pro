@@ -16,6 +16,19 @@ interface Founder {
   joined_at: string;
 }
 
+interface FounderMembershipRow {
+  member_id: string;
+  founder_number: number | null;
+  joined_at: string;
+  members?: {
+    first_name?: string | null;
+    avatar_url?: string | null;
+  } | Array<{
+    first_name?: string | null;
+    avatar_url?: string | null;
+  }> | null;
+}
+
 export async function generateStaticParams() {
   return listBrands().map((a) => ({ slug: a.slug }));
 }
@@ -68,18 +81,18 @@ async function getFoundersForCommunity(
 
     if (membershipsError || !memberships) return null;
 
-    const founders: Founder[] = (memberships ?? [])
-      .map((row: any) => {
+    const founders: Founder[] = (memberships as FounderMembershipRow[])
+      .filter((row): row is FounderMembershipRow & { founder_number: number } => row.founder_number !== null)
+      .map((row) => {
         const member = Array.isArray(row.members) ? row.members[0] : row.members || {};
         return {
           member_id: row.member_id,
           founder_number: row.founder_number,
-          first_name: member.first_name,
-          avatar_url: member.avatar_url,
+          first_name: member.first_name ?? null,
+          avatar_url: member.avatar_url ?? null,
           joined_at: row.joined_at,
         };
-      })
-      .filter((f) => f.founder_number !== null);
+      });
 
     return {
       founders,
@@ -128,8 +141,8 @@ export default async function FounderWallPage({
   const isFull = remainingCount <= 0;
 
   const heroGradient = `linear-gradient(to bottom right, ${brand.accentFrom}66, #0f172a, #000000)`;
-  const numberGradient = (index: number) =>
-    `linear-gradient(135deg, ${brand.accentFrom}, ${brand.accentTo})`;
+  const numberGradient = (founderNumber: number) =>
+    `linear-gradient(${120 + (founderNumber % 40)}deg, ${brand.accentFrom}, ${brand.accentTo})`;
 
   return (
     <main className="mx-auto max-w-7xl space-y-10 px-6 py-12">
@@ -189,7 +202,7 @@ export default async function FounderWallPage({
             premium pricing for life.
           </p>
           <Link
-            href="/premium"
+            href={`/premium?c=${encodeURIComponent(slug)}`}
             className="mt-6 inline-block rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-3 text-sm font-semibold text-white shadow-lg hover:brightness-110"
           >
             Become a Founding Member →
@@ -264,7 +277,7 @@ export default async function FounderWallPage({
             : "Join the first founding members with locked-in pricing for life."}
         </p>
         <Link
-          href="/premium"
+          href={`/premium?c=${encodeURIComponent(slug)}`}
           className="mt-6 inline-block rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-3 text-sm font-semibold text-white shadow-lg hover:brightness-110"
         >
           {isFull ? "Standard Premium →" : "Become a Founding Member →"}

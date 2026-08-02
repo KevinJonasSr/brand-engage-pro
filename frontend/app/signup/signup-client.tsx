@@ -25,9 +25,18 @@ export default function SignupPage({
   const searchParams = useSearchParams();
   const community = searchParams.get("community");
   const ref = searchParams.get("ref");
+  const rawNext = searchParams.get("next");
+  const next = rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//")
+    ? rawNext
+    : null;
   // Where to send the user after a successful signup. Preserve any
   // ?ref=<brand-slug> attribution from the brand-page Join CTA.
   const onboardingHref = ref ? `/onboarding?ref=${encodeURIComponent(ref)}` : "/onboarding";
+  const postSignupHref = next ?? onboardingHref;
+  const loginParams = new URLSearchParams();
+  if (next) loginParams.set("next", next);
+  if (ref) loginParams.set("ref", ref);
+  const loginHref = `/login${loginParams.size ? `?${loginParams.toString()}` : ""}`;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -83,10 +92,10 @@ export default function SignupPage({
     try {
       const supabase = createClient();
       const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${location.origin}/auth/callback?next=${encodeURIComponent(onboardingHref)}`,
+          email,
+          password,
+          options: {
+          emailRedirectTo: `${location.origin}/auth/callback?next=${encodeURIComponent(postSignupHref)}`,
         },
       });
       if (error) throw error;
@@ -94,7 +103,7 @@ export default function SignupPage({
       // If email confirmation is OFF in Supabase, Supabase returns a session here
       // and we can push straight into onboarding.
       if (data.session) {
-        router.push(onboardingHref);
+        router.push(postSignupHref);
         router.refresh();
         return;
       }
@@ -149,7 +158,7 @@ export default function SignupPage({
           <ul className="mt-4 space-y-1.5 text-sm text-white/80">
             <li className="flex items-start gap-2">
               <span aria-hidden>🎁</span>
-              <span>Member-only perks, drops, and behind-the-scenes access</span>
+              <span>Member-only perks, drops, and brand updates</span>
             </li>
             <li className="flex items-start gap-2">
               <span aria-hidden>⭐</span>
@@ -171,7 +180,7 @@ export default function SignupPage({
           </h1>
           {!showContextualHero && (
             <p className="text-sm text-white/70">
-              Create an account to earn points, unlock rewards, and get behind-the-scenes access.
+              Create an account to earn points, unlock rewards, and get member-only updates.
             </p>
           )}
           {!showContextualHero && (
@@ -343,7 +352,7 @@ export default function SignupPage({
         </p>
         <p className="text-center text-sm text-white/60">
           Already have an account?{" "}
-          <Link href="/login" className="text-white underline-offset-4 hover:underline">
+          <Link href={loginHref} className="text-white underline-offset-4 hover:underline">
             Sign in
           </Link>
         </p>

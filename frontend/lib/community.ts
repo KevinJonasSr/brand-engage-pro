@@ -11,15 +11,15 @@ import { createAdminClient } from "@/lib/supabase/admin";
  * scope their queries accordingly.
  *
  * For the legacy domain (brand-engage-pro.vercel.app) and local dev we
- * fall back to RaeLynn, keeping single-tenant parity until wildcard DNS
- * is pointed at the platform.
+ * fall back to Nellie's, keeping the current Brand Engage launch path
+ * usable until wildcard DNS is pointed at the platform.
  * ─────────────────────────────────────────────────────────────────────────
  */
 
 export interface Community {
   slug: string;
   display_name: string;
-  type: "brand" | "label_meta" | "brand";
+  type: "brand" | "label_meta";
   tagline: string | null;
   bio: string | null;
   accent_from: string;
@@ -31,24 +31,23 @@ export interface Community {
   sort_order: number;
 }
 
+export function normalizeCommunitySlug(value: string | null | undefined): string | null {
+  const slug = value?.trim().toLowerCase();
+  if (!slug || !/^[a-z0-9-]{1,64}$/.test(slug)) return null;
+  return slug;
+}
+
 /** Fallback community for hostnames that don't match a known subdomain.
- *  Applies to brand-engage-pro.vercel.app, localhost, and any apex request.
- *  Keeps today's deployment working as a single-tenant RaeLynn site until
- *  subdomains are configured. */
-export const DEFAULT_COMMUNITY_ID = "raelynn";
+ *  Applies to brand-engage-pro.vercel.app, localhost, and any apex request. */
+export const DEFAULT_COMMUNITY_ID = "nellies";
 
 /** Subdomain → community_slug map. MUST stay in sync with the
  *  communities.subdomain column in the DB. When adding a new community,
- *  update both places. `amystroup` is an alias for `danger-twins` per the
- *  Phase 4 architecture doc. */
+ *  update both places. */
 export const COMMUNITY_BY_SUBDOMAIN: Record<string, string> = {
-  raelynn: "raelynn",
-  dangertwins: "danger-twins",
-  amystroup: "danger-twins", // alias, Danger Twins is the primary brand
-  danmarshall: "dan-marshall",
-  hunterhawkins: "hunter-hawkins",
-  streetteam: "street-team",
   nellies: "nellies",
+  "jonas-group-ent": "jonas-group-ent",
+  jonasgroupent: "jonas-group-ent",
 };
 
 /**
@@ -57,11 +56,10 @@ export const COMMUNITY_BY_SUBDOMAIN: Record<string, string> = {
  * source of truth for resolution.
  *
  * Examples:
- *   'raelynn.memberengage.app'          → 'raelynn'
- *   'streetteam.memberengage.app'       → 'street-team'
- *   'brand-engage-pro.vercel.app'    → 'raelynn'  (legacy default)
- *   'memberengage.app'                  → 'raelynn'  (apex, for now)
- *   'localhost:3000'                 → 'raelynn'  (dev)
+ *   'nellies.memberengage.app'          → 'nellies'
+ *   'brand-engage-pro.vercel.app'       → 'nellies'  (launch default)
+ *   'memberengage.app'                  → 'nellies'  (apex, for now)
+ *   'localhost:3000'                    → 'nellies'  (dev)
  */
 export function resolveCommunityFromHost(host: string | null | undefined): string {
   if (!host) return DEFAULT_COMMUNITY_ID;
@@ -74,7 +72,7 @@ export function resolveCommunityFromHost(host: string | null | undefined): strin
   }
 
   // Vercel preview subdomains for per-community deploys, e.g.
-  // 'raelynn-member-engage-<hash>-jonas-group.vercel.app'. We don't use
+  // 'nellies-member-engage-<hash>-jonas-group.vercel.app'. We don't use
   // these today, but this pattern is easy to add later.
 
   return DEFAULT_COMMUNITY_ID;

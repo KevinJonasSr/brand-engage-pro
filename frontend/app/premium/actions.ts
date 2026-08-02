@@ -10,7 +10,12 @@ import {
   getFounderState,
   pickPriceId,
 } from "@/lib/stripe-helpers";
-import { getCurrentCommunityId } from "@/lib/community";
+import { getCurrentCommunityId, normalizeCommunitySlug } from "@/lib/community";
+
+function getCanonicalOrigin(): string | null {
+  const configured = process.env.NEXT_PUBLIC_APP_URL ?? process.env.NEXT_PUBLIC_SITE_URL;
+  return configured ? configured.replace(/\/$/, "") : null;
+}
 
 /**
  * Start a Stripe Checkout Session for Premium. Reads the current
@@ -33,17 +38,24 @@ export async function createCheckoutSessionAction(formData: FormData) {
     throw new Error("Invalid billing_period");
   }
 
+  const requestedCommunityId = normalizeCommunitySlug(
+    formData.get("community_id")?.toString(),
+  );
+  const communityId = requestedCommunityId ?? (await getCurrentCommunityId());
+  const premiumPath = `/premium?c=${encodeURIComponent(communityId)}`;
+
   // 1) Who's subscribing?
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user?.email) {
-    redirect(`/login?next=${encodeURIComponent("/premium")}`);
+    redirect(
+      `/signup?ref=${encodeURIComponent(communityId)}&next=${encodeURIComponent(premiumPath)}`,
+    );
   }
 
   // 2) Which community?
-  const communityId = await getCurrentCommunityId();
   const admin = createAdminClient();
   const { data: community } = await admin
     .from("communities")
@@ -77,13 +89,13 @@ export async function createCheckoutSessionAction(formData: FormData) {
     existing?.subscription_tier === "past_due" ||
     existing?.subscription_tier === "comped"
   ) {
-    redirect(`/premium?already_active=1`);
+    redirect(`${premiumPath}&already_active=1`);
   }
 
   // 4) Make sure the member has a membership row — the webhook handler will
   //    update it when the subscription is created. If they don't have one
   //    yet (e.g. they signed up pre-migration-0011 and never got their
-  //    raelynn membership), insert a free placeholder now.
+  //    their brand membership), insert a free placeholder now.
   await admin
     .from("member_community_memberships")
     .insert({
@@ -121,7 +133,7 @@ export async function createCheckoutSessionAction(formData: FormData) {
   const h = await headers();
   const host = h.get("x-forwarded-host") ?? h.get("host") ?? "brand-engage-pro.vercel.app";
   const proto = h.get("x-forwarded-proto") ?? "https";
-  const origin = `${proto}://${host}`;
+  const origin = getCanonicalOrigin() ?? `${proto}://${host}`;
 
   const stripe = getStripe();
   const session = await stripe.checkout.sessions.create({
@@ -144,8 +156,8 @@ export async function createCheckoutSessionAction(formData: FormData) {
         billing_period: billingPeriod,
       },
     },
-    success_url: `${origin}/premium/welcome?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}/premium?canceled=1`,
+    success_url: `${origin}/premium/welcome?session_id={CHECKOUT_SESSION_ID}&c=${encodeURIComponent(communityId)}`,
+    cancel_url: `${origin}${premiumPath}&canceled=1`,
   });
 
   if (!session.url) {

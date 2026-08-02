@@ -36,16 +36,18 @@ export default function PremiumPaywall({
 }: PremiumPaywallProps) {
   const from = accentFrom ?? "#7c3aed";
   const to = accentTo ?? "#fb923c";
+  const premiumHref = `/premium${communityId ? `?c=${encodeURIComponent(communityId)}` : ""}`;
+  const signupHref = `/signup${communityId ? `?ref=${encodeURIComponent(communityId)}&next=${encodeURIComponent(premiumHref)}` : `?next=${encodeURIComponent(premiumHref)}`}`;
 
   const ctaHref = reason === "signed-out"
-    ? `/login?next=${encodeURIComponent(`/premium${communityId ? `?c=${communityId}` : ""}`)}`
-    : "/premium";
+    ? signupHref
+    : premiumHref;
 
   let ctaLabel: string;
   let featureCopy: string;
 
   if (reason === "signed-out") {
-    ctaLabel = "Sign in to unlock";
+    ctaLabel = "Create free profile";
     featureCopy = `${feature} is for Premium members`;
   } else if (reason === "needs-founder") {
     ctaLabel = "Become a Founding Member";
@@ -79,7 +81,7 @@ export default function PremiumPaywall({
           className="flex-none rounded-full px-3 py-1.5 text-xs font-semibold text-white shadow-glass transition hover:brightness-110"
           style={{ backgroundImage: `linear-gradient(90deg, ${from}, ${to})` }}
         >
-          {reason === "signed-out" ? "Sign in" : reason === "needs-founder" ? "Founders" : "Upgrade"}
+          {reason === "signed-out" ? "Join" : reason === "needs-founder" ? "Founders" : "Upgrade"}
         </Link>
       </div>
     );
@@ -97,7 +99,7 @@ export default function PremiumPaywall({
               {reason === "needs-founder"
                 ? "Founders only — the first 100 paying members"
                 : reason === "signed-out"
-                  ? "Sign in to unlock Premium"
+                  ? "Join to unlock Premium"
                   : "Upgrade to Premium"}
             </p>
             <h3 className="mt-2 text-lg font-bold text-white">{featureCopy}</h3>
@@ -128,7 +130,7 @@ export default function PremiumPaywall({
                 Premium members get exclusive access to:
               </p>
               <ul className="space-y-1 text-xs text-white/70">
-                <li>✓ Behind-the-scenes posts & voice notes</li>
+                <li>✓ Member-only posts, perks, and updates</li>
                 <li>✓ Early event RSVPs & member-only events</li>
                 <li>✓ Exclusive polls & challenges</li>
               </ul>
