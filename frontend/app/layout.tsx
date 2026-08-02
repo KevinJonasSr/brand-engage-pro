@@ -210,6 +210,12 @@ export default async function RootLayout({
             ) : (
               <div className="flex items-center gap-2">
                 <Link
+                  href="/for-brands"
+                  className="hidden text-sm text-white/60 hover:text-white sm:inline-flex"
+                >
+                  For Brands
+                </Link>
+                <Link
                   href="/login"
                   className="hidden rounded-full border border-white/20 px-4 py-2 text-sm font-medium text-white/80 hover:bg-white/10 sm:inline-flex"
                 >
