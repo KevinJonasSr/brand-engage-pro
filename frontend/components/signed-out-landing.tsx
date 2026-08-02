@@ -1,5 +1,73 @@
 import Link from "next/link";
 import type { Brand } from "@/lib/brands";
+import type { ReactNode } from "react";
+
+/* ── Icon set (Lucide-style, 24×24, 1.5px stroke) ─────────────────────── */
+function IconUsers() {
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  );
+}
+function IconZap() {
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+    </svg>
+  );
+}
+function IconGift() {
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <polyline points="20 12 20 22 4 22 4 12" />
+      <rect x="2" y="7" width="20" height="5" />
+      <line x1="12" y1="22" x2="12" y2="7" />
+      <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+      <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+    </svg>
+  );
+}
+function IconTrophy() {
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+      <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+      <path d="M4 22h16" />
+      <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+      <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+      <path d="M18 2H6v7a6 6 0 0 0 12 0V2z" />
+    </svg>
+  );
+}
+function IconMessage() {
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+  );
+}
+function IconCalendar() {
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+    </svg>
+  );
+}
+
+function IconBadge({ icon }: { icon: ReactNode }) {
+  return (
+    <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-aurora/20 to-ember/10 text-aurora">
+      {icon}
+    </span>
+  );
+}
 
 /**
  * Public-facing marketing landing rendered at `/` for signed-out visitors.
@@ -165,19 +233,19 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
               n: "01",
               title: "Follow your brands",
               body: "Pick the brands you love. You'll get their drops, events, polls, and challenges in one feed.",
-              icon: "🤝",
+              icon: <IconUsers />,
             },
             {
               n: "02",
               title: "Earn points for every visit",
               body: "Showing up to events, RSVPing, voting in polls, commenting, sharing your referral code — all of it earns points.",
-              icon: "⚡",
+              icon: <IconZap />,
             },
             {
               n: "03",
               title: "Unlock real perks + access",
               body: "Exclusive merch, members-only events, behind-the-scenes content, limited drops. Points cash in for the real thing.",
-              icon: "🎁",
+              icon: <IconGift />,
             },
           ].map((step) => (
             <div
@@ -188,7 +256,7 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
                 <span className="text-xs font-mono text-white/40">
                   {step.n}
                 </span>
-                <span className="text-3xl">{step.icon}</span>
+                <IconBadge icon={step.icon} />
               </div>
               <h3 className="mt-6 text-lg font-semibold">{step.title}</h3>
               <p className="mt-2 text-sm text-white/65">{step.body}</p>
@@ -223,29 +291,29 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
                 {
                   title: "Tier Journey",
                   body: "Bronze → Silver → Gold → Platinum. Every action moves you up.",
-                  icon: "🏅",
+                  icon: <IconTrophy />,
                 },
                 {
                   title: "Community Hub",
                   body: "Posts, polls, challenges — per brand, moderated, never spam.",
-                  icon: "💬",
+                  icon: <IconMessage />,
                 },
                 {
                   title: "Member Events",
                   body: "Capacity-limited tastings, previews, meet-ups. Reminders included.",
-                  icon: "🎟️",
+                  icon: <IconCalendar />,
                 },
                 {
                   title: "Rewards Marketplace",
                   body: "Redeem points for exclusive merch, behind-the-scenes access, or members-only experiences.",
-                  icon: "🎁",
+                  icon: <IconGift />,
                 },
               ].map((f) => (
                 <div
                   key={f.title}
                   className="rounded-2xl border border-white/10 bg-black/30 p-5"
                 >
-                  <p className="text-2xl">{f.icon}</p>
+                  <IconBadge icon={f.icon} />
                   <h3 className="mt-3 font-semibold">{f.title}</h3>
                   <p className="mt-1 text-xs text-white/60">{f.body}</p>
                 </div>
