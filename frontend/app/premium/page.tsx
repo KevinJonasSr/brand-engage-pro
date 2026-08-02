@@ -155,7 +155,7 @@ export default async function PremiumPage({
             }}
           >
             <span aria-hidden>🌟</span>
-            Founding Member pricing — {founder.slotsRemaining} of {founder.founderCap} spots left. Lock in today&apos;s price forever.
+            {`Founding Member pricing - ${founder.slotsRemaining} of ${founder.founderCap} spots left. Lock in today's price forever.`}
           </div>
         )}
         {founder.isFull && (
@@ -223,7 +223,7 @@ export default async function PremiumPage({
               <input type="hidden" name="community_id" value={communityId} />
               <button
                 type="submit"
-                disabled={!community.stripe_product_id}
+                disabled={Boolean(user) && !community.stripe_product_id}
                 className="group flex flex-col items-start rounded-3xl border border-white/10 bg-black/40 p-6 text-left transition hover:border-white/25 hover:bg-white/5 disabled:opacity-50"
               >
                 <p className="text-xs uppercase tracking-widest text-white/50">
@@ -258,7 +258,7 @@ export default async function PremiumPage({
               <input type="hidden" name="community_id" value={communityId} />
               <button
                 type="submit"
-                disabled={!community.stripe_product_id}
+                disabled={Boolean(user) && !community.stripe_product_id}
                 className="group relative flex flex-col items-start rounded-3xl border-2 border-white/20 bg-gradient-to-br from-white/8 to-black/40 p-6 text-left transition hover:border-white/35 disabled:opacity-50"
               >
                 <span className="absolute right-4 top-4 rounded-full bg-white/15 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-white">
