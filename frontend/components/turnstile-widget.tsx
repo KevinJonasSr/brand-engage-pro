@@ -31,7 +31,7 @@ interface Props {
 const SCRIPT_ID = "cf-turnstile-script";
 const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
 
-export function TurnstileWidget({ onSuccess, onError, onExpire, theme = "dark" }: Props) {
+export function TurnstileWidget({ onSuccess, onError, onExpire, theme = "light" }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
 
@@ -77,7 +77,16 @@ export function TurnstileWidget({ onSuccess, onError, onExpire, theme = "dark" }
 
   if (!SITE_KEY) return null;
 
-  return <div ref={containerRef} className="mt-2" />;
+  return (
+    <div className="mt-5">
+      <div className="mb-3 flex items-center gap-3">
+        <div className="h-px flex-1 bg-white/10" />
+        <span className="text-[10px] uppercase tracking-widest text-white/35">Security check</span>
+        <div className="h-px flex-1 bg-white/10" />
+      </div>
+      <div ref={containerRef} className="overflow-hidden rounded-xl" />
+    </div>
+  );
 }
 
 // Call from a form submit handler to verify the token server-side.

@@ -146,7 +146,6 @@ function LoginForm() {
         <TurnstileWidget
           onSuccess={handleTurnstileSuccess}
           onExpire={handleTurnstileExpire}
-          theme="dark"
         />
 
         <button

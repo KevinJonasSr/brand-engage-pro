@@ -296,7 +296,6 @@ export default function SignupPage({
           <TurnstileWidget
             onSuccess={handleTurnstileSuccess}
             onExpire={handleTurnstileExpire}
-            theme="dark"
           />
 
           <button
