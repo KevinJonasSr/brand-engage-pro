@@ -54,7 +54,7 @@ function enforceAdminBasicAuth(request: NextRequest): NextResponse | null {
  * wired) the middleware becomes a no-op instead of crashing the whole app —
  * so previews of non-protected routes still work end-to-end.
  */
-export async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   // Layer 0: optional HTTP Basic Auth on /admin/*
   const basicAuthBlock = enforceAdminBasicAuth(request);
   if (basicAuthBlock) return basicAuthBlock;
