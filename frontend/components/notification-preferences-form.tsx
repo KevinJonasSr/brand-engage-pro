@@ -29,13 +29,13 @@ const TRIGGER_FIELDS: Array<{
 }> = [
   {
     key: "notify_new_post",
-    label: "New post from a followed artist",
+    label: "New post from a followed brand",
     description: "Drops, announcements, photos.",
   },
   {
     key: "notify_event_match",
     label: "Brand event in your city",
-    description: "When an artist you follow plays near you.",
+    description: "When a brand you follow has an event near you.",
   },
   {
     key: "notify_comment_on_my_post",

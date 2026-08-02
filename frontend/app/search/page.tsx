@@ -87,7 +87,7 @@ function EmptyPrompt() {
     <div className="rounded-2xl border border-white/10 bg-white/5 p-8 text-sm text-white/70">
       <p>
         Search across communities, posts, comments, events, and rewards. Try a
-        topic, lyric, tour stop, or fan question — semantic search figures out
+        topic, post, event, or member question — semantic search figures out
         what you mean even when the exact words don’t appear.
       </p>
     </div>

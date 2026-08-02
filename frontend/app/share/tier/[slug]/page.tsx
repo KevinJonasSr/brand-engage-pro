@@ -16,7 +16,7 @@ export async function generateMetadata({
   const brand = await getBrandFromDb(slug).catch(() => null);
   const brandName = brand?.name ?? "Brand Engage Pro";
   const title = `Premium Member — ${brandName}`;
-  const description = `Unlocked the Premium tier for ${brandName} on Brand Engage Pro — backstage feed, early drops, monthly AMA, and more.`;
+  const description = `Unlocked the Premium tier for ${brandName} on Brand Engage Pro — member feed, early drops, monthly AMA, and more.`;
   return {
     title,
     description,
@@ -45,7 +45,7 @@ export default async function TierSharePage({
       ? `${process.env.NEXT_PUBLIC_APP_URL}/share/tier/${slug}`
       : `https://brand-engage-pro.vercel.app/share/tier/${slug}`;
   const shareTitle = `I just unlocked Premium for ${brand.name}`;
-  const shareText = `Backstage feed, early drops, monthly AMA and more — I'm a Premium member for ${brand.name} on Brand Engage Pro. ${shareUrl}`;
+  const shareText = `Member feed, early drops, monthly AMA and more — I'm a Premium member for ${brand.name} on Brand Engage Pro. ${shareUrl}`;
 
   return (
     <main className="min-h-screen bg-[#050b1f] text-white flex flex-col items-center justify-center px-6 py-16">
@@ -75,7 +75,7 @@ export default async function TierSharePage({
           <h1 className="text-3xl font-bold">{brand.name}</h1>
         </div>
         <p className="text-white/60 text-sm max-w-xs">
-          Backstage feed, early drops, monthly AMA, and exclusive community perks.
+          Member feed, early drops, monthly AMA, and exclusive community perks.
         </p>
         <ShareButton
           title={shareTitle}

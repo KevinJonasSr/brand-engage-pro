@@ -84,7 +84,7 @@ const TYPE_ROWS: Array<{
     key: "notify_new_post",
     emoji: "📝",
     title: "New community posts",
-    body: "When the artist or brand drops a new community post.",
+    body: "When a brand you follow drops a new community post.",
   },
   {
     key: "notify_comment_on_my_post",

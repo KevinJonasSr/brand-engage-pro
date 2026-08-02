@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
@@ -44,7 +44,6 @@ export const metadata: Metadata = {
     "VIP access",
   ],
   manifest: "/manifest.json",
-  themeColor: "#7c3aed",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
@@ -70,6 +69,10 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true },
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#7c3aed",
 };
 
 const navItems = [

@@ -35,13 +35,13 @@ type EarnMore = {
 const earnMore: EarnMore[] = [
   { title: "Share referral link", detail: "Every verified signup", reward: "+150 pts", href: "/referrals" },
   { title: "Browse marketplace", detail: "Redeem points for drops", reward: "—", href: "/marketplace" },
-  { title: "Host a listening party", detail: "Upload recap + 5 photos", reward: "+400 pts", href: "#" },
+  { title: "Host a member meetup", detail: "Upload recap + 5 photos", reward: "+400 pts", href: "#" },
   { title: "Attend livestream Q&A", detail: "Submit 2 questions", reward: "+120 pts", href: "#" },
 ];
 
 // Static preview breakdown shown only to signed-out visitors.
 const previewCategories = [
-  { label: "Listening quests", value: "4,200 pts" },
+  { label: "Engagement quests", value: "4,200 pts" },
   { label: "Referrals", value: "2,800 pts" },
   { label: "Events & travel", value: "3,400 pts" },
   { label: "Merch", value: "1,050 pts" },

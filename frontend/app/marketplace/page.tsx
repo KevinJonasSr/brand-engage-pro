@@ -9,8 +9,8 @@ const tabs = ["Featured", "Merch", "Experiences", "Collectibles", "Member-Exclus
 const fallbackProducts = [
   { title: "Limited Edition Hoodie", tier: "Silver", pts: "3,400 pts", category: "Merch", badge: "Limited" },
   { title: "Members-Only Polaroid Pack", tier: "Gold", pts: "5,200 pts", category: "Featured", badge: "Drop" },
-  { title: "VIP Soundcheck + Meet", tier: "Platinum", pts: "9,800 pts", category: "Experiences", badge: "New" },
-  { title: "Handwritten Lyric Sheet", tier: "Gold", pts: "4,750 pts", category: "Collectibles", badge: "1/50" },
+  { title: "VIP Experience Package", tier: "Platinum", pts: "9,800 pts", category: "Experiences", badge: "New" },
+  { title: "Limited Edition Collectible Card", tier: "Gold", pts: "4,750 pts", category: "Collectibles", badge: "1/50" },
   { title: "Member-Exclusive Limited Drop", tier: "All tiers", pts: "$45", category: "Member-Exclusive", badge: "Preorder" },
 ];
 

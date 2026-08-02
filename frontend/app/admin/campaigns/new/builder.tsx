@@ -168,7 +168,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
-              placeholder="e.g. Album Launch Week"
+              placeholder="e.g. Spring Launch Week"
               className="mt-1 w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
             />
           </label>
@@ -415,7 +415,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
           name="event_title"
           value={eventTitle}
           onChange={(e) => setEventTitle(e.target.value)}
-          placeholder="Event title (e.g. Nashville Listening Party)"
+          placeholder="Event title (e.g. Members-Only Preview Night)"
           className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
         />
         <div className="grid gap-2 md:grid-cols-2">
