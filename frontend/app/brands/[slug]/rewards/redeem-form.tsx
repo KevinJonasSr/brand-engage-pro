@@ -73,7 +73,7 @@ export function RedeemForm({
           // member also sees the redemption land in their inbox; this
           // UI just closes the loop visually before they leave the page.
           <div className="text-center">
-            <div className="mx-auto mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-blue-500 text-3xl">
+            <div className="mx-auto mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-aurora to-ember text-3xl">
               🎉
             </div>
             <h2 className="text-xl font-semibold">Redeemed!</h2>
@@ -151,7 +151,7 @@ export function RedeemForm({
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
+                  className="flex-1 rounded-lg bg-gradient-to-r from-aurora to-ember px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
                 >
                   {loading ? "Redeeming..." : "Confirm Redeem"}
                 </button>

@@ -30,7 +30,7 @@ function KindBadge({ kind }: { kind: CommunityPost["kind"] }) {
   }
   if (kind === "poll") {
     return (
-      <span className="rounded-full bg-fuchsia-500/20 px-2 py-0.5 text-xs uppercase tracking-wide text-fuchsia-200">
+      <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs uppercase tracking-wide text-amber-200">
         📊 Poll
       </span>
     );

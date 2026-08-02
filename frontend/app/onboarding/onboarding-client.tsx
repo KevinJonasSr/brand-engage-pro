@@ -578,7 +578,7 @@ export default function OnboardingWizard() {
         </section>
 
         <aside className="flex-1 space-y-6">
-          <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-purple-700/20 via-slate-900 to-black p-6">
+          <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-aurora/15 via-slate-900 to-black p-6">
             <div className="flex items-center gap-3 text-white/70">
               <Users size={20} className="text-cyan-300" />
               <p className="text-xs uppercase tracking-wide">Experience preview</p>

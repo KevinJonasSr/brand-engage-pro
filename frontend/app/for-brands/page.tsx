@@ -59,7 +59,7 @@ export default async function ForBrandsPage() {
           style={{ fontFamily: "var(--font-display)" }}
         >
           Loyalty that actually rewards your{" "}
-          <span className="bg-gradient-to-r from-aurora via-fuchsia-400 to-ember bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-aurora via-amber-400 to-ember bg-clip-text text-transparent">
             regulars
           </span>
           .

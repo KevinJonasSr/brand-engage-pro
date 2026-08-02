@@ -34,8 +34,8 @@ export default function PremiumPaywall({
   reason = "needs-premium",
   compact = false,
 }: PremiumPaywallProps) {
-  const from = accentFrom ?? "#7c3aed";
-  const to = accentTo ?? "#fb923c";
+  const from = accentFrom ?? "#D4A017";
+  const to = accentTo ?? "#9B2335";
   const premiumHref = `/premium${communityId ? `?c=${encodeURIComponent(communityId)}` : ""}`;
   const signupHref = `/signup${communityId ? `?ref=${encodeURIComponent(communityId)}&next=${encodeURIComponent(premiumHref)}` : `?next=${encodeURIComponent(premiumHref)}`}`;
 

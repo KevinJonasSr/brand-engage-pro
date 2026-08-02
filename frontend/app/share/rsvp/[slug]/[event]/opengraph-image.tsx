@@ -26,8 +26,8 @@ export default async function RsvpOpengraphImage({
   ]);
 
   const brandName = brand?.name ?? "Brand Engage Pro";
-  const accentFrom = brand?.accentFrom ?? "#7c3aed";
-  const accentTo = brand?.accentTo ?? "#fb923c";
+  const accentFrom = brand?.accentFrom ?? "#D4A017";
+  const accentTo = brand?.accentTo ?? "#9B2335";
   const eventTitle = eventRow?.title ?? "Upcoming Event";
   const eventDate = eventRow?.event_date
     ? new Date(eventRow.event_date).toLocaleDateString("en-US", {

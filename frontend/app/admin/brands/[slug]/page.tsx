@@ -95,7 +95,7 @@ export default async function AdminBrandEditPage({
           heroImage: (brand.hero_image as string | null) ?? null,
           heroFocalX: (brand.hero_focal_x as number | null) ?? 50,
           heroFocalY: (brand.hero_focal_y as number | null) ?? 50,
-          accentFrom: (brand.accent_from as string) ?? "#7c3aed",
+          accentFrom: (brand.accent_from as string) ?? "#D4A017",
           accentTo: (brand.accent_to as string) ?? "#f97316",
           genresText,
           socialText,

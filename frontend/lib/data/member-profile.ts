@@ -122,8 +122,8 @@ export async function getMemberProfileBySlug(
     founderBadges: founders.map((m) => ({
       communitySlug: m.communities.slug,
       communityName: m.communities.display_name,
-      accentFrom: m.communities.accent_from ?? "#7c3aed",
-      accentTo: m.communities.accent_to ?? "#fb923c",
+      accentFrom: m.communities.accent_from ?? "#D4A017",
+      accentTo: m.communities.accent_to ?? "#9B2335",
       founderNumber: m.founder_number,
     })),
     badges: badges.map((b) => ({

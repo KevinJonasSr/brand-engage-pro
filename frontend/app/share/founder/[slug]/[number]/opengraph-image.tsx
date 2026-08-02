@@ -21,8 +21,8 @@ export default async function FounderOpengraphImage({
   const number = parseInt(params.number, 10);
 
   const brandName = brand?.name ?? "Brand Engage Pro";
-  const accentFrom = brand?.accentFrom ?? "#7c3aed";
-  const accentTo = brand?.accentTo ?? "#fb923c";
+  const accentFrom = brand?.accentFrom ?? "#D4A017";
+  const accentTo = brand?.accentTo ?? "#9B2335";
   const founderNumber = Number.isFinite(number) && number > 0 ? number : 1;
 
   return new ImageResponse(

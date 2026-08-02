@@ -26,8 +26,8 @@ export default async function BrandOpengraphImage({
   const name = brand?.name ?? "Brand Engage Pro";
   const tagline =
     brand?.tagline ?? "Skip the line. Earn the perks. Become a regular.";
-  const accentFrom = brand?.accentFrom ?? "#7c3aed";
-  const accentTo = brand?.accentTo ?? "#fb923c";
+  const accentFrom = brand?.accentFrom ?? "#D4A017";
+  const accentTo = brand?.accentTo ?? "#9B2335";
   const heroImage = brand?.heroImage ?? null;
 
   return new ImageResponse(

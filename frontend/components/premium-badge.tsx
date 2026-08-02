@@ -33,8 +33,8 @@ export default function PremiumBadge({
 }: PremiumBadgeProps) {
   if (!show || !isPremium) return null;
 
-  const from = accentFrom ?? "#7c3aed";
-  const to = accentTo ?? "#fb923c";
+  const from = accentFrom ?? "#D4A017";
+  const to = accentTo ?? "#9B2335";
 
   const label = isFounder ? "Founder" : "Premium";
   const icon = isFounder ? "👑" : "⭐";

@@ -60,7 +60,7 @@ export default async function MemberRecapPage() {
           href={
             recap.topBrandSlug ? `/brands/${recap.topBrandSlug}` : "/brands"
           }
-          className="rounded-xl bg-gradient-to-r from-purple-500 to-orange-400 px-5 py-2.5 text-sm font-semibold text-white"
+          className="rounded-xl bg-gradient-to-r from-aurora to-ember px-5 py-2.5 text-sm font-semibold text-white"
         >
           Keep the streak going →
         </Link>

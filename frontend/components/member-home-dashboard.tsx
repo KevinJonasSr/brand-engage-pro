@@ -478,7 +478,7 @@ function SpendPointsCard({
         </div>
         <Link
           href={rewardsHref}
-          className="inline-flex rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 px-4 py-2 text-xs font-medium text-white hover:opacity-90"
+          className="inline-flex rounded-lg bg-gradient-to-r from-aurora to-ember px-4 py-2 text-xs font-medium text-white hover:opacity-90"
         >
           Browse rewards →
         </Link>

@@ -26,8 +26,8 @@ export default async function BadgeOpengraphImage({
   ]);
 
   const brandName = brand?.name ?? "Brand Engage Pro";
-  const accentFrom = brand?.accentFrom ?? "#7c3aed";
-  const accentTo = brand?.accentTo ?? "#fb923c";
+  const accentFrom = brand?.accentFrom ?? "#D4A017";
+  const accentTo = brand?.accentTo ?? "#9B2335";
   const badgeName = badgeRow?.name ?? "Badge";
   const badgeIcon = badgeRow?.icon ?? "🏆";
   const badgeDesc = badgeRow?.description ?? "Earned on Brand Engage Pro";

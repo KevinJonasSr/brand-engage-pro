@@ -58,7 +58,7 @@ export default function RewardCardWithForm({
 
         <button
           onClick={() => setShowForm(true)}
-          className="mt-4 w-full rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 px-3 py-2 text-xs font-medium text-white hover:opacity-90"
+          className="mt-4 w-full rounded-lg bg-gradient-to-r from-aurora to-ember px-3 py-2 text-xs font-medium text-white hover:opacity-90"
         >
           Redeem →
         </button>

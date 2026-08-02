@@ -102,8 +102,8 @@ export default async function PremiumWelcomePage({
     }
   }
 
-  const accentFrom = community?.accent_from ?? "#7c3aed";
-  const accentTo = community?.accent_to ?? "#fb923c";
+  const accentFrom = community?.accent_from ?? "#D4A017";
+  const accentTo = community?.accent_to ?? "#9B2335";
 
   return (
     <main className="relative overflow-hidden">

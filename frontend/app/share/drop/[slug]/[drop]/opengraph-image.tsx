@@ -14,8 +14,8 @@ export default async function DropOpengraphImage({
   const brand = await getBrandFromDb(params.slug).catch(() => null);
 
   const brandName = brand?.name ?? "Brand Engage Pro";
-  const accentFrom = brand?.accentFrom ?? "#7c3aed";
-  const accentTo = brand?.accentTo ?? "#fb923c";
+  const accentFrom = brand?.accentFrom ?? "#D4A017";
+  const accentTo = brand?.accentTo ?? "#9B2335";
 
   const dropLabel = decodeURIComponent(params.drop)
     .replace(/-/g, " ")

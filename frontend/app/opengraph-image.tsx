@@ -22,7 +22,7 @@ export default async function OpengraphImage() {
           padding: "80px",
           // Radial aurora + midnight base
           background:
-            "radial-gradient(circle at 15% 10%, rgba(124,58,237,0.35), transparent 50%), " +
+            "radial-gradient(circle at 15% 10%, rgba(212,160,23,0.35), transparent 50%), " +
             "radial-gradient(circle at 85% 90%, rgba(251,146,60,0.25), transparent 55%), " +
             "#050b1f",
           color: "white",
@@ -39,7 +39,7 @@ export default async function OpengraphImage() {
               alignItems: "center",
               justifyContent: "center",
               borderRadius: 999,
-              background: "linear-gradient(135deg, #7c3aed, #fb923c)",
+              background: "linear-gradient(135deg, #D4A017, #9B2335)",
               fontSize: 28,
               fontWeight: 700,
               color: "white",
@@ -78,7 +78,7 @@ export default async function OpengraphImage() {
               lineHeight: 1.02,
               letterSpacing: "-0.035em",
               background:
-                "linear-gradient(90deg, #a78bfa, #f0abfc, #fb923c)",
+                "linear-gradient(90deg, #a78bfa, #f0abfc, #9B2335)",
               backgroundClip: "text",
               color: "transparent",
             }}

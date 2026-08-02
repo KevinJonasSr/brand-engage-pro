@@ -173,7 +173,7 @@ function buildEmailHtml(params: {
 <body style="margin:0;padding:0;background:#050b1f;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#e2e8f0;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#050b1f;padding:40px 20px;">
     <tr><td>
-      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:linear-gradient(135deg,rgba(124,58,237,0.15),#0f172a);border:1px solid rgba(255,255,255,0.1);border-radius:24px;overflow:hidden;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:linear-gradient(135deg,rgba(212,160,23,0.15),#0f172a);border:1px solid rgba(255,255,255,0.1);border-radius:24px;overflow:hidden;">
         <!-- Header -->
         <tr><td style="padding:32px 32px 0;border-bottom:1px solid rgba(255,255,255,0.08);">
           <p style="margin:0 0 4px;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8;">Brand Engage Pro</p>
@@ -186,13 +186,13 @@ function buildEmailHtml(params: {
         </td></tr>
         <!-- CTA -->
         <tr><td style="padding:0 32px 32px;">
-          <a href="https://brand-engage-pro.vercel.app" style="display:inline-block;background:linear-gradient(90deg,#7c3aed,#f56528);color:#fff;font-size:14px;font-weight:600;text-decoration:none;padding:12px 28px;border-radius:999px;">
+          <a href="https://brand-engage-pro.vercel.app" style="display:inline-block;background:linear-gradient(90deg,#D4A017,#f56528);color:#fff;font-size:14px;font-weight:600;text-decoration:none;padding:12px 28px;border-radius:999px;">
             See your dashboard →
           </a>
         </td></tr>
         <!-- Footer -->
         <tr><td style="padding:20px 32px;border-top:1px solid rgba(255,255,255,0.08);">
-          <p style="margin:0;font-size:11px;color:#475569;">You're getting this because you opted in to Brand Engage Pro member emails. <a href="https://brand-engage-pro.vercel.app/unsubscribe" style="color:#7c3aed;">Unsubscribe</a></p>
+          <p style="margin:0;font-size:11px;color:#475569;">You're getting this because you opted in to Brand Engage Pro member emails. <a href="https://brand-engage-pro.vercel.app/unsubscribe" style="color:#D4A017;">Unsubscribe</a></p>
         </td></tr>
       </table>
     </td></tr>

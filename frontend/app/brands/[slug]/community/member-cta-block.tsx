@@ -25,7 +25,7 @@ export default function MemberCtaBlock({
   if (actions.length === 0) return null;
 
   return (
-    <section className="rounded-3xl border border-purple-500/30 bg-gradient-to-br from-purple-900/30 via-slate-900 to-midnight p-5">
+    <section className="rounded-3xl border border-aurora/30 bg-gradient-to-br from-aurora/15 via-slate-900 to-midnight p-5">
       <div className="mb-3 flex items-center justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-white/60">Earn points</p>

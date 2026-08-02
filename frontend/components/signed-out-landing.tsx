@@ -36,7 +36,7 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
             >
               Skip the line. Earn the perks.
               <br />
-              <span className="bg-gradient-to-r from-aurora via-fuchsia-400 to-ember bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-aurora via-amber-400 to-ember bg-clip-text text-transparent">
                 Become a regular.
               </span>
             </h1>
@@ -311,7 +311,7 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
         <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-aurora/25 via-slate-900 to-ember/25 p-10 text-center shadow-glass md:p-16">
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(600px_circle_at_50%_-20%,rgba(124,58,237,0.35),transparent)]"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(600px_circle_at_50%_-20%,rgba(212,160,23,0.35),transparent)]"
           />
           <p className="relative text-xs uppercase tracking-widest text-white/60">
             Ready to earn your first 100 points?

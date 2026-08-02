@@ -53,7 +53,7 @@ export default async function MemberCardPage() {
       <div
         className="relative overflow-hidden rounded-3xl border border-white/10 p-8 shadow-glass"
         style={{
-          background: "linear-gradient(135deg, rgba(124,58,237,0.3) 0%, #0f172a 50%, rgba(245,101,40,0.2) 100%)",
+          background: "linear-gradient(135deg, rgba(212,160,23,0.3) 0%, #0f172a 50%, rgba(245,101,40,0.2) 100%)",
         }}
       >
         {/* Glow */}

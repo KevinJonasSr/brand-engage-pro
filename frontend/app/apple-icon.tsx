@@ -18,7 +18,7 @@ export default function AppleIcon() {
           alignItems: "center",
           justifyContent: "center",
           // No border radius — iOS applies its own rounded mask.
-          background: "linear-gradient(135deg, #7c3aed, #fb923c)",
+          background: "linear-gradient(135deg, #D4A017, #9B2335)",
           color: "white",
           fontSize: 96,
           fontWeight: 700,

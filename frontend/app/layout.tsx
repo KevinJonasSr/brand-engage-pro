@@ -72,7 +72,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#7c3aed",
+  themeColor: "#D4A017",
 };
 
 const navItems = [
@@ -157,14 +157,22 @@ export default async function RootLayout({
           <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
             <div className="flex items-center gap-3">
               <Link href="/" className="flex items-center gap-2">
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-aurora to-ember text-xs font-bold tracking-wider">
-                  BEP
-                </span>
+                <svg viewBox="0 0 32 32" width="32" height="32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <defs>
+                    <linearGradient id="bep-logo-grad" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stopColor="#D4A017" />
+                      <stop offset="100%" stopColor="#9B2335" />
+                    </linearGradient>
+                  </defs>
+                  <rect width="32" height="32" rx="8" fill="url(#bep-logo-grad)" />
+                  <path d="M6 24 L6 18.5 L10.5 22 L16 9 L21.5 22 L26 18.5 L26 24 Z" fill="white" fillOpacity="0.95" />
+                  <rect x="5.5" y="25" width="21" height="2.5" rx="1.25" fill="white" fillOpacity="0.95" />
+                </svg>
                 <span
-                  className="text-lg font-semibold"
+                  className="text-lg font-semibold tracking-tight"
                   style={{ fontFamily: "var(--font-display)" }}
                 >
-                  Brand Engage Pro
+                  Brand Engage<span className="text-aurora"> Pro</span>
                 </span>
               </Link>
               <MobileNav navItems={navItems} />

@@ -51,7 +51,7 @@ export async function updateBrandAction(formData: FormData) {
   const heroFocalY = parseInt(String(formData.get("hero_focal_y") ?? "50"), 10);
   const clampFocal = (n: number) =>
     Math.max(0, Math.min(100, Number.isFinite(n) ? n : 50));
-  const accentFrom = String(formData.get("accent_from") ?? "#7c3aed").trim();
+  const accentFrom = String(formData.get("accent_from") ?? "#D4A017").trim();
   const accentTo = String(formData.get("accent_to") ?? "#f97316").trim();
   const genresRaw = String(formData.get("genres") ?? "").trim();
   const socialRaw = String(formData.get("social") ?? "").trim();

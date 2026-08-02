@@ -163,7 +163,7 @@ export const BRANDS: Record<string, Brand> = {
     bio: "Placeholder bio — awaiting assets from Box drop.",
     heroImage: null,
     accentFrom: "#f59e0b",
-    accentTo: "#fb923c",
+    accentTo: "#9B2335",
     genres: ["Pop", "Indie"],
     upcoming: [{ title: "TBD", detail: "Dates to come", date: "—" }],
     merch: [{ title: "Signed Lyric Print", tier: "Silver+", points: "2,800 pts" }],

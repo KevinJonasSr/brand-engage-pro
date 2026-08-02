@@ -172,7 +172,7 @@ export default async function AdminTeamPage() {
           </label>
           <button
             type="submit"
-            className="rounded-lg bg-gradient-to-r from-purple-500 to-orange-400 px-4 py-2 text-sm font-semibold text-white"
+            className="rounded-lg bg-gradient-to-r from-aurora to-ember px-4 py-2 text-sm font-semibold text-white"
           >
             Add
           </button>
