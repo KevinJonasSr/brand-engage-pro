@@ -62,7 +62,7 @@ export async function middleware(request: NextRequest) {
   // Layer 1: resolve the community from the hostname and stamp it on the
   // request so downstream RSCs / server actions can scope their queries
   // via lib/community.ts::getCurrentCommunityId(). For brand-engage-pro
-  // and localhost the resolver returns the DEFAULT (raelynn), preserving
+  // and localhost the resolver returns the DEFAULT (nellies), preserving
   // single-tenant behavior until wildcard DNS is pointed at the platform.
   const communityId = resolveCommunityFromHost(request.headers.get("host"));
   const requestHeaders = new Headers(request.headers);

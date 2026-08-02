@@ -8,6 +8,14 @@ export const metadata: Metadata = {
   title: "You're invited",
 };
 
+function inviteLinks(code: string) {
+  const params = new URLSearchParams({ ref: code });
+  return {
+    signup: `/signup?${params.toString()}`,
+    login: `/login?${params.toString()}`,
+  };
+}
+
 async function getInviter(code: string): Promise<{
   firstName: string | null;
   referrerId: string;
@@ -36,6 +44,7 @@ export default async function InvitePage({
   if (!inviter) notFound();
 
   const inviterName = inviter.firstName ?? "A Brand Engage Pro member";
+  const links = inviteLinks(code);
 
   return (
     <main className="mx-auto flex min-h-[80vh] max-w-xl flex-col justify-center gap-6 px-6 py-12">
@@ -51,13 +60,13 @@ export default async function InvitePage({
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
-            href="/signup"
+            href={links.signup}
             className="rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white shadow-glass transition hover:brightness-110"
           >
             Create your account
           </Link>
           <Link
-            href="/login"
+            href={links.login}
             className="rounded-full border border-white/20 px-6 py-3 text-sm font-medium text-white/80 hover:bg-white/10"
           >
             I already have an account
