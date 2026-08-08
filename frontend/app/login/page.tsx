@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, useCallback } from "react";
+import { Suspense, useState, useCallback, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -42,6 +42,24 @@ function LoginForm() {
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const handleTurnstileSuccess = useCallback((token: string) => setTurnstileToken(token), []);
   const handleTurnstileExpire = useCallback(() => setTurnstileToken(null), []);
+
+  // Resending signInWithOtp overwrites the previous verifier cookie, silently
+  // invalidating an already-sent link. Lock the button for 60s after a send.
+  const MAGIC_COOLDOWN_SECONDS = 60;
+  const [magicCooldown, setMagicCooldown] = useState(0);
+  const cooldownInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+  useEffect(() => { return () => { if (cooldownInterval.current) clearInterval(cooldownInterval.current); }; }, []);
+
+  function startMagicCooldown() {
+    setMagicCooldown(MAGIC_COOLDOWN_SECONDS);
+    if (cooldownInterval.current) clearInterval(cooldownInterval.current);
+    cooldownInterval.current = setInterval(() => {
+      setMagicCooldown((s) => {
+        if (s <= 1) { if (cooldownInterval.current) clearInterval(cooldownInterval.current); return 0; }
+        return s - 1;
+      });
+    }, 1000);
+  }
 
   async function handlePassword(e: React.FormEvent) {
     e.preventDefault();
@@ -85,6 +103,7 @@ function LoginForm() {
       if (error) throw error;
       setStatus("magic-sent");
       setMessage("Magic link sent. Check your email.");
+      startMagicCooldown();
     } catch (err) {
       setStatus("error");
       setMessage(err instanceof Error ? err.message : "Unable to send magic link.");
@@ -111,7 +130,7 @@ function LoginForm() {
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-white/40 focus:outline-none"
+              className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-white/50 focus:border-white/40 focus:outline-none"
               placeholder="you@email.com"
             />
           </label>
@@ -137,7 +156,7 @@ function LoginForm() {
           </button>
         </form>
 
-        <div className="flex items-center gap-3 text-xs uppercase tracking-wide text-white/40">
+        <div className="flex items-center gap-3 text-xs uppercase tracking-wide text-white/50">
           <div className="h-px flex-1 bg-white/10" />
           or
           <div className="h-px flex-1 bg-white/10" />
@@ -151,10 +170,10 @@ function LoginForm() {
         <button
           type="button"
           onClick={handleMagicLink}
-          disabled={status === "loading"}
+          disabled={status === "loading" || magicCooldown > 0}
           className="w-full rounded-full border border-white/20 px-4 py-3 text-sm font-medium text-white/80 hover:bg-white/10 disabled:opacity-60"
         >
-          Send me a magic link
+          {magicCooldown > 0 ? `Resend in ${magicCooldown}s` : "Send me a magic link"}
         </button>
 
         {message && (

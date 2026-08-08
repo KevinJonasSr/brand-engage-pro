@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -46,6 +46,24 @@ export default function SignupPage({
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const handleTurnstileSuccess = useCallback((token: string) => setTurnstileToken(token), []);
   const handleTurnstileExpire = useCallback(() => setTurnstileToken(null), []);
+
+  // Resubmitting signUp() for the same address silently regenerates the
+  // confirmation token, invalidating whatever link is already in the inbox.
+  const CONFIRM_COOLDOWN_SECONDS = 45;
+  const [confirmCooldown, setConfirmCooldown] = useState(0);
+  const cooldownInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+  useEffect(() => { return () => { if (cooldownInterval.current) clearInterval(cooldownInterval.current); }; }, []);
+
+  function startConfirmCooldown() {
+    setConfirmCooldown(CONFIRM_COOLDOWN_SECONDS);
+    if (cooldownInterval.current) clearInterval(cooldownInterval.current);
+    cooldownInterval.current = setInterval(() => {
+      setConfirmCooldown((s) => {
+        if (s <= 1) { if (cooldownInterval.current) clearInterval(cooldownInterval.current); return 0; }
+        return s - 1;
+      });
+    }, 1000);
+  }
 
   // Email regex — pragmatic, not RFC-perfect. Catches the common typos
   // (missing @, missing TLD, trailing space) without rejecting odd-but-
@@ -111,6 +129,7 @@ export default function SignupPage({
       // Otherwise Supabase emailed a confirmation link — prompt them to check it.
       setStatus("confirm");
       setMessage("Check your email to confirm and finish signing up.");
+      startConfirmCooldown();
     } catch (err) {
       setStatus("error");
       setMessage(err instanceof Error ? err.message : "Unable to create account.");
@@ -300,10 +319,14 @@ export default function SignupPage({
 
           <button
             type="submit"
-            disabled={status === "loading"}
+            disabled={status === "loading" || confirmCooldown > 0}
             className="w-full rounded-full bg-gradient-to-r from-aurora to-ember px-4 py-3 text-sm font-semibold text-white shadow-glass disabled:opacity-60"
           >
-            {status === "loading" ? "Creating account…" : "Create account"}
+            {status === "loading"
+              ? "Creating account…"
+              : confirmCooldown > 0
+                ? `Resend in ${confirmCooldown}s`
+                : "Create account"}
           </button>
         </form>
 
