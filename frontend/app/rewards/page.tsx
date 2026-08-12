@@ -119,8 +119,9 @@ export default async function RewardsPage() {
             </p>
             <p className="mt-3 text-xs text-white/50">
               Ladder: Bronze → Silver → Gold → Platinum (points from visits). Founding = first 100
-              members. Premium ≈ Gold+ on gated specials. Live Nellie&apos;s redeemables (examples):
-              apron + recipe card 1,500 pts · house hot sauce 3-pack 2,200 pts — on the brand rewards page.
+              members. Premium ≈ Gold+ on gated specials. Soft-launch stocked redeemables only:
+              apron + recipe card 1,500 pts · house hot sauce 3-pack 2,200 pts — we don&apos;t market
+              empty Gold/Platinum SKUs.
             </p>
             <div className="mt-8 space-y-4">
               <div className="flex items-center justify-between text-sm text-white/70">

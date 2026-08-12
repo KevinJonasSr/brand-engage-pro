@@ -298,6 +298,8 @@ Product: **BEP = brand ↔ loyal member restaurant loyalty — not music/superfa
 | Brand CTA “Shop drops” | P1 | Guest UX PR: → View rewards / check-in |
 | Redeem shipping language (G6) | P1 trust | Guest UX PR: pickup/show-to-server copy |
 | Apron 1500 / hot sauce 2200 live redeemables + tier CS mapping | P1 | Guest UX PR: migration 0049 + brand rewards guest browse |
+| Preview banner / fake referral totals mislead guests | P0 trust | Guest UX PR: referrals empty for guests; marketplace = stocked only |
+| Soft-launch stock only apron+hot sauce; no empty Gold/Platinum SKUs | P0 trust | Guest UX PR: 0049 deactivates other catalog + gold/platinum offers |
 | Nellie's “Live Music — Rooftop” restaurant events | OK | **Do not remove** |
 
 Security P0s (debug route, email blast, cron auth) remain in **PR #7** — separate from guest UX.

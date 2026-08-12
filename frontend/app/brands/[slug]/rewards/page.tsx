@@ -75,12 +75,12 @@ export default async function RewardsPage({
             Rewards · {brand.name}
           </h1>
           <p className="mt-2 text-sm text-white/60">
-            Spend points on dining and take-home perks from {brand.name}. Soft-launch highlights
-            include the apron + recipe card (1,500 pts) and house hot sauce 3-pack (2,200 pts).
+            Soft launch: stocked redeemables are the apron + recipe card (1,500 pts) and house hot
+            sauce 3-pack (2,200 pts). We don&apos;t list empty Gold/Platinum redeemables.
           </p>
           <p className="mt-2 text-xs text-white/45">
-            Loyalty ladder: Bronze → Silver → Gold → Platinum (from points). Founding = first 100
-            members. Premium club ≈ Gold+ access on gated specials — separate from the points ladder.
+            Ladder: Bronze → Platinum (points). Founding = first 100. Premium ≈ Gold+ on gated
+            specials. Preview banners elsewhere are not your balance — new accounts start at 0.
           </p>
         </div>
 

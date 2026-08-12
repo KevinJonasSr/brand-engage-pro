@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import Link from "next/link";
 import { getCurrentMember } from "@/lib/data/member";
 import { getMyReferrals, getReferralLeaderboard } from "@/lib/data/referrals";
 import InviteQRCode from "@/components/invite-qr";
@@ -8,18 +9,9 @@ import NativeShareButton from "./native-share-button";
 
 const ladder = [
   { level: "1 referral", reward: "+150 pts" },
-  { level: "3 referrals", reward: "Signed postcard" },
-  { level: "5 referrals", reward: "Exclusive merch" },
-  { level: "10 referrals", reward: "VIP livestream" },
-];
-
-// Static preview leaderboard shown only to anonymous visitors so the page
-// isn't blank. Signed-in users see the real state — empty or populated.
-const previewLeaderboard = [
-  { name: "Alexis", total: "27 referrals" },
-  { name: "Brandon", total: "21 referrals" },
-  { name: "Maya", total: "18 referrals" },
-  { name: "Theo", total: "16 referrals" },
+  { level: "3 referrals", reward: "Referral badge" },
+  { level: "5 referrals", reward: "Bonus point boost" },
+  { level: "10 referrals", reward: "Top-referrer recognition" },
 ];
 
 async function buildInviteUrl(code: string | null | undefined): Promise<string> {
@@ -51,9 +43,7 @@ export default async function ReferralsPage() {
         name: row.display_name,
         total: `${row.referral_count} referral${row.referral_count === 1 ? "" : "s"}`,
       }))
-    : previewLeaderboard;
-
-  const possessive = member?.first_name ? `${member.first_name}'s` : "your";
+    : [];
 
   return (
     <div className="min-h-screen bg-midnight">
@@ -61,21 +51,21 @@ export default async function ReferralsPage() {
         <div className="flex-1 space-y-6">
           {!isSignedIn && (
             <PreviewSignupBanner
-              eyebrow="🎟️ Preview"
+              eyebrow="🎟️ Referrals"
               headline="Sign up to get your invite link"
-              body="Members earn 150 bonus points every time a friend joins. Hit milestones and the rewards stack: signed postcards at 3 referrals, exclusive merch at 5, VIP livestream access at 10."
+              body="No demo leaderboards here. After you join, you earn +150 points for each friend who signs up with your link. New accounts start at 0 points."
               bullets={[
                 "+150 pts every verified signup",
-                "Milestones unlock real merch and experiences",
-                "Top referrers get the kind of access nobody else does",
+                "Milestones unlock badges as you go",
+                "Share Nellie's — restaurant loyalty, not music drops",
               ]}
               primaryCta="Sign up to get my link →"
               nextPath="/referrals"
-              firstRewardLine="🎁 Earn 150 bonus points the first time someone uses your link."
+              firstRewardLine="🎁 Earn +150 pts the first time someone uses your link."
             />
           )}
 
-          <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-purple-800/30 via-slate-900 to-midnight p-6 shadow-glass">
+          <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-amber-900/30 via-slate-900 to-midnight p-6 shadow-glass">
             <p className="text-sm uppercase tracking-wide text-white/60">Referrals</p>
             <h1 className="mt-2 text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
               Bring the regulars in
@@ -83,12 +73,23 @@ export default async function ReferralsPage() {
             <p className="mt-4 text-sm text-white/70">
               {isSignedIn
                 ? `You've invited ${myCount} member${myCount === 1 ? "" : "s"} so far. Keep sharing to climb the ladder.`
-                : "Share your personal link to earn bonus points, badges, and early access rewards every time a friend joins."}
+                : "Create an account to get a personal invite link. Preview counts below are empty until you join — we don’t show fake referral totals."}
             </p>
             <div className="mt-6 flex flex-wrap items-center gap-3">
-              <code className="flex-1 rounded-2xl bg-black/40 px-4 py-3 text-sm">{inviteUrl}</code>
-              <CopyLinkButton url={inviteUrl} />
-              <NativeShareButton url={inviteUrl} />
+              {isSignedIn ? (
+                <>
+                  <code className="flex-1 rounded-2xl bg-black/40 px-4 py-3 text-sm">{inviteUrl}</code>
+                  <CopyLinkButton url={inviteUrl} />
+                  <NativeShareButton url={inviteUrl} />
+                </>
+              ) : (
+                <Link
+                  href="/signup?next=/referrals"
+                  className="rounded-full bg-gradient-to-r from-aurora to-ember px-5 py-2.5 text-sm font-semibold text-white"
+                >
+                  Sign up for your invite link →
+                </Link>
+              )}
             </div>
           </section>
 
@@ -102,45 +103,44 @@ export default async function ReferralsPage() {
                   return (
                     <div
                       key={step.level}
-                      className={`rounded-2xl px-4 py-3 ${
+                      className={`rounded-2xl p-4 ${
                         unlocked ? "bg-emerald-500/10 ring-1 ring-emerald-500/30" : "bg-black/30"
                       }`}
                     >
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-semibold">{step.level}</p>
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <p className="text-sm font-semibold">{step.level}</p>
+                          <p className="text-xs text-white/60">{step.reward}</p>
+                        </div>
                         {unlocked && (
-                          <span className="text-xs uppercase tracking-wide text-emerald-300">
-                            Unlocked
-                          </span>
+                          <span className="text-xs font-medium text-emerald-300">Unlocked</span>
                         )}
                       </div>
-                      <p className="text-xs text-white/60">{step.reward}</p>
                     </div>
                   );
                 })}
               </div>
             </div>
+
             <div className="glass-card p-6">
               <p className="text-sm uppercase tracking-wide text-white/60">Top referrers</p>
-              {leaderboardRows.length === 0 ? (
-                <div className="mt-4 rounded-2xl border border-dashed border-white/15 bg-black/20 p-6 text-center text-xs text-white/60">
-                  The leaderboard will appear once members start referring.
-                </div>
-              ) : (
-                <div className="mt-4 space-y-4">
-                  {leaderboardRows.map((entry, index) => (
-                    <div
-                      key={entry.name}
-                      className="flex items-center justify-between rounded-2xl bg-black/30 px-4 py-3"
+              {leaderboardRows.length > 0 ? (
+                <ul className="mt-4 space-y-3">
+                  {leaderboardRows.map((row) => (
+                    <li
+                      key={row.name}
+                      className="flex items-center justify-between rounded-2xl bg-black/30 px-4 py-3 text-sm"
                     >
-                      <span className="text-sm font-semibold">
-                        #{index + 1} {entry.name}
-                      </span>
-                      <span className="text-xs uppercase tracking-wide text-white/60">
-                        {entry.total}
-                      </span>
-                    </div>
+                      <span>{row.name}</span>
+                      <span className="text-white/60">{row.total}</span>
+                    </li>
                   ))}
+                </ul>
+              ) : (
+                <div className="mt-4 rounded-2xl border border-dashed border-white/15 bg-black/20 p-6 text-center text-xs text-white/60">
+                  {isSignedIn
+                    ? "No referral leaders yet — be the first."
+                    : "Leaderboard stays empty for guests. Sign up to earn real referral counts (start at 0)."}
                 </div>
               )}
             </div>
@@ -148,18 +148,15 @@ export default async function ReferralsPage() {
         </div>
 
         <aside className="w-full max-w-sm space-y-6">
-          <section className="glass-card p-6">
-            <p className="text-sm uppercase tracking-wide text-white/60">QR invite</p>
-            <div className="mt-4">
-              <InviteQRCode url={inviteUrl} />
-            </div>
-            <p className="mt-3 text-xs text-white/60">
-              Scan to join via {possessive} invite.
-            </p>
-            <code className="mt-2 block break-all rounded-xl bg-black/30 px-3 py-2 text-center text-xs text-white/60">
-              {inviteUrl}
-            </code>
-          </section>
+          {isSignedIn && member?.referral_code && (
+            <section className="glass-card p-6">
+              <p className="text-sm uppercase tracking-wide text-white/60">Your QR</p>
+              <div className="mt-4 flex justify-center">
+                <InviteQRCode url={inviteUrl} />
+              </div>
+              <p className="mt-4 break-all text-center text-xs text-white/50">{inviteUrl}</p>
+            </section>
+          )}
 
           <section className="glass-card p-6">
             <p className="text-sm uppercase tracking-wide text-white/60">Recent activity</p>
@@ -179,11 +176,9 @@ export default async function ReferralsPage() {
                 </div>
               )
             ) : (
-              <ul className="mt-4 space-y-3 text-sm text-white/70">
-                <li>• Taylor accepted your invite 2 hours ago (+150 pts)</li>
-                <li>• Casey unlocked the Referral badge yesterday</li>
-                <li>• Devon claimed the Gold drop you shared</li>
-              </ul>
+              <div className="mt-4 rounded-2xl border border-dashed border-white/15 bg-black/20 p-6 text-center text-xs text-white/60">
+                No sample activity. After you join, real referrals appear here.
+              </div>
             )}
           </section>
         </aside>

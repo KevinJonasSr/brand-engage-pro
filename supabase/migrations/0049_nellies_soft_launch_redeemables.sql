@@ -1,8 +1,8 @@
 -- 0049_nellies_soft_launch_redeemables.sql
--- Soft-launch CS truth: live Nellie's redeemables include
+-- Soft-launch CS truth: ONLY these Nellie's redeemables are stocked:
 --   • Nellie's Apron + Recipe Card — 1,500 pts
 --   • House Hot Sauce 3-Pack — 2,200 pts
--- Idempotent. Does not remove dining rewards from 0048.
+-- Do not market empty Gold/Platinum redeemables. Idempotent.
 
 insert into public.rewards_catalog (
   community_id, title, description, point_cost, kind, active, sort_order
@@ -38,29 +38,40 @@ where not exists (
     and title = 'House Hot Sauce 3-Pack'
 );
 
--- Align costs if an earlier seed used different titles/prices.
 update public.rewards_catalog
    set point_cost = 1500,
        description = 'Take-home apron and printed recipe card. Show your redemption to your server or host to pick up.',
        active = true,
+       sort_order = 5,
        updated_at = now()
  where community_id = 'nellies'
-   and title = 'Nellie''s Apron + Recipe Card'
-   and point_cost is distinct from 1500;
+   and title = 'Nellie''s Apron + Recipe Card';
 
 update public.rewards_catalog
    set point_cost = 2200,
        description = 'Three house hot sauces to take home. Show your redemption at the register for pickup.',
        active = true,
+       sort_order = 6,
        updated_at = now()
  where community_id = 'nellies'
-   and title = 'House Hot Sauce 3-Pack'
-   and point_cost is distinct from 2200;
+   and title = 'House Hot Sauce 3-Pack';
 
--- Hide Fan Engage-style placeholder pack from Nellie's soft-launch catalog.
+-- Soft launch: unstock every other Nellie's catalog row so we don't market
+-- empty Gold/Platinum / dining SKUs that aren't operationally ready.
 update public.rewards_catalog
    set active = false,
        updated_at = now()
  where community_id = 'nellies'
-   and title = 'Exclusive Digital Reward Pack'
+   and title not in (
+     'Nellie''s Apron + Recipe Card',
+     'House Hot Sauce 3-Pack'
+   )
+   and active = true;
+
+-- Soft launch: hide Gold/Platinum marketplace offers for Nellie's so guests
+-- aren't shown locked "redeemables" that aren't stocked on the rewards tab.
+update public.offers
+   set active = false
+ where community_id = 'nellies'
+   and min_tier in ('gold', 'platinum')
    and active = true;
