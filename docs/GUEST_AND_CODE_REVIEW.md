@@ -296,7 +296,8 @@ Product: **BEP = brand ↔ loyal member restaurant loyalty — not music/superfa
 | Footer memberengage support / For Brands in primary nav | P1 | Guest UX PR: `support@brandengagepro.com`; For Brands footer-only |
 | Stale Upcoming dates; +100 vs +25 perk naming | P1 | Guest UX PR: filter past events; +100 welcome / +25 check-in |
 | Brand CTA “Shop drops” | P1 | Guest UX PR: → View rewards / check-in |
-| Redeem shipping language (G6) | Follow-up | Not in this PR |
+| Redeem shipping language (G6) | P1 trust | Guest UX PR: pickup/show-to-server copy |
+| Apron 1500 / hot sauce 2200 live redeemables + tier CS mapping | P1 | Guest UX PR: migration 0049 + brand rewards guest browse |
 | Nellie's “Live Music — Rooftop” restaurant events | OK | **Do not remove** |
 
 Security P0s (debug route, email blast, cron auth) remain in **PR #7** — separate from guest UX.

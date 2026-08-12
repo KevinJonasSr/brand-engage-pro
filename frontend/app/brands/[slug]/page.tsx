@@ -516,16 +516,34 @@ export default async function BrandPage({
         </div>
       </section>
 
-      {/* Merch */}
+      {/* Soft-launch redeemables teaser — live catalog is /brands/[slug]/rewards */}
       <section className="glass-card p-8">
-        <p className="text-sm uppercase tracking-wide text-white/60">Member club rewards</p>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-sm uppercase tracking-wide text-white/60">Member club rewards</p>
+            <p className="mt-1 text-xs text-white/50">
+              Live redeemables on the brand rewards page (points you earn after joining — new
+              accounts start at 0).
+            </p>
+          </div>
+          <Link
+            href={`/brands/${brand.slug}/rewards`}
+            className="text-sm font-medium text-aurora underline underline-offset-2 hover:text-white"
+          >
+            Open brand rewards →
+          </Link>
+        </div>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           {brand.merch.map((m) => (
-            <div key={m.title} className="rounded-2xl bg-black/30 p-5">
+            <Link
+              key={m.title}
+              href={`/brands/${brand.slug}/rewards`}
+              className="rounded-2xl bg-black/30 p-5 transition hover:bg-black/40"
+            >
               <p className="text-xs uppercase tracking-wide text-white/50">{m.tier}</p>
               <p className="mt-1 text-sm font-semibold">{m.title}</p>
               <p className="mt-3 text-sm font-semibold text-emerald-300">{m.points}</p>
-            </div>
+            </Link>
           ))}
         </div>
       </section>

@@ -102,8 +102,8 @@ export const BRANDS: Record<string, Brand> = {
       },
     ],
     merch: [
-      { title: "Nellie's Apron + Recipe Card", tier: "Bronze+", points: "1,500 pts" },
-      { title: "House Hot Sauce 3-Pack", tier: "Silver+", points: "2,200 pts" },
+      { title: "Nellie's Apron + Recipe Card", tier: "Loyalty redeemable", points: "1,500 pts" },
+      { title: "House Hot Sauce 3-Pack", tier: "Loyalty redeemable", points: "2,200 pts" },
     ],
     social: [
       { label: "Instagram", href: "https://www.instagram.com/nelliessouthernkitchen/" },
