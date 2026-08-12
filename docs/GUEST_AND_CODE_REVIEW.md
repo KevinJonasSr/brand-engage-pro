@@ -184,7 +184,7 @@ select count(*) filter (where profile_slug is null), count(*) from public.member
 
 ## B) Guest experience (Nellie's first)
 
-Journey audited: **join → signup/login → brand home → check-in/stamp → rewards redeem → community**.
+Journey audited: **join → signup/login → brand home → check-in → rewards redeem → community**. (`/stamps` is **404** — do not invent or promise a stamp-card route in CS/docs; signed-in brand-page stamp UI may exist when configured, but is not a guest path.)
 
 Live probes: `/` 200, `/brands/nellies` 200, `/marketplace` 200, `/rewards` 200, `/join` **404**, `/brands/nellies/rewards` redirects guests to login.
 
@@ -200,13 +200,13 @@ Music/fan/artist leftovers are called out explicitly as product-identity bugs (n
 | G2 | **Music leftover** | Marketplace mixes NSK dining perks with JGE **artist** “drops” under merch framing | `frontend/app/marketplace/page.tsx`, seed `0037_nsk_jge_rewards.sql` | Live: “Sign up to redeem these drops”; “Exclusive Content Drop”, “VIP Suite Experience” next to Complimentary Dessert — makes Nellie's feel like a music marketplace |
 | G3 | **Music leftover** | Global nav **Rewards** (`/rewards`) is artist–fan copy | `frontend/app/rewards/page.tsx` | Live: “presales”, “livestream Q&A”, “Redeem points for drops”, dead `#` CTAs — wrong product |
 | G4 | Flow bug | Home “Complete profile” → `/signup` (wrong); Invite → `/onboarding` | `frontend/app/page.tsx` | Brand page correctly uses `/onboarding?ref=…` |
-| G5 | Loyalty UX bug | Check-in copy uses raw slug (“nellies”); stamp “Scan check-in QR” auto-POSTs check-in (no scanner) | `frontend/app/brands/[slug]/checkin/page.tsx`, `frontend/components/stamp-card.tsx` | Breaks restaurant visit/check-in story |
+| G5 | Loyalty UX bug | Check-in copy used raw slug (“nellies”); logged-out “Checking you in…” theater | `frontend/app/brands/[slug]/checkin/page.tsx` | Guest UX PR: display **Nellie's Southern Kitchen**; sign-in immediately after session check. Do **not** invent `/stamps` |
 | G6 | Loyalty UX bug | Redeem modal = merch shipping/delivery language | `frontend/app/brands/[slug]/rewards/redeem-form.tsx` | “shirt size, shipping address”, “will be in touch about delivery” — wrong for dessert/appetizer; should be show-to-server / tonight |
 | G7 | Loyalty UX bug | Brand home “Member club rewards” hardcoded merch, not linked to redeem catalog | `frontend/lib/brands.ts` (`nellies.merch`), brand page | Live: apron / hot sauce cards non-actionable vs real rewards catalog |
 | G8 | **Music leftover** | Landing / signup / empty states still FE drops / merch / **shows** | `signed-out-landing.tsx`, `signup-client.tsx`, `brands/page.tsx`, `member-home-dashboard.tsx`, `page.tsx`, `push-opt-in-prompt.tsx` | Live: “exclusive drops”; empty: “No upcoming shows…” — fan-club framing, not brand loyalty |
 | G9 | Mobile/consent | Sign in hidden (`sm:inline-flex`); cookie banner can cover CTAs | `frontend/app/layout.tsx`, `cookie-banner.tsx`, `mobile-nav.tsx` | Decline/Accept functionally identical on main |
 | G10 | **Music leftover** | Campaign member CTAs are DSP/artist actions | `admin/campaigns/new/builder.tsx`, `brands/[slug]/community/member-cta-block.tsx` | `pre_save`, `radio_request`, `playlist_add` — if any Nellie's campaign publishes these, members see a music product |
-| G11 | **Music leftover** | Share / notifications / referrals / premium still artist–fan | `share/drop/...`, `me/notifications/preferences-form.tsx` (“Drops & releases”), `referrals/page.tsx`, `premium/page.tsx` | “Exclusive Drop”, VIP livestream, early ticket access — bugs if guests hit these surfaces |
+| G11 | **Music leftover** | Share / notifications / premium still artist–fan; referrals VIP livestream was a leftover | `share/drop/...`, `me/notifications/preferences-form.tsx`, `premium/page.tsx` | Referrals VIP livestream → top-referrer recognition in guest UX PR; other share/premium leftovers may remain |
 | G12 | **Music leftover** | LatestStrip kind label `"DROP"`; fallback artist brands in static map | `components/latest-strip.tsx`, `lib/brands.ts` (`raelynn`, etc.) | Reinforces wrong product if shown; DB currently filters to active brands |
 
 ### Guest can-wait (not on Nellie's critical path / non-visible)
@@ -281,25 +281,27 @@ Product: **BEP = brand ↔ loyal member restaurant loyalty — not music/superfa
 
 ### Guide CS scripts (support messaging = eng truth)
 
-1. **Check-in spinner** — You’re not signed in; sign in, then reopen the same check-in link.  
-2. **Onboarding bounce** — Nothing was lost; use `/signup?ref=nellies` (not `/join`).  
-3. **Marketplace leftovers** — Point guests to Nellie's brand rewards; marketplace = stocked brand rewards only.  
+1. **Check-in spinner** — You’re not signed in; sign in, then reopen the same check-in link. UI shows sign-in immediately after session check (no fake “Checking you in…” theater). Brand name = **Nellie's Southern Kitchen** (not raw `nellies`).  
+2. **Onboarding bounce** — Nothing was lost; use **`/signup?ref=nellies`** (not `/join`). Keep this branded join path.  
+3. **Marketplace leftovers** — Point guests to Nellie's brand rewards. Purge music SKUs (Fan-to-Artist Q&A, Artist Listening Party, Artist Photography Print, Early Music Release, Studio Session Observer Pass, Tour Laminate/Credential, Vinyl or CD, Personal Video Shoutout, Free Showcase Ticket, Exclusive Pre-Sale Code, Priority Ticket Window). Keep restaurant items.  
 4. **Preview points ≠ real balance** — Logged-out numbers were not your balance; new accounts start at 0.  
 5. **Tiers + live redeemables** — Bronze → Platinum; Founding = first 100; Premium ≈ Gold+; apron 1,500 + hot sauce 2,200.  
 6. **Preview banner numbers fake/too high** — Those totals were preview theater (not a real account). Guests are not ahead of anyone; **real accounts start at 0**, then earn after join/profile.  
-7. **Tier map + soft-launch stock** — Ladder Bronze → Platinum (points). Founding = first 100. Premium ≈ Gold+ on gated specials. **Only** Nellie's apron (1,500) + hot sauce (2,200) are stocked — **don’t market empty Gold/Platinum redeemables**.
+7. **Tier map + soft-launch stock** — Ladder Bronze → Platinum (points). Founding = first 100. Premium ≈ Gold+ on gated specials. **Only** Nellie's apron (1,500) + hot sauce (2,200) are stocked — **don’t market empty Gold/Platinum redeemables**.  
+8. **Forgot password** — Use **Forgot password?** on `/login` (same as FE).  
+9. **No `/stamps` route** — Don’t promise stamp-card pages; `/stamps` 404s. Check-ins + brand rewards are the loyalty path.
 
 | Guide walk / Nellie's delta | Severity | Fix PR / status |
 |---|---|---|
 | Anonymous `/onboarding` wizard flash | P0 | Guest UX PR: server gate + `authReady`; CTA → `/signup?next=/onboarding` |
-| Check-in stuck spinning when logged out | P0 | Guest UX PR: auth-first → Sign in CTA |
+| Check-in stuck spinning / fake “Checking you in…” when logged out | P0 | Guest UX PR: resolve auth first; sign-in gate (no check-in theater); brand display name |
 | `/join` → 404 | P0 | Guest UX PR: → `/signup` (query preserved) |
 | Preview theater (8500 / 11420 / Gold / fake badges) | P0 trust | Guest UX PR: honest 0 / empty; “Sign up to start at 0” |
 | Specials promo codes visible logged-out | P0 trust | Guest UX PR: teaser until signed in |
 | Event “0 RSVPed” everywhere | P0 trust | Guest UX PR: hide zero count |
 | Community “Anonymous member” + dead reactions | P0 trust | Guest UX PR: admin name lookup; brand on announcements; “Sign in to react” |
 | `/rewards` “more”-only + fan leftovers | P0 trust | Guest UX PR: restaurant loyalty copy |
-| Marketplace artist leftovers | P1 | Guest UX PR: community-scoped offers → stocked-only |
+| Marketplace music SKUs (Guide purge list) | P0 trust | Guest UX PR: migration 0050 + title filter; keep restaurant items |
 | Cookie Decline / referral always set | P1 | Guest UX PR: Accept-only + gate referral |
 | Password Turnstile vs FE | P1 | Guest UX PR: password skip (conflicts with #6) |
 | Gold/Platinum empty vs marketing; Premium vs Bronze–Platinum | P1 | Guest UX PR: stop selling empty SKUs; clarify tier systems in copy |
@@ -309,6 +311,9 @@ Product: **BEP = brand ↔ loyal member restaurant loyalty — not music/superfa
 | Redeem shipping language (G6) | P1 trust | Guest UX PR: pickup/show-to-server copy |
 | Apron 1500 / hot sauce 2200 live redeemables + tier CS mapping | P1 | Guest UX PR: migration 0049 + brand rewards guest browse |
 | Preview banner numbers fake/too high; guests misled | P0 trust | Guest UX PR: banners say start at 0; no inflated sample totals |
+| Referrals “VIP livestream at 10” leftover | P0 trust | Guest UX PR: replaced with top-referrer recognition |
+| Missing Forgot password on `/login` | P0 CS | Guest UX PR: `/forgot-password` + `/reset-password` + login link |
+| Docs inventing `/stamps` stamp-card guest path | P1 docs | Guest UX PR: do not promise — route 404 |
 | Soft-launch stock only apron+hot sauce; no empty Gold/Platinum SKUs | P0 trust | Guest UX PR: 0049 deactivates other catalog + gold/platinum offers |
 | Nellie's “Live Music — Rooftop” restaurant events | OK | **Do not remove** |
 

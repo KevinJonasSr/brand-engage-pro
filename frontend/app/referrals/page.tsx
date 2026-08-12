@@ -7,6 +7,7 @@ import CopyLinkButton from "./copy-link-button";
 import PreviewSignupBanner from "@/components/preview-signup-banner";
 import NativeShareButton from "./native-share-button";
 
+// Restaurant loyalty milestones — no music leftovers (e.g. “VIP livestream”).
 const ladder = [
   { level: "1 referral", reward: "+150 pts" },
   { level: "3 referrals", reward: "Referral badge" },

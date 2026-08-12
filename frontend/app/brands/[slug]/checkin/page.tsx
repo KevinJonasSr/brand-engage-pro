@@ -1,12 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { BRANDS } from "@/lib/brands";
 
 type State =
-  | { status: "loading" }
+  | { status: "resolving" }
+  | { status: "checking_in" }
   | { status: "success"; pointsAwarded: number; alreadyCheckedIn: boolean }
   | { status: "error"; message: string }
   | { status: "unauthenticated" };
@@ -15,15 +17,21 @@ type State =
  * /brands/[slug]/checkin
  *
  * Landing page after a member scans the QR code at a brand location.
- * Resolves auth first so logged-out guests never see a stuck
- * "Checking you in…" spinner — they get Sign in / Create account instead.
+ * Auth resolves first — logged-out guests never see “Checking you in…”
+ * theater; they get Sign in / Create account immediately after session check.
  */
 export default function CheckinPage() {
   const params = useParams<{ slug: string }>();
   const brandSlug = params.slug;
   const checkinPath = brandSlug ? `/brands/${brandSlug}/checkin` : "/";
 
-  const [state, setState] = useState<State>({ status: "loading" });
+  const brandName = useMemo(() => {
+    if (!brandSlug) return "this brand";
+    return BRANDS[brandSlug]?.name ?? brandSlug;
+  }, [brandSlug]);
+
+  // Start in resolving — never imply a successful check-in before auth.
+  const [state, setState] = useState<State>({ status: "resolving" });
 
   const runCheckin = useCallback(async () => {
     if (!brandSlug) {
@@ -31,7 +39,7 @@ export default function CheckinPage() {
       return;
     }
 
-    setState({ status: "loading" });
+    setState({ status: "resolving" });
 
     try {
       const supabase = createClient();
@@ -43,6 +51,9 @@ export default function CheckinPage() {
         setState({ status: "unauthenticated" });
         return;
       }
+
+      // Only signed-in members see the real check-in spinner.
+      setState({ status: "checking_in" });
 
       const res = await fetch("/api/checkin", {
         method: "POST",
@@ -77,10 +88,17 @@ export default function CheckinPage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-6 py-16 text-center">
-      {state.status === "loading" && (
+      {state.status === "resolving" && (
+        <div className="space-y-4">
+          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-white/10 border-t-aurora" />
+          <p className="text-sm text-white/50">One moment…</p>
+        </div>
+      )}
+
+      {state.status === "checking_in" && (
         <div className="space-y-4">
           <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-white/10 border-t-aurora" />
-          <p className="text-sm text-white/60">Checking you in…</p>
+          <p className="text-sm text-white/60">Checking you in at {brandName}…</p>
         </div>
       )}
 
@@ -88,8 +106,9 @@ export default function CheckinPage() {
         <div className="space-y-6">
           <div className="text-5xl">🔑</div>
           <h1 className="text-2xl font-semibold">Sign in to check in</h1>
-          <p className="max-w-xs text-sm text-white/60">
-            Create a free account or sign in to earn visit points for this location.
+          <p className="max-w-sm text-sm text-white/60">
+            Create a free account or sign in to earn visit points at{" "}
+            <span className="text-white/80">{brandName}</span>.
           </p>
           <div className="flex flex-col gap-3">
             <Link
@@ -116,13 +135,14 @@ export default function CheckinPage() {
             +{state.pointsAwarded} points earned
           </p>
           <p className="max-w-xs text-sm text-white/60">
-            Your visit has been recorded. Come back tomorrow for another {state.pointsAwarded} pts.
+            Your visit to {brandName} has been recorded. Come back tomorrow for another{" "}
+            {state.pointsAwarded} pts.
           </p>
           <Link
             href={`/brands/${brandSlug}`}
             className="inline-block rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white"
           >
-            Back to brand home →
+            Back to {brandName} →
           </Link>
         </div>
       )}
@@ -132,13 +152,13 @@ export default function CheckinPage() {
           <div className="text-6xl">✅</div>
           <h1 className="text-2xl font-semibold">Already checked in today</h1>
           <p className="max-w-xs text-sm text-white/60">
-            You&apos;ve already earned your visit points today. See you tomorrow!
+            You&apos;ve already earned your visit points at {brandName} today. See you tomorrow!
           </p>
           <Link
             href={`/brands/${brandSlug}`}
             className="inline-block rounded-full border border-white/20 px-6 py-3 text-sm font-medium text-white/80 hover:bg-white/10"
           >
-            Back to brand home
+            Back to {brandName}
           </Link>
         </div>
       )}

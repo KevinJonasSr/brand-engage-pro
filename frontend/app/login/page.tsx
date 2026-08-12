@@ -139,7 +139,15 @@ function LoginForm() {
             />
           </label>
           <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-wide text-white/60">Password</span>
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-xs uppercase tracking-wide text-white/60">Password</span>
+              <Link
+                href={`/forgot-password${next !== "/" ? `?next=${encodeURIComponent(next)}` : ""}`}
+                className="text-xs text-white/60 underline-offset-2 hover:text-white hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
             <input
               type="password"
               required

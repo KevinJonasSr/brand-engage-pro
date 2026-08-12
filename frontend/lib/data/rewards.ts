@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { emitNetworkEvent } from "@/lib/network";
+import { isMarketplaceMusicSku } from "@/lib/marketplace-music-skus";
 
 export interface RewardRow {
   id: string;
@@ -55,7 +56,8 @@ export async function listRewardsForCommunity(communityId: string): Promise<Rewa
       .eq("active", true)
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: true });
-    return (data ?? []) as RewardRow[];
+    // Soft launch: never surface Fan Engage / music leftover SKUs on BEP.
+    return ((data ?? []) as RewardRow[]).filter((r) => !isMarketplaceMusicSku(r.title));
   } catch {
     return [];
   }

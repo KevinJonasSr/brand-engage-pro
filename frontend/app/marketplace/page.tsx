@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getCurrentMember } from "@/lib/data/member";
 import { getCurrentCommunityId } from "@/lib/community";
 import { listRewardsForCommunity } from "@/lib/data/rewards";
+import { isMarketplaceMusicSku } from "@/lib/marketplace-music-skus";
 import PreviewSignupBanner from "@/components/preview-signup-banner";
 
 export const metadata = { title: "Marketplace" };
@@ -12,10 +13,12 @@ export const metadata = { title: "Marketplace" };
  */
 export default async function MarketplacePage() {
   const communityId = await getCurrentCommunityId();
-  const [member, rewards] = await Promise.all([
+  const [member, catalog] = await Promise.all([
     getCurrentMember(),
     listRewardsForCommunity(communityId),
   ]);
+  // Purge music SKUs even if a stale active row slipped past migration 0050.
+  const rewards = catalog.filter((r) => !isMarketplaceMusicSku(r.title));
   const isSignedIn = member !== null;
   const brandRewardsHref = `/brands/${communityId}/rewards`;
 
