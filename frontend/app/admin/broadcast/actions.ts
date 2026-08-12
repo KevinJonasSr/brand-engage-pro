@@ -32,6 +32,16 @@ export async function sendBroadcast(
     return { ok: false, error: "Brand and message are required." };
   }
 
+  // Email blasts the entire Mailchimp audience (no brand/tier scope).
+  // Soft-launch: SMS only until segmented email targeting lands.
+  if (channel === "email" || channel === "both") {
+    return {
+      ok: false,
+      error:
+        "Email broadcast is disabled until brand/tier scoping is implemented. Use SMS.",
+    };
+  }
+
   // If single-brand admin, ensure they only broadcast to their own brand
   if (!ctx.isSuperAdmin && !ctx.communities.includes(brandSlug)) {
     return { ok: false, error: "You can only broadcast to your own brand." };

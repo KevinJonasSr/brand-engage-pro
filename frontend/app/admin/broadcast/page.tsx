@@ -12,10 +12,10 @@ const TIER_OPTIONS = [
   { value: "platinum", label: "Platinum only" },
 ];
 
+// Email channel removed until Mailchimp brand/tier segments exist
+// (broadcastEmail currently blasts the full audience).
 const CHANNEL_OPTIONS = [
   { value: "sms", label: "SMS" },
-  { value: "email", label: "Email" },
-  { value: "both", label: "SMS + Email" },
 ];
 
 const SMS_LIMIT = 160;
@@ -52,8 +52,9 @@ export default function BroadcastPage() {
         <p className="text-xs uppercase tracking-wide text-white/60">Admin · Broadcast</p>
         <h1 className="mt-1 text-2xl font-semibold">Send a broadcast</h1>
         <p className="mt-2 text-sm text-white/60">
-          Message your members directly — target by tier and channel. Every send
-          is logged to Campaigns for your records.
+          Message your members directly via SMS — target by tier. Every send
+          is logged to Campaigns for your records. Email broadcast is temporarily
+          disabled until brand-scoped segments are ready.
         </p>
       </header>
 
@@ -200,7 +201,7 @@ export default function BroadcastPage() {
       <div className="rounded-2xl border border-white/10 bg-black/20 p-5 text-xs text-white/50 space-y-1">
         <p className="font-medium text-white/60">Good to know</p>
         <p>• SMS recipients must have opted in and have a verified phone number.</p>
-        <p>• Email recipients must have opted in and have a confirmed email address.</p>
+        <p>• Email broadcast is disabled (unscoped Mailchimp audience risk).</p>
         <p>• All sends are throttled (250 ms/msg) to stay within carrier rate limits.</p>
         <p>• Every broadcast is logged under <a href="/admin/campaigns" className="underline underline-offset-2">Campaigns</a> with recipient counts.</p>
       </div>
