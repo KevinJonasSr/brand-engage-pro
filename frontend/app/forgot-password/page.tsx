@@ -4,6 +4,7 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { safeRelativePath } from "@/lib/safe-redirect";
 
 export default function ForgotPasswordPage() {
   return (
@@ -21,9 +22,7 @@ export default function ForgotPasswordPage() {
 
 function ForgotPasswordForm() {
   const searchParams = useSearchParams();
-  const rawNext = searchParams.get("next");
-  const next =
-    rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/";
+  const next = safeRelativePath(searchParams.get("next"), "/");
 
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "sent" | "error">("idle");

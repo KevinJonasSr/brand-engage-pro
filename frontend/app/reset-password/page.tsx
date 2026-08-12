@@ -4,6 +4,7 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { safeRelativePath } from "@/lib/safe-redirect";
 
 export default function ResetPasswordPage() {
   return (
@@ -22,9 +23,7 @@ export default function ResetPasswordPage() {
 function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const rawNext = searchParams.get("next");
-  const next =
-    rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/";
+  const next = safeRelativePath(searchParams.get("next"), "/");
 
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");

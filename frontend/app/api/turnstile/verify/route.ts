@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { authRateLimiter, getClientIp } from "@/lib/rate-limit";
+import { isProductionRuntime, isTurnstileBypassAllowed } from "@/lib/turnstile";
 
 const VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 
@@ -15,9 +16,35 @@ export async function POST(request: NextRequest) {
 
   const secret = process.env.TURNSTILE_SECRET_KEY;
   if (!secret) {
-    // If Turnstile isn't configured yet, let requests through (dev/staging).
-    // Set TURNSTILE_SECRET_KEY in production to enforce.
-    return NextResponse.json({ success: true });
+    if (isTurnstileBypassAllowed()) {
+      console.warn(
+        "[turnstile] TURNSTILE_SECRET_KEY unset; allowing request because TURNSTILE_ALLOW_BYPASS=1",
+      );
+      return NextResponse.json({ success: true, bypass: true });
+    }
+
+    if (isProductionRuntime()) {
+      console.error(
+        "[turnstile] TURNSTILE_SECRET_KEY is not configured — refusing captcha verification",
+      );
+      return NextResponse.json(
+        {
+          success: false,
+          error: "turnstile_not_configured",
+          message: "Security check is temporarily unavailable. Please try again later.",
+        },
+        { status: 503 },
+      );
+    }
+
+    // Local `next dev` (and non-production runtimes) without keys: allow so
+    // engineers can sign in. Production never reaches this branch.
+    console.warn(
+      "[turnstile] TURNSTILE_SECRET_KEY unset in non-production; allowing request. " +
+        "Set TURNSTILE_SECRET_KEY + NEXT_PUBLIC_TURNSTILE_SITE_KEY for real verification, " +
+        "or TURNSTILE_ALLOW_BYPASS=1 on preview/local production builds.",
+    );
+    return NextResponse.json({ success: true, bypass: true });
   }
 
   let token: string | undefined;
