@@ -79,8 +79,8 @@ export function RedeemForm({
             <h2 className="text-xl font-semibold">Redeemed!</h2>
             <p className="mt-1 text-sm text-white/70">{rewardTitle}</p>
             <p className="mt-1 text-xs text-white/50">
-              {pointCost.toLocaleString()} points spent. {brandName} will be in
-              touch about delivery.
+              {pointCost.toLocaleString()} points spent. Show this redemption to
+              your server or host — pickup tonight, not shipping.
             </p>
 
             <div className="mt-6 flex flex-col items-center gap-3">
@@ -122,12 +122,12 @@ export function RedeemForm({
             <form onSubmit={handleSubmit} className="mt-4 space-y-4">
               <div>
                 <label className="block text-xs font-medium uppercase tracking-wide text-white/80">
-                  Delivery Details (optional)
+                  Pickup note (optional)
                 </label>
                 <textarea
                   value={deliveryDetails}
                   onChange={(e) => setDeliveryDetails(e.target.value)}
-                  placeholder="E.g., shirt size, shipping address hint, etc."
+                  placeholder="E.g., dining tonight, name on the reservation, pickup preference"
                   className="mt-2 w-full rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
                   rows={3}
                 />

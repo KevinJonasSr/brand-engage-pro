@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import DropCountdown from "@/components/drop-countdown";
 import Image from "next/image";
 import { RedeemForm } from "./redeem-form";
@@ -10,6 +11,7 @@ interface RewardCardProps {
   brandSlug: string;
   brandName: string;
   memberSlug?: string | null;
+  isSignedIn?: boolean;
 }
 
 export default function RewardCardWithForm({
@@ -17,8 +19,10 @@ export default function RewardCardWithForm({
   brandSlug,
   brandName,
   memberSlug,
+  isSignedIn = true,
 }: RewardCardProps) {
   const [showForm, setShowForm] = useState(false);
+  const rewardsPath = `/brands/${brandSlug}/rewards`;
 
   return (
     <>
@@ -48,7 +52,11 @@ export default function RewardCardWithForm({
 
         {reward.requires_tier && (
           <div className="mt-2 inline-flex rounded-full bg-amber-500/20 px-2 py-1 text-xs uppercase tracking-wide text-amber-300">
-            {reward.requires_tier}
+            {reward.requires_tier === "founder-only"
+              ? "Founding"
+              : reward.requires_tier === "premium"
+                ? "Premium (≈ Gold+)"
+                : reward.requires_tier}
           </div>
         )}
 
@@ -56,15 +64,24 @@ export default function RewardCardWithForm({
           <p className="mt-2 text-xs text-white/50">Only {reward.stock} left</p>
         )}
 
-        <button
-          onClick={() => setShowForm(true)}
-          className="mt-4 w-full rounded-lg bg-gradient-to-r from-aurora to-ember px-3 py-2 text-xs font-medium text-white hover:opacity-90"
-        >
-          Redeem →
-        </button>
+        {isSignedIn ? (
+          <button
+            onClick={() => setShowForm(true)}
+            className="mt-4 w-full rounded-lg bg-gradient-to-r from-aurora to-ember px-3 py-2 text-xs font-medium text-white hover:opacity-90"
+          >
+            Redeem →
+          </button>
+        ) : (
+          <Link
+            href={`/login?next=${encodeURIComponent(rewardsPath)}`}
+            className="mt-4 block w-full rounded-lg border border-white/20 px-3 py-2 text-center text-xs font-medium text-white/85 hover:bg-white/10"
+          >
+            Sign in to redeem →
+          </Link>
+        )}
       </div>
 
-      {showForm && (
+      {showForm && isSignedIn && (
         <RedeemForm
           rewardId={reward.id}
           rewardTitle={reward.title}
@@ -74,7 +91,6 @@ export default function RewardCardWithForm({
           memberSlug={memberSlug}
           onSuccess={() => {
             setShowForm(false);
-            // TODO: trigger toast/refresh
           }}
           onClose={() => setShowForm(false)}
         />

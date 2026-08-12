@@ -1,19 +1,30 @@
-import { notFound, redirect } from "next/navigation";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getBrandFromDb } from "@/lib/data/brands";
 import { getMemberProfileSlug } from "@/lib/data/member-profile";
 import { listRewardsForCommunity, listMyRedemptions } from "@/lib/data/rewards";
-import Image from "next/image";
 import RewardCardWithForm from "./reward-card";
 
 export const dynamic = "force-dynamic";
 
-async function MemberPoints() {
+async function MemberPoints({ isSignedIn }: { isSignedIn: boolean }) {
+  if (!isSignedIn) {
+    return (
+      <div className="rounded-lg border border-dashed border-white/15 bg-black/30 px-4 py-3">
+        <p className="text-xs uppercase tracking-wide text-white/60">Your points</p>
+        <p className="mt-1 text-2xl font-bold text-white">0</p>
+        <p className="mt-1 text-xs text-white/50">
+          Preview only — new accounts start at 0. Sign in to earn and redeem.
+        </p>
+      </div>
+    );
+  }
+
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
   if (!user) return null;
 
   const { data: member } = await supabase
@@ -43,38 +54,64 @@ export default async function RewardsPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    return redirect(`/login?next=/brands/${slug}/rewards`);
-  }
-
   const brand = await getBrandFromDb(slug);
   if (!brand) return notFound();
 
+  const isSignedIn = user !== null;
   const [rewards, myRedemptions, memberSlug] = await Promise.all([
     listRewardsForCommunity(slug),
-    listMyRedemptions(user.id),
-    getMemberProfileSlug(user.id).catch(() => null),
+    user ? listMyRedemptions(user.id) : Promise.resolve([]),
+    user ? getMemberProfileSlug(user.id).catch(() => null) : Promise.resolve(null),
   ]);
 
   const recentRedemptions = myRedemptions.slice(0, 5);
+  const loginNext = `/brands/${slug}/rewards`;
 
   return (
     <div className="min-h-screen bg-midnight px-4 py-8">
       <div className="mx-auto max-w-4xl">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold" style={{ fontFamily: "var(--font-display)" }}>
             Rewards · {brand.name}
           </h1>
-          <p className="mt-2 text-sm text-white/60">Spend your points on exclusive perks from {brand.name}</p>
+          <p className="mt-2 text-sm text-white/60">
+            Soft launch: stocked redeemables are the apron + recipe card (1,500 pts) and house hot
+            sauce 3-pack (2,200 pts). We don&apos;t list empty Gold/Platinum redeemables.
+          </p>
+          <p className="mt-2 text-xs text-white/45">
+            Ladder: Bronze → Platinum (points). Founding = first 100. Premium ≈ Gold+ on gated
+            specials. Preview banners elsewhere are not your balance — new accounts start at 0.
+          </p>
         </div>
 
-        {/* Points Balance */}
+        {!isSignedIn && (
+          <div className="mb-6 rounded-2xl border border-aurora/40 bg-gradient-to-r from-aurora/20 via-slate-900 to-ember/20 px-5 py-4">
+            <p className="text-sm font-semibold">Browse rewards — redeem after you join</p>
+            <p className="mt-1 text-xs text-white/70">
+              Preview points below are not a real balance. New accounts start at 0, then earn +100
+              welcome points when you finish your profile.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Link
+                href={`/signup?ref=${encodeURIComponent(slug)}&next=${encodeURIComponent(loginNext)}`}
+                className="rounded-full bg-gradient-to-r from-aurora to-ember px-4 py-2 text-xs font-semibold text-white"
+              >
+                Create free account →
+              </Link>
+              <Link
+                href={`/login?next=${encodeURIComponent(loginNext)}`}
+                className="rounded-full border border-white/20 px-4 py-2 text-xs text-white/80 hover:bg-white/10"
+              >
+                Sign in
+              </Link>
+            </div>
+          </div>
+        )}
+
         <div className="mb-6">
-          <MemberPoints />
+          <MemberPoints isSignedIn={isSignedIn} />
         </div>
 
-        {/* Rewards Grid */}
         {rewards.length > 0 ? (
           <div className="mb-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {rewards.map((reward) => (
@@ -84,6 +121,7 @@ export default async function RewardsPage({
                 brandSlug={slug}
                 brandName={brand.name}
                 memberSlug={memberSlug}
+                isSignedIn={isSignedIn}
               />
             ))}
           </div>
@@ -93,7 +131,6 @@ export default async function RewardsPage({
           </div>
         )}
 
-        {/* My Redemptions */}
         {recentRedemptions.length > 0 && (
           <div className="mt-12">
             <h2 className="mb-4 text-lg font-semibold">Your Recent Redemptions</h2>

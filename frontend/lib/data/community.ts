@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type {
   ChallengeEntry,
   CommunityComment,
@@ -6,6 +7,30 @@ import type {
   PollData,
   PollOption,
 } from "./types";
+
+/** Display names for community authors. Uses service role because RLS only
+ *  allows members to SELECT their own row — guests would otherwise always
+ *  see "Anonymous member". */
+async function loadAuthorFirstNames(
+  authorIds: string[],
+): Promise<Map<string, string | null>> {
+  if (authorIds.length === 0) return new Map();
+  try {
+    const admin = createAdminClient();
+    const { data } = await admin
+      .from("members")
+      .select("id, first_name")
+      .in("id", authorIds);
+    return new Map(
+      (data ?? []).map((a) => [
+        a.id as string,
+        (a.first_name as string | null) ?? null,
+      ]),
+    );
+  } catch {
+    return new Map();
+  }
+}
 
 /**
  * Fetches the community feed for one brand, newest first with pinned
@@ -38,11 +63,8 @@ export async function getPostsByBrand(
     const postIds = posts.map((p) => p.id as string);
     const authorIds = [...new Set(posts.map((p) => p.author_id as string))];
 
-    const [authorsRes, reactionsRes, myReactionsRes, commentCountRes] = await Promise.all([
-      supabase
-        .from("members")
-        .select("id, first_name")
-        .in("id", authorIds),
+    const [authorNameById, reactionsRes, myReactionsRes, commentCountRes] = await Promise.all([
+      loadAuthorFirstNames(authorIds),
       supabase
         .from("community_reactions")
         .select("post_id, emoji")
@@ -59,10 +81,6 @@ export async function getPostsByBrand(
         .select("post_id")
         .in("post_id", postIds),
     ]);
-
-    const authorNameById = new Map<string, string | null>(
-      (authorsRes.data ?? []).map((a) => [a.id as string, (a.first_name as string | null) ?? null]),
-    );
 
     const reactionsByPost = new Map<string, Record<string, number>>();
     for (const r of reactionsRes.data ?? []) {
@@ -191,13 +209,7 @@ export async function getChallengeEntries(
     if (!data || data.length === 0) return [];
 
     const memberIds = [...new Set(data.map((e) => e.member_id as string))];
-    const { data: members } = await supabase
-      .from("members")
-      .select("id, first_name")
-      .in("id", memberIds);
-    const nameById = new Map<string, string | null>(
-      (members ?? []).map((f) => [f.id as string, (f.first_name as string | null) ?? null]),
-    );
+    const nameById = await loadAuthorFirstNames(memberIds);
 
     return data.map(
       (e) =>
@@ -231,13 +243,7 @@ export async function getCommentsByPost(
     if (!data || data.length === 0) return [];
 
     const authorIds = [...new Set(data.map((c) => c.author_id as string))];
-    const { data: authors } = await supabase
-      .from("members")
-      .select("id, first_name")
-      .in("id", authorIds);
-    const nameById = new Map<string, string | null>(
-      (authors ?? []).map((a) => [a.id as string, (a.first_name as string | null) ?? null]),
-    );
+    const nameById = await loadAuthorFirstNames(authorIds);
 
     return data.map(
       (c) =>

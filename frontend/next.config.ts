@@ -33,6 +33,22 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    // Soft-launch: /join is not a BEP surface (Fan Engage /join is separate).
+    // Preserve query string (e.g. ?ref=nellies) so print/QR links still attribute.
+    return [
+      {
+        source: "/join",
+        destination: "/signup",
+        permanent: false,
+      },
+      {
+        source: "/join/:path*",
+        destination: "/signup",
+        permanent: false,
+      },
+    ];
+  },
   async headers() {
     return [
       ...authSensitiveRoutes.map((source) => ({

@@ -55,7 +55,14 @@ function rowToBrand(row: BrandRow, events: BrandEvent[]): Brand {
     genres: row.genres ?? [],
     social: row.social ?? [],
     upcoming: events
-      .filter((e) => e.active)
+      .filter((e) => {
+        if (!e.active) return false;
+        // Hide past events from the Upcoming strip (guest trust).
+        if (e.starts_at) {
+          return new Date(e.starts_at).getTime() >= Date.now();
+        }
+        return true;
+      })
       .sort((a, b) => a.sort_order - b.sort_order)
       .map((e) => ({
         id: e.id,
@@ -93,6 +100,7 @@ export async function getBrandFromDb(slug: string): Promise<Brand | null> {
         .select("id, brand_slug, title, detail, event_date, url, location, image_url, capacity, starts_at, ends_at, sort_order, active, tier")
         .eq("brand_slug", normalized)
         .eq("active", true)
+        .or(`starts_at.is.null,starts_at.gte.${new Date().toISOString()}`)
         .order("sort_order"),
     ]);
 
@@ -124,6 +132,7 @@ export async function listBrandsFromDb(): Promise<Brand[]> {
       .select("id, brand_slug, title, detail, event_date, url, location, image_url, capacity, starts_at, ends_at, sort_order, active, tier")
       .in("brand_slug", slugs)
       .eq("active", true)
+      .or(`starts_at.is.null,starts_at.gte.${new Date().toISOString()}`)
       .order("sort_order");
 
     const byBrand = new Map<string, BrandEvent[]>();

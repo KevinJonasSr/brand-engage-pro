@@ -90,20 +90,20 @@ export const BRANDS: Record<string, Brand> = {
       {
         title: "Sunday Supper Series — Live Band Night",
         detail: "Family-style supper and a live country/Americana band.",
-        date: "Sunday, May 17 · 6 PM",
+        date: "Sunday, Sep 20 · 6 PM",
         location: "36 N. Main St., Belmont NC",
       },
       {
         title: "Biscuit-Making Class with the Kitchen",
         detail: "Hands-on class with our pastry team. Apron + recipe card to take home.",
-        date: "Saturday, June 13 · 10 AM",
+        date: "Saturday, Oct 10 · 10 AM",
         location: "Nellie's Southern Kitchen, Belmont NC",
         tier: "premium",
       },
     ],
     merch: [
-      { title: "Nellie's Apron + Recipe Card", tier: "Bronze+", points: "1,500 pts" },
-      { title: "House Hot Sauce 3-Pack", tier: "Silver+", points: "2,200 pts" },
+      { title: "Nellie's Apron + Recipe Card", tier: "Loyalty redeemable", points: "1,500 pts" },
+      { title: "House Hot Sauce 3-Pack", tier: "Loyalty redeemable", points: "2,200 pts" },
     ],
     social: [
       { label: "Instagram", href: "https://www.instagram.com/nelliessouthernkitchen/" },

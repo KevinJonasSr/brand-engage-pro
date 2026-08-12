@@ -134,16 +134,16 @@ export default async function BrandPage({
   // Primary CTA adapts to the viewer's state:
   // - anonymous  → "Join the member club" → /signup?ref=<slug>
   // - signed in, no profile → "Complete profile" → /onboarding?ref=<slug>
-  // - signed in, profile done → "Shop drops" → /marketplace
+  // - signed in, profile done → brand rewards (restaurant loyalty, not marketplace drops)
   const primaryCta = !isSignedIn
     ? { label: "Join the member club", href: `/signup?ref=${brand.slug}` }
     : needsProfile
       ? { label: "Complete your profile", href: `/onboarding?ref=${brand.slug}` }
-      : { label: "Shop drops", href: "/marketplace" };
+      : { label: "View rewards", href: `/brands/${brand.slug}/rewards` };
 
   const secondaryCta = isSignedIn
-    ? { label: "My rewards", href: "/rewards" }
-    : { label: "See merchandise", href: "/marketplace" };
+    ? { label: "Check in", href: `/brands/${brand.slug}/checkin` }
+    : { label: "See rewards", href: `/brands/${brand.slug}/rewards` };
 
   const showFounderLink = founderData && founderData.cap > 0;
 
@@ -224,7 +224,7 @@ export default async function BrandPage({
           </div>
           {!isSignedIn && (
             <p className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-aurora/30 bg-aurora/10 px-3 py-1 text-xs font-medium text-aurora">
-              🎁 Join free and unlock your first member perk today.
+              🎁 Join free — finish your profile for +100 welcome points.
             </p>
           )}
         </div>
@@ -390,13 +390,26 @@ export default async function BrandPage({
                         ) : null}
                       </div>
                       {s.redemption_code && (
-                        <p className="mt-3 text-xs text-white/50">
-                          Show code{" "}
-                          <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-white/90">
-                            {s.redemption_code}
-                          </code>{" "}
-                          at the register.
-                        </p>
+                        isSignedIn ? (
+                          <p className="mt-3 text-xs text-white/50">
+                            Show code{" "}
+                            <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-white/90">
+                              {s.redemption_code}
+                            </code>{" "}
+                            at the register.
+                          </p>
+                        ) : (
+                          <p className="mt-3 text-xs text-white/50">
+                            Member code unlocked after{" "}
+                            <Link
+                              href={`/signup?ref=${brand.slug}`}
+                              className="text-aurora underline underline-offset-2 hover:text-white"
+                            >
+                              sign-in
+                            </Link>
+                            .
+                          </p>
+                        )
                       )}
                     </div>
                   </div>
@@ -456,10 +469,15 @@ export default async function BrandPage({
                     <p className="mt-3 text-xs uppercase tracking-wide text-white/40">
                       {e.date}
                     </p>
-                    {eventId && (
+                    {eventId && count > 0 && (
                       <p className="mt-1 text-xs text-white/50">
                         {count}
                         {e.capacity ? ` / ${e.capacity}` : ""} RSVPed
+                      </p>
+                    )}
+                    {eventId && count === 0 && isSignedIn && (
+                      <p className="mt-1 text-xs text-white/50">
+                        Be the first to RSVP
                       </p>
                     )}
                   </div>
@@ -498,16 +516,34 @@ export default async function BrandPage({
         </div>
       </section>
 
-      {/* Merch */}
+      {/* Soft-launch redeemables teaser — live catalog is /brands/[slug]/rewards */}
       <section className="glass-card p-8">
-        <p className="text-sm uppercase tracking-wide text-white/60">Member club rewards</p>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-sm uppercase tracking-wide text-white/60">Member club rewards</p>
+            <p className="mt-1 text-xs text-white/50">
+              Live redeemables on the brand rewards page (points you earn after joining — new
+              accounts start at 0).
+            </p>
+          </div>
+          <Link
+            href={`/brands/${brand.slug}/rewards`}
+            className="text-sm font-medium text-aurora underline underline-offset-2 hover:text-white"
+          >
+            Open brand rewards →
+          </Link>
+        </div>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           {brand.merch.map((m) => (
-            <div key={m.title} className="rounded-2xl bg-black/30 p-5">
+            <Link
+              key={m.title}
+              href={`/brands/${brand.slug}/rewards`}
+              className="rounded-2xl bg-black/30 p-5 transition hover:bg-black/40"
+            >
               <p className="text-xs uppercase tracking-wide text-white/50">{m.tier}</p>
               <p className="mt-1 text-sm font-semibold">{m.title}</p>
               <p className="mt-3 text-sm font-semibold text-emerald-300">{m.points}</p>
-            </div>
+            </Link>
           ))}
         </div>
       </section>

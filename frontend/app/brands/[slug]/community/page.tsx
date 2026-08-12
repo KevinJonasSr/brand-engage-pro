@@ -178,6 +178,7 @@ export default async function BrandCommunityPage({
                 isAuthor={member !== null && post.author_id === member.id}
                 isAdmin={isAdmin}
                 currentUserId={member?.id ?? null}
+                brandName={brand.name}
                 poll={pollByPost[i]}
                 challengeEntries={entriesByPost[i]}
               />

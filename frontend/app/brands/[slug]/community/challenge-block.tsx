@@ -118,7 +118,7 @@ export default function ChallengeBlock({
             <div key={e.id} className="rounded-xl bg-black/40 p-3">
               <div className="flex items-center justify-between">
                 <p className="text-xs font-semibold">
-                  {e.member_first_name ?? "Anonymous member"}
+                  {e.member_first_name?.trim() || "Member"}
                 </p>
                 <p className="text-xs uppercase tracking-wide text-white/40">
                   {timeAgo(e.created_at)}
