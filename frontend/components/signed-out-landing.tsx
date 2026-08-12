@@ -110,9 +110,8 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
             </h1>
             <p className="mt-6 max-w-xl text-lg text-white/70">
               Follow the brands you love, earn points for every visit and
-              every engagement, and unlock real perks — exclusive drops,
-              members-only events, and first access casual customers never
-              get.
+              check-in, and unlock real perks — member specials, dining rewards,
+              and first access casual customers never get.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
@@ -136,77 +135,50 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
             </p>
           </div>
 
-          {/* Mobile preview card — single, no rotation */}
+          {/* Honest start state — no fake points / Gold theater */}
           <div className="lg:hidden mt-8 rounded-3xl border border-white/10 bg-gradient-to-br from-aurora/40 via-slate-900 to-black p-6 shadow-glass">
-            <div className="flex items-center justify-between">
-              <p className="text-xs uppercase tracking-widest text-white/60">Member Profile</p>
-              <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-white/80">Gold tier</span>
-            </div>
-            <p className="mt-4 text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>11,420</p>
-            <p className="text-xs text-white/50">total points</p>
-            <div className="mt-4 space-y-2">
-              <div className="flex items-center justify-between rounded-xl bg-black/30 px-3 py-2 text-xs">
-                <span>🏆 Challenge crasher</span>
-                <span className="text-emerald-300">+250</span>
-              </div>
-              <div className="flex items-center justify-between rounded-xl bg-black/30 px-3 py-2 text-xs">
-                <span>🎟️ Spring Tasting Night</span>
-                <span className="text-emerald-300">+25</span>
-              </div>
-              <div className="flex items-center justify-between rounded-xl bg-black/30 px-3 py-2 text-xs">
-                <span>🤝 Invited 3 friends</span>
-                <span className="text-emerald-300">+450</span>
-              </div>
-            </div>
+            <p className="text-xs uppercase tracking-widest text-white/60">Your member start</p>
+            <p className="mt-4 text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>0</p>
+            <p className="text-xs text-white/50">points until you join</p>
+            <ul className="mt-4 space-y-2 text-xs text-white/70">
+              <li className="rounded-xl bg-black/30 px-3 py-2">+100 welcome points after you finish your profile</li>
+              <li className="rounded-xl bg-black/30 px-3 py-2">+25 pts per daily check-in visit</li>
+              <li className="rounded-xl bg-black/30 px-3 py-2">Redeem food & drink rewards at the brand</li>
+            </ul>
           </div>
 
-          {/* Hero visual — stylized preview card stack (desktop) */}
           <div className="relative hidden lg:block">
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="relative h-[440px] w-[360px]">
-                {/* Back card */}
                 <div className="absolute left-8 top-12 h-[380px] w-[320px] rotate-3 rounded-3xl border border-white/10 bg-gradient-to-br from-ember/25 via-slate-900 to-aurora/25 shadow-glass">
                   <div className="p-6 text-white/70">
-                    <p className="text-xs uppercase tracking-widest">
-                      Next Event
-                    </p>
-                    <p className="mt-2 text-sm font-semibold text-white">
-                      Members&apos; Tasting Night
-                    </p>
+                    <p className="text-xs uppercase tracking-widest">How members earn</p>
+                    <p className="mt-2 text-sm font-semibold text-white">Visits · check-ins · community</p>
                     <p className="mt-1 text-xs text-white/60">
-                      Thu · 8pm · +25 pts for RSVP
+                      Real points only — no demo balances
                     </p>
                   </div>
                 </div>
-                {/* Front card */}
                 <div className="absolute left-0 top-0 h-[380px] w-[320px] -rotate-2 rounded-3xl border border-white/10 bg-gradient-to-br from-aurora/40 via-slate-900 to-black p-6 shadow-glass">
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs uppercase tracking-widest text-white/60">
-                      Member Profile
-                    </p>
-                    <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-white/80">
-                      Gold tier
-                    </span>
-                  </div>
+                  <p className="text-xs uppercase tracking-widest text-white/60">
+                    Sign up to start at 0
+                  </p>
                   <p
                     className="mt-6 text-4xl font-semibold text-white"
                     style={{ fontFamily: "var(--font-display)" }}
                   >
-                    11,420
+                    0
                   </p>
-                  <p className="text-xs text-white/50">total points</p>
-                  <div className="mt-6 space-y-2">
-                    <div className="flex items-center justify-between rounded-xl bg-black/30 px-3 py-2 text-xs">
-                      <span>🏆 Challenge crasher</span>
-                      <span className="text-emerald-300">+250</span>
+                  <p className="text-xs text-white/50">total points (before you join)</p>
+                  <div className="mt-6 space-y-2 text-xs text-white/80">
+                    <div className="rounded-xl bg-black/30 px-3 py-2">
+                      Finish profile → <span className="text-emerald-300">+100 welcome pts</span>
                     </div>
-                    <div className="flex items-center justify-between rounded-xl bg-black/30 px-3 py-2 text-xs">
-                      <span>🎟️ Spring Tasting Night</span>
-                      <span className="text-emerald-300">+25</span>
+                    <div className="rounded-xl bg-black/30 px-3 py-2">
+                      Daily check-in → <span className="text-emerald-300">+25 pts</span>
                     </div>
-                    <div className="flex items-center justify-between rounded-xl bg-black/30 px-3 py-2 text-xs">
-                      <span>🤝 Invited 3 friends</span>
-                      <span className="text-emerald-300">+450</span>
+                    <div className="rounded-xl bg-black/30 px-3 py-2">
+                      Redeem on the brand rewards page
                     </div>
                   </div>
                 </div>
@@ -382,7 +354,7 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
             className="pointer-events-none absolute inset-0 bg-[radial-gradient(600px_circle_at_50%_-20%,rgba(212,160,23,0.35),transparent)]"
           />
           <p className="relative text-xs uppercase tracking-widest text-white/60">
-            Ready to earn your first 100 points?
+            Ready for +100 welcome points?
           </p>
           <h2
             className="relative mt-3 text-3xl font-semibold md:text-4xl"
@@ -391,12 +363,13 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
             Join free in under a minute.
           </h2>
           <p className="relative mt-4 text-white/70">
-            No credit card. No spam. Just the brands you love and the perks
-            they reserve for the regulars.
+            Create your account, finish your member profile, and earn{" "}
+            <span className="text-white">+100 welcome points</span>. Then check
+            in on visits for +25 pts and redeem brand rewards.
           </p>
           <div className="relative mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
-              href="/signup"
+              href="/signup?next=/onboarding"
               className="rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white shadow-glass transition hover:brightness-110"
             >
               Create member profile →

@@ -214,7 +214,7 @@ export default function SignupPage({
           )}
           {!showContextualHero && next !== "/onboarding" && (
             <p className="inline-flex items-center gap-1.5 rounded-full border border-aurora/30 bg-aurora/10 px-3 py-1 text-xs font-medium text-aurora">
-              🎁 Join free and unlock your first member perk today.
+              🎁 Finish your profile for +100 welcome points.
             </p>
           )}
           {referrerName && (

@@ -62,7 +62,7 @@ export default async function UnsubscribePage({
           <h1 className="text-2xl font-semibold">Link not recognized</h1>
           <p className="text-sm text-white/70">
             The unsubscribe token in this link doesn&apos;t match any account. If you&apos;re still
-            getting messages you don&apos;t want, email support@memberengage.app.
+            getting messages you don&apos;t want, email support@brandengagepro.com.
           </p>
         </>
       )}
@@ -71,7 +71,7 @@ export default async function UnsubscribePage({
           <h1 className="text-2xl font-semibold">Missing unsubscribe token</h1>
           <p className="text-sm text-white/70">
             Unsubscribe links in our emails include a token. Use the link in a recent email, or
-            email support@memberengage.app for help.
+            email support@brandengagepro.com for help.
           </p>
         </>
       )}
@@ -79,7 +79,7 @@ export default async function UnsubscribePage({
         <>
           <h1 className="text-2xl font-semibold">Something went wrong</h1>
           <p className="text-sm text-white/70">
-            Please try again in a moment, or email support@memberengage.app.
+            Please try again in a moment, or email support@brandengagepro.com.
           </p>
         </>
       )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import type {
   ChallengeEntry,
   CommunityComment,
@@ -19,6 +20,19 @@ import { relativeTime } from "@/lib/format/relative-time";
 import ModerationChip from "@/components/community/moderation-chip";
 
 const REACTION_SET = ["❤️", "🔥", "👏", "💯", "😂"] as const;
+
+function authorLabel(
+  post: CommunityPost,
+  brandName: string,
+): string {
+  // Brand welcome / staff announcements should never read as "Anonymous member".
+  if (post.kind === "announcement") {
+    return post.author_first_name
+      ? `${post.author_first_name} · ${brandName}`
+      : brandName;
+  }
+  return post.author_first_name?.trim() || "Member";
+}
 
 function KindBadge({ kind }: { kind: CommunityPost["kind"] }) {
   if (kind === "announcement") {
@@ -51,6 +65,7 @@ export default function PostCard({
   isAuthor,
   isAdmin,
   currentUserId,
+  brandName,
   poll,
   challengeEntries,
 }: {
@@ -59,10 +74,13 @@ export default function PostCard({
   isAuthor: boolean;
   isAdmin: boolean;
   currentUserId: string | null;
+  brandName: string;
   poll?: PollData | null;
   challengeEntries?: ChallengeEntry[];
 }) {
   const [showComments, setShowComments] = useState(false);
+  const displayName = authorLabel(post, brandName);
+  const communityPath = `/brands/${post.brand_slug}/community`;
 
   const accentRing =
     post.kind === "announcement"
@@ -81,7 +99,7 @@ export default function PostCard({
         <div>
           <div className="flex items-center gap-2">
             <p className="text-sm font-semibold">
-              {post.author_first_name ?? "Anonymous member"}
+              {displayName}
             </p>
             <KindBadge kind={post.kind} />
           </div>
@@ -177,29 +195,37 @@ export default function PostCard({
 
       {/* Reactions */}
       <div className="flex flex-wrap items-center gap-2 border-t border-white/5 pt-3">
-        {REACTION_SET.map((emoji) => {
-          const count = post.reaction_counts[emoji] ?? 0;
-          const mine = post.my_reactions.includes(emoji);
-          return (
-            <form key={emoji} action={toggleReactionAction}>
-              <input type="hidden" name="post_id" value={post.id} />
-              <input type="hidden" name="brand_slug" value={post.brand_slug} />
-              <input type="hidden" name="emoji" value={emoji} />
-              <button
-                type="submit"
-                disabled={!currentUserId}
-                className={`flex items-center gap-1 rounded-full border px-3 py-1 text-sm transition ${
-                  mine
-                    ? "border-aurora/60 bg-aurora/20 text-white"
-                    : "border-white/10 bg-black/30 text-white/70 hover:bg-black/50"
-                } disabled:cursor-not-allowed disabled:opacity-50`}
-              >
-                <span>{emoji}</span>
-                {count > 0 && <span className="text-xs">{count}</span>}
-              </button>
-            </form>
-          );
-        })}
+        {currentUserId ? (
+          REACTION_SET.map((emoji) => {
+            const count = post.reaction_counts[emoji] ?? 0;
+            const mine = post.my_reactions.includes(emoji);
+            return (
+              <form key={emoji} action={toggleReactionAction}>
+                <input type="hidden" name="post_id" value={post.id} />
+                <input type="hidden" name="brand_slug" value={post.brand_slug} />
+                <input type="hidden" name="emoji" value={emoji} />
+                <button
+                  type="submit"
+                  className={`flex items-center gap-1 rounded-full border px-3 py-1 text-sm transition ${
+                    mine
+                      ? "border-aurora/60 bg-aurora/20 text-white"
+                      : "border-white/10 bg-black/30 text-white/70 hover:bg-black/50"
+                  }`}
+                >
+                  <span>{emoji}</span>
+                  {count > 0 && <span className="text-xs">{count}</span>}
+                </button>
+              </form>
+            );
+          })
+        ) : (
+          <Link
+            href={`/login?next=${encodeURIComponent(communityPath)}`}
+            className="rounded-full border border-white/15 bg-black/30 px-3 py-1 text-xs font-medium text-white/80 hover:bg-white/10"
+          >
+            Sign in to react
+          </Link>
+        )}
         <button
           onClick={() => setShowComments((v) => !v)}
           className="ml-auto rounded-full border border-white/10 bg-black/30 px-3 py-1 text-xs text-white/70 hover:bg-black/50"
@@ -219,7 +245,7 @@ export default function PostCard({
             <div key={c.id} className="rounded-2xl bg-black/30 p-3">
               <div className="flex items-center justify-between">
                 <p className="text-xs font-semibold">
-                  {c.author_first_name ?? "Anonymous member"}
+                  {c.author_first_name?.trim() || "Member"}
                 </p>
                 <p className="text-xs uppercase tracking-wide text-white/40">
                   {relativeTime(c.created_at)}

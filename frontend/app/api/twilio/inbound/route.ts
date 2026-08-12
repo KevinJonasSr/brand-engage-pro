@@ -110,7 +110,7 @@ export async function POST(request: Request) {
 
     if (HELP_KEYWORDS.has(keyword)) {
       return twimlResponse(
-        "Brand Engage Pro: brand alerts + member rewards. Msg & data rates may apply. Reply STOP to opt out. Support: support@memberengage.app",
+        "Brand Engage Pro: brand alerts + member rewards. Msg & data rates may apply. Reply STOP to opt out. Support: support@brandengagepro.com",
       );
     }
 
