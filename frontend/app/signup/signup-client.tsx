@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { TurnstileWidget, verifyTurnstileToken } from "@/components/turnstile-widget";
+import { safeRelativePath } from "@/lib/safe-redirect";
 
 export type ReferrerBrand = {
   slug: string;
@@ -25,10 +26,8 @@ export default function SignupPage({
   const searchParams = useSearchParams();
   const community = searchParams.get("community");
   const ref = searchParams.get("ref");
-  const rawNext = searchParams.get("next");
-  const next = rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//")
-    ? rawNext
-    : null;
+  const rawNext = safeRelativePath(searchParams.get("next"), "");
+  const next = rawNext || null;
   // Where to send the user after a successful signup. Preserve any
   // ?ref=<brand-slug> attribution from the brand-page Join CTA.
   const onboardingHref = ref ? `/onboarding?ref=${encodeURIComponent(ref)}` : "/onboarding";

@@ -3,8 +3,13 @@
 import Link from "next/link";
 import { useSyncExternalStore, useState } from "react";
 import { usePathname } from "next/navigation";
+import {
+  COOKIE_CONSENT_STORAGE_KEY,
+  setCookieConsent,
+  type CookieConsentChoice,
+} from "@/lib/cookie-consent";
 
-const STORAGE_KEY = "memberengage_cookie_consent";
+const REF_COOKIE = "memberengage_ref";
 
 // Read-only external store: any tab can dismiss via the button below; we
 // return the stored string (or null) and let the component decide what to
@@ -14,13 +19,21 @@ function subscribe() {
 }
 function getSnapshot(): string | null {
   try {
-    return window.localStorage.getItem(STORAGE_KEY);
+    return window.localStorage.getItem(COOKIE_CONSENT_STORAGE_KEY);
   } catch {
     return null;
   }
 }
 function getServerSnapshot(): string | null {
   return null;
+}
+
+function clearReferralCookie() {
+  try {
+    document.cookie = `${REF_COOKIE}=; path=/; max-age=0; SameSite=Lax`;
+  } catch {
+    /* ignore */
+  }
 }
 
 export default function CookieBanner() {
@@ -35,14 +48,11 @@ export default function CookieBanner() {
 
   const shown = stored === null && !dismissed;
 
-  function save(choice: "accept" | "decline") {
-    try {
-      window.localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({ choice, at: new Date().toISOString() }),
-      );
-    } catch {
-      /* ignore */
+  function save(choice: CookieConsentChoice) {
+    setCookieConsent(choice);
+    // Decline clears any prior non-essential referral attribution cookie.
+    if (choice === "decline") {
+      clearReferralCookie();
     }
     setDismissed(true);
   }

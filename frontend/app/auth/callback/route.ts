@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { safeRelativePath } from "@/lib/safe-redirect";
 
 /**
  * Handles:
@@ -7,11 +8,12 @@ import { createClient } from "@/lib/supabase/server";
  *   - email confirmation redirects from supabase.auth.signUp
  *
  * Exchanges the `code` for a session and redirects to `next` (defaults to /).
+ * `next` is restricted to same-origin relative paths to prevent open redirects.
  */
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/";
+  const next = safeRelativePath(searchParams.get("next"), "/");
 
   if (code) {
     const supabase = await createClient();

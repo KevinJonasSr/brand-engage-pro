@@ -75,7 +75,16 @@ export function TurnstileWidget({ onSuccess, onError, onExpire, theme = "light" 
     };
   }, [renderWidget]);
 
-  if (!SITE_KEY) return null;
+  if (!SITE_KEY) {
+    if (process.env.NODE_ENV === "production") {
+      return (
+        <p className="mt-5 text-sm text-red-300">
+          Security check unavailable. Please try again later.
+        </p>
+      );
+    }
+    return null;
+  }
 
   return (
     <div className="mt-5">
@@ -89,10 +98,23 @@ export function TurnstileWidget({ onSuccess, onError, onExpire, theme = "light" 
   );
 }
 
-// Call from a form submit handler to verify the token server-side.
-// Returns true if verified (or if Turnstile isn't configured).
+/**
+ * Call from a form submit handler to verify the token server-side.
+ *
+ * Production builds require NEXT_PUBLIC_TURNSTILE_SITE_KEY — missing key fails closed.
+ * Non-production builds without a site key skip the client check so local login works;
+ * the server still enforces TURNSTILE_SECRET_KEY / TURNSTILE_ALLOW_BYPASS rules.
+ */
 export async function verifyTurnstileToken(token: string | null): Promise<boolean> {
-  if (!SITE_KEY) return true;
+  if (!SITE_KEY) {
+    if (process.env.NODE_ENV === "production") {
+      console.error(
+        "[turnstile] NEXT_PUBLIC_TURNSTILE_SITE_KEY is not configured in production",
+      );
+      return false;
+    }
+    return true;
+  }
   if (!token) return false;
 
   try {
@@ -101,7 +123,10 @@ export async function verifyTurnstileToken(token: string | null): Promise<boolea
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token }),
     });
-    const data = (await res.json()) as { success: boolean };
+    const data = (await res.json()) as { success: boolean; message?: string };
+    if (!data.success && data.message) {
+      console.warn("[turnstile]", data.message);
+    }
     return data.success === true;
   } catch {
     return false;
