@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
 
 type State =
   | { status: "loading" }
@@ -14,42 +15,65 @@ type State =
  * /brands/[slug]/checkin
  *
  * Landing page after a member scans the QR code at a brand location.
- * Auto-fires the check-in on mount, then shows a confirmation or error.
- * For unauthenticated visitors, shows a sign-in prompt then redirects back.
+ * Resolves auth first so logged-out guests never see a stuck
+ * "Checking you in…" spinner — they get Sign in / Create account instead.
  */
 export default function CheckinPage() {
   const params = useParams<{ slug: string }>();
-  const router = useRouter();
   const brandSlug = params.slug;
+  const checkinPath = brandSlug ? `/brands/${brandSlug}/checkin` : "/";
 
   const [state, setState] = useState<State>({ status: "loading" });
 
-  useEffect(() => {
-    if (!brandSlug) return;
+  const runCheckin = useCallback(async () => {
+    if (!brandSlug) {
+      setState({ status: "error", message: "Missing brand for this check-in link." });
+      return;
+    }
 
-    fetch("/api/checkin", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ brand_slug: brandSlug }),
-    })
-      .then(async (res) => {
-        if (res.status === 401) {
-          setState({ status: "unauthenticated" });
-          return;
-        }
-        const data = await res.json();
-        if (!res.ok) {
-          setState({ status: "error", message: data.error ?? "Something went wrong" });
-          return;
-        }
-        setState({
-          status: "success",
-          pointsAwarded: data.pointsAwarded,
-          alreadyCheckedIn: data.alreadyCheckedIn,
-        });
-      })
-      .catch(() => setState({ status: "error", message: "Network error — try again." }));
+    setState({ status: "loading" });
+
+    try {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        setState({ status: "unauthenticated" });
+        return;
+      }
+
+      const res = await fetch("/api/checkin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ brand_slug: brandSlug }),
+      });
+
+      if (res.status === 401) {
+        setState({ status: "unauthenticated" });
+        return;
+      }
+
+      const data = await res.json();
+      if (!res.ok) {
+        setState({ status: "error", message: data.error ?? "Something went wrong" });
+        return;
+      }
+
+      setState({
+        status: "success",
+        pointsAwarded: data.pointsAwarded,
+        alreadyCheckedIn: data.alreadyCheckedIn,
+      });
+    } catch {
+      setState({ status: "error", message: "Network error — try again." });
+    }
   }, [brandSlug]);
+
+  useEffect(() => {
+    void runCheckin();
+  }, [runCheckin]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-6 py-16 text-center">
@@ -65,20 +89,20 @@ export default function CheckinPage() {
           <div className="text-5xl">🔑</div>
           <h1 className="text-2xl font-semibold">Sign in to check in</h1>
           <p className="max-w-xs text-sm text-white/60">
-            Create a free account or sign in to earn your {brandSlug} visit points.
+            Create a free account or sign in to earn visit points for this location.
           </p>
           <div className="flex flex-col gap-3">
             <Link
-              href={`/signup?ref=${brandSlug}&next=/brands/${brandSlug}/checkin`}
+              href={`/login?next=${encodeURIComponent(checkinPath)}`}
               className="rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white"
             >
-              Create free account →
+              Sign in to check in →
             </Link>
             <Link
-              href={`/login?next=/brands/${brandSlug}/checkin`}
+              href={`/signup?ref=${encodeURIComponent(brandSlug ?? "")}&next=${encodeURIComponent(checkinPath)}`}
               className="text-sm text-white/60 hover:text-white"
             >
-              Already a member? Sign in
+              New here? Create a free account
             </Link>
           </div>
         </div>
@@ -98,7 +122,7 @@ export default function CheckinPage() {
             href={`/brands/${brandSlug}`}
             className="inline-block rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white"
           >
-            Back to {brandSlug} →
+            Back to brand home →
           </Link>
         </div>
       )}
@@ -114,7 +138,7 @@ export default function CheckinPage() {
             href={`/brands/${brandSlug}`}
             className="inline-block rounded-full border border-white/20 px-6 py-3 text-sm font-medium text-white/80 hover:bg-white/10"
           >
-            Back to {brandSlug}
+            Back to brand home
           </Link>
         </div>
       )}
@@ -126,8 +150,7 @@ export default function CheckinPage() {
           <p className="max-w-xs text-sm text-white/60">{state.message}</p>
           <button
             onClick={() => {
-              setState({ status: "loading" });
-              router.refresh();
+              void runCheckin();
             }}
             className="rounded-full border border-white/20 px-6 py-3 text-sm font-medium text-white/80 hover:bg-white/10"
           >

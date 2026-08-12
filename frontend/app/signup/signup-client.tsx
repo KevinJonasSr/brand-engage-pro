@@ -195,14 +195,24 @@ export default function SignupPage({
         <div className="space-y-2">
           <p className="text-sm uppercase tracking-wide text-white/60">Brand Engage Pro</p>
           <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
-            {showContextualHero ? "Create your account" : "Join the inner circle"}
+            {next === "/onboarding"
+              ? "Create your account to continue"
+              : showContextualHero
+                ? "Create your account"
+                : "Join the member club"}
           </h1>
-          {!showContextualHero && (
+          {next === "/onboarding" && (
+            <p className="rounded-2xl border border-aurora/30 bg-aurora/10 px-3 py-2 text-sm text-white/80">
+              Next up: your member profile — rewards, check-ins, and brand perks.
+              Create a free account to continue.
+            </p>
+          )}
+          {!showContextualHero && next !== "/onboarding" && (
             <p className="text-sm text-white/70">
               Create an account to earn points, unlock rewards, and get member-only updates.
             </p>
           )}
-          {!showContextualHero && (
+          {!showContextualHero && next !== "/onboarding" && (
             <p className="inline-flex items-center gap-1.5 rounded-full border border-aurora/30 bg-aurora/10 px-3 py-1 text-xs font-medium text-aurora">
               🎁 Join free and unlock your first member perk today.
             </p>

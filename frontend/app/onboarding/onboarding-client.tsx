@@ -128,29 +128,32 @@ export default function OnboardingWizard() {
   // editable AND required so onboarding doesn't dead-end.
   const [emailAutoFilled, setEmailAutoFilled] = useState(false);
   const [smsConsent, setSmsConsent] = useState(false);
+  // Server page already redirects anonymous visitors; this client gate
+  // avoids a wizard flash if the session drops mid-render.
+  const [authReady, setAuthReady] = useState(false);
 
   const currentStep = steps[stepIndex];
   const progress = useMemo(() => ((stepIndex + 1) / steps.length) * 100, [stepIndex]);
 
-  // Auth guard + email prefill: /onboarding is the profile-completion wizard;
-  // by the time someone lands here they should already have a Supabase auth
-  // session. Bounce unauthenticated visitors to /signup (preserving any
-  // ?ref= attribution); for signed-in members, prefill the email field
-  // from auth.users.email so they don't have to retype it.
+  // Prefill email from the session. Unauthenticated bounce is handled by
+  // the server page; keep a client redirect as a safety net.
   const searchParams = useSearchParams();
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) {
         const ref = searchParams.get("ref");
-        const next = ref ? `/signup?ref=${encodeURIComponent(ref)}` : "/signup";
-        router.replace(next);
+        const params = new URLSearchParams();
+        params.set("next", "/onboarding");
+        if (ref) params.set("ref", ref);
+        router.replace(`/signup?${params.toString()}`);
         return;
       }
       if (user.email) {
         setFormState((prev) => ({ ...prev, email: user.email ?? "" }));
         setEmailAutoFilled(true);
       }
+      setAuthReady(true);
     });
   }, [router, searchParams]);
 
@@ -350,6 +353,16 @@ export default function OnboardingWizard() {
 
   const isLastStep = stepIndex === steps.length - 1;
   const stepValid = canAdvanceCurrentStep();
+
+  if (!authReady) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black text-white">
+        <div className="mx-auto flex max-w-6xl items-center justify-center px-6 py-24">
+          <p className="text-white/60">Loading your member profile…</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black text-white">

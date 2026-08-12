@@ -1,18 +1,11 @@
 import { getActiveOffers } from "@/lib/data/offers";
 import { getCurrentMember } from "@/lib/data/member";
+import { getCurrentCommunityId } from "@/lib/community";
 import type { Offer } from "@/lib/data/types";
 import PreviewSignupBanner from "@/components/preview-signup-banner";
+import Link from "next/link";
 
-const tabs = ["Featured", "Merch", "Experiences", "Collectibles", "Member-Exclusive"];
-
-// Static preview content used when Supabase has no offers yet.
-const fallbackProducts = [
-  { title: "Limited Edition Hoodie", tier: "Silver", pts: "3,400 pts", category: "Merch", badge: "Limited" },
-  { title: "Members-Only Polaroid Pack", tier: "Gold", pts: "5,200 pts", category: "Featured", badge: "Drop" },
-  { title: "VIP Experience Package", tier: "Platinum", pts: "9,800 pts", category: "Experiences", badge: "New" },
-  { title: "Limited Edition Collectible Card", tier: "Gold", pts: "4,750 pts", category: "Collectibles", badge: "1/50" },
-  { title: "Member-Exclusive Limited Drop", tier: "All tiers", pts: "$45", category: "Member-Exclusive", badge: "Preorder" },
-];
+const tabs = ["Featured", "Food & drink", "Experiences", "Merch", "Member-exclusive"];
 
 function formatPrice(o: Offer): string {
   if (o.price_points) return `${new Intl.NumberFormat("en-US").format(o.price_points)} pts`;
@@ -37,23 +30,23 @@ function formatCategory(cat: Offer["category"]): string {
 export const metadata = { title: "Marketplace" };
 
 export default async function MarketplacePage() {
-  const [dbOffers, member] = await Promise.all([
+  const [dbOffers, member, communityId] = await Promise.all([
     getActiveOffers(),
     getCurrentMember(),
+    getCurrentCommunityId(),
   ]);
   const isSignedIn = member !== null;
-  const usingDb = dbOffers.length > 0;
 
-  const products = usingDb
-    ? dbOffers.map((o) => ({
-        title: o.title,
-        tier: formatTier(o.min_tier),
-        pts: formatPrice(o),
-        category: formatCategory(o.category),
-        badge: o.inventory != null && o.inventory > 0 ? `${o.inventory} left` : "New",
-        slug: o.slug,
-      }))
-    : fallbackProducts.map((p) => ({ ...p, slug: p.title.toLowerCase().replace(/\s+/g, "-") }));
+  const products = dbOffers.map((o) => ({
+    title: o.title,
+    tier: formatTier(o.min_tier),
+    pts: formatPrice(o),
+    category: formatCategory(o.category),
+    badge: o.inventory != null && o.inventory > 0 ? `${o.inventory} left` : "New",
+    slug: o.slug,
+  }));
+
+  const brandRewardsHref = `/brands/${communityId}/rewards`;
 
   return (
     <div className="min-h-screen bg-midnight">
@@ -62,12 +55,12 @@ export default async function MarketplacePage() {
           {!isSignedIn && (
             <PreviewSignupBanner
               eyebrow="🛍️ Preview"
-              headline="Sign up to redeem these drops"
-              body="Members earn points by showing up — visits, posts, referrals — then trade them for the merch, experiences, and collectibles below. Drops are tier-locked so the regulars who care the most get first crack."
+              headline="Sign up to redeem member rewards"
+              body="Members earn points for visits, check-ins, and community — then redeem them for food, drink, and loyalty perks at this brand."
               bullets={[
-                "Real merch + experiences from your favorite brands",
-                "Points-only or member-priority pricing",
-                "Tier-locked so casual visitors don't outbid regulars",
+                "Real rewards from the brand you follow",
+                "Points from visits, stamps, and engagement",
+                "Member-only specials for regulars",
               ]}
               primaryCta="Sign up to redeem →"
               nextPath="/marketplace"
@@ -75,14 +68,23 @@ export default async function MarketplacePage() {
             />
           )}
 
-          <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-purple-800/30 via-slate-900 to-midnight p-6 shadow-glass">
+          <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-amber-900/30 via-slate-900 to-midnight p-6 shadow-glass">
             <p className="text-sm uppercase tracking-wide text-white/60">Marketplace</p>
             <h1 className="mt-2 text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
-              Drops tailored to your tier
+              Member rewards for this brand
             </h1>
             <p className="mt-4 text-sm text-white/70">
-              Redeem points or purchase exclusive merch, experiences, and collectibles before they hit the public store.
+              Soft launch shows loyalty rewards for the active brand only — not artist or fan-club catalog items.
+              Prefer the brand rewards page for stamp cards and visit redemptions.
             </p>
+            <div className="mt-4">
+              <Link
+                href={brandRewardsHref}
+                className="text-sm font-medium text-aurora underline underline-offset-2 hover:text-white"
+              >
+                Open brand rewards →
+              </Link>
+            </div>
             <div className="mt-6 flex flex-wrap gap-3">
               {tabs.map((tab, index) => (
                 <button
@@ -99,26 +101,46 @@ export default async function MarketplacePage() {
             </div>
           </section>
 
-          <section className="grid gap-4 md:grid-cols-2">
-            {products.map((item) => (
-              <div key={item.slug} className="glass-card p-5">
-                <div className="flex items-center justify-between text-xs uppercase tracking-wide text-white/50">
-                  <span>{item.tier !== "Bronze" && item.tier !== "All tiers" && "🔒 "}{item.tier}</span>
-                  <span className="rounded-full bg-white/10 px-3 py-1 text-white/70">{item.badge}</span>
+          {products.length === 0 ? (
+            <section className="glass-card p-8 text-center">
+              <h2 className="text-xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
+                No marketplace rewards yet
+              </h2>
+              <p className="mt-3 text-sm text-white/60">
+                Check the brand rewards page for visit perks, stamp cards, and redeemable offers.
+              </p>
+              <Link
+                href={brandRewardsHref}
+                className="mt-6 inline-block rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white"
+              >
+                Go to brand rewards →
+              </Link>
+            </section>
+          ) : (
+            <section className="grid gap-4 md:grid-cols-2">
+              {products.map((item) => (
+                <div key={item.slug} className="glass-card p-5">
+                  <div className="flex items-center justify-between text-xs uppercase tracking-wide text-white/50">
+                    <span>{item.tier !== "Bronze" && item.tier !== "All tiers" && "🔒 "}{item.tier}</span>
+                    <span className="rounded-full bg-white/10 px-3 py-1 text-white/70">{item.badge}</span>
+                  </div>
+                  <h3 className="mt-4 text-xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-sm text-white/70">Category · {item.category}</p>
+                  <div className="mt-6 flex items-center justify-between">
+                    <span className="text-lg font-semibold text-emerald-300">{item.pts}</span>
+                    <Link
+                      href={brandRewardsHref}
+                      className="rounded-full border border-white/30 px-4 py-2 text-sm text-white/80 hover:bg-white/10"
+                    >
+                      View rewards
+                    </Link>
+                  </div>
                 </div>
-                <h3 className="mt-4 text-xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
-                  {item.title}
-                </h3>
-                <p className="mt-2 text-sm text-white/70">Category · {item.category}</p>
-                <div className="mt-6 flex items-center justify-between">
-                  <span className="text-lg font-semibold text-emerald-300">{item.pts}</span>
-                  <button className="rounded-full border border-white/30 px-4 py-2 text-sm text-white/80">
-                    Redeem
-                  </button>
-                </div>
-              </div>
-            ))}
-          </section>
+              ))}
+            </section>
+          )}
         </div>
 
       </main>

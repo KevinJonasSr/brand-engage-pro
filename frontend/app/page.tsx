@@ -137,7 +137,7 @@ export default async function Home({
                 </p>
               </div>
               <Link
-                href="/signup"
+                href="/onboarding"
                 className="rounded-full bg-gradient-to-r from-aurora to-ember px-4 py-2 text-sm font-semibold text-white shadow-glass transition hover:brightness-110"
               >
                 Complete profile

@@ -1,16 +1,37 @@
 /**
  * Server-component wrapper around the onboarding client.
  *
- * The client (./onboarding-client) calls useSearchParams() at top level,
- * which Next.js 15+ requires to be inside a <Suspense> boundary. This
- * file exists solely to provide that boundary; everything else lives in
- * onboarding-client.tsx.
+ * Auth is gated here (same pattern as /onboarding/chat) so anonymous
+ * visitors never see a wizard flash before the client redirect runs.
+ * Unauthenticated users are sent to signup with next=/onboarding so they
+ * return to the profile wizard after creating an account.
  */
 
 import { Suspense } from "react";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 import OnboardingWizard from "./onboarding-client";
 
-export default function OnboardingPage() {
+export const dynamic = "force-dynamic";
+
+export default async function OnboardingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ ref?: string }>;
+}) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    const sp = (await searchParams) ?? {};
+    const params = new URLSearchParams();
+    params.set("next", "/onboarding");
+    if (sp.ref) params.set("ref", sp.ref);
+    redirect(`/signup?${params.toString()}`);
+  }
+
   return (
     <Suspense
       fallback={

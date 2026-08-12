@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { useSyncExternalStore, useState } from "react";
 import { usePathname } from "next/navigation";
-
-const STORAGE_KEY = "memberengage_cookie_consent";
+import {
+  COOKIE_CONSENT_STORAGE_KEY,
+  setCookieConsent,
+} from "@/lib/cookie-consent";
 
 // Read-only external store: any tab can dismiss via the button below; we
 // return the stored string (or null) and let the component decide what to
@@ -14,7 +16,7 @@ function subscribe() {
 }
 function getSnapshot(): string | null {
   try {
-    return window.localStorage.getItem(STORAGE_KEY);
+    return window.localStorage.getItem(COOKIE_CONSENT_STORAGE_KEY);
   } catch {
     return null;
   }
@@ -23,6 +25,20 @@ function getServerSnapshot(): string | null {
   return null;
 }
 
+function hasAccepted(stored: string | null): boolean {
+  if (!stored) return false;
+  try {
+    const parsed = JSON.parse(stored) as { choice?: unknown };
+    return parsed.choice === "accept";
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Accept-only cookie notice (Fan Engage parity). Referral / non-essential
+ * cookies are gated on Accept via `allowsNonEssentialCookies()`.
+ */
 export default function CookieBanner() {
   const stored = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const [dismissed, setDismissed] = useState(false);
@@ -33,17 +49,10 @@ export default function CookieBanner() {
   const TOP_ON = ["/onboarding", "/signup", "/login"];
   const topForRoute = TOP_ON.some((prefix) => pathname.startsWith(prefix));
 
-  const shown = stored === null && !dismissed;
+  const shown = !hasAccepted(stored) && !dismissed;
 
-  function save(choice: "accept" | "decline") {
-    try {
-      window.localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({ choice, at: new Date().toISOString() }),
-      );
-    } catch {
-      /* ignore */
-    }
+  function accept() {
+    setCookieConsent("accept");
     setDismissed(true);
   }
 
@@ -68,13 +77,7 @@ export default function CookieBanner() {
       </p>
       <div className="mt-3 flex items-center justify-end gap-2">
         <button
-          onClick={() => save("decline")}
-          className="rounded-full border border-white/20 px-3 py-1 text-xs text-white/70 hover:bg-white/10"
-        >
-          Decline
-        </button>
-        <button
-          onClick={() => save("accept")}
+          onClick={accept}
           className="rounded-full bg-gradient-to-r from-aurora to-ember px-3 py-1 text-xs font-semibold text-white"
         >
           Accept

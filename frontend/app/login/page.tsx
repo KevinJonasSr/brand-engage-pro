@@ -61,6 +61,10 @@ function LoginForm() {
     }, 1000);
   }
 
+  // Password sign-in intentionally skips Turnstile (Fan Engage parity /
+  // least-confused guest path). Magic-link below still verifies captcha.
+  // Do not reintroduce password Turnstile without an explicit product decision —
+  // open PR #6 conflicts by requiring it on password login.
   async function handlePassword(e: React.FormEvent) {
     e.preventDefault();
     setStatus("loading");
