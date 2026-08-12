@@ -34,6 +34,7 @@ function LoginForm() {
   if (next !== "/") signupParams.set("next", next);
   if (ref) signupParams.set("ref", ref);
   const signupHref = `/signup${signupParams.size ? `?${signupParams.toString()}` : ""}`;
+  const forgotHref = `/forgot-password${next !== "/" ? `?next=${encodeURIComponent(next)}` : ""}`;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -67,6 +68,16 @@ function LoginForm() {
   // open PR #6 conflicts by requiring it on password login.
   async function handlePassword(e: React.FormEvent) {
     e.preventDefault();
+    if (!email.trim()) {
+      setStatus("error");
+      setMessage("Enter an email first.");
+      return;
+    }
+    if (!password) {
+      setStatus("error");
+      setMessage("Enter your password, or use a magic link below.");
+      return;
+    }
     setStatus("loading");
     setMessage("");
     try {
@@ -82,7 +93,7 @@ function LoginForm() {
   }
 
   async function handleMagicLink() {
-    if (!email) {
+    if (!email.trim()) {
       setStatus("error");
       setMessage("Enter an email first.");
       return;
@@ -125,24 +136,28 @@ function LoginForm() {
           <p className="text-sm text-white/70">Sign in to access your rewards and perks.</p>
         </div>
 
+        {/* Shared email — outside the password form so magic-link never hits
+            browser constraint validation on an empty password field. */}
+        <label className="block space-y-1">
+          <span className="text-xs uppercase tracking-wide text-white/60">Email</span>
+          <input
+            type="email"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-white/50 focus:border-white/40 focus:outline-none"
+            placeholder="you@email.com"
+          />
+        </label>
+
+        {/* Password path only — HTML required applies solely to this submit.
+            Magic-link lives outside this <form> so empty password never blocks OTP. */}
         <form onSubmit={handlePassword} className="space-y-4">
-          <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-wide text-white/60">Email</span>
-            <input
-              type="email"
-              required
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-white/50 focus:border-white/40 focus:outline-none"
-              placeholder="you@email.com"
-            />
-          </label>
           <label className="block space-y-1">
             <div className="flex items-center justify-between gap-3">
               <span className="text-xs uppercase tracking-wide text-white/60">Password</span>
               <Link
-                href={`/forgot-password${next !== "/" ? `?next=${encodeURIComponent(next)}` : ""}`}
+                href={forgotHref}
                 className="text-xs text-white/60 underline-offset-2 hover:text-white hover:underline"
               >
                 Forgot password?
@@ -150,6 +165,7 @@ function LoginForm() {
             </div>
             <input
               type="password"
+              name="password"
               required
               autoComplete="current-password"
               value={password}
@@ -174,19 +190,28 @@ function LoginForm() {
           <div className="h-px flex-1 bg-white/10" />
         </div>
 
-        <TurnstileWidget
-          onSuccess={handleTurnstileSuccess}
-          onExpire={handleTurnstileExpire}
-        />
+        {/* Magic-link path — deliberately outside the password <form>.
+            type=button so it never triggers password constraint validation. */}
+        <div className="space-y-3">
+          <TurnstileWidget
+            onSuccess={handleTurnstileSuccess}
+            onExpire={handleTurnstileExpire}
+          />
 
-        <button
-          type="button"
-          onClick={handleMagicLink}
-          disabled={status === "loading" || magicCooldown > 0}
-          className="w-full rounded-full border border-white/20 px-4 py-3 text-sm font-medium text-white/80 hover:bg-white/10 disabled:opacity-60"
-        >
-          {magicCooldown > 0 ? `Resend in ${magicCooldown}s` : "Send me a magic link"}
-        </button>
+          <button
+            type="button"
+            onClick={() => {
+              void handleMagicLink();
+            }}
+            disabled={status === "loading" || magicCooldown > 0}
+            className="w-full rounded-full border border-white/20 px-4 py-3 text-sm font-medium text-white/80 hover:bg-white/10 disabled:opacity-60"
+          >
+            {magicCooldown > 0 ? `Resend in ${magicCooldown}s` : "Send me a magic link"}
+          </button>
+          <p className="text-xs text-white/45">
+            Magic link only needs your email — password can stay blank.
+          </p>
+        </div>
 
         {message && (
           <p

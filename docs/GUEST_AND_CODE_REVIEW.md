@@ -289,6 +289,7 @@ Product: **BEP = brand ↔ loyal member restaurant loyalty — not music/superfa
 6. **Preview banner numbers fake/too high** — Those totals were preview theater (not a real account). Guests are not ahead of anyone; **real accounts start at 0**, then earn after join/profile.  
 7. **Tier map + soft-launch stock** — Ladder Bronze → Platinum (points). Founding = first 100. Premium ≈ Gold+ on gated specials. **Only** Nellie's apron (1,500) + hot sauce (2,200) are stocked — **don’t market empty Gold/Platinum redeemables**.  
 8. **Forgot password** — Use **Forgot password?** on `/login` (same as FE).  
+8b. **Magic link vs password required** — Magic link only needs email; empty password must not trigger browser “fill out this field”. Password `required` stays on the password form only.  
 9. **No `/stamps` route** — Don’t promise stamp-card pages; `/stamps` 404s. Check-ins + brand rewards are the loyalty path.
 
 | Guide walk / Nellie's delta | Severity | Fix PR / status |
