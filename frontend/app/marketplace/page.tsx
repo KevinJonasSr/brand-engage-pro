@@ -25,12 +25,12 @@ export default async function MarketplacePage() {
         {!isSignedIn && (
           <PreviewSignupBanner
             eyebrow="🛍️ Brand rewards"
-            headline="Sign up to start at 0 — then redeem real perks"
-            body="Preview numbers elsewhere are not your balance. New accounts start at 0. Soft-launch stocked redeemables for Nellie's: apron + recipe card (1,500 pts) and house hot sauce 3-pack (2,200 pts)."
+            headline="Preview totals aren’t real — new accounts start at 0"
+            body="Logged-out preview banners never showed a real balance (and high sample numbers were misleading). Soft-launch stocked redeemables for Nellie's only: apron + recipe card (1,500 pts) and house hot sauce 3-pack (2,200 pts)."
             bullets={[
-              "Loyalty ladder: Bronze → Platinum from points you earn",
-              "Founding = first 100 members · Premium ≈ Gold+ on gated specials",
-              "We don't market empty Gold/Platinum redeemables",
+              "Ladder: Bronze → Platinum from points you earn after joining",
+              "Founding = first 100 · Premium ≈ Gold+ on gated specials",
+              "We don’t market empty Gold/Platinum redeemables",
             ]}
             primaryCta="Sign up free →"
             nextPath="/marketplace"

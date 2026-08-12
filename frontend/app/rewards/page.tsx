@@ -80,12 +80,12 @@ export default async function RewardsPage() {
           {!isSignedIn && (
             <PreviewSignupBanner
               eyebrow="🎁 Member rewards"
-              headline="Sign up to start at 0 — then earn real points"
-              body="No demo balances here. Members earn points from visits, check-ins, and community, then redeem them for brand loyalty perks (food, drink, and member specials)."
+              headline="Preview numbers aren’t your balance — start at 0"
+              body="Any high point totals you saw logged out were preview theater, not a real account. New members start at 0, then earn from visits, check-ins, and community. Soft-launch stocked redeemables (Nellie's): apron + recipe card 1,500 pts · house hot sauce 3-pack 2,200 pts — we don’t market empty Gold/Platinum SKUs."
               bullets={[
-                "+100 welcome points when you finish your member profile",
-                "Loyalty tiers Bronze → Platinum from points you actually earn",
-                "Redeem on each brand’s rewards page — not a music/fan catalog",
+                "New accounts start at 0 — then +100 welcome points after your profile",
+                "Ladder: Bronze → Platinum · Founding = first 100 · Premium ≈ Gold+ on gated specials",
+                "Redeem only what’s stocked on the brand rewards page",
               ]}
               primaryCta="Sign up free →"
               nextPath="/rewards"

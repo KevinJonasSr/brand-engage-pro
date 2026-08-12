@@ -52,10 +52,10 @@ export default async function ReferralsPage() {
           {!isSignedIn && (
             <PreviewSignupBanner
               eyebrow="🎟️ Referrals"
-              headline="Sign up to get your invite link"
-              body="No demo leaderboards here. After you join, you earn +150 points for each friend who signs up with your link. New accounts start at 0 points."
+              headline="No fake referral totals — start at 0"
+              body="Preview banners don’t invent leaderboard scores or point balances. New accounts start at 0. After you join, you earn +150 points for each friend who signs up with your link."
               bullets={[
-                "+150 pts every verified signup",
+                "+150 pts every verified signup (real referrals only)",
                 "Milestones unlock badges as you go",
                 "Share Nellie's — restaurant loyalty, not music drops",
               ]}

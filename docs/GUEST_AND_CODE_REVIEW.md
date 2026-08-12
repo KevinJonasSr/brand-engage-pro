@@ -279,6 +279,16 @@ Do **not** treat G10–G12 as harmless polish if those surfaces are reachable du
 
 Product: **BEP = brand ↔ loyal member restaurant loyalty — not music/superfan.**
 
+### Guide CS scripts (support messaging = eng truth)
+
+1. **Check-in spinner** — You’re not signed in; sign in, then reopen the same check-in link.  
+2. **Onboarding bounce** — Nothing was lost; use `/signup?ref=nellies` (not `/join`).  
+3. **Marketplace leftovers** — Point guests to Nellie's brand rewards; marketplace = stocked brand rewards only.  
+4. **Preview points ≠ real balance** — Logged-out numbers were not your balance; new accounts start at 0.  
+5. **Tiers + live redeemables** — Bronze → Platinum; Founding = first 100; Premium ≈ Gold+; apron 1,500 + hot sauce 2,200.  
+6. **Preview banner numbers fake/too high** — Those totals were preview theater (not a real account). Guests are not ahead of anyone; **real accounts start at 0**, then earn after join/profile.  
+7. **Tier map + soft-launch stock** — Ladder Bronze → Platinum (points). Founding = first 100. Premium ≈ Gold+ on gated specials. **Only** Nellie's apron (1,500) + hot sauce (2,200) are stocked — **don’t market empty Gold/Platinum redeemables**.
+
 | Guide walk / Nellie's delta | Severity | Fix PR / status |
 |---|---|---|
 | Anonymous `/onboarding` wizard flash | P0 | Guest UX PR: server gate + `authReady`; CTA → `/signup?next=/onboarding` |
@@ -289,7 +299,7 @@ Product: **BEP = brand ↔ loyal member restaurant loyalty — not music/superfa
 | Event “0 RSVPed” everywhere | P0 trust | Guest UX PR: hide zero count |
 | Community “Anonymous member” + dead reactions | P0 trust | Guest UX PR: admin name lookup; brand on announcements; “Sign in to react” |
 | `/rewards` “more”-only + fan leftovers | P0 trust | Guest UX PR: restaurant loyalty copy |
-| Marketplace artist leftovers | P1 | Guest UX PR: community-scoped offers |
+| Marketplace artist leftovers | P1 | Guest UX PR: community-scoped offers → stocked-only |
 | Cookie Decline / referral always set | P1 | Guest UX PR: Accept-only + gate referral |
 | Password Turnstile vs FE | P1 | Guest UX PR: password skip (conflicts with #6) |
 | Gold/Platinum empty vs marketing; Premium vs Bronze–Platinum | P1 | Guest UX PR: stop selling empty SKUs; clarify tier systems in copy |
@@ -298,7 +308,7 @@ Product: **BEP = brand ↔ loyal member restaurant loyalty — not music/superfa
 | Brand CTA “Shop drops” | P1 | Guest UX PR: → View rewards / check-in |
 | Redeem shipping language (G6) | P1 trust | Guest UX PR: pickup/show-to-server copy |
 | Apron 1500 / hot sauce 2200 live redeemables + tier CS mapping | P1 | Guest UX PR: migration 0049 + brand rewards guest browse |
-| Preview banner / fake referral totals mislead guests | P0 trust | Guest UX PR: referrals empty for guests; marketplace = stocked only |
+| Preview banner numbers fake/too high; guests misled | P0 trust | Guest UX PR: banners say start at 0; no inflated sample totals |
 | Soft-launch stock only apron+hot sauce; no empty Gold/Platinum SKUs | P0 trust | Guest UX PR: 0049 deactivates other catalog + gold/platinum offers |
 | Nellie's “Live Music — Rooftop” restaurant events | OK | **Do not remove** |
 

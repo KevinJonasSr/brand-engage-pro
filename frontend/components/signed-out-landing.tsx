@@ -215,8 +215,8 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
             },
             {
               n: "03",
-              title: "Unlock real perks + access",
-              body: "Exclusive merch, members-only events, behind-the-scenes content, limited drops. Points cash in for the real thing.",
+              title: "Redeem what’s actually stocked",
+              body: "Points cash in for live brand rewards (soft launch: apron 1,500 · hot sauce 2,200). We don’t market empty Gold/Platinum SKUs.",
               icon: <IconGift />,
             },
           ].map((step) => (
@@ -262,7 +262,7 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
               {[
                 {
                   title: "Tier Journey",
-                  body: "Bronze → Silver → Gold → Platinum. Every action moves you up.",
+                  body: "Bronze → Platinum from points. Founding = first 100. Premium ≈ Gold+ on gated specials.",
                   icon: <IconTrophy />,
                 },
                 {
@@ -276,8 +276,8 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
                   icon: <IconCalendar />,
                 },
                 {
-                  title: "Rewards Marketplace",
-                  body: "Redeem points for exclusive merch, behind-the-scenes access, or members-only experiences.",
+                  title: "Stocked rewards",
+                  body: "Soft launch: Nellie's apron 1,500 pts + hot sauce 2,200 pts. New accounts start at 0 — no empty Gold/Platinum catalog.",
                   icon: <IconGift />,
                 },
               ].map((f) => (
