@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { processAllAnniversaries } from "@/lib/anniversaries/celebrate";
+import { verifyCronAuth } from "@/lib/cron-auth";
 
 /**
  * GET /api/cron/anniversary-celebrate
@@ -11,31 +12,15 @@ import { processAllAnniversaries } from "@/lib/anniversaries/celebrate";
  * Idempotent — the unique (member_id, brand_slug, milestone) on
  * member_anniversary_log means re-runs only fire net-new milestones.
  *
- * Auth: Vercel cron requests come with `authorization: Bearer <CRON_SECRET>`.
- * We accept either the bearer header or `?secret=...` for manual triggering.
+ * Auth: Bearer $CRON_SECRET via verifyCronAuth (fail-closed).
  */
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function GET(req: Request) {
-  if (!isAuthorized(req)) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const authErr = verifyCronAuth(req);
+  if (authErr) return authErr;
   const summary = await processAllAnniversaries();
   return NextResponse.json({ ok: true, ...summary, ranAt: new Date().toISOString() });
-}
-
-function isAuthorized(req: Request): boolean {
-  const secret = process.env.CRON_SECRET;
-  if (!secret) {
-    // No CRON_SECRET set → allow (dev/test). Production should always set it.
-    console.warn("CRON_SECRET unset — allowing anniversary cron without auth");
-    return true;
-  }
-  const auth = req.headers.get("authorization") ?? "";
-  if (auth === `Bearer ${secret}`) return true;
-  const url = new URL(req.url);
-  if (url.searchParams.get("secret") === secret) return true;
-  return false;
 }

@@ -126,10 +126,13 @@ export async function broadcastSms(params: {
  * regular campaign against the configured audience, sets plain-text + html
  * content, and fires it immediately.
  *
- * Note: this sends to every audience member (not just members who logged in
- * via the app), since Mailchimp segments are owned on their side. For
- * app-only targeting we'd need a Mailchimp interest/group or tag-based
- * segment — wire-up deferred to a future phase.
+ * DISABLED until brand/tier-scoped Mailchimp segments exist.
+ * Current implementation always targets the full MAILCHIMP_AUDIENCE_ID list
+ * (no brandSlug filter), which is launch-blocking for multi-brand / Nellie's
+ * soft launch. Re-enable only after segment/tag targeting is wired.
+ *
+ * Opt-in escape hatch for explicit ops use: MAILCHIMP_BROADCAST_ENABLED=1
+ * (never set in production until scoping lands).
  */
 export async function broadcastEmail(params: {
   subject: string;
@@ -138,6 +141,14 @@ export async function broadcastEmail(params: {
   replyTo?: string;
 }): Promise<BroadcastResult> {
   const result: BroadcastResult = { attempted: 0, sent: 0, failed: 0, recipients: 0 };
+
+  if (process.env.MAILCHIMP_BROADCAST_ENABLED !== "1") {
+    return {
+      ...result,
+      error:
+        "Email broadcast disabled until brand-scoped Mailchimp segments are implemented. Use SMS.",
+    };
+  }
 
   const apiKey = process.env.MAILCHIMP_API_KEY;
   const server = process.env.MAILCHIMP_SERVER_PREFIX;

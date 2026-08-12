@@ -4,6 +4,7 @@ import {
   notifyDropExpiring,
   notifyDropLaunched,
 } from "@/lib/notifications/triggers/drop";
+import { verifyCronAuth } from "@/lib/cron-auth";
 
 /**
  * Cron: GET /api/cron/drops-notifier
@@ -50,13 +51,8 @@ const TABLE_FOR: Record<TargetType, string> = {
 };
 
 export async function GET(req: Request) {
-  const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret) {
-    const authHeader = req.headers.get("authorization");
-    if (authHeader !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-    }
-  }
+  const authErr = verifyCronAuth(req);
+  if (authErr) return authErr;
 
   const admin = createAdminClient();
   const now = new Date();
