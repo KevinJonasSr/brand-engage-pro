@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { TurnstileWidget, verifyTurnstileToken } from "@/components/turnstile-widget";
+import { safeRelativePath } from "@/lib/safe-redirect";
 
 export default function LoginPage() {
   return (
@@ -25,10 +26,7 @@ function LoginFallback() {
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const rawNext = searchParams.get("next");
-  const next = rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//")
-    ? rawNext
-    : "/";
+  const next = safeRelativePath(searchParams.get("next"), "/");
   const ref = searchParams.get("ref");
   const signupParams = new URLSearchParams();
   if (next !== "/") signupParams.set("next", next);

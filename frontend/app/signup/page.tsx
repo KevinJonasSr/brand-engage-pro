@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { safeRelativePath } from "@/lib/safe-redirect";
 import SignupClient, { type ReferrerBrand } from "./signup-client";
 
 export const metadata = { title: "Sign up" };
@@ -55,11 +56,6 @@ async function getReferrerBrand(slug: string | undefined): Promise<ReferrerBrand
   }
 }
 
-function safeRelativePath(value: string | undefined): string | null {
-  if (!value || !value.startsWith("/") || value.startsWith("//")) return null;
-  return value;
-}
-
 export default async function SignupPage({
   searchParams,
 }: {
@@ -68,7 +64,7 @@ export default async function SignupPage({
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const sp = (await searchParams) ?? {};
-  if (user) redirect(safeRelativePath(sp.next) ?? "/");
+  if (user) redirect(safeRelativePath(sp.next, "/"));
   const [referrerName, referrerBrand] = await Promise.all([
     getReferrerName(),
     getReferrerBrand(sp.ref),
