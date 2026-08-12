@@ -67,8 +67,8 @@ Full detail + **guest journey** findings: [`GUEST_AND_CODE_REVIEW.md`](./GUEST_A
 ## Recommended sequence
 
 1. Merge PR #7 → redeploy → confirm debug route 404 → purge Auth probes.  
-2. Merge **guest UX walk PR** (onboarding gate, check-in signed-out, `/join`→signup, marketplace brand-scope, Accept-only cookies, password Turnstile skip). See Guide mapping in `GUEST_AND_CODE_REVIEW.md`.  
-3. Follow-up guest copy (Shop drops /rewards music language / redeem shipping) — keep FE sign-in unblocked.  
+2. Merge **guest UX walk PR** (onboarding/check-in/join + Nellie's trust deltas: preview theater, promo codes, RSVP, community authors, rewards fan-copy, footer, events). See Guide mapping in `GUEST_AND_CODE_REVIEW.md`.  
+3. Follow-up: redeem shipping language (G6) only — keep FE sign-in unblocked.  
 4. PR #6: adopt redirect + Turnstile fail-closed; **do not** take password Turnstile (conflicts with FE / guest UX PR).  
 5. RLS / `redeem_reward` migration before marketing points economy.  
 6. Soft-launch Nellie's SMS-only; OAuth still gated; one admin; brand-loyalty framing only.

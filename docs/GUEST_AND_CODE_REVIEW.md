@@ -267,7 +267,7 @@ Do **not** treat G10–G12 as harmless polish if those surfaces are reachable du
 1. Merge **PR #7**; redeploy; confirm `/api/debug-supabase` → 404; purge probe users.  
 2. Soft-launch ops rule: **SMS-only** broadcast; do not set `MAILCHIMP_BROADCAST_ENABLED`.  
 3. Merge **guest UX walk PR** (below) — onboarding gate, check-in signed-out, `/join` redirect, marketplace brand-scope, Accept-only cookies, password Turnstile skip.  
-4. Remaining guest product-identity copy (G1 brand “Shop drops”, G3 `/rewards` music copy, G6 redeem shipping language, etc.) in a follow-up — keep FE sign-in unblocked.  
+4. Follow-up only: redeem shipping language (G6). Trust deltas (preview theater, codes, RSVP, community, rewards fan-copy) are in the guest UX PR.  
 5. PR #6: take redirect/Turnstile fail-closed pieces **without** password Turnstile (conflicts with FE least-confused path — guest UX PR keeps password skip).  
 6. Ship RLS / `redeem_reward` migration (coordinate with FE if shared patterns).  
 7. Confirm env + migration SQL on `enfpviapxvqyoarwwsuf`.  
@@ -279,16 +279,25 @@ Do **not** treat G10–G12 as harmless polish if those surfaces are reachable du
 
 Product: **BEP = brand ↔ loyal member restaurant loyalty — not music/superfan.**
 
-| Guide walk finding | Severity | Fix PR / status |
+| Guide walk / Nellie's delta | Severity | Fix PR / status |
 |---|---|---|
-| Anonymous `/onboarding` wizard flash before auth redirect | P0 | Guest UX PR: server gate + client `authReady`; homepage CTA → `/signup?next=/onboarding` + signup interstitial |
-| `/brands/[slug]/checkin` stuck on “Checking you in…” when logged out | P0 | Guest UX PR: auth-first → “Sign in to check in” + `/login?next=…` |
-| `/join` → 404 | P0 | Guest UX PR: redirect `/join` → `/signup` (query preserved) |
-| Marketplace shows artist/fan leftovers (Fan-to-Artist Q&A, Artist Photography Print, Listening Party, etc.) | P1 | Guest UX PR: offers scoped to current community (Nellie's default); remove artist fallback catalog; loyalty copy |
-| Cookie Decline cosmetic; referral cookie always set | P1 | Guest UX PR: Accept-only banner; `memberengage_ref` gated on Accept (FE parity) |
-| Password sign-in Turnstile confusion vs FE | P1 | Guest UX PR: **keep password Turnstile skip** (FE least-confused). **Conflicts with PR #6** which adds password Turnstile — do not merge that part onto BEP without explicit override |
-| Nellie's “Live Music — Rooftop” style restaurant events | OK | **Do not remove** — restaurant programming, not FE leftover |
-| Remaining G1 “Shop drops”, G3 `/rewards` presales, G6 shipping redeem, etc. | P1 follow-up | Out of this small PR so FE sign-in stays #1 org priority |
+| Anonymous `/onboarding` wizard flash | P0 | Guest UX PR: server gate + `authReady`; CTA → `/signup?next=/onboarding` |
+| Check-in stuck spinning when logged out | P0 | Guest UX PR: auth-first → Sign in CTA |
+| `/join` → 404 | P0 | Guest UX PR: → `/signup` (query preserved) |
+| Preview theater (8500 / 11420 / Gold / fake badges) | P0 trust | Guest UX PR: honest 0 / empty; “Sign up to start at 0” |
+| Specials promo codes visible logged-out | P0 trust | Guest UX PR: teaser until signed in |
+| Event “0 RSVPed” everywhere | P0 trust | Guest UX PR: hide zero count |
+| Community “Anonymous member” + dead reactions | P0 trust | Guest UX PR: admin name lookup; brand on announcements; “Sign in to react” |
+| `/rewards` “more”-only + fan leftovers | P0 trust | Guest UX PR: restaurant loyalty copy |
+| Marketplace artist leftovers | P1 | Guest UX PR: community-scoped offers |
+| Cookie Decline / referral always set | P1 | Guest UX PR: Accept-only + gate referral |
+| Password Turnstile vs FE | P1 | Guest UX PR: password skip (conflicts with #6) |
+| Gold/Platinum empty vs marketing; Premium vs Bronze–Platinum | P1 | Guest UX PR: stop selling empty SKUs; clarify tier systems in copy |
+| Footer memberengage support / For Brands in primary nav | P1 | Guest UX PR: `support@brandengagepro.com`; For Brands footer-only |
+| Stale Upcoming dates; +100 vs +25 perk naming | P1 | Guest UX PR: filter past events; +100 welcome / +25 check-in |
+| Brand CTA “Shop drops” | P1 | Guest UX PR: → View rewards / check-in |
+| Redeem shipping language (G6) | Follow-up | Not in this PR |
+| Nellie's “Live Music — Rooftop” restaurant events | OK | **Do not remove** |
 
 Security P0s (debug route, email blast, cron auth) remain in **PR #7** — separate from guest UX.
 
