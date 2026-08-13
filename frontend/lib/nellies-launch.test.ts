@@ -3,6 +3,8 @@ import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 import {
+  NELLIES_BOURBON_CAPACITY,
+  NELLIES_BOURBON_LOCATION,
   NELLIES_BOURBON_STARTS_AT,
   NELLIES_BOURBON_WHEN,
   NELLIES_HIDDEN_TITLES,
@@ -132,55 +134,45 @@ describe("Nellie's Jackie launch fixture", () => {
 });
 
 describe("Bourbon & Cigar Night", () => {
-  it("stamps Sept 23, 7:00pm ET regardless of a relative starts_at", () => {
+  it("stamps PDR, Sept 23 7:00pm ET, cap 40, and strips Rooftop from detail", () => {
+    assert.match(NELLIES_BOURBON_LOCATION, /Private Dining Room/);
+    assert.doesNotMatch(NELLIES_BOURBON_LOCATION, /rooftop/i);
     assert.match(NELLIES_BOURBON_WHEN, /September 23/);
     assert.match(NELLIES_BOURBON_WHEN, /7:00 PM ET/);
+    assert.equal(NELLIES_BOURBON_CAPACITY, 40);
     assert.equal(NELLIES_BOURBON_STARTS_AT, "2026-09-23T23:00:00.000Z");
   });
 
-  it("uses the event row location field only when detail names a different room", () => {
-    // Live CS: location = Private Dining Room, detail = "on the Rooftop".
+  it("forces Private Dining Room even when the row says Rooftop", () => {
     const copy = resolveBourbonGuestCopy({
-      location: "Nellie's Southern Kitchen — Private Dining Room",
+      location: "Nellie's Southern Kitchen — Rooftop",
       detail:
         "An exclusive evening of premium bourbon pours and hand-selected cigars on the Rooftop. Capacity limited to 40 guests.",
       capacity: 40,
     });
-    assert.equal(copy.location, "Nellie's Southern Kitchen — Private Dining Room");
+    assert.equal(copy.location, NELLIES_BOURBON_LOCATION);
     assert.doesNotMatch(copy.detail, /rooftop/i);
-    assert.equal(copy.conflict, true);
     assert.equal(copy.capacity, 40);
   });
 
-  it("does not invent Private Dining Room when the row location is Rooftop", () => {
-    const copy = resolveBourbonGuestCopy({
-      location: "Nellie's Southern Kitchen — Rooftop",
-      detail: "Tasting in the Private Dining Room.",
-      capacity: 40,
-    });
-    assert.equal(copy.location, "Nellie's Southern Kitchen — Rooftop");
-    assert.doesNotMatch(copy.detail, /private dining/i);
-    assert.equal(copy.conflict, true);
-  });
-
-  it("does not invent a location when the row has none", () => {
+  it("stamps PDR when the row has no location", () => {
     const copy = resolveBourbonGuestCopy({
       location: null,
       detail: "Members welcome.",
     });
-    assert.equal(copy.location, "");
-    assert.equal(copy.conflict, false);
+    assert.equal(copy.location, NELLIES_BOURBON_LOCATION);
+    assert.equal(copy.capacity, 40);
   });
 
-  it("shapes Nellie upcoming to Bourbon with forced date and row location", () => {
+  it("shapes Nellie upcoming to Bourbon with PDR, date, and cap 40", () => {
     const events = applyNelliesLaunchEvents("nellies", [
       {
         id: "11111111-1111-1111-1111-111111111111",
         title: "Bourbon & Cigar Night",
         detail: "Hand-selected cigars on the Rooftop.",
         event_date: null,
-        location: "Nellie's Southern Kitchen — Private Dining Room",
-        capacity: 40,
+        location: "Nellie's Southern Kitchen — Rooftop",
+        capacity: null,
         active: true,
       },
       {
@@ -192,31 +184,11 @@ describe("Bourbon & Cigar Night", () => {
     assert.equal(events.length, 1);
     assert.equal(events[0].title, "Bourbon & Cigar Night");
     assert.equal(events[0].date, NELLIES_BOURBON_WHEN);
-    assert.equal(
-      events[0].location,
-      "Nellie's Southern Kitchen — Private Dining Room",
-    );
+    assert.equal(events[0].location, NELLIES_BOURBON_LOCATION);
     assert.equal(events[0].capacity, 40);
     assert.doesNotMatch(events[0].detail, /rooftop/i);
+    assert.doesNotMatch(events[0].location, /rooftop/i);
     assert.equal(events[0].startsAt, NELLIES_BOURBON_STARTS_AT);
-  });
-
-  it("keeps a Rooftop location field instead of overwriting it with PDR", () => {
-    const events = applyNelliesLaunchEvents("nellies", [
-      {
-        id: "11111111-1111-1111-1111-111111111111",
-        title: "Bourbon & Cigar Night",
-        detail: "On the Rooftop",
-        event_date: null,
-        starts_at: "2026-08-27T23:00:00.000Z",
-        location: "Nellie's Southern Kitchen — Rooftop",
-        capacity: 40,
-        active: true,
-      },
-    ]);
-    assert.equal(events[0].date, NELLIES_BOURBON_WHEN);
-    assert.equal(events[0].location, "Nellie's Southern Kitchen — Rooftop");
-    assert.match(events[0].location, /Rooftop/);
   });
 
   it("drops rooftop extras from the signed-out Latest strip", () => {
@@ -245,13 +217,14 @@ describe("Bourbon & Cigar Night", () => {
         when: "",
         ts: "2026-08-27T23:00:00.000Z",
         body: "Tasting on the Rooftop",
-        location: "Nellie's Southern Kitchen — Private Dining Room",
+        location: "Nellie's Southern Kitchen — Rooftop",
       },
     ]);
     assert.equal(cards.length, 1);
     assert.equal(cards[0].title, "Bourbon & Cigar Night");
     assert.equal(cards[0].when, NELLIES_BOURBON_WHEN);
     assert.equal(cards[0].ts, NELLIES_BOURBON_STARTS_AT);
+    assert.equal(cards[0].location, NELLIES_BOURBON_LOCATION);
     assert.doesNotMatch(cards[0].body ?? "", /rooftop/i);
   });
 });
@@ -272,6 +245,8 @@ describe("guest surfaces", () => {
     assert.match(eventsPage, /Bourbon & Cigar Night/);
     assert.match(eventsPage, /September 23/);
     assert.match(eventsPage, /NELLIES_BOURBON_WHEN|7:00 PM ET/);
+    assert.match(eventsPage, /NELLIES_BOURBON_LOCATION|Private Dining Room/);
+    assert.doesNotMatch(eventsPage, /Rooftop/);
   });
 
   it("renders Jackie’s three on the Nellie brand page source", () => {
@@ -283,7 +258,7 @@ describe("guest surfaces", () => {
     assert.match(brandPage, /NELLIES_BRAND_SLUG/);
   });
 
-  it("hardcodes Nellie fallback without apron/hot sauce merch or an invented room", () => {
+  it("hardcodes Nellie fallback with PDR, no apron/hot sauce merch, no Rooftop", () => {
     const brands = readFileSync(
       fileURLToPath(new URL("./brands.ts", import.meta.url)),
       "utf8",
@@ -292,9 +267,9 @@ describe("guest surfaces", () => {
     const block = nellies.slice(0, nellies.indexOf("raelynn:"));
     assert.match(block, /Bourbon & Cigar Night/);
     assert.match(block, /September 23/);
+    assert.match(block, /Private Dining Room/);
     assert.doesNotMatch(block, /Apron/);
     assert.doesNotMatch(block, /Hot Sauce/);
-    assert.doesNotMatch(block, /Private Dining Room/);
     assert.doesNotMatch(block, /Rooftop/);
   });
 });

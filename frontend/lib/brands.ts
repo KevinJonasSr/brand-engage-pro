@@ -91,6 +91,7 @@ export const BRANDS: Record<string, Brand> = {
         title: "Bourbon & Cigar Night",
         detail: "Premium bourbon pours and hand-selected cigars. Members welcome.",
         date: "Wednesday, September 23 · 7:00 PM ET",
+        location: "Nellie's Southern Kitchen — Private Dining Room",
         capacity: 40,
       },
     ],

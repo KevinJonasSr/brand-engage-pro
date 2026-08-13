@@ -12,9 +12,12 @@ export const NELLIES_BRAND_SLUG = "nellies";
 
 export const NELLIES_BOURBON_TITLE = "Bourbon & Cigar Night";
 export const NELLIES_BOURBON_WHEN = "Wednesday, September 23 · 7:00 PM ET";
+export const NELLIES_BOURBON_LOCATION =
+  "Nellie's Southern Kitchen — Private Dining Room";
 /** 7:00 PM America/New_York on 2026-09-23 (EDT, UTC−4). */
 export const NELLIES_BOURBON_STARTS_AT = "2026-09-23T23:00:00.000Z";
 export const NELLIES_BOURBON_ENDS_AT = "2026-09-24T02:00:00.000Z";
+export const NELLIES_BOURBON_CAPACITY = 40;
 export const NELLIES_BOURBON_DETAIL_FALLBACK =
   "Premium bourbon pours and hand-selected cigars. Members welcome.";
 
@@ -103,25 +106,14 @@ export function isBourbonCigarTitle(title: string): boolean {
 }
 
 /**
- * TODO(Dash→Kevin): live Bourbon row has location = "Private Dining Room"
- * and detail = "on the Rooftop". Canonical room is not decided. Guest
- * copy uses brand_events.location only (the primary field). Do not invent
- * the other room.
+ * Founder call: Private Dining Room, not Rooftop. Sept 23 2026 7pm ET, cap 40.
+ * Always stamp those fields; strip rooftop from detail so copy cannot split.
  */
 export type BourbonGuestCopy = {
   location: string;
   detail: string;
-  conflict: boolean;
-  capacity: number | null;
+  capacity: number;
 };
-
-function mentionsRooftop(text: string): boolean {
-  return fold(text).includes("rooftop");
-}
-
-function mentionsPrivateDining(text: string): boolean {
-  return fold(text).includes("private dining");
-}
 
 function stripPhrase(text: string, pattern: RegExp): string {
   return text
@@ -137,30 +129,13 @@ export function resolveBourbonGuestCopy(row: {
   detail?: string | null;
   capacity?: number | null;
 }): BourbonGuestCopy {
-  const location = (row.location ?? "").trim();
   let detail = (row.detail ?? "").trim();
-  const locRoof = mentionsRooftop(location);
-  const locPdr = mentionsPrivateDining(location);
-  const detRoof = mentionsRooftop(detail);
-  const detPdr = mentionsPrivateDining(detail);
-  const conflict =
-    Boolean(location) &&
-    ((locPdr && detRoof) || (locRoof && detPdr) || (detRoof && detPdr && locPdr !== locRoof));
-
-  if (location && locPdr && detRoof) {
-    detail = stripPhrase(detail, /\s*on the rooftop\b/gi);
-    detail = stripPhrase(detail, /\brooftop\b/gi);
-  } else if (location && locRoof && detPdr) {
-    detail = stripPhrase(detail, /\s*in the private dining room\b/gi);
-    detail = stripPhrase(detail, /\bprivate dining room\b/gi);
-    detail = stripPhrase(detail, /\bprivate dining\b/gi);
-  }
-
+  detail = stripPhrase(detail, /\s*on the rooftop\b/gi);
+  detail = stripPhrase(detail, /\brooftop\b/gi);
   return {
-    location,
+    location: NELLIES_BOURBON_LOCATION,
     detail: detail || NELLIES_BOURBON_DETAIL_FALLBACK,
-    conflict,
-    capacity: row.capacity ?? null,
+    capacity: NELLIES_BOURBON_CAPACITY,
   };
 }
 
@@ -341,10 +316,10 @@ export const NELLIES_BOURBON_EVENT: LaunchEvent = {
   title: NELLIES_BOURBON_TITLE,
   detail: NELLIES_BOURBON_DETAIL_FALLBACK,
   date: NELLIES_BOURBON_WHEN,
-  location: "",
+  location: NELLIES_BOURBON_LOCATION,
   startsAt: NELLIES_BOURBON_STARTS_AT,
   endsAt: NELLIES_BOURBON_ENDS_AT,
-  capacity: null,
+  capacity: NELLIES_BOURBON_CAPACITY,
   url: null,
   tier: "public",
   active: true,
@@ -406,10 +381,8 @@ export type LaunchLatestCard = {
 };
 
 /**
- * LatestStrip queries brand_events directly (and matches null
- * event_starts_at), so unpublished-in-SQL-only is not enough. Drop extra
- * rooftop recurrences; stamp Bourbon with Sept 23 · 7:00 PM ET; use the
- * event row's location field only.
+ * LatestStrip queries brand_events directly. Drop extra rooftop recurrences;
+ * stamp Bourbon with PDR, Sept 23 · 7:00 PM ET, cap 40.
  */
 export function filterNelliesLaunchLatestCards<T extends LaunchLatestCard>(
   brandSlug: string,

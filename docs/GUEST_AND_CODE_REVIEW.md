@@ -54,7 +54,7 @@ Use these scripts — do **not** invent routes or stock.
 1. **Join path** — **`/signup?ref=nellies`**. Do **not** send guests to `/join` as the branded path (live `/join` may 307 → signup after PR #9; CS still quotes signup+ref only).
 2. **No `/stamps`** — route **404**. Check-ins + brand rewards are the loyalty path; do not promise a stamp-card page.
 3. **Check-in needs sign-in** — logged-out guests see a sign-in gate (no fake “Checking you in…” theater). Brand display name = **Nellie's Southern Kitchen**.
-4. **Jackie launch perks** — free dessert with entrée **on join**; **1,500** bonus points after **3 verified check-ins**; birthday entrée up to $30 **in birthday month**. Bourbon & Cigar Night: **September 23, 2026, 7:00 PM ET**. Location = `brand_events.location` only (live row currently Private Dining Room while detail said Rooftop — Kevin to confirm canonical). Apron / hot sauce merch **hidden**. Do not market 1-pt catalog SKUs.
+4. **Jackie launch perks** — free dessert with entrée **on join**; **1,500** bonus points after **3 verified check-ins**; birthday entrée up to $30 **in birthday month**. Bourbon & Cigar Night: **September 23, 2026, 7:00 PM ET**, Private Dining Room (not Rooftop), cap 40. Apron / hot sauce merch **hidden**. Do not market 1-pt catalog SKUs.
 5. **Music SKUs purged** — marketplace/catalog music leftovers deactivated via migration **0050** on `enfpviapxvqyoarwwsuf`.
 6. **Forgot password** — use **Forgot password?** on `/login`.
 7. **Magic link vs password** — magic link only needs email; empty password must not block OTP.
@@ -236,7 +236,7 @@ select count(*) filter (where profile_slug is null), count(*) from public.member
 
 - Guest brand CTA → `/signup?ref=nellies`
 - Live brand page bio, specials, events read as a restaurant
-- Soft-launch catalog: Jackie join / 3-visit / birthday rules + Bourbon Sept 23 (location from event row only). Apron/hot sauce hidden.
+- Soft-launch catalog: Jackie join / 3-visit / birthday rules + Bourbon Sept 23 (Private Dining Room, cap 40). Apron/hot sauce hidden.
 - Music SKUs deactivated
 - Cookie banner + Accept-gated referral cookie
 - Forgot / reset password paths on login

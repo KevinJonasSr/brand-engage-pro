@@ -21,7 +21,7 @@
 | Join | **`/signup?ref=nellies`** — do not market `/join` |
 | Stamps | **No `/stamps`** (404) |
 | Check-in | **Needs sign-in** |
-| Active perks | Jackie: dessert on join; 1,500 pts after 3 check-ins; birthday entrée in birthday month. Bourbon & Cigar Night **Sept 23, 2026 7:00pm ET** (location = event row `location` field; Kevin to confirm Rooftop vs PDR). Apron/hot sauce **hidden**. |
+| Active perks | Jackie: dessert on join; 1,500 pts after 3 check-ins; birthday entrée in birthday month. Bourbon & Cigar Night **Sept 23, 2026 7:00pm ET**, Private Dining Room, cap 40. Apron/hot sauce **hidden**. |
 | Music SKUs | Purged (migration **0050**) |
 | Probe users | Deleted |
 | Guide Brand CS | Flipped to eng truth |

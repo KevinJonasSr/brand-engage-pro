@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getBrandFromDb } from "@/lib/data/brands";
 import {
+  NELLIES_BOURBON_CAPACITY,
+  NELLIES_BOURBON_LOCATION,
   NELLIES_BOURBON_TITLE,
   NELLIES_BOURBON_WHEN,
   NELLIES_BRAND_SLUG,
@@ -62,15 +64,15 @@ export default async function EventsPage() {
           {bourbon?.detail && (
             <p className="mt-1 text-xs text-white/70">{bourbon.detail}</p>
           )}
-          {bourbon?.location ? (
-            <p className="mt-2 text-xs text-white/60">📍 {bourbon.location}</p>
-          ) : null}
+          <p className="mt-2 text-xs text-white/60">
+            📍 {bourbon?.location || NELLIES_BOURBON_LOCATION}
+          </p>
           <p className="mt-3 text-xs uppercase tracking-wide text-white/40">
             {bourbon?.date || NELLIES_BOURBON_WHEN}
           </p>
-          {bourbon?.capacity != null && bourbon.capacity > 0 ? (
-            <p className="mt-1 text-xs text-white/50">Cap {bourbon.capacity}</p>
-          ) : null}
+          <p className="mt-1 text-xs text-white/50">
+            Cap {bourbon?.capacity ?? NELLIES_BOURBON_CAPACITY}
+          </p>
         </div>
         <Link
           href="/brands/nellies#upcoming"

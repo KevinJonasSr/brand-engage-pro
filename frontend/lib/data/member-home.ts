@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Badge, MemberProfile } from "./types";
 import {
+  NELLIES_BOURBON_LOCATION,
   NELLIES_BOURBON_STARTS_AT,
   NELLIES_BOURBON_TITLE,
   NELLIES_BOURBON_WHEN,
@@ -383,7 +384,7 @@ export async function getMemberHomeData(): Promise<MemberHomeData | null> {
         title: bourbon ? NELLIES_BOURBON_TITLE : e.title,
         starts_at: bourbon ? NELLIES_BOURBON_STARTS_AT : e.starts_at,
         event_date: bourbon ? NELLIES_BOURBON_WHEN : e.event_date,
-        location: e.location,
+        location: bourbon ? NELLIES_BOURBON_LOCATION : e.location,
         url: e.url,
         rsvped: myRsvpedIds.has(e.id),
         has_scheduled_reminder:
