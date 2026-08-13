@@ -147,20 +147,29 @@ export async function countPendingRedemptions(communityId: string): Promise<numb
 }
 
 /**
- * Invoke the redeem_reward RPC.
+ * Invoke the redeem_reward RPC for the signed-in member.
+ * Member id is taken from the session (not the caller) so a client cannot
+ * redeem against someone else's balance. The SQL function also binds
+ * auth.uid() = p_member_id for authenticated JWTs.
  * Returns { ok, redemptionId?, error? }
  */
 export async function redeemReward({
-  memberId,
   rewardId,
   deliveryDetails,
 }: {
-  memberId: string;
   rewardId: string;
   deliveryDetails?: string;
 }): Promise<{ ok: boolean; redemptionId?: string; error?: string }> {
   try {
     const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return { ok: false, error: "Not signed in" };
+    }
+    const memberId = user.id;
+
     const { data, error } = await supabase.rpc("redeem_reward", {
       p_member_id: memberId,
       p_reward_id: rewardId,

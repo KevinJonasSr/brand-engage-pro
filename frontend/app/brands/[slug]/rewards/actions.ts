@@ -22,7 +22,6 @@ export async function redeemRewardAction(formData: FormData) {
   }
 
   const result = await redeemReward({
-    memberId: user.id,
     rewardId,
     deliveryDetails,
   });

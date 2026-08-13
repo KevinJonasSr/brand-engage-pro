@@ -1,11 +1,11 @@
 # Brand Engage Pro — Guest + Code Soft-Launch Status
 
-**Date:** 2026-08-13 (post #10)  
-**Repo:** `KevinJonasSr/brand-engage-pro` @ `main` (`87ac19b`)  
+**Date:** 2026-08-13 (points-integrity + #10 auth follow-up)  
+**Repo:** `KevinJonasSr/brand-engage-pro` @ `main` (`c232393`)  
 **Live:** https://brand-engage-pro.vercel.app  
 **Supabase:** `enfpviapxvqyoarwwsuf`  
 **Supersedes:** stale claims in earlier drafts of this file / PR #5 that still listed live P0s; Turnstile fail-open + open-redirect claims from the #8 docs refresh  
-**Shipped fix PRs:** [#7](https://github.com/KevinJonasSr/brand-engage-pro/pull/7) (security P0s), [#9](https://github.com/KevinJonasSr/brand-engage-pro/pull/9) (Nellie's guest walk), [#10](https://github.com/KevinJonasSr/brand-engage-pro/pull/10) (`safeRelativePath` + Turnstile fail-closed)  
+**Shipped fix PRs:** [#7](https://github.com/KevinJonasSr/brand-engage-pro/pull/7) (security P0s), [#9](https://github.com/KevinJonasSr/brand-engage-pro/pull/9) (Nellie's guest walk), [#10](https://github.com/KevinJonasSr/brand-engage-pro/pull/10) (`safeRelativePath` + Turnstile fail-closed), migration **0051** (members self-update + `redeem_reward` caller bind)  
 **Closed without merge:** [#6](https://github.com/KevinJonasSr/brand-engage-pro/pull/6) (password-Turnstile / Decline-cookie conflicted with #9; safe slice shipped in #10)
 
 Fan Engage launches **first**. Items below are tagged **must-before-BEP** vs **can-wait-after-FE**.
@@ -40,7 +40,8 @@ Fork leftovers from Fan Engage (copy, CTAs, campaign kinds, marketplace music of
 | Probe Auth pollution | **Cleared** — `bep-probe+*@example-debug.invalid` Auth users deleted on `enfpviapxvqyoarwwsuf` |
 | Guide Brand CS | **Flipped** — support scripts match eng truth below |
 | Multi-brand / multi-admin | **Still not safe** (admin IDOR P1s remain) |
-| Points integrity (RLS / redeem bind) | **Still open** — see remaining P1s (verified on main) |
+| Points integrity (RLS / redeem bind) | **Shipped in repo** — migration **0051** (apply on `enfpviapxvqyoarwwsuf` before marketing points) |
+| Turnstile fail-closed + auth redirect | **Shipped** — PR #10 |
 
 Do **not** open multi-brand admin access until community-scoped admin actions land.
 
@@ -112,27 +113,26 @@ Use these scripts — do **not** invent routes or stock.
 
 ---
 
-## Remaining open findings (verified on `main` @ `87ac19b`)
+## Remaining open findings
 
-These were called out in the original review and are **still true** in the repo (no later migration/PR closed them). Treat as **must-before-BEP** for a marketed points economy / public multi-tenant launch; acceptable caveats for single-admin Nellie's soft launch only where noted.
+Integrity gaps A/B and Turnstile/redirect (C/D) are **shipped in repo**. Items below remain for multi-admin / SMS / marketplace marketing.
 
-### Still-open integrity gaps (former P0s → now launch blockers before points marketing)
+### Integrity gaps — **SHIPPED** (migration **0051**)
 
-#### RLS: `members_self_update` unrestricted
+#### RLS: `members_self_update` unrestricted — **SHIPPED**
 | | |
 |---|---|
-| **Path** | `supabase/migrations/0001_init.sql` — `members_self_update` is `for update using (auth.uid() = id)` with **no column restriction** |
-| **Related** | `purchases_self_insert`; `memberships_own_update` in `0011_multi_tenant.sql` |
-| **Verify** | No later migration replaces this policy with column-limited updates |
-| **Why** | Authenticated member can inflate `total_points` via anon client if PostgREST exposes those columns |
-| **Timing** | **must-before-BEP** for points integrity — needs migration |
+| **Was** | `0001_init.sql` — `for update using (auth.uid() = id)` with no column restriction |
+| **Fix** | Migration **0051**: column GRANT + trigger allowlist for profile/prefs; `memberships_own_update` no longer lets members PATCH `total_points` |
+| **Members can still self-update** | `first_name`, `last_name`, `city`, `phone`, `handle`, `favorite_brand`, `interest`, `sms_opted_in`, `email_opted_in`, `avatar_url`, `socials`, `public_profile_enabled`, `consent_accepted_at`, `consent_version` |
+| **Ops** | Apply **0051** on `enfpviapxvqyoarwwsuf` before marketing points |
 
-#### `redeem_reward` does not bind caller to `p_member_id`
+#### `redeem_reward` caller bind — **SHIPPED**
 | | |
 |---|---|
-| **Paths** | `supabase/migrations/0021_rewards_redemption.sql` (SECURITY DEFINER); grants in `0025_*`; client `frontend/lib/data/rewards.ts` passes `p_member_id` |
-| **Verify** | Function body has **no** `auth.uid() = p_member_id` check; no later migration adds it |
-| **Timing** | **must-before-BEP** — needs migration |
+| **Was** | SECURITY DEFINER took `p_member_id` with no `auth.uid()` check |
+| **Fix** | **0051** redefines the function: `auth.role() = 'authenticated'` requires `auth.uid() = p_member_id`; anon execute revoked; `service_role` / postgres (no member JWT) still allowed. Client `redeemReward()` uses the session user only |
+| **Admin** | Fulfill/cancel stay on service-role table updates (not this RPC) |
 
 ### P1 — high priority (soft-launch caveats / pre-BEP)
 
@@ -245,7 +245,7 @@ select count(*) filter (where profile_slug is null), count(*) from public.member
 
 ## Top remaining work (ordered)
 
-1. **RLS + `redeem_reward` auth.uid bind** migration before any points-economy marketing.  
+1. **Apply migration 0051** on `enfpviapxvqyoarwwsuf` before marketing points.
 2. **Twilio inbound fail-closed** + bind SMS send to own phone (if SMS marketed).  
 3. **Admin community scoping** before second brand/admin.  
 4. Residual music CTA kinds / share surfaces (G10–G12) before those features go live.  
@@ -260,7 +260,7 @@ select count(*) filter (where profile_slug is null), count(*) from public.member
 | Debug route, email blast, cron fail-close | **Shipped** — PR #7 |
 | Nellie's guest walk + 0049/0050 + probe purge + Guide CS | **Shipped** — PR #9 + ops |
 | Turnstile fail-closed + open redirect | **Shipped** — PR #10 (not full #6) |
-| RLS points / redeem_reward caller check | **must-before-BEP** (still open on main) |
+| RLS points / redeem_reward caller check | **Shipped in repo** — migration **0051** (apply on live DB) |
 | Twilio signature fail-closed + SMS abuse | **must-before-BEP** if SMS marketed |
 | Admin IDOR community scope | can-wait single admin; **must** before multi-admin |
 | Dual catalog cleanup | **must** if marketplace shown as redeem |
@@ -272,15 +272,14 @@ select count(*) filter (where profile_slug is null), count(*) from public.member
 ## Recommended sequence (from here)
 
 1. Keep soft-launch ops: **SMS-only** broadcast; do not set `MAILCHIMP_BROADCAST_ENABLED`.  
-2. Ship RLS / `redeem_reward` migration before marketing points.  
-3. Confirm env + migration SQL stay healthy on `enfpviapxvqyoarwwsuf`.  
+2. Apply **0051** on `enfpviapxvqyoarwwsuf` before marketing points.  
+3. Admin community scope before second brand/admin.
 4. Soft-launch continue: magic-link + password, OAuth gated, one admin — **brand loyalty framing only**.
 
 ---
 
 ## Method
 
-- Re-verified on `main` @ `87ac19b` + live HTTP probes (debug **404**, `/signup?ref=nellies` **200**, `/join` **307**, `/stamps` **404**). Auth redirect + Turnstile fail-closed shipped in PR #10 (`b7a7e61`).  
-- Confirmed remaining RLS / `redeem_reward` gaps by reading migrations (no later bind/column restrict).  
-- No invented metrics. Ops claims for applied 0049/0050, probe purge, and Guide CS flip recorded as soft-launch truth from launch ops.  
-- Original pre-launch P0 list updated to **shipped** with PR refs; open work called out separately.
+- Re-verified on `main` @ `c232393` (PR #10/#11: Turnstile fail-closed + safe redirect).  
+- Closed RLS / `redeem_reward` gaps with migration **0051** + session-bound `redeemReward()`.  
+- No invented metrics or probe users.
