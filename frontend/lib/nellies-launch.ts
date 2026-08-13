@@ -12,13 +12,10 @@ export const NELLIES_BRAND_SLUG = "nellies";
 
 export const NELLIES_BOURBON_TITLE = "Bourbon & Cigar Night";
 export const NELLIES_BOURBON_WHEN = "Wednesday, September 23 · 7:00 PM ET";
-export const NELLIES_BOURBON_LOCATION =
-  "Nellie's Southern Kitchen — Private Dining Room";
 /** 7:00 PM America/New_York on 2026-09-23 (EDT, UTC−4). */
 export const NELLIES_BOURBON_STARTS_AT = "2026-09-23T23:00:00.000Z";
 export const NELLIES_BOURBON_ENDS_AT = "2026-09-24T02:00:00.000Z";
-export const NELLIES_BOURBON_CAPACITY = 40;
-export const NELLIES_BOURBON_DETAIL =
+export const NELLIES_BOURBON_DETAIL_FALLBACK =
   "Premium bourbon pours and hand-selected cigars. Members welcome.";
 
 export const NELLIES_THREE_VISIT_THRESHOLD = 3;
@@ -105,12 +102,66 @@ export function isBourbonCigarTitle(title: string): boolean {
   return t.includes("bourbon") && t.includes("cigar");
 }
 
-export function stripRooftop(text: string): string {
+/**
+ * TODO(Dash→Kevin): live Bourbon row has location = "Private Dining Room"
+ * and detail = "on the Rooftop". Canonical room is not decided. Guest
+ * copy uses brand_events.location only (the primary field). Do not invent
+ * the other room.
+ */
+export type BourbonGuestCopy = {
+  location: string;
+  detail: string;
+  conflict: boolean;
+  capacity: number | null;
+};
+
+function mentionsRooftop(text: string): boolean {
+  return fold(text).includes("rooftop");
+}
+
+function mentionsPrivateDining(text: string): boolean {
+  return fold(text).includes("private dining");
+}
+
+function stripPhrase(text: string, pattern: RegExp): string {
   return text
-    .replace(/\brooftop\b/gi, "")
+    .replace(pattern, "")
     .replace(/\s{2,}/g, " ")
     .replace(/\s+([,.—–-])/g, "$1")
+    .replace(/^[,.—–-]\s*/, "")
     .trim();
+}
+
+export function resolveBourbonGuestCopy(row: {
+  location?: string | null;
+  detail?: string | null;
+  capacity?: number | null;
+}): BourbonGuestCopy {
+  const location = (row.location ?? "").trim();
+  let detail = (row.detail ?? "").trim();
+  const locRoof = mentionsRooftop(location);
+  const locPdr = mentionsPrivateDining(location);
+  const detRoof = mentionsRooftop(detail);
+  const detPdr = mentionsPrivateDining(detail);
+  const conflict =
+    Boolean(location) &&
+    ((locPdr && detRoof) || (locRoof && detPdr) || (detRoof && detPdr && locPdr !== locRoof));
+
+  if (location && locPdr && detRoof) {
+    detail = stripPhrase(detail, /\s*on the rooftop\b/gi);
+    detail = stripPhrase(detail, /\brooftop\b/gi);
+  } else if (location && locRoof && detPdr) {
+    detail = stripPhrase(detail, /\s*in the private dining room\b/gi);
+    detail = stripPhrase(detail, /\bprivate dining room\b/gi);
+    detail = stripPhrase(detail, /\bprivate dining\b/gi);
+  }
+
+  return {
+    location,
+    detail: detail || NELLIES_BOURBON_DETAIL_FALLBACK,
+    conflict,
+    capacity: row.capacity ?? null,
+  };
 }
 
 function isJackieWelcome(title: string): boolean {
@@ -288,12 +339,12 @@ export type LaunchEvent = {
 export const NELLIES_BOURBON_EVENT: LaunchEvent = {
   id: "launch:bourbon-cigar",
   title: NELLIES_BOURBON_TITLE,
-  detail: NELLIES_BOURBON_DETAIL,
+  detail: NELLIES_BOURBON_DETAIL_FALLBACK,
   date: NELLIES_BOURBON_WHEN,
-  location: NELLIES_BOURBON_LOCATION,
+  location: "",
   startsAt: NELLIES_BOURBON_STARTS_AT,
   endsAt: NELLIES_BOURBON_ENDS_AT,
-  capacity: NELLIES_BOURBON_CAPACITY,
+  capacity: null,
   url: null,
   tier: "public",
   active: true,
@@ -325,20 +376,22 @@ export function applyNelliesLaunchEvents<
       }));
   }
   const match = rows.find((row) => isBourbonCigarTitle(row.title));
+  const copy = resolveBourbonGuestCopy({
+    location: match?.location,
+    detail: match?.detail,
+    capacity: match?.capacity,
+  });
   return [
     {
       ...NELLIES_BOURBON_EVENT,
       id: match?.id ?? NELLIES_BOURBON_EVENT.id,
       title: NELLIES_BOURBON_TITLE,
-      detail: stripRooftop(NELLIES_BOURBON_DETAIL),
-      // Always force the guest-visible date. Live 0048 rows still have
-      // relative starts_at / null event_date, which is why Sept 23 7pm ET
-      // does not show even when PDR + cap 40 already do.
+      detail: copy.detail,
       date: NELLIES_BOURBON_WHEN,
-      location: NELLIES_BOURBON_LOCATION,
+      location: copy.location,
       startsAt: NELLIES_BOURBON_STARTS_AT,
       endsAt: NELLIES_BOURBON_ENDS_AT,
-      capacity: NELLIES_BOURBON_CAPACITY,
+      capacity: copy.capacity,
     },
   ];
 }
@@ -349,12 +402,14 @@ export type LaunchLatestCard = {
   when?: string;
   ts?: string;
   body?: string | null;
+  location?: string | null;
 };
 
 /**
  * LatestStrip queries brand_events directly (and matches null
- * event_starts_at), so unpublished-in-SQL-only is not enough. Drop Hana's
- * rooftop extras and stamp Bourbon with Sept 23 · 7:00 PM ET.
+ * event_starts_at), so unpublished-in-SQL-only is not enough. Drop extra
+ * rooftop recurrences; stamp Bourbon with Sept 23 · 7:00 PM ET; use the
+ * event row's location field only.
  */
 export function filterNelliesLaunchLatestCards<T extends LaunchLatestCard>(
   brandSlug: string,
@@ -368,12 +423,17 @@ export function filterNelliesLaunchLatestCards<T extends LaunchLatestCard>(
     if (isNelliesHiddenTitle(card.title)) continue;
     if (card.kind === "event" && !isBourbonCigarTitle(card.title)) continue;
     if (isBourbonCigarTitle(card.title)) {
+      const copy = resolveBourbonGuestCopy({
+        location: card.location,
+        detail: card.body,
+      });
       out.push({
         ...card,
         title: NELLIES_BOURBON_TITLE,
         when: NELLIES_BOURBON_WHEN,
         ts: NELLIES_BOURBON_STARTS_AT,
-        body: stripRooftop(card.body ?? NELLIES_BOURBON_DETAIL),
+        body: copy.detail,
+        location: copy.location,
       });
       continue;
     }

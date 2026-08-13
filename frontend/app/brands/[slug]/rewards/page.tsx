@@ -77,8 +77,7 @@ export default async function RewardsPage({
           <p className="mt-2 text-sm text-white/60">
             Jackie launch: free dessert with entrée when you join, 1,500 bonus points after three
             visits, and a birthday entrée up to $30. Bourbon &amp; Cigar Night is September 23,
-            7:00 PM ET in the Private Dining Room. We don&apos;t list empty Gold/Platinum
-            redeemables or merch SKUs.
+            7:00 PM ET. We don&apos;t list empty Gold/Platinum redeemables or merch SKUs.
           </p>
           <p className="mt-2 text-xs text-white/45">
             Ladder: Bronze → Platinum (points). Founding = first 100. Premium ≈ Gold+ on gated

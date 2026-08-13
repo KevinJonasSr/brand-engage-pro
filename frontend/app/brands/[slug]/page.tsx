@@ -27,6 +27,10 @@ import { getActivityPulse } from "@/lib/data/activity-pulse";
 import StampCard from "@/components/stamp-card";
 import { getStampCardData } from "@/lib/data/stamp-card";
 import { getActiveGoalsWithProgress } from "@/lib/goals/progress";
+import {
+  NELLIES_BRAND_SLUG,
+  jackieLaunchSpecials,
+} from "@/lib/nellies-launch";
 export const dynamic = "force-dynamic";
 
 // Per-brand hero focal-point now comes from brands.hero_focal_x /
@@ -94,6 +98,8 @@ export default async function BrandPage({
   if (!brand) notFound();
   const isSignedIn = member !== null;
   const needsProfile = isSignedIn && !member.first_name;
+  const isNellies = slug.toLowerCase() === NELLIES_BRAND_SLUG;
+  const guestSpecials = isNellies ? jackieLaunchSpecials() : specials;
 
   // Fetch activity pulse + stamp card in parallel (non-blocking — both fail gracefully)
   const [pulse, stampCardData, eventIds, goals] = await Promise.all([
@@ -333,12 +339,16 @@ export default async function BrandPage({
         brandSlug={slug}
         viewerMemberId={member?.id ?? null}
         />
-      {/* Jackie launch perks — injected for Nellie's even if catalog flags are off */}
-      {specials.length > 0 && (
+      {/* Jackie launch perks — fixture, not 1-pt catalog SKUs. Always
+          render for Nellie's so guests see the three even if specials
+          rows are still the old fried-chicken / premium-teaser set. */}
+      {guestSpecials.length > 0 && (
         <section id="offers" className="glass-card p-8 scroll-mt-24">
-          <p className="text-sm uppercase tracking-wide text-white/60">Launch offers</p>
+          <p className="text-sm uppercase tracking-wide text-white/60">
+            {isNellies ? "Launch offers" : "Specials"}
+          </p>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
-            {specials.map((s) => {
+            {guestSpecials.map((s) => {
               const access = canAccess(s.tier, entitlement);
               if (!access.allowed) {
                 return (

@@ -10,9 +10,11 @@
 --   3. Birthday entrée up to $30 — redeemable in birthday month (persist
 --      members.birthday_month)
 --
--- Keep: Bourbon & Cigar Night — Private Dining Room (NOT Rooftop),
--- September 23, 2026, 7:00pm America/New_York, cap 40.
+-- Keep: Bourbon & Cigar Night — September 23, 2026, 7:00pm America/New_York.
 -- Set event_date AND event_starts_at (and starts_at) so the date shows.
+-- Do NOT overwrite location. Live row has location = Private Dining Room
+-- and detail = "on the Rooftop"; Dash is asking Kevin which is canonical.
+-- Guest copy uses brand_events.location (primary) only.
 --
 -- APPLY on BEP Supabase project enfpviapxvqyoarwwsuf (SQL Editor → Run)
 -- AFTER 0051. Does not change redeem_reward caller bind / member
@@ -296,7 +298,9 @@ create trigger award_nellies_three_visit_bonus
   after insert on public.checkins
   for each row execute function public.award_nellies_three_visit_bonus();
 
--- ─── 3. Bourbon & Cigar Night — Private Dining Room, Sept 23 2026 7pm ET ─
+-- ─── 3. Bourbon & Cigar Night — date/time only; location stays on the row ─
+-- TODO(Dash→Kevin): location vs detail currently disagree (Private Dining
+-- Room vs Rooftop). This update does not invent a room.
 update public.brand_events
    set active = true,
        title = 'Bourbon & Cigar Night',
@@ -304,13 +308,21 @@ update public.brand_events
        starts_at = timestamptz '2026-09-23 19:00:00 America/New_York',
        event_starts_at = timestamptz '2026-09-23 19:00:00 America/New_York',
        ends_at = timestamptz '2026-09-23 22:00:00 America/New_York',
-       location = 'Nellie''s Southern Kitchen — Private Dining Room',
-       capacity = 40,
-       detail = 'Premium bourbon pours and hand-selected cigars. Members welcome.',
        brand_slug = coalesce(nullif(brand_slug, ''), 'nellies'),
        community_id = coalesce(nullif(community_id, ''), 'nellies')
  where (community_id = 'nellies' or brand_slug = 'nellies')
    and title ilike '%bourbon%cigar%';
+
+-- If the primary location field is not Rooftop, drop rooftop from detail
+-- so guests do not see two rooms. Leaves location unchanged.
+update public.brand_events
+   set detail = trim(both from regexp_replace(
+         regexp_replace(coalesce(detail, ''), '\s*on the [Rr]ooftop\.?', '', 'g'),
+         '\s{2,}', ' ', 'g'))
+ where (community_id = 'nellies' or brand_slug = 'nellies')
+   and title ilike '%bourbon%cigar%'
+   and coalesce(location, '') not ilike '%rooftop%'
+   and coalesce(detail, '') ilike '%rooftop%';
 
 insert into public.brand_events (
   brand_slug, community_id, title, detail, event_date, location,
@@ -322,7 +334,7 @@ select
   'Bourbon & Cigar Night',
   'Premium bourbon pours and hand-selected cigars. Members welcome.',
   'Wednesday, September 23 · 7:00 PM ET',
-  'Nellie''s Southern Kitchen — Private Dining Room',
+  null,
   timestamptz '2026-09-23 19:00:00 America/New_York',
   timestamptz '2026-09-23 19:00:00 America/New_York',
   timestamptz '2026-09-23 22:00:00 America/New_York',
@@ -404,6 +416,69 @@ update public.specials
 update public.brand_events
    set active = false
  where title ilike '%music row house tour%'
+   and active = true;
+
+-- ─── 4b. Jackie’s three as public specials (NOT 1-pt catalog SKUs) ───────
+-- Production guest page reads `specials`, so these rows make the three
+-- visible after Dash applies SQL, even before the frontend deploy.
+insert into public.specials (
+  brand_slug, community_id, title, description,
+  points_required, redemption_code, tier, sort_order, active
+)
+select v.brand_slug, v.community_id, v.title, v.description,
+       null, null, 'public', v.sort_order, true
+from (values
+  ('nellies', 'nellies', 'Free Dessert w/ Entree',
+   'Granted when you join — not a points redeemable. Complimentary dessert with an entrée. Show your member card.',
+   1::smallint),
+  ('nellies', 'nellies', '1,500 Bonus Points',
+   'Awarded automatically after your third verified visit check-in — not a catalog SKU.',
+   2::smallint),
+  ('nellies', 'nellies', 'Birthday Entree up to $30',
+   'Redeemable during your birthday month (entrée up to $30). Add your birthday month on your profile — not a 1-pt SKU.',
+   3::smallint)
+) as v(brand_slug, community_id, title, description, sort_order)
+where not exists (
+  select 1 from public.specials s
+   where (s.brand_slug = 'nellies' or s.community_id = 'nellies')
+     and s.title = v.title
+);
+
+update public.specials
+   set active = true,
+       tier = 'public',
+       points_required = null,
+       redemption_code = null,
+       sort_order = case title
+         when 'Free Dessert w/ Entree' then 1
+         when '1,500 Bonus Points' then 2
+         when 'Birthday Entree up to $30' then 3
+         else sort_order
+       end,
+       description = case title
+         when 'Free Dessert w/ Entree' then
+           'Granted when you join — not a points redeemable. Complimentary dessert with an entrée. Show your member card.'
+         when '1,500 Bonus Points' then
+           'Awarded automatically after your third verified visit check-in — not a catalog SKU.'
+         when 'Birthday Entree up to $30' then
+           'Redeemable during your birthday month (entrée up to $30). Add your birthday month on your profile — not a 1-pt SKU.'
+         else description
+       end
+ where (community_id = 'nellies' or brand_slug = 'nellies')
+   and title in (
+     'Free Dessert w/ Entree',
+     '1,500 Bonus Points',
+     'Birthday Entree up to $30'
+   );
+
+update public.specials
+   set active = false
+ where (community_id = 'nellies' or brand_slug = 'nellies')
+   and title not in (
+     'Free Dessert w/ Entree',
+     '1,500 Bonus Points',
+     'Birthday Entree up to $30'
+   )
    and active = true;
 
 -- Catalog + offers: keep Jackie 1-pt SKUs UNPUBLISHED. Hide merch extras.

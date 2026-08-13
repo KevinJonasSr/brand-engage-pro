@@ -1,10 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getBrandFromDb } from "@/lib/data/brands";
-import { listSpecialsForBrand } from "@/lib/data/specials";
 import {
-  NELLIES_BOURBON_CAPACITY,
-  NELLIES_BOURBON_LOCATION,
   NELLIES_BOURBON_TITLE,
   NELLIES_BOURBON_WHEN,
   NELLIES_BRAND_SLUG,
@@ -24,19 +21,7 @@ export const metadata: Metadata = {
  * Same Jackie launch set as /brands/nellies — do not expand.
  */
 export default async function EventsPage() {
-  const [brand, specials] = await Promise.all([
-    getBrandFromDb(NELLIES_BRAND_SLUG),
-    listSpecialsForBrand(NELLIES_BRAND_SLUG),
-  ]);
-
-  const offers =
-    specials.length > 0
-      ? specials.map((s) => ({ title: s.title, description: s.description ?? "" }))
-      : NELLIES_PUBLISHED_OFFERS.map((o) => ({
-          title: o.title,
-          description: o.description,
-        }));
-
+  const brand = await getBrandFromDb(NELLIES_BRAND_SLUG);
   const bourbon =
     brand?.upcoming.find((e) => /bourbon/i.test(e.title) && /cigar/i.test(e.title)) ??
     brand?.upcoming[0] ??
@@ -61,8 +46,8 @@ export default async function EventsPage() {
       <section id="offers" className="glass-card space-y-4 p-6">
         <p className="text-sm uppercase tracking-wide text-white/60">Launch offers</p>
         <ul className="space-y-4">
-          {offers.map((offer) => (
-            <li key={offer.title} className="rounded-2xl bg-black/30 p-5">
+          {NELLIES_PUBLISHED_OFFERS.map((offer) => (
+            <li key={offer.slug} className="rounded-2xl bg-black/30 p-5">
               <p className="text-sm font-semibold">{offer.title}</p>
               <p className="mt-1 text-xs leading-relaxed text-white/70">{offer.description}</p>
             </li>
@@ -77,15 +62,15 @@ export default async function EventsPage() {
           {bourbon?.detail && (
             <p className="mt-1 text-xs text-white/70">{bourbon.detail}</p>
           )}
-          <p className="mt-2 text-xs text-white/60">
-            📍 {bourbon?.location ?? NELLIES_BOURBON_LOCATION}
-          </p>
+          {bourbon?.location ? (
+            <p className="mt-2 text-xs text-white/60">📍 {bourbon.location}</p>
+          ) : null}
           <p className="mt-3 text-xs uppercase tracking-wide text-white/40">
             {bourbon?.date || NELLIES_BOURBON_WHEN}
           </p>
-          <p className="mt-1 text-xs text-white/50">
-            Cap {bourbon?.capacity ?? NELLIES_BOURBON_CAPACITY}
-          </p>
+          {bourbon?.capacity != null && bourbon.capacity > 0 ? (
+            <p className="mt-1 text-xs text-white/50">Cap {bourbon.capacity}</p>
+          ) : null}
         </div>
         <Link
           href="/brands/nellies#upcoming"
