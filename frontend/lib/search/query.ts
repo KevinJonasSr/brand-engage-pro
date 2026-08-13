@@ -25,6 +25,7 @@ import {
   isBourbonCigarTitle,
   isNelliesHiddenTitle,
   isNelliesPublishedOfferTitle,
+  resolveBourbonGuestCopy,
 } from "@/lib/nellies-launch";
 import type {
   SearchHit,
@@ -340,12 +341,15 @@ async function fetchAllSourceRows(
           ) {
             continue;
           }
+          const bourbon = isBourbonCigarTitle(row.title)
+            ? resolveBourbonGuestCopy({ detail: row.detail })
+            : null;
           out.brand_events.set(row.id, {
             kind: "event",
             id: row.id,
             brand_slug: row.brand_slug,
             title: row.title,
-            detail: row.detail,
+            detail: bourbon ? bourbon.detail : row.detail,
             event_date: row.event_date,
             url: row.url,
           });
