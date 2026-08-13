@@ -3,8 +3,8 @@
 > Full narrative + guest journey: [`docs/GUEST_AND_CODE_REVIEW.md`](./GUEST_AND_CODE_REVIEW.md).  
 > This file is the short P0/P1 status tracker (post soft-launch refresh).
 
-**Date:** 2026-08-12 (post soft-launch)  
-**Repo:** `KevinJonasSr/brand-engage-pro` @ `main` (`6d0c9e7`)  
+**Date:** 2026-08-13 (post #10)  
+**Repo:** `KevinJonasSr/brand-engage-pro` @ `main` (`87ac19b`)  
 **Live:** https://brand-engage-pro.vercel.app  
 **Supabase:** `enfpviapxvqyoarwwsuf`
 
@@ -31,7 +31,7 @@
 ## Safe to launch?
 
 **Nellie's single-admin SMS-only soft launch: yes on current posture** (P0 security + guest-walk items shipped).  
-**Multi-brand / multi-admin / marketed points economy: not yet** — RLS + `redeem_reward` bind + admin IDOR + surgical Turnstile/redirect still open.
+**Multi-brand / multi-admin / marketed points economy: not yet** — RLS + `redeem_reward` bind + admin IDOR still open.
 
 Fan Engage launches first — see must-vs-wait table in `GUEST_AND_CODE_REVIEW.md`.
 
@@ -45,6 +45,8 @@ Fan Engage launches first — see must-vs-wait table in `GUEST_AND_CODE_REVIEW.m
 | 2 | Admin broadcast email unscoped | **Shipped** — SMS-only / email disabled unscoped | PR #7 |
 | 3 | Cron auth not uniformly fail-closed | **Shipped** — all 14 use `verifyCronAuth` | PR #7 |
 | — | Nellie's guest walk (onboarding, check-in, join redirect, marketplace, cookies, CS) | **Shipped** | [PR #9](https://github.com/KevinJonasSr/brand-engage-pro/pull/9) |
+| C | Turnstile verify fail-open when secret missing | **Shipped** — production fail-closed | [PR #10](https://github.com/KevinJonasSr/brand-engage-pro/pull/10) |
+| D | Auth callback `next` unsanitized | **Shipped** — `safeRelativePath` | PR #10 |
 | — | Soft-launch catalog + music purge | **Applied** on `enfpviapxvqyoarwwsuf` | Migrations **0049** / **0050** |
 
 ---
@@ -55,14 +57,12 @@ Fan Engage launches first — see must-vs-wait table in `GUEST_AND_CODE_REVIEW.m
 |---|---|---|---|
 | A | `members_self_update` unrestricted (points inflation risk) | `supabase/migrations/0001_init.sql` | No later migration column-restricts updates — **must-before-BEP** points marketing |
 | B | `redeem_reward` SECURITY DEFINER without `auth.uid() = p_member_id` | `0021_rewards_redemption.sql`, `0025_*.sql` | Still unbound on main — **must-before-BEP** |
-| C | Turnstile verify fail-open when secret missing | `frontend/app/api/turnstile/verify/route.ts` | Needs surgical fail-closed PR |
-| D | Auth callback `next` unsanitized | `frontend/app/auth/callback/route.ts` | Open redirect — take from #6 surgically |
 
 ---
 
-## Caution: draft PR #6
+## Caution: draft PR #6 — closed without merge
 
-**Do not merge [#6](https://github.com/KevinJonasSr/brand-engage-pro/pull/6) as-is.** Password Turnstile + Decline-cookie approach **conflicts** with soft-launch main (PR #9: password Turnstile skip + Accept-only cookies). Path: surgical PR for redirect sanitize + Turnstile fail-closed only.
+[#6](https://github.com/KevinJonasSr/brand-engage-pro/pull/6) was **closed without merging**. Surgical pieces (`safeRelativePath` + Turnstile fail-closed) landed in [#10](https://github.com/KevinJonasSr/brand-engage-pro/pull/10). Password-Turnstile and Decline-cookie parts conflict with [#9](https://github.com/KevinJonasSr/brand-engage-pro/pull/9) and were not taken.
 
 ---
 
@@ -83,17 +83,17 @@ Full detail: [`GUEST_AND_CODE_REVIEW.md`](./GUEST_AND_CODE_REVIEW.md).
 |---|---|---|
 | [#7](https://github.com/KevinJonasSr/brand-engage-pro/pull/7) | P0 security | **Merged** |
 | [#9](https://github.com/KevinJonasSr/brand-engage-pro/pull/9) | Nellie's guest walk | **Merged** |
-| [#6](https://github.com/KevinJonasSr/brand-engage-pro/pull/6) | Auth/Turnstile/consent | **Do not merge as-is** — surgical follow-up |
-| [#8](https://github.com/KevinJonasSr/brand-engage-pro/pull/8) | This status docs refresh | Update & ready for review |
+| [#10](https://github.com/KevinJonasSr/brand-engage-pro/pull/10) | `safeRelativePath` + Turnstile fail-closed | **Merged** (supersedes safe slice of #6) |
+| [#6](https://github.com/KevinJonasSr/brand-engage-pro/pull/6) | Auth/Turnstile/consent | **Closed without merge** — conflicts with #9 |
+| [#8](https://github.com/KevinJonasSr/brand-engage-pro/pull/8) | Prior status docs refresh | Merged; this file supersedes Turnstile/redirect claims |
 | [#5](https://github.com/KevinJonasSr/brand-engage-pro/pull/5) | Prior docs-only | Superseded |
-| [#3](https://github.com/KevinJonasSr/brand-engage-pro/pull/3) / [#4](https://github.com/KevinJonasSr/brand-engage-pro/pull/4) | `/join` / salvage | Prefer close as superseded |
+| [#3](https://github.com/KevinJonasSr/brand-engage-pro/pull/3) / [#4](https://github.com/KevinJonasSr/brand-engage-pro/pull/4) | `/join` / salvage | **Closed** as superseded |
 
 ---
 
 ## Recommended sequence
 
 1. Keep SMS-only broadcast; never enable unscoped Mailchimp broadcast in prod.  
-2. Surgical auth PR (redirect + Turnstile fail-closed) — **not** full #6.  
-3. RLS / `redeem_reward` migration before marketing points.  
-4. Admin community scope before second brand/admin.  
-5. Continue Nellie's soft launch: one admin, brand-loyalty framing only.
+2. RLS / `redeem_reward` migration before marketing points.  
+3. Admin community scope before second brand/admin.  
+4. Continue Nellie's soft launch: one admin, brand-loyalty framing only.

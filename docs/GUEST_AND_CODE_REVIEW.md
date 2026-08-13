@@ -1,12 +1,12 @@
 # Brand Engage Pro — Guest + Code Soft-Launch Status
 
-**Date:** 2026-08-12 (post soft-launch refresh)  
-**Repo:** `KevinJonasSr/brand-engage-pro` @ `main` (`6d0c9e7`)  
+**Date:** 2026-08-13 (post #10)  
+**Repo:** `KevinJonasSr/brand-engage-pro` @ `main` (`87ac19b`)  
 **Live:** https://brand-engage-pro.vercel.app  
 **Supabase:** `enfpviapxvqyoarwwsuf`  
-**Supersedes:** stale claims in earlier drafts of this file / PR #5 that still listed live P0s  
-**Shipped fix PRs:** [#7](https://github.com/KevinJonasSr/brand-engage-pro/pull/7) (security P0s), [#9](https://github.com/KevinJonasSr/brand-engage-pro/pull/9) (Nellie's guest walk)  
-**Do not merge as-is:** [#6](https://github.com/KevinJonasSr/brand-engage-pro/pull/6) (see caution below)
+**Supersedes:** stale claims in earlier drafts of this file / PR #5 that still listed live P0s; Turnstile fail-open + open-redirect claims from the #8 docs refresh  
+**Shipped fix PRs:** [#7](https://github.com/KevinJonasSr/brand-engage-pro/pull/7) (security P0s), [#9](https://github.com/KevinJonasSr/brand-engage-pro/pull/9) (Nellie's guest walk), [#10](https://github.com/KevinJonasSr/brand-engage-pro/pull/10) (`safeRelativePath` + Turnstile fail-closed)  
+**Closed without merge:** [#6](https://github.com/KevinJonasSr/brand-engage-pro/pull/6) (password-Turnstile / Decline-cookie conflicted with #9; safe slice shipped in #10)
 
 Fan Engage launches **first**. Items below are tagged **must-before-BEP** vs **can-wait-after-FE**.
 
@@ -31,7 +31,7 @@ Fork leftovers from Fan Engage (copy, CTAs, campaign kinds, marketplace music of
 
 **Security + guest-walk P0s from the original review are shipped on `main` and live.** Soft launch for a **single trusted admin + SMS-only** Nellie's **restaurant loyalty** club is the current ops posture.
 
-| Gate | Status on `main` @ `6d0c9e7` / live |
+| Gate | Status on `main` @ `87ac19b` / live |
 |---|---|
 | Unauthenticated `/api/debug-supabase` | **Shipped** — route removed in PR #7; prod **404** |
 | Admin email broadcast unscoped | **Shipped** — UI SMS-only; server rejects email/`both` unless `MAILCHIMP_BROADCAST_ENABLED=1` (PR #7) |
@@ -94,30 +94,25 @@ Use these scripts — do **not** invent routes or stock.
 
 ---
 
-## Caution: draft PR #6 — do **not** merge as-is
+## Caution: draft PR #6 — closed without merge
 
-[#6](https://github.com/KevinJonasSr/brand-engage-pro/pull/6) (`cursor/auth-security-soft-launch-e8a8`) still contains useful pieces (auth-callback redirect sanitization, Turnstile **fail-closed** in production) but **conflicts with soft-launch truth already on main via PR #9**:
+[#6](https://github.com/KevinJonasSr/brand-engage-pro/pull/6) (`cursor/auth-security-soft-launch-e8a8`) was **closed without merging**. It conflicted with soft-launch truth already on main via PR #9:
 
 | PR #6 change | Soft-launch conflict |
 |---|---|
 | Requires Turnstile on **password** login | Main (PR #9) intentionally **skips** password Turnstile to match FE least-confused path |
 | Cookie Decline / referral gating | Partially superseded by PR #9 `cookie-consent` + Accept-only referral cookie |
 
-**Path forward:** a **surgical** follow-up PR that takes only:
+**Shipped in [#10](https://github.com/KevinJonasSr/brand-engage-pro/pull/10)** (surgical slice only):
 
 1. `safeRelativePath` / auth-callback open-redirect fix  
 2. Turnstile verify **fail-closed** when secret missing in production  
 
-…and **does not** reintroduce password Turnstile or undo Accept-only cookie behavior.
-
-**Still open on main today (verified):**
-
-- `frontend/app/api/turnstile/verify/route.ts` — missing secret → `{ success: true }` (fail-open)
-- `frontend/app/auth/callback/route.ts` — `next` concatenated onto `origin` without sanitization (open redirect)
+…and **did not** reintroduce password Turnstile or undo Accept-only cookie behavior.
 
 ---
 
-## Remaining open findings (verified on `main` @ `6d0c9e7`)
+## Remaining open findings (verified on `main` @ `87ac19b`)
 
 These were called out in the original review and are **still true** in the repo (no later migration/PR closed them). Treat as **must-before-BEP** for a marketed points economy / public multi-tenant launch; acceptable caveats for single-admin Nellie's soft launch only where noted.
 
@@ -156,8 +151,8 @@ These were called out in the original review and are **still true** in the repo 
 Soft-launch mitigations (0049/0050) deactivate music SKUs and limit Nellie's active redeemables, but two catalogs remain. Marketplace vs rewards-tab confusion can return if operators re-seed or reactivate wrong rows.  
 **Timing:** Rewards-tab-only Nellie's = **can-wait**. Marketing marketplace as live redeem = **must-before**.
 
-#### P1-3. Turnstile fail-open + auth callback open redirect
-See **PR #6 caution** — surgical fix needed; do not merge #6 wholesale.
+#### P1-3. Turnstile fail-open + auth callback open redirect — **SHIPPED (PR #10)**
+Surgical slice from #6: `safeRelativePath` on auth callback / login / signup `next`, and production Turnstile fail-closed when keys are missing. Password login remains captcha-free; cookie banner remains Accept-only.
 
 #### P1-4. Twilio inbound signature fail-open + full-table phone scan
 | Path | `frontend/app/api/twilio/inbound/route.ts` |
@@ -189,8 +184,8 @@ See **PR #6 caution** — surgical fix needed; do not merge #6 wholesale.
 - Docs drift: README URLs TBD; COLLABORATING may point at old Vercel host / wrong migrations path.
 - Inherited naming: `memberengage_*` cookies, `fe_admin_community`, reply-to leftovers.
 - In-memory rate limits weaken on multi-instance Vercel.
-- Open PR #4 salvage bundles largely already on main — prefer close as superseded.
-- Open PR #3 `/join` — superseded by PR #9 redirect; CS still uses `/signup?ref=nellies`.
+- Open PR #4 salvage bundles largely already on main — **closed** as superseded.
+- Open PR #3 `/join` — **closed**; superseded by PR #9 redirect; CS still uses `/signup?ref=nellies`.
 
 ---
 
@@ -250,12 +245,11 @@ select count(*) filter (where profile_slug is null), count(*) from public.member
 
 ## Top remaining work (ordered)
 
-1. **Surgical auth PR** (not full #6) — callback redirect sanitize + Turnstile fail-closed; keep password Turnstile skip + Accept-only cookies.  
-2. **RLS + `redeem_reward` auth.uid bind** migration before any points-economy marketing.  
-3. **Twilio inbound fail-closed** + bind SMS send to own phone (if SMS marketed).  
-4. **Admin community scoping** before second brand/admin.  
-5. Residual music CTA kinds / share surfaces (G10–G12) before those features go live.  
-6. Dual-catalog cleanup if marketplace is marketed as redeem.
+1. **RLS + `redeem_reward` auth.uid bind** migration before any points-economy marketing.  
+2. **Twilio inbound fail-closed** + bind SMS send to own phone (if SMS marketed).  
+3. **Admin community scoping** before second brand/admin.  
+4. Residual music CTA kinds / share surfaces (G10–G12) before those features go live.  
+5. Dual-catalog cleanup if marketplace is marketed as redeem.
 
 ---
 
@@ -265,8 +259,8 @@ select count(*) filter (where profile_slug is null), count(*) from public.member
 |---|---|
 | Debug route, email blast, cron fail-close | **Shipped** — PR #7 |
 | Nellie's guest walk + 0049/0050 + probe purge + Guide CS | **Shipped** — PR #9 + ops |
+| Turnstile fail-closed + open redirect | **Shipped** — PR #10 (not full #6) |
 | RLS points / redeem_reward caller check | **must-before-BEP** (still open on main) |
-| Turnstile fail-closed + open redirect | **must-before-BEP** public auth — surgical PR (not #6 as-is) |
 | Twilio signature fail-closed + SMS abuse | **must-before-BEP** if SMS marketed |
 | Admin IDOR community scope | can-wait single admin; **must** before multi-admin |
 | Dual catalog cleanup | **must** if marketplace shown as redeem |
@@ -278,16 +272,15 @@ select count(*) filter (where profile_slug is null), count(*) from public.member
 ## Recommended sequence (from here)
 
 1. Keep soft-launch ops: **SMS-only** broadcast; do not set `MAILCHIMP_BROADCAST_ENABLED`.  
-2. Land **surgical** redirect + Turnstile fail-closed PR; leave draft **#6** closed or heavily rewritten.  
-3. Ship RLS / `redeem_reward` migration before marketing points.  
-4. Confirm env + migration SQL stay healthy on `enfpviapxvqyoarwwsuf`.  
-5. Soft-launch continue: magic-link + password, OAuth gated, one admin — **brand loyalty framing only**.
+2. Ship RLS / `redeem_reward` migration before marketing points.  
+3. Confirm env + migration SQL stay healthy on `enfpviapxvqyoarwwsuf`.  
+4. Soft-launch continue: magic-link + password, OAuth gated, one admin — **brand loyalty framing only**.
 
 ---
 
 ## Method
 
-- Re-verified on `main` @ `6d0c9e7` + live HTTP probes (debug **404**, `/signup?ref=nellies` **200**, `/join` **307**, `/stamps` **404**).  
+- Re-verified on `main` @ `87ac19b` + live HTTP probes (debug **404**, `/signup?ref=nellies` **200**, `/join` **307**, `/stamps` **404**). Auth redirect + Turnstile fail-closed shipped in PR #10 (`b7a7e61`).  
 - Confirmed remaining RLS / `redeem_reward` gaps by reading migrations (no later bind/column restrict).  
 - No invented metrics. Ops claims for applied 0049/0050, probe purge, and Guide CS flip recorded as soft-launch truth from launch ops.  
 - Original pre-launch P0 list updated to **shipped** with PR refs; open work called out separately.
