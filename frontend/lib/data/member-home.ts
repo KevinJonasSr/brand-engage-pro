@@ -1,6 +1,15 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Badge, MemberProfile } from "./types";
+import {
+  NELLIES_BOURBON_LOCATION,
+  NELLIES_BOURBON_STARTS_AT,
+  NELLIES_BOURBON_TITLE,
+  NELLIES_BOURBON_WHEN,
+  NELLIES_BRAND_SLUG,
+  isBourbonCigarTitle,
+  isNelliesHiddenTitle,
+} from "@/lib/nellies-launch";
 
 export interface MemberHomeFollowedBrand {
   slug: string;
@@ -359,17 +368,23 @@ export async function getMemberHomeData(): Promise<MemberHomeData | null> {
     location: string | null;
     url: string | null;
   }>)
+    .filter((e) => {
+      if (isNelliesHiddenTitle(e.title)) return false;
+      if (e.brand_slug === NELLIES_BRAND_SLUG) return isBourbonCigarTitle(e.title);
+      return true;
+    })
     .slice(0, 3)
     .map((e) => {
       const reminderKinds = remindersByEvent.get(e.id) ?? new Set<string>();
+      const bourbon = isBourbonCigarTitle(e.title);
       return {
         id: e.id,
         brand_slug: e.brand_slug,
         brand_name: brandNameBySlug.get(e.brand_slug) ?? null,
-        title: e.title,
-        starts_at: e.starts_at,
-        event_date: e.event_date,
-        location: e.location,
+        title: bourbon ? NELLIES_BOURBON_TITLE : e.title,
+        starts_at: bourbon ? NELLIES_BOURBON_STARTS_AT : e.starts_at,
+        event_date: bourbon ? NELLIES_BOURBON_WHEN : e.event_date,
+        location: bourbon ? NELLIES_BOURBON_LOCATION : e.location,
         url: e.url,
         rsvped: myRsvpedIds.has(e.id),
         has_scheduled_reminder:
@@ -389,7 +404,10 @@ export async function getMemberHomeData(): Promise<MemberHomeData | null> {
     url: string | null;
     cta_label: string;
     point_value: number;
-  }>).slice(0, 6).map((c) => ({
+  }>)
+    .filter((c) => !isNelliesHiddenTitle(c.title) && !isNelliesHiddenTitle(c.cta_label ?? ""))
+    .slice(0, 6)
+    .map((c) => ({
     id: c.id,
     brand_slug: c.brand_slug,
     brand_name: brandNameBySlug.get(c.brand_slug) ?? null,

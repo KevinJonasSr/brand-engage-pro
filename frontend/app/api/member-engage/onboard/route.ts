@@ -18,6 +18,7 @@ type OnboardPayload = {
   emailOptedIn?: boolean;
   consentAcceptedAt?: string;
   consentVersion?: string;
+  birthdayMonth?: number | string | null;
 };
 
 /**
@@ -86,6 +87,19 @@ export async function POST(request: Request) {
         { error: "Unable to save profile." },
         { status: 500 },
       );
+    }
+
+    const birthdayMonth = parseBirthdayMonth(payload.birthdayMonth);
+    if (birthdayMonth !== undefined) {
+      try {
+        const admin = createAdminClient();
+        await admin
+          .from("members")
+          .update({ birthday_month: birthdayMonth })
+          .eq("id", user.id);
+      } catch (err) {
+        console.warn("onboard: birthday_month save failed", err);
+      }
     }
 
     // 2. Handle referral code — service-role so we can look up the referrer.
@@ -179,6 +193,35 @@ export async function POST(request: Request) {
       // non-fatal — profile save still succeeded
     }
 
+    // 3b. Nellie's membership + Jackie welcome dessert (join grant, not a 1-pt SKU).
+    try {
+      const admin = createAdminClient();
+      await admin.from("member_community_memberships").upsert(
+        {
+          member_id: user.id,
+          community_id: "nellies",
+          status: "active",
+        },
+        { onConflict: "member_id,community_id" },
+      );
+      const { error: perkErr } = await admin.rpc("grant_nellies_welcome_dessert", {
+        p_member_id: user.id,
+      });
+      if (perkErr) {
+        await admin.from("member_perks").upsert(
+          {
+            member_id: user.id,
+            community_id: "nellies",
+            perk_slug: "nsk-welcome-dessert",
+            source_ref: `nellies:welcome-dessert:${user.id}`,
+          },
+          { onConflict: "source_ref" },
+        );
+      }
+    } catch (err) {
+      console.warn("onboard: Nellie's welcome dessert grant failed", err);
+    }
+
     // 4. Founding-member badge — auto-awarded to anyone who completes
     //    onboarding before the founding window closes (2026-07-15).
     //    award_badge() handles dedupe + in-app notification; the wider
@@ -220,4 +263,12 @@ async function getTotal(
     .eq("id", memberId)
     .maybeSingle();
   return (data?.total_points as number | null) ?? 0;
+}
+
+function parseBirthdayMonth(value: unknown): number | null | undefined {
+  if (value === undefined) return undefined;
+  if (value === null || value === "") return null;
+  const n = typeof value === "number" ? value : Number.parseInt(String(value), 10);
+  if (!Number.isInteger(n) || n < 1 || n > 12) return undefined;
+  return n;
 }

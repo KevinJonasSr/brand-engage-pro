@@ -1,6 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { BRANDS as FALLBACK_BRANDS, type Brand } from "@/lib/brands";
+import {
+  NELLIES_BRAND_SLUG,
+  applyNelliesLaunchEvents,
+} from "@/lib/nellies-launch";
 
 export type { Brand } from "@/lib/brands";
 
@@ -38,10 +42,46 @@ type BrandRow = {
   sort_order: number;
 };
 
+function isUuid(value: string | undefined): value is string {
+  return !!value && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+}
+
 function rowToBrand(row: BrandRow, events: BrandEvent[]): Brand {
   // Preserve the legacy Brand shape (merch still comes from the fallback
   // for now; future phase moves merch to DB-backed offers-per-brand).
   const fallback = FALLBACK_BRANDS[row.slug];
+  const isNellies = row.slug === NELLIES_BRAND_SLUG;
+  const upcoming = isNellies
+    ? applyNelliesLaunchEvents(row.slug, events).map((e) => ({
+        id: isUuid(e.id) ? e.id : undefined,
+        title: e.title,
+        detail: e.detail,
+        date: e.date,
+        capacity: e.capacity ?? null,
+        location: e.location,
+        url: e.url ?? null,
+        tier: (e.tier ?? "public") as "public" | "premium",
+      }))
+    : events
+        .filter((e) => {
+          if (!e.active) return false;
+          // Hide past events from the Upcoming strip (guest trust).
+          if (e.starts_at) {
+            return new Date(e.starts_at).getTime() >= Date.now();
+          }
+          return true;
+        })
+        .sort((a, b) => a.sort_order - b.sort_order)
+        .map((e) => ({
+          id: e.id,
+          title: e.title,
+          detail: e.detail ?? "",
+          date: e.event_date ?? "",
+          capacity: e.capacity ?? null,
+          location: e.location ?? null,
+          url: e.url ?? null,
+          tier: (e.tier ?? "public") as "public" | "premium",
+        }));
   return {
     slug: row.slug,
     name: row.name,
@@ -54,27 +94,9 @@ function rowToBrand(row: BrandRow, events: BrandEvent[]): Brand {
     accentTo: row.accent_to,
     genres: row.genres ?? [],
     social: row.social ?? [],
-    upcoming: events
-      .filter((e) => {
-        if (!e.active) return false;
-        // Hide past events from the Upcoming strip (guest trust).
-        if (e.starts_at) {
-          return new Date(e.starts_at).getTime() >= Date.now();
-        }
-        return true;
-      })
-      .sort((a, b) => a.sort_order - b.sort_order)
-      .map((e) => ({
-        id: e.id,
-        title: e.title,
-        detail: e.detail ?? "",
-        date: e.event_date ?? "",
-        capacity: e.capacity ?? null,
-        location: e.location ?? null,
-        url: e.url ?? null,
-        tier: (e.tier ?? "public") as "public" | "premium",
-      })),
-    merch: fallback?.merch ?? [],
+    upcoming,
+    // Nellie's Jackie launch is specials + Bourbon — not merch redeemables.
+    merch: isNellies ? [] : (fallback?.merch ?? []),
   };
 }
 

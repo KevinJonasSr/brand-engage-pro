@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { relativeTime } from "@/lib/format/relative-time";
+import { filterNelliesLaunchLatestCards } from "@/lib/nellies-launch";
 
 type CardKind = "post" | "event" | "drop" | "prediction";
 
@@ -13,6 +14,7 @@ type LatestCard = {
   ts: string;
   /** "in 3d" / "5h ago" — pre-formatted */
   when: string;
+  location?: string | null;
 };
 
 const KIND_LABEL: Record<CardKind, string> = {
@@ -37,7 +39,7 @@ const KIND_COLOR: Record<CardKind, string> = {
  * then BEP names (brand_events, etc.). Whichever returns rows wins.
  */
 export async function LatestStrip({ slug }: { slug: string }) {
-  const cards = await collect(slug);
+  const cards = filterNelliesLaunchLatestCards(slug, await collect(slug));
   if (cards.length === 0) return null;
 
   // Sort: future events first (closest first), then by recency.
@@ -194,11 +196,12 @@ async function collect(slug: string): Promise<LatestCard[]> {
     const nowIso = new Date().toISOString();
     const { data, error } = await supabase
       .from("brand_events")
-      .select("id, title, detail, event_starts_at, event_date")
+      .select("id, title, detail, event_starts_at, event_date, location")
       .eq("brand_slug", slug)
+      .eq("active", true)
       .or(`event_starts_at.gte.${nowIso},event_starts_at.is.null`)
       .order("event_starts_at", { ascending: true, nullsFirst: false })
-      .limit(3);
+      .limit(8);
     if (!error && data && data.length > 0) {
       for (const e of data as Array<{
         id: string;
@@ -206,6 +209,7 @@ async function collect(slug: string): Promise<LatestCard[]> {
         detail: string | null;
         event_starts_at: string | null;
         event_date: string | null;
+        location: string | null;
       }>) {
         const ts = e.event_starts_at ?? new Date().toISOString();
         const when = e.event_starts_at
@@ -218,6 +222,36 @@ async function collect(slug: string): Promise<LatestCard[]> {
           href: hrefForEventHub(slug),
           ts,
           when,
+          location: e.location,
+        });
+      }
+    } else {
+      const { data: fallback } = await supabase
+        .from("brand_events")
+        .select("id, title, detail, starts_at, event_date, location")
+        .eq("brand_slug", slug)
+        .eq("active", true)
+        .or(`starts_at.gte.${nowIso},starts_at.is.null`)
+        .order("starts_at", { ascending: true, nullsFirst: false })
+        .limit(8);
+      for (const e of (fallback ?? []) as Array<{
+        id: string;
+        title: string;
+        detail: string | null;
+        starts_at: string | null;
+        event_date: string | null;
+        location: string | null;
+      }>) {
+        const ts = e.starts_at ?? new Date().toISOString();
+        const when = e.starts_at ? relativeTime(e.starts_at) : (e.event_date ?? "");
+        cards.push({
+          kind: "event",
+          title: e.title,
+          body: truncate(e.detail, 120),
+          href: hrefForEventHub(slug),
+          ts,
+          when,
+          location: e.location,
         });
       }
     }

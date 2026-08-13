@@ -9,7 +9,7 @@ type Field = {
   label: string;
   name: string;
   placeholder?: string;
-  type: "text" | "email" | "tel" | "radio";
+  type: "text" | "email" | "tel" | "radio" | "select";
   options?: string[];
   otherOptionLabel?: string;
   otherFieldName?: string;
@@ -96,6 +96,26 @@ const steps: { title: string; description: string; fields: Field[] }[] = [
         name: "handle",
         placeholder: "@supermember",
         type: "text",
+      },
+      {
+        label: "Birthday month",
+        name: "birthdayMonth",
+        type: "select",
+        options: [
+          "1|January",
+          "2|February",
+          "3|March",
+          "4|April",
+          "5|May",
+          "6|June",
+          "7|July",
+          "8|August",
+          "9|September",
+          "10|October",
+          "11|November",
+          "12|December",
+        ],
+        hint: "Needed for the birthday entrée (up to $30) during your birthday month.",
       },
     ],
   },
@@ -262,6 +282,7 @@ export default function OnboardingWizard() {
           favoriteBrand: resolveFavoriteBrand(),
           interest: formState.interest,
           referralCode: refCode,
+          birthdayMonth: formState.birthdayMonth || undefined,
           smsOptedIn: true,
           emailOptedIn: Boolean(formState.email),
         }),
@@ -302,6 +323,7 @@ export default function OnboardingWizard() {
           favoriteBrand: resolveFavoriteBrand(),
           interest: formState.interest,
           referralCode: refCode,
+          birthdayMonth: formState.birthdayMonth || undefined,
           smsOptedIn: Boolean(formState.phone) && smsConsent,
           emailOptedIn: Boolean(formState.email),
           consentAcceptedAt: new Date().toISOString(),
@@ -426,6 +448,31 @@ export default function OnboardingWizard() {
                         )}
                       </div>
                     </div>
+                  );
+                }
+                if (field.type === "select" && field.options) {
+                  return (
+                    <label key={field.name} className="block text-sm text-white/80">
+                      <span>{field.label}</span>
+                      <select
+                        value={formState[field.name] ?? ""}
+                        onChange={(event) => handleInput(field.name, event.target.value)}
+                        className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white focus:border-white/40 focus:outline-none"
+                      >
+                        <option value="">Select month</option>
+                        {field.options.map((opt) => {
+                          const [value, label] = opt.split("|");
+                          return (
+                            <option key={value} value={value}>
+                              {label ?? value}
+                            </option>
+                          );
+                        })}
+                      </select>
+                      {field.hint && (
+                        <span className="mt-1 block text-xs text-white/50">{field.hint}</span>
+                      )}
+                    </label>
                   );
                 }
                 return (

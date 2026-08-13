@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentCommunityId } from "@/lib/community";
+import { applyNelliesLaunchOffers } from "@/lib/nellies-launch";
 import type { Offer } from "./types";
 
 /**
@@ -23,9 +24,13 @@ export async function getActiveOffers(): Promise<Offer[]> {
       .or(`ends_at.is.null,ends_at.gte.${now}`)
       .order("created_at", { ascending: false });
     if (error) throw error;
-    return (data ?? []) as Offer[];
+    return applyNelliesLaunchOffers(
+      communityId,
+      (data ?? []) as Offer[],
+    ) as Offer[];
   } catch {
-    return [];
+    const communityId = await getCurrentCommunityId().catch(() => "nellies");
+    return applyNelliesLaunchOffers(communityId, []) as Offer[];
   }
 }
 

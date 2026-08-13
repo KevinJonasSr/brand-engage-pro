@@ -75,8 +75,10 @@ export default async function RewardsPage({
             Rewards · {brand.name}
           </h1>
           <p className="mt-2 text-sm text-white/60">
-            Soft launch: stocked redeemables are the apron + recipe card (1,500 pts) and house hot
-            sauce 3-pack (2,200 pts). We don&apos;t list empty Gold/Platinum redeemables.
+            Jackie launch: free dessert with entrée when you join, 1,500 bonus points after three
+            visits, and a birthday entrée up to $30. Bourbon &amp; Cigar Night is September 23,
+            7:00 PM ET in the Private Dining Room. We don&apos;t list empty Gold/Platinum
+            redeemables or merch SKUs.
           </p>
           <p className="mt-2 text-xs text-white/45">
             Ladder: Bronze → Platinum (points). Founding = first 100. Premium ≈ Gold+ on gated

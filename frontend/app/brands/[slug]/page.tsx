@@ -27,6 +27,10 @@ import { getActivityPulse } from "@/lib/data/activity-pulse";
 import StampCard from "@/components/stamp-card";
 import { getStampCardData } from "@/lib/data/stamp-card";
 import { getActiveGoalsWithProgress } from "@/lib/goals/progress";
+import {
+  NELLIES_BRAND_SLUG,
+  jackieLaunchSpecials,
+} from "@/lib/nellies-launch";
 export const dynamic = "force-dynamic";
 
 // Per-brand hero focal-point now comes from brands.hero_focal_x /
@@ -94,6 +98,8 @@ export default async function BrandPage({
   if (!brand) notFound();
   const isSignedIn = member !== null;
   const needsProfile = isSignedIn && !member.first_name;
+  const isNellies = slug.toLowerCase() === NELLIES_BRAND_SLUG;
+  const guestSpecials = isNellies ? jackieLaunchSpecials() : specials;
 
   // Fetch activity pulse + stamp card in parallel (non-blocking — both fail gracefully)
   const [pulse, stampCardData, eventIds, goals] = await Promise.all([
@@ -333,12 +339,16 @@ export default async function BrandPage({
         brandSlug={slug}
         viewerMemberId={member?.id ?? null}
         />
-      {/* Specials — recurring offers a brand publishes to its members */}
-      {specials.length > 0 && (
-        <section className="glass-card p-8">
-          <p className="text-sm uppercase tracking-wide text-white/60">Specials</p>
+      {/* Jackie launch perks — fixture, not 1-pt catalog SKUs. Always
+          render for Nellie's so guests see the three even if specials
+          rows are still the old fried-chicken / premium-teaser set. */}
+      {guestSpecials.length > 0 && (
+        <section id="offers" className="glass-card p-8 scroll-mt-24">
+          <p className="text-sm uppercase tracking-wide text-white/60">
+            {isNellies ? "Launch offers" : "Specials"}
+          </p>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
-            {specials.map((s) => {
+            {guestSpecials.map((s) => {
               const access = canAccess(s.tier, entitlement);
               if (!access.allowed) {
                 return (
@@ -516,37 +526,38 @@ export default async function BrandPage({
         </div>
       </section>
 
-      {/* Soft-launch redeemables teaser — live catalog is /brands/[slug]/rewards */}
-      <section className="glass-card p-8">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="text-sm uppercase tracking-wide text-white/60">Member club rewards</p>
-            <p className="mt-1 text-xs text-white/50">
-              Live redeemables on the brand rewards page (points you earn after joining — new
-              accounts start at 0).
-            </p>
-          </div>
-          <Link
-            href={`/brands/${brand.slug}/rewards`}
-            className="text-sm font-medium text-aurora underline underline-offset-2 hover:text-white"
-          >
-            Open brand rewards →
-          </Link>
-        </div>
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
-          {brand.merch.map((m) => (
+      {brand.merch.length > 0 && (
+        <section className="glass-card p-8">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-sm uppercase tracking-wide text-white/60">Member club rewards</p>
+              <p className="mt-1 text-xs text-white/50">
+                Live redeemables on the brand rewards page (points you earn after joining — new
+                accounts start at 0).
+              </p>
+            </div>
             <Link
-              key={m.title}
               href={`/brands/${brand.slug}/rewards`}
-              className="rounded-2xl bg-black/30 p-5 transition hover:bg-black/40"
+              className="text-sm font-medium text-aurora underline underline-offset-2 hover:text-white"
             >
-              <p className="text-xs uppercase tracking-wide text-white/50">{m.tier}</p>
-              <p className="mt-1 text-sm font-semibold">{m.title}</p>
-              <p className="mt-3 text-sm font-semibold text-emerald-300">{m.points}</p>
+              Open brand rewards →
             </Link>
-          ))}
-        </div>
-      </section>
+          </div>
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            {brand.merch.map((m) => (
+              <Link
+                key={m.title}
+                href={`/brands/${brand.slug}/rewards`}
+                className="rounded-2xl bg-black/30 p-5 transition hover:bg-black/40"
+              >
+                <p className="text-xs uppercase tracking-wide text-white/50">{m.tier}</p>
+                <p className="mt-1 text-sm font-semibold">{m.title}</p>
+                <p className="mt-3 text-sm font-semibold text-emerald-300">{m.points}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </main>
   );
 }
