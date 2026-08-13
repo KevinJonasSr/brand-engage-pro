@@ -4,7 +4,23 @@ import { Suspense, useState, useCallback, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { TurnstileWidget, verifyTurnstileToken } from "@/components/turnstile-widget";
+import {
+  TurnstileWidget,
+  isTurnstileRequired,
+  prefetchTurnstileScript,
+  turnstileFailureMessage,
+  verifyTurnstileToken,
+  type TurnstileLoadState,
+} from "@/components/turnstile-widget";
+import {
+  emailReadyForMagicLink,
+  magicLinkButtonLabel,
+  magicLinkClickAction,
+  magicLinkPersistentHelper,
+  nextMagicLinkGate,
+  scrollToTurnstileChallenge,
+  shouldShowParentChallengeError,
+} from "@/lib/turnstile-ux";
 import { safeRelativePath } from "@/lib/safe-redirect";
 
 export default function LoginPage() {
@@ -34,27 +50,73 @@ function LoginForm() {
   const signupHref = `/signup${signupParams.size ? `?${signupParams.toString()}` : ""}`;
   const forgotHref = `/forgot-password${next !== "/" ? `?next=${encodeURIComponent(next)}` : ""}`;
 
+  const turnstileRequired = isTurnstileRequired();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "error" | "magic-sent">("idle");
   const [message, setMessage] = useState("");
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-  const handleTurnstileSuccess = useCallback((token: string) => setTurnstileToken(token), []);
+  const [turnstileError, setTurnstileError] = useState(false);
+  const [turnstileLoadState, setTurnstileLoadState] =
+    useState<TurnstileLoadState>("loading");
+  const [turnstileKey, setTurnstileKey] = useState(0);
+  // Don't mount Turnstile until the guest chooses magic-link — keeps the
+  // password door above the fold and avoids a blank check on first paint.
+  const [magicLinkOpen, setMagicLinkOpen] = useState(false);
+  const pendingMagicSend = useRef(false);
+
+  const handleTurnstileSuccess = useCallback((token: string) => {
+    setTurnstileToken(token);
+    setTurnstileError(false);
+  }, []);
+  const handleTurnstileError = useCallback(() => setTurnstileError(true), []);
   const handleTurnstileExpire = useCallback(() => setTurnstileToken(null), []);
+  const handleTurnstileLoadState = useCallback((state: TurnstileLoadState) => {
+    setTurnstileLoadState(state);
+    // Retry remounts into loading while challengeFailed was still true —
+    // clear it so "Security check failed…" cannot flash under the skeleton.
+    if (state === "loading" || state === "ready") {
+      setTurnstileError(false);
+    }
+  }, []);
+  // Tokens are single-use: once verified (pass or fail) the widget must be
+  // remounted to issue a fresh one, or every retry fails with a stale token.
+  const resetChallenge = useCallback(() => {
+    setTurnstileToken(null);
+    setTurnstileLoadState("loading");
+    setTurnstileKey((k) => k + 1);
+  }, []);
 
   // Resending signInWithOtp overwrites the previous verifier cookie, silently
   // invalidating an already-sent link. Lock the button for 60s after a send.
   const MAGIC_COOLDOWN_SECONDS = 60;
   const [magicCooldown, setMagicCooldown] = useState(0);
   const cooldownInterval = useRef<ReturnType<typeof setInterval> | null>(null);
-  useEffect(() => { return () => { if (cooldownInterval.current) clearInterval(cooldownInterval.current); }; }, []);
+  useEffect(() => {
+    return () => {
+      if (cooldownInterval.current) clearInterval(cooldownInterval.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (turnstileRequired) prefetchTurnstileScript();
+  }, [turnstileRequired]);
+
+  useEffect(() => {
+    if (!magicLinkOpen) return;
+    const id = window.requestAnimationFrame(() => scrollToTurnstileChallenge());
+    return () => window.cancelAnimationFrame(id);
+  }, [magicLinkOpen]);
 
   function startMagicCooldown() {
     setMagicCooldown(MAGIC_COOLDOWN_SECONDS);
     if (cooldownInterval.current) clearInterval(cooldownInterval.current);
     cooldownInterval.current = setInterval(() => {
       setMagicCooldown((s) => {
-        if (s <= 1) { if (cooldownInterval.current) clearInterval(cooldownInterval.current); return 0; }
+        if (s <= 1) {
+          if (cooldownInterval.current) clearInterval(cooldownInterval.current);
+          return 0;
+        }
         return s - 1;
       });
     }, 1000);
@@ -66,6 +128,7 @@ function LoginForm() {
   // open PR #6 conflicts by requiring it on password login.
   async function handlePassword(e: React.FormEvent) {
     e.preventDefault();
+    pendingMagicSend.current = false;
     if (!email.trim()) {
       setStatus("error");
       setMessage("Enter an email first.");
@@ -90,19 +153,33 @@ function LoginForm() {
     }
   }
 
-  async function handleMagicLink() {
-    if (!email.trim()) {
-      setStatus("error");
-      setMessage("Enter an email first.");
-      return;
-    }
+  const magicGate = nextMagicLinkGate({
+    configured: turnstileRequired,
+    revealed: magicLinkOpen && emailReadyForMagicLink(email),
+    token: turnstileToken,
+    loadState: turnstileLoadState,
+  });
+  const persistentHelper = magicLinkPersistentHelper({
+    gate: magicGate,
+    loadState: turnstileLoadState,
+    challengeFailed: turnstileError,
+  });
+  const showParentChallengeError = shouldShowParentChallengeError({
+    loadState: turnstileLoadState,
+    challengeFailed: turnstileError,
+  });
+
+  async function sendMagicLink(token: string | null) {
     setStatus("loading");
     setMessage("");
 
-    const captchaOk = await verifyTurnstileToken(turnstileToken);
-    if (!captchaOk) {
+    const captcha = await verifyTurnstileToken(token);
+    resetChallenge();
+    if (!captcha.success) {
+      pendingMagicSend.current = false;
       setStatus("error");
-      setMessage("Please complete the security check before continuing.");
+      setMessage(turnstileFailureMessage(captcha.error));
+      requestAnimationFrame(() => scrollToTurnstileChallenge());
       return;
     }
     try {
@@ -114,14 +191,66 @@ function LoginForm() {
         },
       });
       if (error) throw error;
+      pendingMagicSend.current = false;
       setStatus("magic-sent");
-      setMessage("Magic link sent. Check your email.");
+      setMessage(
+        "Magic link sent. Check your email — use the newest link; requesting another one invalidates the previous one.",
+      );
       startMagicCooldown();
     } catch (err) {
+      pendingMagicSend.current = false;
       setStatus("error");
       setMessage(err instanceof Error ? err.message : "Unable to send magic link.");
     }
   }
+
+  // Secondary door: magic link. Turnstile only on this path.
+  async function handleMagicLink() {
+    if (magicCooldown > 0 || status === "loading") return;
+    const action = magicLinkClickAction({
+      email,
+      configured: turnstileRequired,
+      revealed: magicLinkOpen,
+      token: turnstileToken,
+      loadState: turnstileLoadState,
+    });
+    if (action === "need-email") {
+      setStatus("error");
+      setMessage("Enter an email first.");
+      return;
+    }
+
+    if (action === "reveal") {
+      pendingMagicSend.current = true;
+      setMagicLinkOpen(true);
+      setStatus("idle");
+      setMessage("");
+      return;
+    }
+
+    if (action !== "send") {
+      pendingMagicSend.current = true;
+      // Widget / helper / button label already explain wait, retry, and
+      // complete-check — don't stack a second error line on the page.
+      requestAnimationFrame(() => scrollToTurnstileChallenge());
+      return;
+    }
+
+    pendingMagicSend.current = false;
+    await sendMagicLink(turnstileToken);
+  }
+
+  // Completing the check after the first tap should send without a second click.
+  useEffect(() => {
+    if (!pendingMagicSend.current || !turnstileToken || magicCooldown > 0) return;
+    if (status === "loading") return;
+    pendingMagicSend.current = false;
+    void sendMagicLink(turnstileToken);
+    // sendMagicLink is recreated each render; token is the trigger we want.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [turnstileToken]);
+
+  const magicLinkDisabled = status === "loading" || magicCooldown > 0;
 
   return (
     <main className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center gap-6 px-6 py-12">
@@ -191,26 +320,54 @@ function LoginForm() {
         {/* Magic-link path — deliberately outside the password <form>.
             type=button so it never triggers password constraint validation. */}
         <div className="space-y-3">
-          <TurnstileWidget
-            onSuccess={handleTurnstileSuccess}
-            onExpire={handleTurnstileExpire}
-          />
+          <p className="text-xs text-white/45">
+            Prefer a passwordless email link? We&apos;ll send it to the{" "}
+            <span className="text-white/70">email above</span>
+            {magicLinkOpen && turnstileLoadState !== "error" && !turnstileError
+              ? ". Complete the security check, then send."
+              : "."}{" "}
+            Password can stay blank. Use the newest link — each request invalidates
+            the previous one.
+          </p>
+
+          {turnstileRequired && magicLinkOpen && emailReadyForMagicLink(email) && (
+            <div className="space-y-2">
+              <p className="text-xs uppercase tracking-wide text-white/45">Security check</p>
+              <TurnstileWidget
+                key={turnstileKey}
+                onSuccess={handleTurnstileSuccess}
+                onError={handleTurnstileError}
+                onExpire={handleTurnstileExpire}
+                onLoadStateChange={handleTurnstileLoadState}
+                theme="dark"
+              />
+              {showParentChallengeError && (
+                <p className="text-xs text-rose-300">
+                  Security check failed. Retry above, or sign in with your password.
+                </p>
+              )}
+            </div>
+          )}
 
           <button
             type="button"
             onClick={() => {
               void handleMagicLink();
             }}
-            disabled={status === "loading" || magicCooldown > 0}
+            disabled={magicLinkDisabled}
             className="w-full rounded-full border border-white/20 px-4 py-3 text-sm font-medium text-white/80 hover:bg-white/10 disabled:opacity-60"
           >
-            {magicCooldown > 0 ? `Resend in ${magicCooldown}s` : "Send me a magic link"}
+            {magicLinkButtonLabel({
+              cooldown: magicCooldown,
+              status,
+              gate: magicGate,
+            })}
           </button>
-          <p className="text-xs text-white/45">
-            Magic link only needs your email — password can stay blank.
-          </p>
         </div>
 
+        {persistentHelper && status !== "error" && status !== "magic-sent" && (
+          <p className="text-sm text-emerald-300">{persistentHelper}</p>
+        )}
         {message && (
           <p
             className={`text-sm ${

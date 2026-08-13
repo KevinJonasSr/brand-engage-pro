@@ -4,7 +4,18 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { TurnstileWidget, verifyTurnstileToken } from "@/components/turnstile-widget";
+import {
+  TurnstileWidget,
+  isTurnstileRequired,
+  prefetchTurnstileScript,
+  turnstileFailureMessage,
+  verifyTurnstileToken,
+  type TurnstileLoadState,
+} from "@/components/turnstile-widget";
+import {
+  scrollToTurnstileChallenge,
+  shouldShowParentChallengeError,
+} from "@/lib/turnstile-ux";
 import { safeRelativePath } from "@/lib/safe-redirect";
 
 export type ReferrerBrand = {
@@ -42,9 +53,29 @@ export default function SignupPage({
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "error" | "confirm">("idle");
   const [message, setMessage] = useState("");
+  const turnstileRequired = isTurnstileRequired();
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-  const handleTurnstileSuccess = useCallback((token: string) => setTurnstileToken(token), []);
+  const [turnstileError, setTurnstileError] = useState(false);
+  const [turnstileLoadState, setTurnstileLoadState] =
+    useState<TurnstileLoadState>("loading");
+  const [turnstileKey, setTurnstileKey] = useState(0);
+  const handleTurnstileSuccess = useCallback((token: string) => {
+    setTurnstileToken(token);
+    setTurnstileError(false);
+  }, []);
+  const handleTurnstileError = useCallback(() => setTurnstileError(true), []);
   const handleTurnstileExpire = useCallback(() => setTurnstileToken(null), []);
+  const handleTurnstileLoadState = useCallback((state: TurnstileLoadState) => {
+    setTurnstileLoadState(state);
+    if (state === "loading" || state === "ready") {
+      setTurnstileError(false);
+    }
+  }, []);
+  const resetChallenge = useCallback(() => {
+    setTurnstileToken(null);
+    setTurnstileLoadState("loading");
+    setTurnstileKey((k) => k + 1);
+  }, []);
 
   // Resubmitting signUp() for the same address silently regenerates the
   // confirmation token, invalidating whatever link is already in the inbox.
@@ -52,6 +83,10 @@ export default function SignupPage({
   const [confirmCooldown, setConfirmCooldown] = useState(0);
   const cooldownInterval = useRef<ReturnType<typeof setInterval> | null>(null);
   useEffect(() => { return () => { if (cooldownInterval.current) clearInterval(cooldownInterval.current); }; }, []);
+
+  useEffect(() => {
+    if (turnstileRequired) prefetchTurnstileScript();
+  }, [turnstileRequired]);
 
   function startConfirmCooldown() {
     setConfirmCooldown(CONFIRM_COOLDOWN_SECONDS);
@@ -97,15 +132,24 @@ export default function SignupPage({
       return;
     }
 
-    const captchaOk = await verifyTurnstileToken(turnstileToken);
-    if (!captchaOk) {
+    if (turnstileRequired && !turnstileToken) {
       setStatus("error");
-      setMessage("Please complete the security check before continuing.");
+      setMessage(turnstileFailureMessage("missing_token"));
+      requestAnimationFrame(() => scrollToTurnstileChallenge());
       return;
     }
 
     setStatus("loading");
     setMessage("");
+
+    const captcha = await verifyTurnstileToken(turnstileToken);
+    resetChallenge();
+    if (!captcha.success) {
+      setStatus("error");
+      setMessage(turnstileFailureMessage(captcha.error));
+      requestAnimationFrame(() => scrollToTurnstileChallenge());
+      return;
+    }
     try {
       const supabase = createClient();
       const { data, error } = await supabase.auth.signUp({
@@ -321,10 +365,24 @@ export default function SignupPage({
             })()}
           </label>
 
-          <TurnstileWidget
-            onSuccess={handleTurnstileSuccess}
-            onExpire={handleTurnstileExpire}
-          />
+          {turnstileRequired && (
+            <TurnstileWidget
+              key={turnstileKey}
+              onSuccess={handleTurnstileSuccess}
+              onError={handleTurnstileError}
+              onExpire={handleTurnstileExpire}
+              onLoadStateChange={handleTurnstileLoadState}
+              theme="dark"
+            />
+          )}
+          {shouldShowParentChallengeError({
+            loadState: turnstileLoadState,
+            challengeFailed: turnstileError,
+          }) && (
+            <p className="text-xs text-rose-300">
+              Security check failed. Tap Retry above, or try again.
+            </p>
+          )}
 
           <button
             type="submit"
