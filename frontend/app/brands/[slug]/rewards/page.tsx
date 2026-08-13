@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getBrandFromDb } from "@/lib/data/brands";
 import { getMemberProfileSlug } from "@/lib/data/member-profile";
 import { listRewardsForCommunity, listMyRedemptions } from "@/lib/data/rewards";
+import { NELLIES_BRAND_SLUG } from "@/lib/nellies-launch";
 import RewardCardWithForm from "./reward-card";
 
 export const dynamic = "force-dynamic";
@@ -66,6 +67,7 @@ export default async function RewardsPage({
 
   const recentRedemptions = myRedemptions.slice(0, 5);
   const loginNext = `/brands/${slug}/rewards`;
+  const isNellies = slug.toLowerCase() === NELLIES_BRAND_SLUG;
 
   return (
     <div className="min-h-screen bg-midnight px-4 py-8">
@@ -75,10 +77,19 @@ export default async function RewardsPage({
             Rewards · {brand.name}
           </h1>
           <p className="mt-2 text-sm text-white/60">
-            Jackie launch: free dessert with entrée when you join, 1,500 bonus points after three
-            visits, and a birthday entrée up to $30. Bourbon &amp; Cigar Night is September 23,
-            7:00 PM ET in the Private Dining Room. We don&apos;t list empty Gold/Platinum
-            redeemables or merch SKUs.
+            {isNellies ? (
+              <>
+                Join Nellie&apos;s and earn points from visits and check-ins. Jackie launch: free
+                dessert with entrée when you join, 1,500 bonus points after three visits, and a
+                birthday entrée up to $30. Bourbon &amp; Cigar Night is September 23, 7:00 PM ET
+                in the Private Dining Room.
+              </>
+            ) : (
+              <>
+                Earn points from visits and check-ins, then redeem live brand rewards. New accounts
+                start at 0. We don&apos;t list empty Gold/Platinum redeemables.
+              </>
+            )}
           </p>
           <p className="mt-2 text-xs text-white/45">
             Ladder: Bronze → Platinum (points). Founding = first 100. Premium ≈ Gold+ on gated
@@ -129,7 +140,17 @@ export default async function RewardsPage({
           </div>
         ) : (
           <div className="glass-card mb-12 rounded-2xl p-8 text-center">
-            <p className="text-sm text-white/60">No rewards available yet. Check back soon!</p>
+            <p className="text-sm text-white/60">
+              {isNellies ? (
+                <>
+                  Jackie launch perks live on the brand page — welcome dessert with entrée when you
+                  join, 1,500 bonus points after three visits, birthday entrée up to $30, and
+                  Bourbon &amp; Cigar Night on September 23. Earn points from visits and check-ins.
+                </>
+              ) : (
+                <>No rewards available yet. Check back soon!</>
+              )}
+            </p>
           </div>
         )}
 

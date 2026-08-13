@@ -85,7 +85,7 @@ export default async function RewardsPage() {
               bullets={[
                 "New accounts start at 0 — then +100 welcome points after your profile",
                 "Ladder: Bronze → Platinum · Founding = first 100 · Premium ≈ Gold+ on gated specials",
-                "Redeem only what’s stocked on the brand rewards page",
+                "Nellie's Jackie launch: dessert on join · 1,500 pts after 3 visits · birthday entrée",
               ]}
               primaryCta="Sign up free →"
               nextPath="/rewards"
@@ -119,9 +119,10 @@ export default async function RewardsPage() {
             </p>
             <p className="mt-3 text-xs text-white/50">
               Ladder: Bronze → Silver → Gold → Platinum (points from visits). Founding = first 100
-              members. Premium ≈ Gold+ on gated specials. Jackie launch perks are join / 3-visit /
-              birthday-month rules — not 1-pt merch SKUs. We don&apos;t market empty Gold/Platinum
-              catalogs or apron/hot sauce redeemables.
+              members. Premium ≈ Gold+ on gated specials. Join Nellie&apos;s, earn from visits and
+              check-ins, then Jackie&apos;s welcome dessert, 1,500 pts after 3 visits, and birthday
+              entrée. Bourbon &amp; Cigar Night is September 23, 7:00 PM ET in the Private Dining
+              Room. We don&apos;t list empty Gold/Platinum redeemables.
             </p>
             <div className="mt-8 space-y-4">
               <div className="flex items-center justify-between text-sm text-white/70">

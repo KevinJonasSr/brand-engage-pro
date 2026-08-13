@@ -95,6 +95,7 @@ export const BRANDS: Record<string, Brand> = {
         capacity: 40,
       },
     ],
+    // Jackie launch: specials + Bourbon only. No merch redeemables in the fallback.
     merch: [],
     social: [
       { label: "Instagram", href: "https://www.instagram.com/nelliessouthernkitchen/" },

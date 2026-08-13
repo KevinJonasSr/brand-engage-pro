@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import { join } from "node:path";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 import {
@@ -271,5 +272,47 @@ describe("guest surfaces", () => {
     assert.doesNotMatch(block, /Apron/);
     assert.doesNotMatch(block, /Hot Sauce/);
     assert.doesNotMatch(block, /Rooftop/);
+    assert.match(block, /merch:\s*\[\s*\]/);
+  });
+
+  it("does not market apron / hot sauce merch on guest or signed-in surfaces", () => {
+    const merchLeak = /\bapron\b|hot\s*sauce|2,\s*200\s*pts|recipe card/i;
+    const here = fileURLToPath(new URL(".", import.meta.url));
+    const roots = [
+      fileURLToPath(new URL("../app", import.meta.url)),
+      fileURLToPath(new URL("../components", import.meta.url)),
+      here,
+    ];
+    const skipDirs = new Set(["admin", "api"]);
+    const skipFiles = new Set(["nellies-launch.ts", "nellies-launch.test.ts"]);
+    const files: string[] = [join(here, "brands.ts")];
+    const walk = (dir: string) => {
+      for (const name of readdirSync(dir)) {
+        if (skipDirs.has(name)) continue;
+        const p = join(dir, name);
+        if (statSync(p).isDirectory()) {
+          walk(p);
+        } else if (
+          /\.(ts|tsx)$/.test(name) &&
+          !name.endsWith(".test.ts") &&
+          !skipFiles.has(name)
+        ) {
+          files.push(p);
+        }
+      }
+    };
+    for (const root of roots) walk(root);
+
+    for (const file of files) {
+      const source = readFileSync(file, "utf8");
+      const nelliesBlock = file.endsWith("brands.ts")
+        ? source.slice(source.indexOf("nellies:"), source.indexOf("raelynn:"))
+        : source;
+      assert.doesNotMatch(
+        nelliesBlock,
+        merchLeak,
+        `${file} still markets apron/hot sauce merch`,
+      );
+    }
   });
 });

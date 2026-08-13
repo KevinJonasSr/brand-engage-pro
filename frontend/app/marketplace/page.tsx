@@ -3,6 +3,7 @@ import { getCurrentMember } from "@/lib/data/member";
 import { getCurrentCommunityId } from "@/lib/community";
 import { listRewardsForCommunity } from "@/lib/data/rewards";
 import { isMarketplaceMusicSku } from "@/lib/marketplace-music-skus";
+import { NELLIES_BRAND_SLUG } from "@/lib/nellies-launch";
 import PreviewSignupBanner from "@/components/preview-signup-banner";
 
 export const metadata = { title: "Marketplace" };
@@ -62,7 +63,16 @@ export default async function MarketplacePage() {
               No stocked rewards yet
             </h2>
             <p className="mt-3 text-sm text-white/60">
-              Check the brand rewards page — soft launch may still be loading catalog rows.
+              {communityId.toLowerCase() === NELLIES_BRAND_SLUG ? (
+                <>
+                  Join Nellie&apos;s to earn points from visits and check-ins. Jackie launch perks
+                  live on the brand page: welcome dessert with entrée, 1,500 pts after 3 visits,
+                  birthday entrée up to $30, and Bourbon &amp; Cigar Night (September 23, Private
+                  Dining Room).
+                </>
+              ) : (
+                <>Check the brand rewards page for live redeemables.</>
+              )}
             </p>
             <Link
               href={brandRewardsHref}
