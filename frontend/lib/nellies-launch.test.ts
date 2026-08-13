@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import { join } from "node:path";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 import {
@@ -155,6 +156,33 @@ describe("Bourbon & Cigar Night", () => {
     assert.equal(copy.capacity, 40);
   });
 
+  it("strips Platinum / Gold / priority / waitlist from Bourbon detail", () => {
+    const copy = resolveBourbonGuestCopy({
+      location: "Nellie's Southern Kitchen — Private Dining Room",
+      detail:
+        "Platinum members receive priority seating; Gold members may request the waitlist. Members welcome.",
+      capacity: 40,
+    });
+    assert.doesNotMatch(copy.detail, /platinum/i);
+    assert.doesNotMatch(copy.detail, /gold members/i);
+    assert.doesNotMatch(copy.detail, /priority seating/i);
+    assert.doesNotMatch(copy.detail, /waitlist/i);
+    assert.match(copy.detail, /Members welcome/i);
+    assert.equal(copy.location, NELLIES_BOURBON_LOCATION);
+    assert.equal(copy.capacity, 40);
+  });
+
+  it("strips 0048 invite-only Platinum / Gold waitlist copy", () => {
+    const copy = resolveBourbonGuestCopy({
+      detail:
+        "An exclusive evening of premium bourbon pours and hand-selected cigars. Invite-only for Platinum members; Gold members may request waitlist access. Earn the Bourbon Enthusiast badge.",
+    });
+    assert.doesNotMatch(copy.detail, /platinum/i);
+    assert.doesNotMatch(copy.detail, /gold members/i);
+    assert.doesNotMatch(copy.detail, /waitlist/i);
+    assert.doesNotMatch(copy.detail, /invite-only/i);
+  });
+
   it("stamps PDR when the row has no location", () => {
     const copy = resolveBourbonGuestCopy({
       location: null,
@@ -271,5 +299,57 @@ describe("guest surfaces", () => {
     assert.doesNotMatch(block, /Apron/);
     assert.doesNotMatch(block, /Hot Sauce/);
     assert.doesNotMatch(block, /Rooftop/);
+    assert.match(block, /merch:\s*\[\s*\]/);
+  });
+
+  it("does not market apron / hot sauce merch on guest or signed-in surfaces", () => {
+    const merchLeak = /\bapron\b|hot\s*sauce|2,\s*200\s*pts|recipe card/i;
+    const vipLeak =
+      /platinum members|gold members may request|priority seating/i;
+    const here = fileURLToPath(new URL(".", import.meta.url));
+    const roots = [
+      fileURLToPath(new URL("../app", import.meta.url)),
+      fileURLToPath(new URL("../components", import.meta.url)),
+      here,
+    ];
+    const skipDirs = new Set(["admin", "api"]);
+    const skipFiles = new Set(["nellies-launch.ts", "nellies-launch.test.ts"]);
+    const files: string[] = [join(here, "brands.ts")];
+    const walk = (dir: string) => {
+      for (const name of readdirSync(dir)) {
+        if (skipDirs.has(name)) continue;
+        const p = join(dir, name);
+        if (statSync(p).isDirectory()) {
+          walk(p);
+        } else if (
+          /\.(ts|tsx)$/.test(name) &&
+          !name.endsWith(".test.ts") &&
+          !skipFiles.has(name)
+        ) {
+          files.push(p);
+        }
+      }
+    };
+    for (const root of roots) walk(root);
+
+    for (const file of files) {
+      const source = readFileSync(file, "utf8");
+      const nelliesBlock = file.endsWith("brands.ts")
+        ? source.slice(source.indexOf("nellies:"), source.indexOf("raelynn:"))
+        : source;
+      assert.doesNotMatch(
+        nelliesBlock,
+        merchLeak,
+        `${file} still markets apron/hot sauce merch`,
+      );
+      const inLib = file.includes("/lib/");
+      if (!inLib || file.endsWith("brands.ts")) {
+        assert.doesNotMatch(
+          nelliesBlock,
+          vipLeak,
+          `${file} still markets Bourbon Platinum/Gold waitlist copy`,
+        );
+      }
+    }
   });
 });

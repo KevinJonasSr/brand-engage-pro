@@ -1,5 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  isBourbonCigarTitle,
+  resolveBourbonGuestCopy,
+} from "@/lib/nellies-launch";
 
 export interface EventRow {
   id: string;
@@ -66,8 +70,19 @@ export async function getEventById(eventId: string): Promise<EventWithRsvp | nul
       rsvpByMe = data !== null;
     }
 
+    const row = event as EventRow;
+    const bourbon = isBourbonCigarTitle(row.title)
+      ? resolveBourbonGuestCopy(row)
+      : null;
     return {
-      ...(event as EventRow),
+      ...row,
+      ...(bourbon
+        ? {
+            location: bourbon.location,
+            detail: bourbon.detail,
+            capacity: bourbon.capacity,
+          }
+        : {}),
       rsvp_count: count ?? 0,
       rsvp_by_me: rsvpByMe,
       brand_name: (brand?.name as string | null) ?? null,

@@ -107,7 +107,8 @@ export function isBourbonCigarTitle(title: string): boolean {
 
 /**
  * Founder call: Private Dining Room, not Rooftop. Sept 23 2026 7pm ET, cap 40.
- * Always stamp those fields; strip rooftop from detail so copy cannot split.
+ * Always stamp those fields. DB detail still carries VIP/tier leak
+ * (Platinum priority / Gold waitlist from 0048) — never guest-visible.
  */
 export type BourbonGuestCopy = {
   location: string;
@@ -129,7 +130,10 @@ export function resolveBourbonGuestCopy(row: {
   detail?: string | null;
   capacity?: number | null;
 }): BourbonGuestCopy {
-  let detail = (row.detail ?? "").trim();
+  const raw = (row.detail ?? "").trim();
+  const hadVipLeak =
+    /platinum|gold members|priority seating|\bwaitlist\b/i.test(raw);
+  let detail = hadVipLeak ? "" : raw;
   detail = stripPhrase(detail, /\s*on the rooftop\b/gi);
   detail = stripPhrase(detail, /\brooftop\b/gi);
   return {

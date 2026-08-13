@@ -1,5 +1,10 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { broadcastEmail, broadcastSms } from "@/lib/broadcast";
+import {
+  NELLIES_BOURBON_TITLE,
+  isBourbonCigarTitle,
+  resolveBourbonGuestCopy,
+} from "@/lib/nellies-launch";
 
 export type ReminderKind = "reminder_24h" | "reminder_1h" | "manual";
 
@@ -62,20 +67,25 @@ export async function loadEventsInReminderWindow(kind: "reminder_24h" | "reminde
     .in("slug", slugs);
   const byName = new Map((brands ?? []).map((a) => [a.slug as string, a.name as string]));
 
-  return remaining.map(
-    (r) =>
-      ({
-        id: r.id as string,
-        brand_slug: r.brand_slug as string,
-        title: r.title as string,
-        detail: (r.detail as string | null) ?? null,
-        starts_at: r.starts_at as string,
-        location: (r.location as string | null) ?? null,
-        url: (r.url as string | null) ?? null,
-        reminder_sms_template: (r.reminder_sms_template as string | null) ?? null,
-        brand_name: byName.get(r.brand_slug as string) ?? null,
-      }) as ReminderWindowEvent,
-  );
+  return remaining.map((r) => {
+    const bourbon = isBourbonCigarTitle(String(r.title ?? ""))
+      ? resolveBourbonGuestCopy({
+          detail: (r.detail as string | null) ?? null,
+          location: (r.location as string | null) ?? null,
+        })
+      : null;
+    return {
+      id: r.id as string,
+      brand_slug: r.brand_slug as string,
+      title: bourbon ? NELLIES_BOURBON_TITLE : (r.title as string),
+      detail: bourbon ? bourbon.detail : ((r.detail as string | null) ?? null),
+      starts_at: r.starts_at as string,
+      location: bourbon ? bourbon.location : ((r.location as string | null) ?? null),
+      url: (r.url as string | null) ?? null,
+      reminder_sms_template: (r.reminder_sms_template as string | null) ?? null,
+      brand_name: byName.get(r.brand_slug as string) ?? null,
+    } as ReminderWindowEvent;
+  });
 }
 
 function buildDefaultReminderCopy(event: ReminderWindowEvent, kind: ReminderKind): {
