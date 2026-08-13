@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { listBrandsFromDb } from "@/lib/data/brands";
+import { isGuestHomeFeaturedBrand } from "@/lib/guest-home-featured-brands";
 
 export const dynamic = "force-dynamic";
 
@@ -45,7 +46,7 @@ export const metadata: Metadata = {
  * onboarding" language until the Brand Agreement is finalized.
  */
 export default async function ForBrandsPage() {
-  const brands = await listBrandsFromDb();
+  const brands = (await listBrandsFromDb()).filter(isGuestHomeFeaturedBrand);
 
   return (
     <main className="mx-auto max-w-5xl space-y-20 px-6 py-16">

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Brand } from "@/lib/brands";
+import { featuredBrandsForGuestHome } from "@/lib/guest-home-featured-brands";
 import type { ReactNode } from "react";
 
 /* ── Icon set (Lucide-style, 24×24, 1.5px stroke) ─────────────────────── */
@@ -78,7 +79,7 @@ function IconBadge({ icon }: { icon: ReactNode }) {
  * personalized Member Home dashboard from Phase 3e instead.
  */
 export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
-  const featured = brands.slice(0, 5);
+  const featured = featuredBrandsForGuestHome(brands);
 
   return (
     <main className="overflow-hidden">
