@@ -81,7 +81,7 @@ export default async function RewardsPage() {
             <PreviewSignupBanner
               eyebrow="🎁 Member rewards"
               headline="Preview numbers aren’t your balance — start at 0"
-              body="Any high point totals you saw logged out were preview theater, not a real account. New members start at 0, then earn from visits, check-ins, and community. Soft-launch stocked redeemables (Nellie's): apron + recipe card 1,500 pts · house hot sauce 3-pack 2,200 pts — we don’t market empty Gold/Platinum SKUs."
+              body="Any high point totals you saw logged out were preview theater, not a real account. New members start at 0, then earn from visits, check-ins, and community. Nellie's Jackie launch: free dessert with entrée on join · 1,500 pts after 3 visits · birthday entrée up to $30. Bourbon & Cigar Night — September 23, 7:00 PM ET (Private Dining Room)."
               bullets={[
                 "New accounts start at 0 — then +100 welcome points after your profile",
                 "Ladder: Bronze → Platinum · Founding = first 100 · Premium ≈ Gold+ on gated specials",
@@ -119,9 +119,9 @@ export default async function RewardsPage() {
             </p>
             <p className="mt-3 text-xs text-white/50">
               Ladder: Bronze → Silver → Gold → Platinum (points from visits). Founding = first 100
-              members. Premium ≈ Gold+ on gated specials. Soft-launch stocked redeemables only:
-              apron + recipe card 1,500 pts · house hot sauce 3-pack 2,200 pts — we don&apos;t market
-              empty Gold/Platinum SKUs.
+              members. Premium ≈ Gold+ on gated specials. Jackie launch perks are join / 3-visit /
+              birthday-month rules — not 1-pt merch SKUs. We don&apos;t market empty Gold/Platinum
+              catalogs or apron/hot sauce redeemables.
             </p>
             <div className="mt-8 space-y-4">
               <div className="flex items-center justify-between text-sm text-white/70">

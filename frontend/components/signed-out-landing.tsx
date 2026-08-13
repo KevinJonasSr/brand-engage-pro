@@ -216,7 +216,7 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
             {
               n: "03",
               title: "Redeem what’s actually stocked",
-              body: "Points cash in for live brand rewards (soft launch: apron 1,500 · hot sauce 2,200). We don’t market empty Gold/Platinum SKUs.",
+              body: "Points cash in for live brand rewards. Nellie's Jackie launch: dessert on join, 1,500 pts after 3 visits, birthday entrée. We don’t market empty Gold/Platinum SKUs.",
               icon: <IconGift />,
             },
           ].map((step) => (
@@ -277,7 +277,7 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
                 },
                 {
                   title: "Stocked rewards",
-                  body: "Soft launch: Nellie's apron 1,500 pts + hot sauce 2,200 pts. New accounts start at 0 — no empty Gold/Platinum catalog.",
+                  body: "Jackie launch: free dessert with entrée on join, 1,500 pts after 3 visits, birthday entrée up to $30. New accounts start at 0 — no empty Gold/Platinum catalog.",
                   icon: <IconGift />,
                 },
               ].map((f) => (

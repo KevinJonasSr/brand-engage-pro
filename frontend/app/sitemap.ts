@@ -18,10 +18,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
-      url: `${appUrl}/brands`,
+      url: `${appUrl}/events`,
       lastModified: now,
       changeFrequency: "weekly",
-      priority: 0.8,
+      priority: 0.7,
     },
     {
       url: `${appUrl}/terms`,

@@ -20,6 +20,12 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { embedText, pgvectorLiteral, slugToSourceId, EmbeddingError } from "@/lib/embeddings";
 import { cachedEmbedQuery } from "./embed-cache";
+import {
+  NELLIES_BRAND_SLUG,
+  isBourbonCigarTitle,
+  isNelliesHiddenTitle,
+  isNelliesPublishedOfferTitle,
+} from "@/lib/nellies-launch";
 import type {
   SearchHit,
   SearchHitData,
@@ -327,6 +333,13 @@ async function fetchAllSourceRows(
           active: boolean;
         }>) {
           if (!row.active) continue;
+          if (isNelliesHiddenTitle(row.title)) continue;
+          if (
+            row.brand_slug === NELLIES_BRAND_SLUG &&
+            !isBourbonCigarTitle(row.title)
+          ) {
+            continue;
+          }
           out.brand_events.set(row.id, {
             kind: "event",
             id: row.id,
@@ -358,6 +371,8 @@ async function fetchAllSourceRows(
           active: boolean;
         }>) {
           if (!row.active) continue;
+          if (isNelliesHiddenTitle(row.title)) continue;
+          if (row.community_id === NELLIES_BRAND_SLUG) continue;
           out.rewards_catalog.set(row.id, {
             kind: "reward",
             id: row.id,
@@ -389,6 +404,13 @@ async function fetchAllSourceRows(
           active: boolean;
         }>) {
           if (!row.active) continue;
+          if (isNelliesHiddenTitle(row.title)) continue;
+          if (
+            row.community_id === NELLIES_BRAND_SLUG &&
+            !isNelliesPublishedOfferTitle(row.title)
+          ) {
+            continue;
+          }
           out.specials.set(row.id, {
             kind: "special",
             id: row.id,

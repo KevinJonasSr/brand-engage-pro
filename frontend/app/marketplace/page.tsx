@@ -29,7 +29,7 @@ export default async function MarketplacePage() {
           <PreviewSignupBanner
             eyebrow="🛍️ Brand rewards"
             headline="Preview totals aren’t real — new accounts start at 0"
-            body="Logged-out preview banners never showed a real balance (and high sample numbers were misleading). Soft-launch stocked redeemables for Nellie's only: apron + recipe card (1,500 pts) and house hot sauce 3-pack (2,200 pts)."
+            body="Logged-out preview banners never showed a real balance (and high sample numbers were misleading). Nellie's Jackie launch: free dessert with entrée on join, 1,500 bonus points after 3 visits, birthday entrée up to $30. Bourbon & Cigar Night — September 23, 7:00 PM ET, Private Dining Room."
             bullets={[
               "Ladder: Bronze → Platinum from points you earn after joining",
               "Founding = first 100 · Premium ≈ Gold+ on gated specials",

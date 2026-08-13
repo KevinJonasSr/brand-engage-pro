@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { applyNelliesLaunchSpecials } from "@/lib/nellies-launch";
 
 /**
  * Time-windowed offers a brand publishes to its members.
@@ -53,10 +54,15 @@ export async function listSpecialsForBrand(
       .eq("brand_slug", brandSlug.toLowerCase())
       .eq("active", true)
       .order("sort_order");
-    if (error || !data) return [];
-    return data as Special[];
+    if (error || !data) {
+      return applyNelliesLaunchSpecials(brandSlug, []) as Special[];
+    }
+    return applyNelliesLaunchSpecials(
+      brandSlug,
+      data as Special[],
+    ) as Special[];
   } catch {
-    return [];
+    return applyNelliesLaunchSpecials(brandSlug, []) as Special[];
   }
 }
 
