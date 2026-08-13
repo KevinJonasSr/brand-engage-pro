@@ -31,7 +31,7 @@ Fork leftovers from Fan Engage (copy, CTAs, campaign kinds, marketplace music of
 
 **Security + guest-walk P0s from the original review are shipped on `main` and live.** Soft launch for a **single trusted admin + SMS-only** Nellie's **restaurant loyalty** club is the current ops posture.
 
-| Gate | Status on `main` @ `87ac19b` / live |
+| Gate | Status on `main` @ `c232393` / live |
 |---|---|
 | Unauthenticated `/api/debug-supabase` | **Shipped** — route removed in PR #7; prod **404** |
 | Admin email broadcast unscoped | **Shipped** — UI SMS-only; server rejects email/`both` unless `MAILCHIMP_BROADCAST_ENABLED=1` (PR #7) |
