@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { safeRelativePath } from "@/lib/safe-redirect";
+import { getPolicy } from "@/lib/data/policies";
 import SignupClient, { type ReferrerBrand } from "./signup-client";
 
 export const metadata = { title: "Sign up" };
@@ -65,13 +66,22 @@ export default async function SignupPage({
   const { data: { user } } = await supabase.auth.getUser();
   const sp = (await searchParams) ?? {};
   if (user) redirect(safeRelativePath(sp.next, "/"));
-  const [referrerName, referrerBrand] = await Promise.all([
+  const [referrerName, referrerBrand, terms, privacy] = await Promise.all([
     getReferrerName(),
     getReferrerBrand(sp.ref),
+    getPolicy("terms"),
+    getPolicy("privacy"),
   ]);
+  const consentDocs = [terms, privacy]
+    .filter((p): p is NonNullable<typeof p> => !!p && !p.is_draft)
+    .map((p) => ({ slug: p.slug, title: p.title, content_md: p.content_md }));
   return (
     <Suspense fallback={null}>
-      <SignupClient referrerName={referrerName} referrerBrand={referrerBrand} />
+      <SignupClient
+        referrerName={referrerName}
+        referrerBrand={referrerBrand}
+        consentDocs={consentDocs}
+      />
     </Suspense>
   );
 }
