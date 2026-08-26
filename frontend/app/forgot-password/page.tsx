@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { safeRelativePath } from "@/lib/safe-redirect";
+import { resolveAppUrl } from "@/lib/site-url";
 
 export default function ForgotPasswordPage() {
   return (
@@ -34,7 +35,7 @@ function ForgotPasswordForm() {
     setMessage("");
     try {
       const supabase = createClient();
-      const redirectTo = `${location.origin}/auth/callback?next=${encodeURIComponent("/reset-password")}`;
+      const redirectTo = `${resolveAppUrl()}/auth/callback?next=${encodeURIComponent("/reset-password")}`;
       const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
       if (error) throw error;
       setStatus("sent");

@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { resolveCommunityFromHost } from "@/lib/community";
+import { resolvePinnedCanonicalLocation } from "@/lib/site-url";
 
 /**
  * Routes a signed-in user must be able to reach.
@@ -55,11 +56,23 @@ function enforceAdminBasicAuth(request: NextRequest): NextResponse | null {
  * so previews of non-protected routes still work end-to-end.
  */
 export default async function proxy(request: NextRequest) {
-  // Layer 0: optional HTTP Basic Auth on /admin/*
+  // Layer 0: pin forbidden production aliases to www (308).
+  // brand-engage-pro.vercel.app and apex brandengagepro.com → www + path + query.
+  // Preview *.vercel.app hosts are not pinned.
+  const pinned = resolvePinnedCanonicalLocation(
+    request.headers.get("host"),
+    request.nextUrl.pathname,
+    request.nextUrl.search,
+  );
+  if (pinned) {
+    return NextResponse.redirect(pinned, 308);
+  }
+
+  // Layer 1: optional HTTP Basic Auth on /admin/*
   const basicAuthBlock = enforceAdminBasicAuth(request);
   if (basicAuthBlock) return basicAuthBlock;
 
-  // Layer 1: resolve the community from the hostname and stamp it on the
+  // Layer 2: resolve the community from the hostname and stamp it on the
   // request so downstream RSCs / server actions can scope their queries
   // via lib/community.ts::getCurrentCommunityId(). For brand-engage-pro
   // and localhost the resolver returns the DEFAULT (nellies), preserving

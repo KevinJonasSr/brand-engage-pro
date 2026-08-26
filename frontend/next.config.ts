@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { CANONICAL_PRODUCTION_ORIGIN, resolveAppUrl } from "./lib/site-url";
 
 const authSensitiveHeaders = [
   { key: "Cache-Control", value: "private, no-store, no-cache, max-age=0, must-revalidate, no-transform" },
@@ -36,7 +37,26 @@ const nextConfig: NextConfig = {
   async redirects() {
     // Soft-launch: /join is not a BEP surface (Fan Engage /join is separate).
     // Preserve query string (e.g. ?ref=nellies) so print/QR links still attribute.
+    const hostPin = (host: string) => [
+      {
+        source: "/",
+        has: [{ type: "host" as const, value: host }],
+        destination: `${CANONICAL_PRODUCTION_ORIGIN}/`,
+        permanent: true,
+      },
+      {
+        source: "/:path*",
+        has: [{ type: "host" as const, value: host }],
+        destination: `${CANONICAL_PRODUCTION_ORIGIN}/:path*`,
+        permanent: true,
+      },
+    ];
     return [
+      // brand-engage-pro.vercel.app (and apex landing) → www. 308.
+      // Apex already 308s to www at the edge — keep that. Query is preserved.
+      // Do not pin preview *.vercel.app hosts.
+      ...hostPin("brand-engage-pro.vercel.app"),
+      ...hostPin("brandengagepro.com"),
       {
         source: "/join",
         destination: "/signup",
@@ -60,7 +80,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Access-Control-Allow-Origin",
-            value: process.env.NEXT_PUBLIC_SITE_URL ?? "https://brand-engage-pro.vercel.app",
+            value: resolveAppUrl(),
           },
           {
             key: "Access-Control-Allow-Methods",
