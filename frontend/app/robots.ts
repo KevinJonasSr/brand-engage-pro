@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
+import { resolveAppUrl } from "@/lib/site-url";
 
-const appUrl =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://brand-engage-pro.vercel.app";
+const appUrl = resolveAppUrl();
 
 export default function robots(): MetadataRoute.Robots {
   return {

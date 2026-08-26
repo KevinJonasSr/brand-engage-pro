@@ -22,6 +22,8 @@ import {
 import { safeRelativePath } from "@/lib/safe-redirect";
 import { ConsentModal, type ConsentDoc } from "@/components/consent-modal";
 import { CONSENT_COPY, consentReviewTitle } from "@/lib/consent-accept";
+import { continueAfterPasswordSignup } from "@/lib/password-signup-continue";
+import { resolveAppUrl } from "@/lib/site-url";
 
 export type ReferrerBrand = {
   slug: string;
@@ -58,7 +60,8 @@ export default function SignupPage({
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
-  const [status, setStatus] = useState<"idle" | "loading" | "error" | "confirm">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
+  const appOrigin = resolveAppUrl();
   const [message, setMessage] = useState("");
   const turnstileRequired = isTurnstileRequired();
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
@@ -90,27 +93,9 @@ export default function SignupPage({
     setTurnstileKey((k) => k + 1);
   }, []);
 
-  // Resubmitting signUp() for the same address silently regenerates the
-  // confirmation token, invalidating whatever link is already in the inbox.
-  const CONFIRM_COOLDOWN_SECONDS = 45;
-  const [confirmCooldown, setConfirmCooldown] = useState(0);
-  const cooldownInterval = useRef<ReturnType<typeof setInterval> | null>(null);
-  useEffect(() => { return () => { if (cooldownInterval.current) clearInterval(cooldownInterval.current); }; }, []);
-
   useEffect(() => {
     if (turnstileRequired) prefetchTurnstileScript();
   }, [turnstileRequired]);
-
-  function startConfirmCooldown() {
-    setConfirmCooldown(CONFIRM_COOLDOWN_SECONDS);
-    if (cooldownInterval.current) clearInterval(cooldownInterval.current);
-    cooldownInterval.current = setInterval(() => {
-      setConfirmCooldown((s) => {
-        if (s <= 1) { if (cooldownInterval.current) clearInterval(cooldownInterval.current); return 0; }
-        return s - 1;
-      });
-    }, 1000);
-  }
 
   // Email regex — pragmatic, not RFC-perfect. Catches the common typos
   // (missing @, missing TLD, trailing space) without rejecting odd-but-
@@ -180,7 +165,6 @@ export default function SignupPage({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (confirmCooldown > 0) return;
 
     // Inline validation BEFORE we hit Supabase. Surface field-specific
     // errors so a 6-char password isn't silently rejected as a generic
@@ -195,25 +179,18 @@ export default function SignupPage({
       return;
     }
 
-    // Confirmation resend already passed the gate — don't re-trap on a
-    // remounted / failed widget.
-    const resending = status === "confirm";
-    if (!resending) {
-      // Verify Turnstile *before* the consent modal. Tokens are single-use and
-      // ~5min TTL; reading ToS behind the modal would otherwise race the
-      // widget (which sits under the overlay and can't be refreshed).
-      setStatus("loading");
-      setMessage("");
-      const ok = await ensureCaptcha();
-      if (!ok) return;
+    // Verify Turnstile *before* the consent modal. Tokens are single-use and
+    // ~5min TTL; reading ToS behind the modal would otherwise race the
+    // widget (which sits under the overlay and can't be refreshed).
+    setStatus("loading");
+    setMessage("");
+    const ok = await ensureCaptcha();
+    if (!ok) return;
 
-      // Explicit, logged consent is required before an account is created.
-      // Hold here and let the consent modal drive the actual submit.
-      setStatus("idle");
-      setConsentOpen(true);
-      return;
-    }
-    await createAccount();
+    // Explicit, logged consent is required before an account is created.
+    // Hold here and let the consent modal drive the actual submit.
+    setStatus("idle");
+    setConsentOpen(true);
   }
 
   async function createAccount(consentVersion?: string) {
@@ -223,8 +200,7 @@ export default function SignupPage({
     // Prefer the pre-consent verification; fall back to a live verify when
     // createAccount is reached without that one-shot (shouldn't happen in
     // the normal consent path, but keeps the no-docs path safe on retry).
-    // Skip on confirmation resend — the account already exists.
-    if (status !== "confirm" && !(await ensureCaptcha())) return;
+    if (!(await ensureCaptcha())) return;
     captchaVerifiedRef.current = false;
 
     try {
@@ -233,7 +209,9 @@ export default function SignupPage({
         email,
         password,
         options: {
-          emailRedirectTo: `${location.origin}/auth/callback?next=${encodeURIComponent(postSignupHref)}`,
+          // Never $VERCEL_URL / vercel.app / apex — www only. Confirm-email
+          // is not the member path (PKCE email links fail).
+          emailRedirectTo: `${appOrigin}/auth/callback?next=${encodeURIComponent(postSignupHref)}`,
           data: consentVersion
             ? {
                 consent_accepted_at: new Date().toISOString(),
@@ -244,18 +222,21 @@ export default function SignupPage({
       });
       if (error) throw error;
 
-      // If email confirmation is OFF in Supabase, Supabase returns a session here
-      // and we can push straight into onboarding.
-      if (data.session) {
+      const continued = await continueAfterPasswordSignup({
+        session: data.session,
+        email,
+        password,
+        signInWithPassword: (credentials) =>
+          supabase.auth.signInWithPassword(credentials),
+      });
+      if (continued.ok) {
         router.push(postSignupHref);
         router.refresh();
         return;
       }
 
-      // Otherwise Supabase emailed a confirmation link — prompt them to check it.
-      setStatus("confirm");
-      setMessage("Check your email to confirm and finish signing up.");
-      startConfirmCooldown();
+      setStatus("error");
+      setMessage(continued.message);
     } catch (err) {
       setStatus("error");
       setMessage(err instanceof Error ? err.message : "Unable to create account.");
@@ -477,43 +458,18 @@ export default function SignupPage({
 
           <button
             type="submit"
-            disabled={
-              status === "loading" ||
-              confirmCooldown > 0 ||
-              (status !== "confirm" && !canSubmitSignup)
-            }
+            disabled={status === "loading" || !canSubmitSignup}
             className="w-full rounded-full bg-gradient-to-r from-aurora to-ember px-4 py-3 text-sm font-semibold text-white shadow-glass disabled:opacity-60"
           >
             {signupTurnstileButtonLabel({
-              cooldown: confirmCooldown,
+              cooldown: 0,
               status,
               gate: turnstileGate,
             })}
           </button>
         </form>
 
-        {status === "confirm" && (
-          <div className="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4">
-            <p className="text-sm font-semibold text-emerald-200">
-              Almost there — what happens next:
-            </p>
-            <ol className="mt-3 space-y-2 text-xs text-emerald-100/90">
-              <li className="flex gap-2">
-                <span className="font-mono text-emerald-300/70">1.</span>
-                <span>Check your email and click the confirmation link we just sent.</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="font-mono text-emerald-300/70">2.</span>
-                <span>Set up your member profile — 60 seconds, no credit card.</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="font-mono text-emerald-300/70">3.</span>
-                <span>Unlock your first member perk and start earning points.</span>
-              </li>
-            </ol>
-          </div>
-        )}
-        {message && status !== "confirm" && (
+        {message && (
           <p
             className={`text-sm ${
               status === "error" ? "text-red-300" : "text-emerald-300"

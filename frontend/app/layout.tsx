@@ -15,6 +15,7 @@ import { getUnreadCount } from "@/lib/data/notifications";
 import { getCurrentCommunityId } from "@/lib/community";
 import { getEntitlement } from "@/lib/entitlements";
 import { getAdminContext } from "@/lib/admin";
+import { resolveAppUrl } from "@/lib/site-url";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-body" });
 const spaceGrotesk = Space_Grotesk({
@@ -23,8 +24,7 @@ const spaceGrotesk = Space_Grotesk({
   variable: "--font-display",
 });
 
-const appUrl =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://brand-engage-pro.vercel.app";
+const appUrl = resolveAppUrl();
 
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),

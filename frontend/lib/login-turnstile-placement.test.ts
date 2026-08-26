@@ -4,7 +4,7 @@ import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const loginPage = readFileSync(
-  fileURLToPath(new URL("../app/login/page.tsx", import.meta.url)),
+  fileURLToPath(new URL("../app/login/login-client.tsx", import.meta.url)),
   "utf8",
 );
 const passwordFormStart = loginPage.indexOf("<form onSubmit={handlePassword}");
