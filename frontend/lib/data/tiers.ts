@@ -39,8 +39,8 @@ const FALLBACK: Tier[] = [
  *
  * Mapping for CS / soft launch:
  * - Bronze → Platinum = points ladder from visits
- * - Founding = first 100 members (paid/recognition track, not a points tier)
- * - Premium ≈ Gold+ access on gated specials/events
+ * - Founding = free first-100 join badge (not a points tier, not Premium)
+ * - Premium = separate paid club ($10/mo / $99/yr) ≈ Gold+ on gated specials
  */
 export async function getTiers(): Promise<Tier[]> {
   try {

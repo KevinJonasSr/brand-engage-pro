@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getBrandFromDb } from "@/lib/data/brands";
 import { getMemberProfileSlug } from "@/lib/data/member-profile";
 import { listRewardsForCommunity, listMyRedemptions } from "@/lib/data/rewards";
+import { resolveBrandSlug } from "@/lib/brand-aliases";
 import { NELLIES_BRAND_SLUG } from "@/lib/nellies-launch";
 import RewardCardWithForm from "./reward-card";
 
@@ -16,7 +17,7 @@ async function MemberPoints({ isSignedIn }: { isSignedIn: boolean }) {
         <p className="text-xs uppercase tracking-wide text-white/60">Your points</p>
         <p className="mt-1 text-2xl font-bold text-white">0</p>
         <p className="mt-1 text-xs text-white/50">
-          Preview only — new accounts start at 0. Sign in to earn and redeem.
+          Sign in to earn and redeem. New accounts start at 0.
         </p>
       </div>
     );
@@ -49,7 +50,8 @@ export default async function RewardsPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = resolveBrandSlug(rawSlug);
   const supabase = await createClient();
   const {
     data: { user },
@@ -86,14 +88,14 @@ export default async function RewardsPage({
               </>
             ) : (
               <>
-                Earn points from visits and check-ins, then redeem live brand rewards. New accounts
-                start at 0. We don&apos;t list empty Gold/Platinum redeemables.
+                Earn points from visits and check-ins, then redeem live brand rewards.
+                Digital unlocks and member perks for this club live here.
               </>
             )}
           </p>
           <p className="mt-2 text-xs text-white/45">
-            Ladder: Bronze → Platinum (points). Founding = first 100. Premium ≈ Gold+ on gated
-            specials. Preview banners elsewhere are not your balance — new accounts start at 0.
+            Ladder: Bronze → Platinum (points). Founding = free first 100. Premium = separate paid.
+            specials. Your balance starts at 0 after you join.
           </p>
         </div>
 
@@ -101,8 +103,7 @@ export default async function RewardsPage({
           <div className="mb-6 rounded-2xl border border-aurora/40 bg-gradient-to-r from-aurora/20 via-slate-900 to-ember/20 px-5 py-4">
             <p className="text-sm font-semibold">Browse rewards — redeem after you join</p>
             <p className="mt-1 text-xs text-white/70">
-              Preview points below are not a real balance. New accounts start at 0, then earn +100
-              welcome points when you finish your profile.
+              Finish your profile for +100 welcome points, then earn from visits and check-ins.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Link

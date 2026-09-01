@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { relativeTime } from "@/lib/format/relative-time";
+import { filterJgeLaunchEvents } from "@/lib/jge-launch";
 import { filterNelliesLaunchLatestCards } from "@/lib/nellies-launch";
 
 type CardKind = "post" | "event" | "drop" | "prediction";
@@ -39,7 +40,10 @@ const KIND_COLOR: Record<CardKind, string> = {
  * then BEP names (brand_events, etc.). Whichever returns rows wins.
  */
 export async function LatestStrip({ slug }: { slug: string }) {
-  const cards = filterNelliesLaunchLatestCards(slug, await collect(slug));
+  const cards = filterJgeLaunchEvents(
+    slug,
+    filterNelliesLaunchLatestCards(slug, await collect(slug)),
+  );
   if (cards.length === 0) return null;
 
   // Sort: future events first (closest first), then by recency.

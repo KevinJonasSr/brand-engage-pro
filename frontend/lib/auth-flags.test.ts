@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 import { isForgotPasswordEnabled, isMagicLinkEnabled } from "./auth-flags.ts";
@@ -14,6 +14,10 @@ const loginClient = readFileSync(
 );
 const envExample = readFileSync(
   fileURLToPath(new URL("../.env.example", import.meta.url)),
+  "utf8",
+);
+const forgotPage = readFileSync(
+  fileURLToPath(new URL("../app/forgot-password/page.tsx", import.meta.url)),
   "utf8",
 );
 
@@ -72,5 +76,15 @@ describe("auth door flags", () => {
     assert.match(envExample, /NEXT_PUBLIC_FORGOT_PASSWORD_ENABLED/);
     assert.doesNotMatch(envExample, /^NEXT_PUBLIC_MAGIC_LINK_ENABLED=true/m);
     assert.doesNotMatch(envExample, /^NEXT_PUBLIC_FORGOT_PASSWORD_ENABLED=true/m);
+  });
+
+  it("gates /forgot-password to /login while HOLD and does not ship /magic-link", () => {
+    assert.match(forgotPage, /isForgotPasswordEnabled\(\)/);
+    assert.match(forgotPage, /redirect\("\/login"\)/);
+    assert.doesNotMatch(forgotPage, /Send reset link/);
+    const magicLinkPage = fileURLToPath(
+      new URL("../app/magic-link/page.tsx", import.meta.url),
+    );
+    assert.equal(existsSync(magicLinkPage), false);
   });
 });

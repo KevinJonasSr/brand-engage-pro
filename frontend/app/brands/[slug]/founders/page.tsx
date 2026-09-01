@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { listBrands } from "@/lib/brands";
 import { getBrandFromDb } from "@/lib/data/brands";
+import { getFoundingClaims } from "@/lib/founding";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
@@ -41,7 +42,7 @@ export async function generateMetadata(
   if (!brand) return { title: "Founder Wall" };
   return {
     title: `Founding Members · ${brand.name}`,
-    description: `See the founding members of ${brand.name} — the first paying community members with locked-in pricing for life.`,
+    description: `See the founding members of ${brand.name} — the free first 100 who join.`,
   };
 }
 
@@ -94,9 +95,10 @@ async function getFoundersForCommunity(
         };
       });
 
+    const claims = await getFoundingClaims(communitySlug);
     return {
       founders,
-      founderCap: (community.founder_cap as number) ?? 100,
+      founderCap: claims.cap,
     };
   } catch {
     return null;
@@ -161,7 +163,7 @@ export default async function FounderWallPage({
           Founding Members of {brand.name}
         </h1>
         <p className="mt-3 max-w-2xl text-lg text-white/80">
-          The first {founderCap} paying members — locked-in pricing for life
+          The free first 100 who join — a Founding badge. Premium is a separate paid club.
         </p>
       </section>
 
@@ -198,14 +200,14 @@ export default async function FounderWallPage({
         <section className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-12 text-center">
           <p className="text-lg font-semibold">Be the first.</p>
           <p className="mt-2 text-sm text-white/70">
-            Founder slots #{1}-{founderCap} are up for grabs. Claim yours and lock in
-            premium pricing for life.
+            Founding badges #{1}-{founderCap} go to the first members who join — free,
+            not a Premium purchase.
           </p>
           <Link
-            href={`/premium?c=${encodeURIComponent(slug)}`}
+            href={`/signup?ref=${encodeURIComponent(slug)}&next=${encodeURIComponent(`/brands/${slug}/founders`)}`}
             className="mt-6 inline-block rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-3 text-sm font-semibold text-white shadow-lg hover:brightness-110"
           >
-            Become a Founding Member →
+            Join free for a Founding badge →
           </Link>
         </section>
       ) : (
@@ -274,7 +276,7 @@ export default async function FounderWallPage({
         <p className="mt-2 text-sm text-white/70">
           {isFull
             ? "All founder slots are claimed. Join as a Standard Premium member to access the same perks."
-            : "Join the first founding members with locked-in pricing for life."}
+            : "Join free to claim a Founding badge. Premium ($10/mo or $99/yr) is separate paid."}
         </p>
         <Link
           href={`/premium?c=${encodeURIComponent(slug)}`}

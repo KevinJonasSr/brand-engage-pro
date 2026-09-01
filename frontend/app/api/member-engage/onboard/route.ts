@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { emitNetworkEvent } from "@/lib/network";
+import { claimFreeFoundingOnJoin } from "@/lib/founding";
 
 export const runtime = "nodejs";
 
@@ -204,6 +205,21 @@ export async function POST(request: Request) {
         },
         { onConflict: "member_id,community_id" },
       );
+      await claimFreeFoundingOnJoin(user.id, "nellies");
+      const favorite = typeof payload.favoriteBrand === "string"
+        ? payload.favoriteBrand.trim().toLowerCase()
+        : "";
+      if (favorite && favorite !== "nellies" && /^[a-z0-9-]{1,64}$/.test(favorite)) {
+        await admin.from("member_community_memberships").upsert(
+          {
+            member_id: user.id,
+            community_id: favorite,
+            status: "active",
+          },
+          { onConflict: "member_id,community_id" },
+        );
+        await claimFreeFoundingOnJoin(user.id, favorite);
+      }
       const { error: perkErr } = await admin.rpc("grant_nellies_welcome_dessert", {
         p_member_id: user.id,
       });

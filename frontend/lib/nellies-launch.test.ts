@@ -59,6 +59,11 @@ describe("Nellie's Jackie launch fixture", () => {
     assert.equal(isNelliesHiddenTitle("Bourbon & Cigar Night"), false);
   });
 
+  it("does not rewrite JGE Music Row House Tour", () => {
+    const rows = [{ id: "jge-1", title: "Music Row House Tour" }];
+    assert.deepEqual(applyNelliesLaunchSpecials("jonas-group-ent", rows), rows);
+  });
+
   it("injects Jackie’s three onto the brand-page specials surface", () => {
     const shown = applyNelliesLaunchSpecials("nellies", [
       {
@@ -275,6 +280,10 @@ describe("guest surfaces", () => {
     assert.match(eventsPage, /NELLIES_BOURBON_WHEN|7:00 PM ET/);
     assert.match(eventsPage, /NELLIES_BOURBON_LOCATION|Private Dining Room/);
     assert.doesNotMatch(eventsPage, /Rooftop/);
+    assert.match(eventsPage, /Sign in to RSVP/);
+    assert.match(eventsPage, /Join to RSVP/);
+    assert.match(eventsPage, /\/login\?next=/);
+    assert.doesNotMatch(eventsPage, /RSVP on the brand page/);
   });
 
   it("renders Jackie’s three on the Nellie brand page source", () => {
@@ -284,6 +293,10 @@ describe("guest surfaces", () => {
     );
     assert.match(brandPage, /jackieLaunchSpecials|NELLIES_PUBLISHED_OFFERS/);
     assert.match(brandPage, /NELLIES_BRAND_SLUG/);
+    assert.match(brandPage, /Sign in to RSVP/);
+    assert.match(brandPage, /Join to RSVP/);
+    assert.match(brandPage, /\/premium\?c=/);
+    assert.match(brandPage, /founders/);
   });
 
   it("hardcodes Nellie fallback with PDR, no apron/hot sauce merch, no Rooftop", () => {

@@ -21,9 +21,13 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { embedText, pgvectorLiteral, slugToSourceId, EmbeddingError } from "@/lib/embeddings";
 import { cachedEmbedQuery } from "./embed-cache";
 import {
+  JGE_BRAND_SLUG,
+  isJgeHiddenTitle,
+  isJgePublishedSpecialTitle,
+} from "@/lib/jge-launch";
+import {
   NELLIES_BRAND_SLUG,
   isBourbonCigarTitle,
-  isNelliesHiddenTitle,
   isNelliesPublishedOfferTitle,
   resolveBourbonGuestCopy,
 } from "@/lib/nellies-launch";
@@ -334,10 +338,11 @@ async function fetchAllSourceRows(
           active: boolean;
         }>) {
           if (!row.active) continue;
-          if (isNelliesHiddenTitle(row.title)) continue;
-          if (
-            row.brand_slug === NELLIES_BRAND_SLUG &&
-            !isBourbonCigarTitle(row.title)
+          if (row.brand_slug === NELLIES_BRAND_SLUG) {
+            if (!isBourbonCigarTitle(row.title)) continue;
+          } else if (
+            row.brand_slug === JGE_BRAND_SLUG &&
+            isJgeHiddenTitle(row.title)
           ) {
             continue;
           }
@@ -375,8 +380,13 @@ async function fetchAllSourceRows(
           active: boolean;
         }>) {
           if (!row.active) continue;
-          if (isNelliesHiddenTitle(row.title)) continue;
           if (row.community_id === NELLIES_BRAND_SLUG) continue;
+          if (
+            row.community_id === JGE_BRAND_SLUG &&
+            isJgeHiddenTitle(row.title)
+          ) {
+            continue;
+          }
           out.rewards_catalog.set(row.id, {
             kind: "reward",
             id: row.id,
@@ -408,10 +418,15 @@ async function fetchAllSourceRows(
           active: boolean;
         }>) {
           if (!row.active) continue;
-          if (isNelliesHiddenTitle(row.title)) continue;
           if (
             row.community_id === NELLIES_BRAND_SLUG &&
             !isNelliesPublishedOfferTitle(row.title)
+          ) {
+            continue;
+          }
+          if (
+            row.community_id === JGE_BRAND_SLUG &&
+            !isJgePublishedSpecialTitle(row.title)
           ) {
             continue;
           }

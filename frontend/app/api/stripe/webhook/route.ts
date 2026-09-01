@@ -14,9 +14,8 @@ export const dynamic = "force-dynamic";
  * STRIPE_WEBHOOK_SECRET. Every event_id is recorded in stripe_events
  * for idempotency — replays are no-ops. Handled events:
  *
- *   customer.subscription.created  → flip membership to 'premium',
- *                                    assign founder slot if applicable,
- *                                    award Founding Member badge
+ *   customer.subscription.created  → flip membership to 'premium'
+ *                                    (Founding 100 is claimed on join, not here)
  *   customer.subscription.updated  → sync status (past_due / cancelled /
  *                                    active), period end, cancel-at-end
  *   customer.subscription.deleted  → revert to 'free', clear sub id
@@ -161,7 +160,7 @@ async function handleSubscriptionCreated(
   sub: Stripe.Subscription,
   admin: SupabaseClient,
 ) {
-  const { memberId, communityId, tier, billingPeriod } = parseSubMetadata(sub);
+  const { memberId, communityId, billingPeriod } = parseSubMetadata(sub);
   if (!memberId || !communityId) {
     console.warn("subscription.created: missing metadata", sub.id);
     return;
@@ -184,30 +183,7 @@ async function handleSubscriptionCreated(
     .eq("community_id", communityId);
   if (updErr) throw new Error(`membership update failed: ${updErr.message}`);
 
-  // Founder slot — only if subscription metadata marks them as a
-  // potential founder. The Postgres function serializes concurrent
-  // claims per community via advisory lock and returns null if the cap
-  // is hit.
-  if (tier === "founder") {
-    const { data: slot } = await admin.rpc("claim_founder_slot", {
-      p_member_id: memberId,
-      p_community_id: communityId,
-    });
-    if (typeof slot === "number" && slot > 0) {
-      // Phase 5e: route through award_community_badge so the member also
-      // gets the +500 pts ledger entry AND the in-app notification.
-      // Idempotent — ON CONFLICT DO NOTHING, returns false if already
-      // earned in this community (e.g. Stripe retry after a 5xx).
-      const { error: awardErr } = await admin.rpc("award_community_badge", {
-        p_member_id: memberId,
-        p_slug: "founding-member",
-        p_community_id: communityId,
-      });
-      if (awardErr) {
-        console.warn("founding-member badge award failed", awardErr);
-      }
-    }
-  }
+  // Founding 100 is claimed on join (free), not on Premium checkout.
 }
 
 async function handleSubscriptionUpdated(

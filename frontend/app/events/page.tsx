@@ -74,12 +74,26 @@ export default async function EventsPage() {
             Cap {bourbon?.capacity ?? NELLIES_BOURBON_CAPACITY}
           </p>
         </div>
-        <Link
-          href="/brands/nellies#upcoming"
-          className="inline-block text-sm text-aurora underline underline-offset-2"
-        >
-          RSVP on the brand page →
-        </Link>
+        <div className="flex flex-wrap items-center gap-3 pt-2">
+          <Link
+            href={`/login?next=${encodeURIComponent("/brands/nellies#upcoming")}`}
+            className="rounded-full bg-gradient-to-r from-aurora to-ember px-4 py-2 text-sm font-semibold text-white"
+          >
+            Sign in to RSVP
+          </Link>
+          <Link
+            href={`/signup?ref=nellies&next=${encodeURIComponent("/brands/nellies#upcoming")}`}
+            className="rounded-full border border-white/25 px-4 py-2 text-sm font-medium text-white/85 hover:bg-white/10"
+          >
+            Join to RSVP
+          </Link>
+          <Link
+            href="/brands/nellies#upcoming"
+            className="text-sm text-white/70 underline-offset-2 hover:text-white hover:underline"
+          >
+            View on the brand page
+          </Link>
+        </div>
       </section>
     </main>
   );

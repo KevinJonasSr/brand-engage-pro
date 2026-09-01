@@ -29,12 +29,12 @@ export default async function MarketplacePage() {
         {!isSignedIn && (
           <PreviewSignupBanner
             eyebrow="🛍️ Brand rewards"
-            headline="Preview totals aren’t real — new accounts start at 0"
-            body="Logged-out preview banners never showed a real balance (and high sample numbers were misleading). Nellie's Jackie launch: free dessert with entrée on join, 1,500 bonus points after 3 visits, birthday entrée up to $30. Bourbon & Cigar Night — September 23, 7:00 PM ET, Private Dining Room."
+            headline="Join to unlock brand rewards"
+            body="Earn points after you join, then redeem on each brand’s rewards page. Nellie's Jackie launch: free dessert with entrée on join, 1,500 bonus points after 3 visits, birthday entrée up to $30. Bourbon & Cigar Night — September 23, 7:00 PM ET, Private Dining Room."
             bullets={[
               "Ladder: Bronze → Platinum from points you earn after joining",
-              "Founding = first 100 · Premium ≈ Gold+ on gated specials",
-              "We don’t market empty Gold/Platinum redeemables",
+              "Founding = free first 100 · Premium = separate paid club",
+              "Live unlocks sit on each brand page — this list is stocked catalog only",
             ]}
             primaryCta="Sign up free →"
             nextPath="/marketplace"
@@ -45,41 +45,57 @@ export default async function MarketplacePage() {
         <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-amber-900/30 via-slate-900 to-midnight p-6 shadow-glass">
           <p className="text-sm uppercase tracking-wide text-white/60">Marketplace</p>
           <h1 className="mt-2 text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
-            Stocked brand rewards only
+            Brand rewards
           </h1>
           <p className="mt-4 text-sm text-white/70">
-            Soft launch lists what&apos;s actually stocked on the brand rewards page — not a
-            Gold/Platinum catalog of empty SKUs. Prefer{" "}
+            Catalog items you can redeem with points you earn after joining. Jackie launch
+            perks and digital unlocks live on each{" "}
             <Link href={brandRewardsHref} className="text-aurora underline underline-offset-2">
               brand rewards
             </Link>{" "}
-            for redeem + pickup.
+            page.
           </p>
         </section>
 
         {rewards.length === 0 ? (
           <section className="glass-card p-8 text-center">
             <h2 className="text-xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
-              No stocked rewards yet
+              Live unlocks are on brand pages
             </h2>
             <p className="mt-3 text-sm text-white/60">
               {communityId.toLowerCase() === NELLIES_BRAND_SLUG ? (
                 <>
-                  Join Nellie&apos;s to earn points from visits and check-ins. Jackie launch perks
-                  live on the brand page: welcome dessert with entrée, 1,500 pts after 3 visits,
-                  birthday entrée up to $30, and Bourbon &amp; Cigar Night (September 23, Private
-                  Dining Room).
+                  Nellie&apos;s Jackie launch perks (welcome dessert, 1,500 pts after 3 visits,
+                  birthday entrée, Bourbon &amp; Cigar Night) live on the brand page — they are
+                  not catalog SKUs. Jonas Group Entertainment lists member rewards (signed lyric
+                  sheets, catalog vinyl) on its brand rewards page.
                 </>
               ) : (
-                <>Check the brand rewards page for live redeemables.</>
+                <>
+                  Check each brand&apos;s rewards page for live redeemables and digital unlocks.
+                  Nellie&apos;s Jackie launch perks sit on the brand page; JGE lists member
+                  rewards on{" "}
+                  <Link href="/brands/jonas-group-ent/rewards" className="text-aurora underline underline-offset-2">
+                    /brands/jonas-group-ent/rewards
+                  </Link>
+                  .
+                </>
               )}
             </p>
-            <Link
-              href={brandRewardsHref}
-              className="mt-6 inline-block rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white"
-            >
-              Go to brand rewards →
-            </Link>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              <Link
+                href={brandRewardsHref}
+                className="inline-block rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white"
+              >
+                Go to brand rewards →
+              </Link>
+              <Link
+                href="/brands/jonas-group-ent/rewards"
+                className="inline-block rounded-full border border-white/25 px-5 py-3 text-sm font-medium text-white/85 hover:bg-white/10"
+              >
+                JGE rewards
+              </Link>
+            </div>
           </section>
         ) : (
           <section className="grid gap-4 md:grid-cols-2">

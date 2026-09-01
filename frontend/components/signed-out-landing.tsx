@@ -263,7 +263,7 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
               {[
                 {
                   title: "Tier Journey",
-                  body: "Bronze → Platinum from points. Founding = first 100. Premium ≈ Gold+ on gated specials.",
+                  body: "Bronze → Platinum from points. Founding = free first 100. Premium is a separate paid club.",
                   icon: <IconTrophy />,
                 },
                 {

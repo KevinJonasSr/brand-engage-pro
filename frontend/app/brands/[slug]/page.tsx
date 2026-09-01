@@ -12,7 +12,6 @@ import { getRsvpMetaForEvents } from "@/lib/data/events";
 import { listSpecialsForBrand, formatRecurrence } from "@/lib/data/specials";
 import { getCurrentMember } from "@/lib/data/member";
 import { canAccess, getViewerEntitlement } from "@/lib/entitlements";
-import { createAdminClient } from "@/lib/supabase/admin";
 import PremiumPaywall from "@/components/premium-paywall";
 import DropCountdown from "@/components/drop-countdown";
 import SocialIcon from "@/components/social-icon";
@@ -27,6 +26,9 @@ import { getActivityPulse } from "@/lib/data/activity-pulse";
 import StampCard from "@/components/stamp-card";
 import { getStampCardData } from "@/lib/data/stamp-card";
 import { getActiveGoalsWithProgress } from "@/lib/goals/progress";
+import { resolveBrandSlug } from "@/lib/brand-aliases";
+import { getFoundingClaims } from "@/lib/founding";
+import { JGE_BRAND_SLUG } from "@/lib/jge-launch";
 import {
   NELLIES_BRAND_SLUG,
   jackieLaunchSpecials,
@@ -46,7 +48,8 @@ export async function generateStaticParams() {
 export async function generateMetadata(
   { params }: { params: Promise<{ slug: string }> },
 ): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = resolveBrandSlug(rawSlug);
   const brand = await getBrandFromDb(slug);
   if (!brand) return { title: "Brand" };
   return {
@@ -57,25 +60,8 @@ export async function generateMetadata(
 
 async function getFounderCount(communitySlug: string): Promise<{ count: number; cap: number } | null> {
   try {
-    const admin = createAdminClient();
-    const { data: community, error: communityError } = await admin
-      .from("communities")
-      .select("founder_cap")
-      .eq("slug", communitySlug)
-      .maybeSingle();
-    if (communityError || !community) return null;
-
-    const { count, error: countError } = await admin
-      .from("member_community_memberships")
-      .select("*", { count: "exact", head: true })
-      .eq("community_id", communitySlug)
-      .eq("is_founder", true);
-    if (countError || count === null) return null;
-
-    return {
-      count,
-      cap: (community.founder_cap as number) ?? 100,
-    };
+    const claims = await getFoundingClaims(communitySlug);
+    return { count: claims.claimed, cap: claims.cap };
   } catch {
     return null;
   }
@@ -86,7 +72,8 @@ export default async function BrandPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = resolveBrandSlug(rawSlug);
   const [brand, member, isFollowing, entitlement, founderData, specials] = await Promise.all([
     getBrandFromDb(slug),
     getCurrentMember(),
@@ -131,9 +118,11 @@ export default async function BrandPage({
         : "Premium members get access to member-only perks, exclusive drops, and the things we save for the inner circle.",
     events: isRestaurant
       ? "Premium members get access to intimate member events, early RSVPs, and behind-the-scenes-only moments."
-      : isMusic
-        ? "Premium members get access to intimate listening parties, early ticket access, and backstage-only moments."
-        : "Premium members get access to member-only events, early RSVPs, and behind-the-scenes-only moments.",
+      : slug === JGE_BRAND_SLUG
+        ? "Premium is a separate paid membership. Live JGE access is the house tour, early writer/artist listens, and capped rotating live sessions."
+        : isMusic
+          ? "Premium members get access to member-only sessions, early RSVPs, and backstage-only moments."
+          : "Premium members get access to member-only events, early RSVPs, and behind-the-scenes-only moments.",
   };
   const ctaGradient = `linear-gradient(to right, ${brand.accentFrom}, ${brand.accentTo})`;
 
@@ -237,18 +226,36 @@ export default async function BrandPage({
       </section>
 
       {/* Founder wall link */}
-      {showFounderLink && (
-        <section className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-4">
+      <section className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-4">
+        <p className="text-xs uppercase tracking-wide text-white/50">
+          Optional upgrades
+        </p>
+        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+          {showFounderLink ? (
+            <Link
+              href={`/brands/${brand.slug}/founders`}
+              className="inline-flex items-center gap-2 font-medium text-white/80 transition hover:text-white"
+            >
+              👑 {(founderData?.count ?? 0) === 0
+                ? "Be one of the first 100 Founding Members"
+                : `See the ${founderData!.count} Founding ${founderData!.count === 1 ? "Member" : "Members"}`}{" "}→
+            </Link>
+          ) : (
+            <Link
+              href={`/brands/${brand.slug}/founders`}
+              className="inline-flex items-center gap-2 font-medium text-white/80 transition hover:text-white"
+            >
+              Founding Members →
+            </Link>
+          )}
           <Link
-            href={`/brands/${slug}/founders`}
-            className="inline-flex items-center gap-2 text-sm font-medium text-white/80 hover:text-white transition"
+            href={`/premium?c=${encodeURIComponent(brand.slug)}`}
+            className="text-white/70 underline-offset-4 hover:text-white hover:underline"
           >
-            👑 {(founderData?.count ?? 0) === 0
-              ? "Be one of the first 100 Founding Members"
-              : `See the ${founderData!.count} Founding ${founderData!.count === 1 ? "Member" : "Members"}`}{" "}→
+            Premium
           </Link>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* Activity pulse — anonymized social proof */}
       {pulse && <ActivityPulseStrip pulse={pulse} />}
@@ -498,6 +505,22 @@ export default async function BrandPage({
                       initialRsvped={rsvped}
                       atCapacity={atCapacity}
                     />
+                  )}
+                  {!isSignedIn && (
+                    <div className="flex shrink-0 flex-col items-end gap-1.5">
+                      <Link
+                        href={`/login?next=${encodeURIComponent(`/brands/${brand.slug}#upcoming`)}`}
+                        className="rounded-full bg-gradient-to-r from-aurora to-ember px-3 py-1 text-xs font-semibold text-white"
+                      >
+                        Sign in to RSVP
+                      </Link>
+                      <Link
+                        href={`/signup?ref=${encodeURIComponent(brand.slug)}&next=${encodeURIComponent(`/brands/${brand.slug}#upcoming`)}`}
+                        className="text-xs text-white/70 underline-offset-2 hover:text-white hover:underline"
+                      >
+                        Join to RSVP
+                      </Link>
+                    </div>
                   )}
                 </div>
                 {eventId && (

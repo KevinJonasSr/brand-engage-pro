@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { applyJgeLaunchSpecials } from "@/lib/jge-launch";
 import { applyNelliesLaunchSpecials } from "@/lib/nellies-launch";
 
 /**
@@ -55,14 +56,20 @@ export async function listSpecialsForBrand(
       .eq("active", true)
       .order("sort_order");
     if (error || !data) {
-      return applyNelliesLaunchSpecials(brandSlug, []) as Special[];
+      return applyJgeLaunchSpecials(
+        brandSlug,
+        applyNelliesLaunchSpecials(brandSlug, []) as Special[],
+      ) as Special[];
     }
-    return applyNelliesLaunchSpecials(
+    return applyJgeLaunchSpecials(
       brandSlug,
-      data as Special[],
+      applyNelliesLaunchSpecials(brandSlug, data as Special[]) as Special[],
     ) as Special[];
   } catch {
-    return applyNelliesLaunchSpecials(brandSlug, []) as Special[];
+    return applyJgeLaunchSpecials(
+      brandSlug,
+      applyNelliesLaunchSpecials(brandSlug, []) as Special[],
+    ) as Special[];
   }
 }
 

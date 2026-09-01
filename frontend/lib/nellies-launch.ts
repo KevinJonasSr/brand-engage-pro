@@ -278,7 +278,7 @@ export function applyNelliesLaunchSpecials<T extends { title: string; id: string
   rows: T[],
 ): Array<T | LaunchSpecial> {
   if (brandSlug.toLowerCase() !== NELLIES_BRAND_SLUG) {
-    return rows.filter((row) => !isNelliesHiddenTitle(row.title));
+    return rows;
   }
   const seeded = jackieLaunchSpecials();
   const slots: Array<T | LaunchSpecial> = [...seeded];
@@ -344,7 +344,7 @@ export function applyNelliesLaunchEvents<
 >(brandSlug: string, rows: T[]): LaunchEvent[] {
   if (brandSlug.toLowerCase() !== NELLIES_BRAND_SLUG) {
     return rows
-      .filter((row) => row.active !== false && !isNelliesHiddenTitle(row.title))
+      .filter((row) => row.active !== false)
       .map((row) => ({
         id: row.id,
         title: row.title,
@@ -393,7 +393,7 @@ export function filterNelliesLaunchLatestCards<T extends LaunchLatestCard>(
   cards: T[],
 ): T[] {
   if (brandSlug.toLowerCase() !== NELLIES_BRAND_SLUG) {
-    return cards.filter((card) => !isNelliesHiddenTitle(card.title));
+    return cards;
   }
   const out: T[] = [];
   for (const card of cards) {
@@ -425,7 +425,7 @@ export function filterNelliesLaunchRewards<T extends { title: string }>(
   rows: T[],
 ): T[] {
   if (communityId.toLowerCase() !== NELLIES_BRAND_SLUG) {
-    return rows.filter((row) => !isNelliesHiddenTitle(row.title));
+    return rows;
   }
   return [];
 }

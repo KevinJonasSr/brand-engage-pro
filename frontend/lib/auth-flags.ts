@@ -25,8 +25,9 @@ export function isMagicLinkEnabled(env: EnvLike = process.env): boolean {
  * Forgot-password link on /login. Off when VERCEL_ENV /
  * NEXT_PUBLIC_VERCEL_ENV is production unless
  * NEXT_PUBLIC_FORGOT_PASSWORD_ENABLED is explicitly true.
- * /forgot-password may stay reachable by URL; do not link it from /login
- * in production. Do not set that flag in production.
+ * /forgot-password redirects to /login (no reset form) while HOLD.
+ * Do not link it from /login in production. Do not set that flag
+ * in production. /magic-link stays 404.
  */
 export function isForgotPasswordEnabled(env: EnvLike = process.env): boolean {
   if (isExplicitlyTrue(env.NEXT_PUBLIC_FORGOT_PASSWORD_ENABLED)) return true;

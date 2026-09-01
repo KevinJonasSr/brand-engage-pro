@@ -14,9 +14,18 @@ export const CANONICAL_PRODUCTION_ORIGIN = "https://www.brandengagepro.com";
 
 export const CANONICAL_PRODUCTION_HOST = "www.brandengagepro.com";
 
-/** Production aliases that must 308 to www + path + query. */
+/**
+ * Production aliases that must 308 to www + path + query.
+ * Sibling Vercel production hosts (not preview git-* / *-cursor-*) pin
+ * the same way as brand-engage-pro.vercel.app.
+ *
+ * Dashboard still needed: assign www.brandengagepro.com as the Production
+ * domain. Optional: add each host below as a Vercel alias so TLS answers
+ * there; this app then 308s to www. Do not add preview deploy hosts.
+ */
 export const FORBIDDEN_LANDING_HOSTS = [
   "brand-engage-pro.vercel.app",
+  "brand-engage-pro-jonas-group.vercel.app",
   "brandengagepro.com",
 ] as const;
 
@@ -65,10 +74,7 @@ export function resolvePinnedCanonicalLocation(
   search = "",
 ): string | null {
   const hostname = (host ?? "").split(":")[0].toLowerCase();
-  if (
-    hostname !== "brand-engage-pro.vercel.app" &&
-    hostname !== "brandengagepro.com"
-  ) {
+  if (!(FORBIDDEN_LANDING_HOSTS as readonly string[]).includes(hostname)) {
     return null;
   }
   const path = pathname.startsWith("/") ? pathname : `/${pathname}`;

@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { BRANDS as FALLBACK_BRANDS, type Brand } from "@/lib/brands";
+import { resolveBrandSlug } from "@/lib/brand-aliases";
+import { filterJgeLaunchEvents } from "@/lib/jge-launch";
 import {
   NELLIES_BRAND_SLUG,
   applyNelliesLaunchEvents,
@@ -62,15 +64,17 @@ function rowToBrand(row: BrandRow, events: BrandEvent[]): Brand {
         url: e.url ?? null,
         tier: (e.tier ?? "public") as "public" | "premium",
       }))
-    : events
-        .filter((e) => {
+    : filterJgeLaunchEvents(
+        row.slug,
+        events.filter((e) => {
           if (!e.active) return false;
           // Hide past events from the Upcoming strip (guest trust).
           if (e.starts_at) {
             return new Date(e.starts_at).getTime() >= Date.now();
           }
           return true;
-        })
+        }),
+      )
         .sort((a, b) => a.sort_order - b.sort_order)
         .map((e) => ({
           id: e.id,
@@ -108,7 +112,7 @@ function rowToBrand(row: BrandRow, events: BrandEvent[]): Brand {
 export async function getBrandFromDb(slug: string): Promise<Brand | null> {
   try {
     const supabase = await createClient();
-    const normalized = slug.toLowerCase();
+    const normalized = resolveBrandSlug(slug);
 
     const [{ data: brand, error: aErr }, { data: events, error: eErr }] = await Promise.all([
       supabase
@@ -131,7 +135,7 @@ export async function getBrandFromDb(slug: string): Promise<Brand | null> {
     }
     return rowToBrand(brand as BrandRow, (events ?? []) as BrandEvent[]);
   } catch {
-    return FALLBACK_BRANDS[slug.toLowerCase()] ?? null;
+    return FALLBACK_BRANDS[resolveBrandSlug(slug)] ?? null;
   }
 }
 
