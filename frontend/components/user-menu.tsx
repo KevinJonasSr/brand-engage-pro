@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
+import { hardSignOut } from "@/lib/auth-signout-browser";
 
 interface UserMenuProps {
   member: {
@@ -168,21 +168,14 @@ export default function UserMenu({ member, isAdmin, unreadCount = 0 }: UserMenuP
             {/* Divider before Sign out */}
             <div className="my-1 border-t border-white/10" />
 
-            {/* Sign out — client signOut + /logout (same door as typed URL).
-                Closing the menu first unmounted the old POST form before it
-                submitted, which is why header Sign out was a no-op. */}
+            {/* Sign out — wipe sb-* stores then GET /logout. Do not close
+                the menu first (that unmounted the old POST form). */}
             <button
               type="button"
               className="w-full px-4 py-2 text-left text-sm text-white/80 hover:bg-white/10 transition"
               role="menuitem"
-              onClick={async () => {
-                try {
-                  const supabase = createClient();
-                  await supabase.auth.signOut();
-                } catch {
-                  // still hit the server door
-                }
-                window.location.assign("/logout");
+              onClick={() => {
+                void hardSignOut();
               }}
             >
               Sign out

@@ -4,6 +4,7 @@ import { Suspense, useState, useCallback, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { clearBrowserAuthStorage } from "@/lib/auth-cookies";
 import {
   TurnstileWidget,
   isTurnstileRequired,
@@ -166,7 +167,14 @@ function LoginForm({
     setStatus("loading");
     setMessage("");
     try {
+      // Drop leftover walk-account cookies/session before minting this one.
       const supabase = createClient();
+      try {
+        await supabase.auth.signOut({ scope: "local" });
+      } catch {
+        // continue into password sign-in
+      }
+      clearBrowserAuthStorage();
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       router.push(next);

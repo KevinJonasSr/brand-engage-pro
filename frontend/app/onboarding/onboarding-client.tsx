@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo, useState } from "react";
 import { ArrowRight, Star } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import FirstSessionChecklist from "@/components/first-session-checklist";
+import { FAVORITE_BRAND_OPTIONS } from "@/lib/onboard-profile";
 
 type Field = {
   label: string;
@@ -19,17 +18,6 @@ type Field = {
   readOnly?: boolean;
   hint?: string;
 };
-
-const FAVORITE_BRAND_OPTIONS = [
-  "Restaurants & Food",
-  "Retail & Apparel",
-  "Fitness & Wellness",
-  "Beauty & Personal Care",
-  "Entertainment & Media",
-  "Travel & Hospitality",
-  "Tech & Gadgets",
-  "Other",
-];
 
 const steps: { title: string; description: string; fields: Field[] }[] = [
   {
@@ -122,49 +110,29 @@ const steps: { title: string; description: string; fields: Field[] }[] = [
   },
 ];
 
-export default function OnboardingWizard() {
-  const router = useRouter();
-  const [stepIndex, setStepIndex] = useState(0);
-  const [formState, setFormState] = useState<Record<string, string>>({});
+export default function OnboardingWizard({
+  initialForm = {},
+  initialStep = 0,
+}: {
+  initialForm?: Record<string, string>;
+  initialStep?: number;
+}) {
+  const [stepIndex, setStepIndex] = useState(initialStep);
+  const [formState, setFormState] = useState<Record<string, string>>(initialForm);
   const [smsStatus, setSmsStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [smsMessage, setSmsMessage] = useState("Ready to send the confirmation text.");
   const [finishStatus, setFinishStatus] = useState<"idle" | "saving" | "error">("idle");
   const [finishMessage, setFinishMessage] = useState<string | null>(null);
   const [tosConsent, setTosConsent] = useState(false);
-  // Tracks whether the email field was successfully auto-prefilled
-  // from auth.users. When true, the field stays readOnly. When false
-  // (anonymous, expired, OAuth without email scope), the field is
-  // editable AND required so onboarding doesn't dead-end.
-  const [emailAutoFilled, setEmailAutoFilled] = useState(false);
+  // Email comes from the server page (auth.users). When present the field
+  // stays readOnly. When missing, it is editable AND required so
+  // onboarding doesn't dead-end. No client getUser() bounce — that
+  // self-redirected mid-form when the session cookie flickered.
+  const [emailAutoFilled] = useState(Boolean(initialForm.email?.trim()));
   const [smsConsent, setSmsConsent] = useState(false);
-  // Server page already redirects anonymous visitors; this client gate
-  // avoids a wizard flash if the session drops mid-render.
-  const [authReady, setAuthReady] = useState(false);
 
   const currentStep = steps[stepIndex];
   const progress = useMemo(() => ((stepIndex + 1) / steps.length) * 100, [stepIndex]);
-
-  // Prefill email from the session. Unauthenticated bounce is handled by
-  // the server page; keep a client redirect as a safety net.
-  const searchParams = useSearchParams();
-  useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) {
-        const ref = searchParams.get("ref");
-        const params = new URLSearchParams();
-        params.set("next", "/onboarding");
-        if (ref) params.set("ref", ref);
-        router.replace(`/signup?${params.toString()}`);
-        return;
-      }
-      if (user.email) {
-        setFormState((prev) => ({ ...prev, email: user.email ?? "" }));
-        setEmailAutoFilled(true);
-      }
-      setAuthReady(true);
-    });
-  }, [router, searchParams]);
 
   const handleInput = (name: string, value: string) => {
     setFormState((prev) => ({ ...prev, [name]: value }));
@@ -216,6 +184,7 @@ export default function OnboardingWizard() {
     const favoriteBrand = resolveFavoriteBrand();
     fetch("/api/member-engage/onboard", {
       method: "POST",
+      credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         firstName: formState.firstName,
@@ -330,6 +299,7 @@ export default function OnboardingWizard() {
       const refCode = refFromUrl ?? refFromCookie;
       const onboardRes = await fetch("/api/member-engage/onboard", {
         method: "POST",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           firstName: formState.firstName,
@@ -347,8 +317,30 @@ export default function OnboardingWizard() {
         }),
       });
 
+      const body = (await onboardRes.json().catch(() => ({}))) as {
+        error?: string;
+        member?: { first_name?: string | null; interest?: string | null };
+      };
+
       if (!onboardRes.ok) {
-        throw new Error(`Onboarding save failed (${onboardRes.status})`);
+        setFinishMessage(
+          typeof body.error === "string"
+            ? body.error
+            : `Onboarding save failed (${onboardRes.status})`,
+        );
+        throw new Error(body.error ?? `Onboarding save failed (${onboardRes.status})`);
+      }
+
+      const savedName = body.member?.first_name?.trim() ?? "";
+      const savedInterest = body.member?.interest?.trim() ?? "";
+      if (
+        (formState.firstName?.trim() && savedName !== formState.firstName.trim()) ||
+        (formState.interest?.trim() && savedInterest !== formState.interest.trim())
+      ) {
+        setFinishMessage(
+          "Your name or interests did not save. Please try Finish again.",
+        );
+        throw new Error("Onboarding persist mismatch");
       }
 
       if (refFromCookie && typeof document !== "undefined") {
@@ -381,8 +373,7 @@ export default function OnboardingWizard() {
         }).catch((err) => console.warn("Twilio SMS did not complete:", err));
       }
 
-      router.push("/");
-      router.refresh();
+      window.location.assign("/");
     } catch (error) {
       console.error(error);
       setFinishStatus("error");
@@ -391,16 +382,6 @@ export default function OnboardingWizard() {
 
   const isLastStep = stepIndex === steps.length - 1;
   const stepValid = canAdvanceCurrentStep();
-
-  if (!authReady) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black text-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-center px-6 py-24">
-          <p className="text-white/60">Loading your member profile…</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black text-white">

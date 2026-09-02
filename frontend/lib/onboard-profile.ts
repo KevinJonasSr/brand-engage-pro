@@ -29,11 +29,82 @@ export function isOnboardDraft(payload: {
   return payload.draft === true;
 }
 
+export const FAVORITE_BRAND_OPTIONS = [
+  "Restaurants & Food",
+  "Retail & Apparel",
+  "Fitness & Wellness",
+  "Beauty & Personal Care",
+  "Entertainment & Media",
+  "Travel & Hospitality",
+  "Tech & Gadgets",
+  "Other",
+];
+
+export type OnboardingMemberRow = {
+  first_name?: string | null;
+  city?: string | null;
+  interest?: string | null;
+  favorite_brand?: string | null;
+  phone?: string | null;
+  socials?: unknown;
+  birthday_month?: number | null;
+  email?: string | null;
+  consent_accepted_at?: string | null;
+};
+
 function trimOrNull(value: string | null | undefined): string | null | undefined {
   if (value === undefined) return undefined;
   if (value === null) return null;
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : null;
+}
+
+/** Finish stamped consent and a preferred name — do not reopen a blank wizard. */
+export function isOnboardingComplete(
+  member: Pick<OnboardingMemberRow, "first_name" | "consent_accepted_at"> | null,
+): boolean {
+  return Boolean(member?.first_name?.trim() && member?.consent_accepted_at);
+}
+
+export function onboardingResumeStep(form: Record<string, string>): number {
+  if (!form.firstName?.trim()) return 0;
+  if (!form.interest?.trim()) return 1;
+  return 2;
+}
+
+/**
+ * Rehydrate the wizard from the members row so Preferred name, lane
+ * (interest), and favorite brand survive reload / /onboarding reopen.
+ */
+export function wizardFormFromMember(
+  member: OnboardingMemberRow | null,
+  email?: string | null,
+): Record<string, string> {
+  const socials =
+    member?.socials && typeof member.socials === "object" && !Array.isArray(member.socials)
+      ? (member.socials as Record<string, unknown>)
+      : {};
+  const handle =
+    typeof socials.instagram_or_tiktok === "string"
+      ? socials.instagram_or_tiktok
+      : "";
+  const favorite = member?.favorite_brand?.trim() ?? "";
+  const known = FAVORITE_BRAND_OPTIONS.filter((option) => option !== "Other");
+  const isKnown = Boolean(favorite && known.includes(favorite));
+  return {
+    firstName: member?.first_name?.trim() ?? "",
+    email: (email ?? member?.email ?? "").trim(),
+    city: member?.city?.trim() ?? "",
+    interest: member?.interest?.trim() ?? "",
+    favoriteBrand: isKnown ? favorite : favorite ? "Other" : "",
+    favoriteBrandOther: !isKnown && favorite ? favorite : "",
+    phone: member?.phone?.trim() ?? "",
+    handle,
+    birthdayMonth:
+      typeof member?.birthday_month === "number" && member.birthday_month >= 1
+        ? String(member.birthday_month)
+        : "",
+  };
 }
 
 /**
