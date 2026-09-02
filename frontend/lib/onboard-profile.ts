@@ -52,6 +52,40 @@ export type OnboardingMemberRow = {
   consent_accepted_at?: string | null;
 };
 
+/**
+ * Columns the /onboarding gate may request.
+ *
+ * Do NOT include birthday_month — that column is in migration 0052 but is
+ * not on live members (enfpviapxvqyoarwwsuf). A typed PostgREST select of
+ * a missing column returns data:null without throwing, which made #24's
+ * completion gate treat finished rows (n24: first_name + consent) as a
+ * blank 33% wizard.
+ */
+export const ONBOARDING_MEMBER_SELECT =
+  "first_name, city, interest, favorite_brand, phone, socials, consent_accepted_at, email";
+
+export type OnboardingMemberQueryResult = {
+  data: OnboardingMemberRow | null;
+  error: { message?: string } | null;
+};
+
+/**
+ * Load the members row for the wizard gate. If a typed select errors
+ * (schema cache miss / missing column), retry with `*` so a finished
+ * profile still redirects home instead of remounting Step 1 empty.
+ */
+export async function resolveOnboardingMember(
+  query: (columns: string) => Promise<OnboardingMemberQueryResult>,
+): Promise<OnboardingMemberRow | null> {
+  const primary = await query(ONBOARDING_MEMBER_SELECT);
+  if (!primary.error) {
+    return primary.data ?? null;
+  }
+  const fallback = await query("*");
+  if (fallback.error) return null;
+  return fallback.data ?? null;
+}
+
 function trimOrNull(value: string | null | undefined): string | null | undefined {
   if (value === undefined) return undefined;
   if (value === null) return null;
