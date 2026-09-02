@@ -53,12 +53,12 @@ export default async function ReferralsPage() {
           {!isSignedIn && (
             <PreviewSignupBanner
               eyebrow="🎟️ Referrals"
-              headline="No fake referral totals — start at 0"
-              body="Preview banners don’t invent leaderboard scores or point balances. New accounts start at 0. After you join, you earn +150 points for each friend who signs up with your link."
+              headline="Invite friends — earn +150 pts per signup"
+              body="Create a free account to get your personal invite link. You earn +150 points for each friend who joins with it. New accounts start at 0 — no sample totals here."
               bullets={[
-                "+150 pts every verified signup (real referrals only)",
+                "+150 pts every verified signup",
                 "Milestones unlock badges as you go",
-                "Share Nellie's — restaurant loyalty, not music drops",
+                "Share Nellie's or Jonas Group Entertainment with people you actually know",
               ]}
               primaryCta="Sign up to get my link →"
               nextPath="/referrals"
@@ -74,7 +74,7 @@ export default async function ReferralsPage() {
             <p className="mt-4 text-sm text-white/70">
               {isSignedIn
                 ? `You've invited ${myCount} member${myCount === 1 ? "" : "s"} so far. Keep sharing to climb the ladder.`
-                : "Create an account to get a personal invite link. Preview counts below are empty until you join — we don’t show fake referral totals."}
+                : "Create an account to get a personal invite link. Your referral count starts at 0."}
             </p>
             <div className="mt-6 flex flex-wrap items-center gap-3">
               {isSignedIn ? (

@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { isBrandSlugAlias, resolveBrandSlug } from "@/lib/brand-aliases";
 import { resolveCommunityFromHost } from "@/lib/community";
 import { resolvePinnedCanonicalLocation } from "@/lib/site-url";
 
@@ -66,6 +67,17 @@ export default async function proxy(request: NextRequest) {
   );
   if (pinned) {
     return NextResponse.redirect(pinned, 308);
+  }
+
+  // JGE aliases (/brands/jge, /brands/jonas-group-entertainment, …)
+  // → /brands/jonas-group-ent, preserving community/rewards/founders.
+  const brandMatch = request.nextUrl.pathname.match(/^\/brands\/([^/]+)(\/.*)?$/);
+  if (brandMatch && isBrandSlugAlias(brandMatch[1])) {
+    const canonical = resolveBrandSlug(brandMatch[1]);
+    const rest = brandMatch[2] ?? "";
+    const loc = request.nextUrl.clone();
+    loc.pathname = `/brands/${canonical}${rest}`;
+    return NextResponse.redirect(loc, 307);
   }
 
   // Layer 1: optional HTTP Basic Auth on /admin/*

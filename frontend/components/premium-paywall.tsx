@@ -97,7 +97,7 @@ export default function PremiumPaywall({
           <div>
             <p className="text-sm font-semibold text-white/90">
               {reason === "needs-founder"
-                ? "Founders only — the first 100 paying members"
+                ? "Founders only — the free first 100 who join"
                 : reason === "signed-out"
                   ? "Join to unlock Premium"
                   : "Upgrade to Premium"}
@@ -116,7 +116,7 @@ export default function PremiumPaywall({
           {reason === "needs-founder" ? (
             <>
               <p className="text-xs text-white/60">
-                Be one of the first 100 members to support this brand directly. Founders get:
+                Founding is a free first-100 badge. Premium is a separate paid club. Founders get:
               </p>
               <ul className="space-y-1 text-xs text-white/70">
                 <li>✓ Exclusive founder-only posts & events</li>

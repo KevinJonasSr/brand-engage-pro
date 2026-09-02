@@ -81,7 +81,7 @@ describe("resolveAppUrl / canonical", () => {
     assert.match(layoutSrc, /resolveAppUrl/);
     assert.doesNotMatch(layoutSrc, /brand-engage-pro\.vercel\.app/);
     assert.match(nextConfigSrc, /resolveAppUrl/);
-    assert.match(nextConfigSrc, /brand-engage-pro\.vercel\.app/);
+    assert.match(nextConfigSrc, /FORBIDDEN_LANDING_HOSTS/);
     assert.match(nextConfigSrc, /CANONICAL_PRODUCTION_ORIGIN\}\/:path\*/);
     assert.match(proxySrc, /resolvePinnedCanonicalLocation/);
   });
@@ -119,5 +119,17 @@ describe("resolvePinnedCanonicalLocation", () => {
       resolvePinnedCanonicalLocation("www.brandengagepro.com", "/login"),
       null,
     );
+  });
+
+  it("pins the sibling production vercel.app host the same way", () => {
+    assert.equal(
+      resolvePinnedCanonicalLocation(
+        "brand-engage-pro-jonas-group.vercel.app",
+        "/brands/nellies",
+      ),
+      "https://www.brandengagepro.com/brands/nellies",
+    );
+    assert.match(siteUrlSrc, /brand-engage-pro-jonas-group\.vercel\.app/);
+    assert.match(siteUrlSrc, /Dashboard still needed/);
   });
 });

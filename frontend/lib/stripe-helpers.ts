@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripe } from "@/lib/stripe";
+import { getFoundingClaims } from "@/lib/founding";
 
 /**
  * Server-only helpers for the Stripe Checkout + subscription flow.
@@ -49,35 +50,17 @@ export interface FounderState {
 }
 
 /**
- * Count memberships that have ever been premium (active + past_due +
- * cancelled — i.e. anyone who has at some point paid). Founders = first N
- * by time. Once 100 people have subscribed, the cap is hit; subsequent
- * subscribers get standard pricing even if they sign up via /premium with
- * a founder query param.
+ * Founding 100 counters. Delegates to getFoundingClaims — free first-100
+ * joins (`is_founder`), never Stripe / premium subscription counts.
+ * Premium checkout must not treat this as paid-founder eligibility.
  */
 export async function getFounderState(communityId: string): Promise<FounderState> {
-  const admin = createAdminClient();
-  const [{ data: community }, { count }] = await Promise.all([
-    admin
-      .from("communities")
-      .select("founder_cap")
-      .eq("slug", communityId)
-      .maybeSingle(),
-    admin
-      .from("member_community_memberships")
-      .select("member_id", { count: "exact", head: true })
-      .eq("community_id", communityId)
-      .in("subscription_tier", ["premium", "past_due", "cancelled"]),
-  ]);
-
-  const founderCap = (community?.founder_cap as number) ?? 100;
-  const founderCount = count ?? 0;
-  const slotsRemaining = Math.max(0, founderCap - founderCount);
+  const claims = await getFoundingClaims(communityId);
   return {
-    founderCap,
-    founderCount,
-    slotsRemaining,
-    isFull: slotsRemaining === 0,
+    founderCap: claims.cap,
+    founderCount: claims.claimed,
+    slotsRemaining: claims.remaining,
+    isFull: claims.isFull,
   };
 }
 

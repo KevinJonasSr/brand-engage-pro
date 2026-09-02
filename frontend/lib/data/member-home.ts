@@ -2,6 +2,10 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Badge, MemberProfile } from "./types";
 import {
+  JGE_BRAND_SLUG,
+  isJgeHiddenTitle,
+} from "@/lib/jge-launch";
+import {
   NELLIES_BOURBON_LOCATION,
   NELLIES_BOURBON_STARTS_AT,
   NELLIES_BOURBON_TITLE,
@@ -369,8 +373,12 @@ export async function getMemberHomeData(): Promise<MemberHomeData | null> {
     url: string | null;
   }>)
     .filter((e) => {
-      if (isNelliesHiddenTitle(e.title)) return false;
-      if (e.brand_slug === NELLIES_BRAND_SLUG) return isBourbonCigarTitle(e.title);
+      if (e.brand_slug === NELLIES_BRAND_SLUG) {
+        return isBourbonCigarTitle(e.title);
+      }
+      if (e.brand_slug === JGE_BRAND_SLUG) {
+        return !isJgeHiddenTitle(e.title);
+      }
       return true;
     })
     .slice(0, 3)
@@ -405,7 +413,20 @@ export async function getMemberHomeData(): Promise<MemberHomeData | null> {
     cta_label: string;
     point_value: number;
   }>)
-    .filter((c) => !isNelliesHiddenTitle(c.title) && !isNelliesHiddenTitle(c.cta_label ?? ""))
+    .filter((c) => {
+      if (c.brand_slug === NELLIES_BRAND_SLUG) {
+        return (
+          !isNelliesHiddenTitle(c.title) &&
+          !isNelliesHiddenTitle(c.cta_label ?? "")
+        );
+      }
+      if (c.brand_slug === JGE_BRAND_SLUG) {
+        return (
+          !isJgeHiddenTitle(c.title) && !isJgeHiddenTitle(c.cta_label ?? "")
+        );
+      }
+      return true;
+    })
     .slice(0, 6)
     .map((c) => ({
     id: c.id,

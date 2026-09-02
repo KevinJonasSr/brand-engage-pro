@@ -1,5 +1,10 @@
 import type { NextConfig } from "next";
-import { CANONICAL_PRODUCTION_ORIGIN, resolveAppUrl } from "./lib/site-url";
+import { brandAliasRedirects } from "./lib/brand-aliases";
+import {
+  CANONICAL_PRODUCTION_ORIGIN,
+  FORBIDDEN_LANDING_HOSTS,
+  resolveAppUrl,
+} from "./lib/site-url";
 
 const authSensitiveHeaders = [
   { key: "Cache-Control", value: "private, no-store, no-cache, max-age=0, must-revalidate, no-transform" },
@@ -52,11 +57,12 @@ const nextConfig: NextConfig = {
       },
     ];
     return [
-      // brand-engage-pro.vercel.app (and apex landing) → www. 308.
+      // Production sibling hosts + apex → www. 308.
       // Apex already 308s to www at the edge — keep that. Query is preserved.
-      // Do not pin preview *.vercel.app hosts.
-      ...hostPin("brand-engage-pro.vercel.app"),
-      ...hostPin("brandengagepro.com"),
+      // Do not pin preview *.vercel.app hosts (git-*, *-cursor-*).
+      ...FORBIDDEN_LANDING_HOSTS.flatMap((host) => hostPin(host)),
+      // JGE aliases → /brands/jonas-group-ent (subpaths preserved).
+      ...brandAliasRedirects(),
       {
         source: "/join",
         destination: "/signup",

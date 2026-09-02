@@ -7,7 +7,6 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripe } from "@/lib/stripe";
 import {
   getOrCreateStripeCustomer,
-  getFounderState,
   pickPriceId,
 } from "@/lib/stripe-helpers";
 import { getCurrentCommunityId, normalizeCommunitySlug } from "@/lib/community";
@@ -24,11 +23,8 @@ function getCanonicalOrigin(): string | null {
  * standard × monthly vs annual), creates the session, and redirects
  * the browser to Stripe.
  *
- * Founder slot assignment is atomic at webhook time — we only PICK
- * the founder price here if slots are still available, but a race at
- * the boundary means two users might both get a founder price_id; the
- * webhook handler (Phase 5c) re-checks the count before assigning
- * is_founder=true + founder_number.
+ * Founding 100 is a free first-join badge — checkout never sells it.
+ * Always use standard Premium prices ($10/mo / $99/yr).
  */
 export async function createCheckoutSessionAction(formData: FormData) {
   const billingPeriod = (formData.get("billing_period") ?? "monthly") as
@@ -106,9 +102,8 @@ export async function createCheckoutSessionAction(formData: FormData) {
     .select()
     .maybeSingle();
 
-  // 5) Founder eligibility (advisory — webhook re-checks atomically)
-  const founderState = await getFounderState(communityId);
-  const asFounder = !founderState.isFull;
+  // 5) Founding is free (first 100 joins). Premium is always standard paid.
+  const asFounder = false;
 
   const priceId = pickPriceId(community, billingPeriod, asFounder);
   if (!priceId) {

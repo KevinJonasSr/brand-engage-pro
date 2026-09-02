@@ -80,11 +80,11 @@ export default async function RewardsPage() {
           {!isSignedIn && (
             <PreviewSignupBanner
               eyebrow="🎁 Member rewards"
-              headline="Preview numbers aren’t your balance — start at 0"
-              body="Any high point totals you saw logged out were preview theater, not a real account. New members start at 0, then earn from visits, check-ins, and community. Nellie's Jackie launch: free dessert with entrée on join · 1,500 pts after 3 visits · birthday entrée up to $30. Bourbon & Cigar Night — September 23, 7:00 PM ET (Private Dining Room)."
+              headline="Join free — earn from real visits"
+              body="New members start at 0 and earn from visits, check-ins, and community. Nellie's Jackie launch: free dessert with entrée on join · 1,500 pts after 3 visits · birthday entrée up to $30. Bourbon & Cigar Night — September 23, 7:00 PM ET (Private Dining Room)."
               bullets={[
-                "New accounts start at 0 — then +100 welcome points after your profile",
-                "Ladder: Bronze → Platinum · Founding = first 100 · Premium ≈ Gold+ on gated specials",
+                "+100 welcome points after you finish your profile",
+                "Ladder: Bronze → Platinum · Founding = free first 100 · Premium = separate paid",
                 "Nellie's Jackie launch: dessert on join · 1,500 pts after 3 visits · birthday entrée",
               ]}
               primaryCta="Sign up free →"
@@ -100,7 +100,7 @@ export default async function RewardsPage() {
                 ? nextTier
                   ? `${formatPts(toNext)} away from ${nextTier.display_name}`
                   : "You're at max loyalty tier"
-                : "Start at 0 — climb with real visits"}
+                : "Earn from visits, check-ins, and community"}
             </h1>
             <p className="mt-4 text-sm text-white/70">
               {isSignedIn && nextTier ? (
@@ -118,8 +118,8 @@ export default async function RewardsPage() {
               )}
             </p>
             <p className="mt-3 text-xs text-white/50">
-              Ladder: Bronze → Silver → Gold → Platinum (points from visits). Founding = first 100
-              members. Premium ≈ Gold+ on gated specials. Join Nellie&apos;s, earn from visits and
+              Ladder: Bronze → Silver → Gold → Platinum (points from visits). Founding = free
+              first 100 who join. Premium is a separate paid club. Join Nellie&apos;s, earn from visits and
               check-ins, then Jackie&apos;s welcome dessert, 1,500 pts after 3 visits, and birthday
               entrée. Bourbon &amp; Cigar Night is September 23, 7:00 PM ET in the Private Dining
               Room. We don&apos;t list empty Gold/Platinum redeemables.
@@ -183,7 +183,7 @@ export default async function RewardsPage() {
                   href="/signup?next=/rewards"
                   className="mt-4 inline-block text-sm font-medium text-aurora underline underline-offset-2"
                 >
-                  Sign up to start at 0 →
+                  Sign up to start earning →
                 </Link>
               </div>
             ) : badges.length === 0 ? (
@@ -320,7 +320,7 @@ export default async function RewardsPage() {
               )
             ) : (
               <div className="mt-4 rounded-2xl border border-dashed border-white/15 bg-black/20 p-4 text-center text-xs text-white/60">
-                Sign up to start at 0 pts. No sample balances on this page.
+                Sign up to earn points from visits and check-ins. Your balance starts at 0.
               </div>
             )}
           </section>

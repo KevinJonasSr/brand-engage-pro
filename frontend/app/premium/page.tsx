@@ -2,7 +2,8 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentCommunityId, normalizeCommunitySlug } from "@/lib/community";
-import { getFounderState, fmtPrice } from "@/lib/stripe-helpers";
+import { getFoundingClaims } from "@/lib/founding";
+import { fmtPrice } from "@/lib/stripe-helpers";
 import { createCheckoutSessionAction } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -76,7 +77,7 @@ export default async function PremiumPage({
   const isPremium =
     tier === "premium" || tier === "past_due" || tier === "comped";
 
-  const founder = await getFounderState(communityId);
+  const founder = await getFoundingClaims(communityId);
 
   const monthly = community.monthly_price_cents;
   const annual = community.annual_price_cents;
@@ -155,19 +156,19 @@ export default async function PremiumPage({
             }}
           >
             <span aria-hidden>🌟</span>
-            {`Founding Member pricing - ${founder.slotsRemaining} of ${founder.founderCap} spots left. Lock in today's price forever.`}
+            {`Founding is a free first-100 badge — ${founder.remaining} of ${founder.cap} spots left. Premium below is separate paid ($10/mo or $99/yr).`}
           </div>
         )}
         {founder.isFull && (
           <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-white/55">
-            Founding Member spots are full. Standard pricing applies — future
-            price increases won&apos;t affect existing subscribers on either
-            plan.
+            Founding 100 is full. Premium is still available as a separate
+            paid club — {fmtPrice(community.monthly_price_cents)}/mo or{" "}
+            {fmtPrice(community.annual_price_cents)}/yr.
           </div>
         )}
 
         {/* Founder wall link */}
-        {founder.founderCap > 0 && (
+        {founder.cap > 0 && (
           <div className="mt-3">
             <Link
               href={`/brands/${communityId}/founders`}

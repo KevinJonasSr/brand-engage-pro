@@ -1,3 +1,17 @@
+/** Inline alias map — do not import brand-aliases here (Node tests + Next). */
+const JGE_FALLBACK_ALIASES = new Set([
+  "jge",
+  "jonas-group-entertainment",
+  "jonasgroupent",
+  "jonasgroup",
+  "jonas-group",
+]);
+
+function resolveFallbackSlug(slug: string): string {
+  const normalized = slug.trim().toLowerCase();
+  return JGE_FALLBACK_ALIASES.has(normalized) ? "jonas-group-ent" : normalized;
+}
+
 export type Brand = {
   slug: string;
   name: string;
@@ -41,27 +55,13 @@ export const BRANDS: Record<string, Brand> = {
     bio: [
       "Jonas Group Entertainment is a full-service entertainment company on Nashville's historic Music Row, owned by the Jonas family. We are a label, a publisher, an artist-management group, and a steward of some of the most influential catalogs in country and pop.",
       "Under our roof: Red Van Records (label), Jonas Group Publishing (songwriter representation and catalog), and a management roster that includes Rhett Akins, Aaron Gillespie, Levi Hummon, RaeLynn, Bailee Madison, Franklin Jonas, Justin Ebach, David Kalmusky, Hunter Hawkins, Amy Stroup, and Dan Marshall. Jonas Group Publishing champions Music Row catalogs through signings, acquisitions, and sync — including the acquired Jonas Brothers catalog.",
-      "This page is for the people who've been on our list for years — fans of the artists, friends of the family, and members of the broader Jonas universe. Members get early ticket access for roster shows, listening-party invites, and signed lyric sheets and catalog vinyl from the rewards store. Founders get a private guided tour of our Music Row house at 1600 17th Ave South.",
+      "This page is for the people who've been on our list for years — fans of the artists, friends of the family, and members of the broader Jonas universe. Live access includes a Music Row house tour, early writer and artist listens, and capped rotating live sessions with Kevin, Leslie, Amanda, Abby, and Raymond.",
     ].join("\n\n"),
     heroImage: "/brands/jonas-group-ent/hero.png",
     accentFrom: "#0a0a0a",
     accentTo: "#525252",
     genres: ["All genres", "Country", "Pop", "Rock", "Americana"],
-    upcoming: [
-      {
-        title: "New-Release Listening Party — Spring Drop",
-        detail: "Virtual listening party for an upcoming JGP release. Artist joins for Q&A.",
-        date: "Thursday, May 21 · 7 PM CT",
-        location: "Virtual (member-only link)",
-      },
-      {
-        title: "Songwriter Round at the Music Row House",
-        detail: "Three writers, acoustic guitars, the stories behind the cuts.",
-        date: "Saturday, June 20 · 7 PM CT",
-        location: "1600 17th Ave South, Nashville TN",
-        tier: "premium",
-      },
-    ],
+    upcoming: [],
     merch: [
       { title: "Signed Lyric Sheet (Roster Pick)", tier: "Bronze+", points: "1,800 pts" },
       { title: "Catalog Vinyl Pressing", tier: "Silver+", points: "3,200 pts" },
@@ -177,7 +177,7 @@ export const BRANDS: Record<string, Brand> = {
 };
 
 export function getBrand(slug: string): Brand | null {
-  return BRANDS[slug.toLowerCase()] ?? null;
+  return BRANDS[resolveFallbackSlug(slug)] ?? null;
 }
 
 export function listBrands(): Brand[] {
