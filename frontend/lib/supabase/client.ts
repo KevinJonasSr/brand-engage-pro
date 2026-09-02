@@ -1,12 +1,10 @@
 import { createBrowserClient } from "@supabase/ssr";
 import { AUTH_COOKIE_OPTIONS } from "@/lib/auth-cookies";
 
-let browserClient: ReturnType<typeof createBrowserClient> | null = null;
-
 /**
  * Supabase client for browser / client components.
- * Singleton so header Sign out and the wizard share one cookie jar —
- * multiple createBrowserClient() instances were a session-bleed source.
+ * `isSingleton: true` so header Sign out and the wizard share one cookie
+ * jar — multiple createBrowserClient() instances were a session-bleed source.
  */
 export function createClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -18,11 +16,8 @@ export function createClient() {
     );
   }
 
-  if (browserClient) return browserClient;
-
-  browserClient = createBrowserClient(url, anon, {
+  return createBrowserClient(url, anon, {
     cookieOptions: AUTH_COOKIE_OPTIONS,
     isSingleton: true,
   });
-  return browserClient;
 }
