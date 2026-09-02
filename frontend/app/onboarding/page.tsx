@@ -14,6 +14,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import {
   isOnboardingComplete,
   onboardingResumeStep,
+  resolveOnboardingMember,
   wizardFormFromMember,
   type OnboardingMemberRow,
 } from "@/lib/onboard-profile";
@@ -39,24 +40,30 @@ export default async function OnboardingPage({
     redirect(`/signup?${params.toString()}`);
   }
 
-  const memberSelect =
-    "first_name, city, interest, favorite_brand, phone, socials, birthday_month, consent_accepted_at, email";
+  const loadMember = async (
+    client: ReturnType<typeof createAdminClient> | typeof supabase,
+  ) =>
+    resolveOnboardingMember(async (columns) => {
+      const { data, error } = await client
+        .from("members")
+        .select(columns)
+        .eq("id", user.id)
+        .maybeSingle();
+      return { data: (data as OnboardingMemberRow | null) ?? null, error };
+    });
+
   let member: OnboardingMemberRow | null = null;
   try {
-    const admin = createAdminClient();
-    const { data } = await admin
-      .from("members")
-      .select(memberSelect)
-      .eq("id", user.id)
-      .maybeSingle();
-    member = (data as OnboardingMemberRow | null) ?? null;
+    member = await loadMember(createAdminClient());
   } catch {
-    const { data } = await supabase
-      .from("members")
-      .select(memberSelect)
-      .eq("id", user.id)
-      .maybeSingle();
-    member = (data as OnboardingMemberRow | null) ?? null;
+    member = null;
+  }
+  if (!member) {
+    try {
+      member = await loadMember(supabase);
+    } catch {
+      member = null;
+    }
   }
 
   if (isOnboardingComplete(member)) {

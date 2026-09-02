@@ -3,10 +3,12 @@ import { describe, it } from "node:test";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import {
+  ONBOARDING_MEMBER_SELECT,
   buildMemberProfileUpdates,
   isOnboardDraft,
   isOnboardingComplete,
   onboardingResumeStep,
+  resolveOnboardingMember,
   wizardFormFromMember,
 } from "./onboard-profile.ts";
 
@@ -114,5 +116,48 @@ describe("onboard profile persist", () => {
     assert.match(onboardRoute, /Unable to save interests/);
     assert.match(pageSrc, /isOnboardingComplete/);
     assert.match(pageSrc, /wizardFormFromMember/);
+    assert.match(pageSrc, /resolveOnboardingMember/);
+  });
+
+  it("treats the live n24 row as finished and does not select birthday_month", () => {
+    // Live members (enfpviapxvqyoarwwsuf) has first_name + consent for
+    // lyra.cs.walk.bep.0902n24, but no birthday_month column. #24 selected
+    // that column; PostgREST returned data:null (no throw) and the gate
+    // treated a finished member as a blank 33% wizard.
+    assert.equal(
+      isOnboardingComplete({
+        first_name: "CS Walk N24",
+        consent_accepted_at: "2026-09-02 10:35:45.222+00",
+      }),
+      true,
+    );
+    assert.doesNotMatch(ONBOARDING_MEMBER_SELECT, /birthday_month/);
+    assert.doesNotMatch(pageSrc, /birthday_month/);
+    assert.match(ONBOARDING_MEMBER_SELECT, /consent_accepted_at/);
+    assert.match(ONBOARDING_MEMBER_SELECT, /first_name/);
+  });
+
+  it("recovers the members row when a typed select misses a live column", async () => {
+    const n24 = {
+      first_name: "CS Walk N24",
+      interest: "Rewards",
+      favorite_brand: "Restaurants & Food",
+      consent_accepted_at: "2026-09-02 10:35:45.222+00",
+      email: "lyra.cs.walk.bep.0902n24@jonasgroup.com",
+    };
+    let calls = 0;
+    const member = await resolveOnboardingMember(async (columns) => {
+      calls += 1;
+      if (columns !== "*") {
+        return {
+          data: null,
+          error: { message: "column members.birthday_month does not exist" },
+        };
+      }
+      return { data: n24, error: null };
+    });
+    assert.equal(calls, 2);
+    assert.equal(member?.first_name, "CS Walk N24");
+    assert.equal(isOnboardingComplete(member), true);
   });
 });
