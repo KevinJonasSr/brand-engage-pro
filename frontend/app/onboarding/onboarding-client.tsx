@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowRight, CheckCircle2, Star, Users } from "lucide-react";
+import { ArrowRight, Star } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import FirstSessionChecklist from "@/components/first-session-checklist";
 
 type Field = {
   label: string;
@@ -119,19 +120,6 @@ const steps: { title: string; description: string; fields: Field[] }[] = [
       },
     ],
   },
-];
-
-const checklist = [
-  { label: "Preferences saved", value: "Ready" },
-  { label: "SMS double opt-in", value: "Auto" },
-  { label: "Referral code", value: "Generated" },
-  { label: "Community badge", value: "Unlocked" },
-];
-
-const experiences = [
-  { title: "Founders Weekend", detail: "3-day members-only itinerary + challenge roadmap" },
-  { title: "Marketplace Passport", detail: "Auto grants Bronze badge + merch credits" },
-  { title: "Text-to-Perks", detail: "SMS prompts that turn into instant point bursts" },
 ];
 
 export default function OnboardingWizard() {
@@ -638,36 +626,15 @@ export default function OnboardingWizard() {
         </section>
 
         <aside className="flex-1 space-y-6">
-          <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-aurora/15 via-slate-900 to-black p-6">
-            <div className="flex items-center gap-3 text-white/70">
-              <Users size={20} className="text-cyan-300" />
-              <p className="text-xs uppercase tracking-wide">Experience preview</p>
-            </div>
-            <h2 className="mt-3 text-2xl font-semibold">Plan the first 72 hours</h2>
-            <div className="mt-4 space-y-4">
-              {experiences.map((experience) => (
-                <div key={experience.title} className="rounded-2xl border border-white/10 bg-black/40 p-4">
-                  <p className="text-sm font-semibold">{experience.title}</p>
-                  <p className="text-xs text-white/60">{experience.detail}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-            <p className="text-xs uppercase tracking-wide text-white/60">Launch checklist</p>
-            <div className="mt-4 space-y-3">
-              {checklist.map((item) => (
-                <div key={item.label} className="flex items-center justify-between rounded-2xl bg-black/30 px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 size={16} className="text-emerald-300" />
-                    <span className="text-sm">{item.label}</span>
-                  </div>
-                  <span className="text-xs text-white/60">{item.value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <FirstSessionChecklist
+            dismissible={false}
+            facts={{
+              hasProfile: Boolean(formState.firstName?.trim()),
+              hasJoinedBrand: false,
+              hasCheckinOrRedeem: false,
+              hasInvite: false,
+            }}
+          />
         </aside>
       </div>
     </div>
