@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { hasBrowserSignedOutMarker } from "@/lib/auth-cookies";
 
 /**
  * Tasteful "Install Brand Engage Pro" prompt that appears after a member
@@ -54,9 +55,23 @@ export default function InstallPrompt() {
   const isIos = /iPad|iPhone|iPod/.test(ua);
 
   // Check whether the signed-in member has at least one follow before we
-  // arm the install-prompt timer.
+  // arm the install-prompt timer. Skip auth doors — createClient().getUser()
+  // here was reminting leftover N24 onto /signup.
   useEffect(() => {
     if (dismissed) return;
+    if (hasBrowserSignedOutMarker()) return;
+    if (typeof window !== "undefined") {
+      const path = window.location.pathname;
+      if (
+        path === "/signup" ||
+        path === "/login" ||
+        path === "/logout" ||
+        path === "/signout" ||
+        path === "/join"
+      ) {
+        return;
+      }
+    }
     const supabase = createClient();
     let mounted = true;
     supabase.auth.getUser().then(({ data: { user } }) => {

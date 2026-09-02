@@ -5,6 +5,11 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
+  clearBrowserAuthStorage,
+  clearBrowserSignedOut,
+  hasBrowserSignedOutMarker,
+} from "@/lib/auth-cookies";
+import {
   TurnstileWidget,
   isTurnstileRequired,
   prefetchTurnstileScript,
@@ -96,6 +101,30 @@ export default function SignupPage({
   useEffect(() => {
     if (turnstileRequired) prefetchTurnstileScript();
   }, [turnstileRequired]);
+
+  useEffect(() => {
+    // Drop leftover walk-account cookies/session before a new signup.
+    // Refuse SIGNED_IN from proxy refresh / singleton / other tabs while
+    // the sticky signed-out marker is set.
+    clearBrowserAuthStorage();
+    let subscription: { unsubscribe: () => void } | undefined;
+    try {
+      const supabase = createClient();
+      void supabase.auth.signOut({ scope: "local" }).catch(() => {});
+      const { data } = supabase.auth.onAuthStateChange((event) => {
+        if (event === "SIGNED_IN" && hasBrowserSignedOutMarker()) {
+          void supabase.auth.signOut({ scope: "local" }).catch(() => {});
+          clearBrowserAuthStorage();
+        }
+      });
+      subscription = data.subscription;
+    } catch {
+      // env missing — form still works
+    }
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, []);
 
   // Email regex — pragmatic, not RFC-perfect. Catches the common typos
   // (missing @, missing TLD, trailing space) without rejecting odd-but-
@@ -206,6 +235,7 @@ export default function SignupPage({
     captchaVerifiedRef.current = false;
 
     try {
+      clearBrowserSignedOut();
       const supabase = createClient();
       const { data, error } = await supabase.auth.signUp({
         email,

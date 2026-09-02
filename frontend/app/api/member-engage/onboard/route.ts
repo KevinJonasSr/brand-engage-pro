@@ -1,17 +1,84 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { stampOnboardedCookie } from "@/lib/auth-cookies";
+import { getFirstSessionFacts } from "@/lib/data/first-session";
 import { emitNetworkEvent } from "@/lib/network";
 import { claimFreeFoundingOnJoin } from "@/lib/founding";
 import {
   buildMemberProfileUpdates,
   isOnboardDraft,
+  isOnboardingComplete,
+  resolveOnboardingMember,
+  wizardFormFromMember,
   type OnboardProfilePayload,
+  type OnboardingMemberRow,
 } from "@/lib/onboard-profile";
 
 export const runtime = "nodejs";
 
 type OnboardPayload = OnboardProfilePayload;
+
+/**
+ * Hard-reload recovery for the wizard. Finished profiles (first_name +
+ * consent) return complete so the client can replace("/") instead of
+ * remounting a blank 33% Step 1.
+ */
+export async function GET() {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Not signed in" }, { status: 401 });
+    }
+
+    const loadMember = async (
+      client: ReturnType<typeof createAdminClient> | typeof supabase,
+    ) =>
+      resolveOnboardingMember(async (columns) => {
+        const { data, error } = await client
+          .from("members")
+          .select(columns)
+          .eq("id", user.id)
+          .maybeSingle();
+        return { data: (data as OnboardingMemberRow | null) ?? null, error };
+      });
+
+    let member: OnboardingMemberRow | null = null;
+    try {
+      member = await loadMember(createAdminClient());
+    } catch {
+      member = null;
+    }
+    if (!member) {
+      try {
+        member = await loadMember(supabase);
+      } catch {
+        member = null;
+      }
+    }
+
+    const complete = isOnboardingComplete(member);
+    const form = wizardFormFromMember(member, user.email);
+    const facts = await getFirstSessionFacts();
+    const response = NextResponse.json({
+      complete,
+      member,
+      form,
+      facts,
+    });
+    if (complete) stampOnboardedCookie(response);
+    return response;
+  } catch (err) {
+    console.error("onboard GET error:", err);
+    return NextResponse.json(
+      { error: "Unable to load onboarding." },
+      { status: 500 },
+    );
+  }
+}
 
 /**
  * Finalizes an onboarding submission for the currently-signed-in member.
@@ -312,7 +379,7 @@ export async function POST(request: Request) {
       }
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       member: {
         id: member?.id,
@@ -324,6 +391,8 @@ export async function POST(request: Request) {
         profile_slug: member?.profile_slug,
       },
     });
+    stampOnboardedCookie(response);
+    return response;
   } catch (err) {
     console.error("onboard route error:", err);
     return NextResponse.json(

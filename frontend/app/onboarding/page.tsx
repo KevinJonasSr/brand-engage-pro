@@ -8,9 +8,13 @@
  */
 
 import { Suspense } from "react";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { ONBOARDED_COOKIE, ONBOARDED_MAX_AGE } from "@/lib/auth-cookies";
+import { getFirstSessionFacts } from "@/lib/data/first-session";
+import { EMPTY_FIRST_SESSION_FACTS } from "@/lib/first-session";
 import {
   isOnboardingComplete,
   onboardingResumeStep,
@@ -55,23 +59,37 @@ export default async function OnboardingPage({
   let member: OnboardingMemberRow | null = null;
   try {
     member = await loadMember(createAdminClient());
-  } catch {
+  } catch (err) {
+    console.warn("onboarding: admin member load failed", err);
     member = null;
   }
   if (!member) {
     try {
       member = await loadMember(supabase);
-    } catch {
+    } catch (err) {
+      console.warn("onboarding: user member load failed", err);
       member = null;
     }
   }
 
   if (isOnboardingComplete(member)) {
+    const cookieStore = await cookies();
+    cookieStore.set(ONBOARDED_COOKIE, "1", {
+      path: "/",
+      maxAge: ONBOARDED_MAX_AGE,
+      sameSite: "lax",
+    });
     redirect("/");
   }
 
   const initialForm = wizardFormFromMember(member, user.email);
   const initialStep = onboardingResumeStep(initialForm);
+  const firstSession = (await getFirstSessionFacts()) ?? EMPTY_FIRST_SESSION_FACTS;
+  const initialFacts = {
+    ...firstSession,
+    hasProfile:
+      firstSession.hasProfile || Boolean(initialForm.firstName?.trim()),
+  };
 
   return (
     <Suspense
@@ -83,7 +101,11 @@ export default async function OnboardingPage({
         </div>
       }
     >
-      <OnboardingWizard initialForm={initialForm} initialStep={initialStep} />
+      <OnboardingWizard
+        initialForm={initialForm}
+        initialStep={initialStep}
+        initialFacts={initialFacts}
+      />
     </Suspense>
   );
 }

@@ -11,6 +11,8 @@ import UserMenu from "@/components/user-menu";
 import { MobileNav } from "@/components/mobile-nav";
 import { getMemberProfileSlug } from "@/lib/data/member-profile";
 import { createClient } from "@/lib/supabase/server";
+import { SIGNED_OUT_COOKIE, isSignedOutMarkerValue } from "@/lib/auth-cookies";
+import { cookies } from "next/headers";
 import { getUnreadCount } from "@/lib/data/notifications";
 import { getCurrentCommunityId } from "@/lib/community";
 import { getEntitlement } from "@/lib/entitlements";
@@ -90,6 +92,10 @@ const navItems = [
  */
 async function getCurrentUserSafe() {
   try {
+    const cookieStore = await cookies();
+    if (isSignedOutMarkerValue(cookieStore.get(SIGNED_OUT_COOKIE)?.value)) {
+      return null;
+    }
     const supabase = await createClient();
     const { data } = await supabase.auth.getUser();
     if (!data.user) return null;

@@ -68,6 +68,8 @@ describe("onboard profile persist", () => {
     assert.match(onboardRoute, /buildMemberProfileUpdates/);
     assert.match(onboardRoute, /isOnboardDraft/);
     assert.match(onboardRoute, /if \(draft\)/);
+    assert.match(onboardRoute, /export async function GET/);
+    assert.match(onboardRoute, /stampOnboardedCookie/);
   });
 
   it("wizard Finish stays clickable and persists draft fields on Continue", () => {
@@ -159,5 +161,39 @@ describe("onboard profile persist", () => {
     assert.equal(calls, 2);
     assert.equal(member?.first_name, "CS Walk N24");
     assert.equal(isOnboardingComplete(member), true);
+  });
+
+  it("recovers when PostgREST returns silent data:null with no error", async () => {
+    // #25 only retried on error. Live n24b still remounted a blank 33%
+    // wizard on hard reload — the same silent-null class as birthday_month.
+    const n24b = {
+      first_name: "CS Walk N24",
+      consent_accepted_at: "2026-09-02 10:55:25.168+00",
+    };
+    let calls = 0;
+    const member = await resolveOnboardingMember(async (columns) => {
+      calls += 1;
+      if (columns !== "*") {
+        return { data: null, error: null };
+      }
+      return { data: n24b, error: null };
+    });
+    assert.equal(calls, 2);
+    assert.equal(isOnboardingComplete(member), true);
+  });
+
+  it("gates on first_name + consent_accepted_at only", () => {
+    assert.match(ONBOARDING_MEMBER_SELECT, /first_name/);
+    assert.match(ONBOARDING_MEMBER_SELECT, /consent_accepted_at/);
+    assert.doesNotMatch(ONBOARDING_MEMBER_SELECT, /email/);
+    assert.doesNotMatch(ONBOARDING_MEMBER_SELECT, /socials/);
+    assert.doesNotMatch(ONBOARDING_MEMBER_SELECT, /birthday_month/);
+    assert.match(pageSrc, /bep_onboarded|ONBOARDED_COOKIE/);
+    assert.match(wizard, /\/api\/member-engage\/onboard/);
+    assert.match(wizard, /location\.replace\("\/"\)/);
+    assert.doesNotMatch(
+      wizard,
+      /hasJoinedBrand:\s*false,\s*hasCheckinOrRedeem:\s*false,\s*hasInvite:\s*false/,
+    );
   });
 });

@@ -3,12 +3,18 @@ import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 import {
+  ONBOARDED_COOKIE,
+  SIGNED_OUT_COOKIE,
   authCookieExpireDomains,
   collectAuthCookieNames,
   expireAuthCookieHeader,
   expireAuthCookiesOnResponse,
   isAuthCookieName,
+  isAuthPublicPath,
   isAuthSignOutPath,
+  isSignedOutMarkerValue,
+  shouldRedirectOnboardingHome,
+  shouldSkipSessionRefresh,
   supabaseAuthCookieBaseName,
 } from "./auth-cookies.ts";
 
@@ -83,9 +89,14 @@ describe("auth cookie isolation", () => {
     assert.equal(isAuthSignOutPath("/auth/signout"), true);
     assert.equal(isAuthSignOutPath("/"), false);
     assert.match(proxySrc, /isAuthSignOutPath/);
+    assert.match(proxySrc, /shouldSkipSessionRefresh/);
+    assert.match(proxySrc, /shouldRedirectOnboardingHome/);
     assert.match(proxySrc, /domain: undefined/);
     assert.match(serverSrc, /AUTH_COOKIE_OPTIONS/);
-    assert.match(clientSrc, /isSingleton: true/);
+    assert.match(serverSrc, /SIGNED_OUT_COOKIE/);
+    assert.match(clientSrc, /isSingleton: !signedOut/);
+    assert.match(clientSrc, /hasBrowserSignedOutMarker/);
+    assert.match(clientSrc, /persistSession: false/);
     const prior = process.env.NEXT_PUBLIC_SUPABASE_URL;
     process.env.NEXT_PUBLIC_SUPABASE_URL =
       "https://enfpviapxvqyoarwwsuf.supabase.co";
@@ -103,5 +114,26 @@ describe("auth cookie isolation", () => {
       if (prior === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_URL;
       else process.env.NEXT_PUBLIC_SUPABASE_URL = prior;
     }
+  });
+
+  it("makes logout sticky and refuses leftover refresh on signup/login", () => {
+    assert.equal(SIGNED_OUT_COOKIE, "bep_signed_out");
+    assert.equal(ONBOARDED_COOKIE, "bep_onboarded");
+    assert.equal(isSignedOutMarkerValue("1"), true);
+    assert.equal(isSignedOutMarkerValue("true"), true);
+    assert.equal(isSignedOutMarkerValue(""), false);
+    assert.equal(isAuthPublicPath("/signup"), true);
+    assert.equal(isAuthPublicPath("/login"), true);
+    assert.equal(isAuthPublicPath("/join"), true);
+    assert.equal(isAuthPublicPath("/"), false);
+    assert.equal(shouldSkipSessionRefresh("/signup", false), true);
+    assert.equal(shouldSkipSessionRefresh("/login", false), true);
+    assert.equal(shouldSkipSessionRefresh("/", true), true);
+    assert.equal(shouldSkipSessionRefresh("/", false), false);
+    assert.equal(shouldRedirectOnboardingHome("/onboarding", true, false), true);
+    assert.equal(shouldRedirectOnboardingHome("/onboarding", true, true), false);
+    assert.equal(shouldRedirectOnboardingHome("/onboarding", false, false), false);
+    assert.match(proxySrc, /expireAuthCookiesOnResponse/);
+    assert.match(proxySrc, /SIGNED_OUT_COOKIE|stampSignedOut/);
   });
 });

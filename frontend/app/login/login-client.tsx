@@ -4,7 +4,11 @@ import { Suspense, useState, useCallback, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { clearBrowserAuthStorage } from "@/lib/auth-cookies";
+import {
+  clearBrowserAuthStorage,
+  clearBrowserSignedOut,
+  hasBrowserSignedOutMarker,
+} from "@/lib/auth-cookies";
 import {
   TurnstileWidget,
   isTurnstileRequired,
@@ -124,6 +128,28 @@ function LoginForm({
   }, [turnstileRequired, magicLinkEnabled]);
 
   useEffect(() => {
+    if (!hasBrowserSignedOutMarker()) return;
+    clearBrowserAuthStorage();
+    let subscription: { unsubscribe: () => void } | undefined;
+    try {
+      const supabase = createClient();
+      void supabase.auth.signOut({ scope: "local" }).catch(() => {});
+      const { data } = supabase.auth.onAuthStateChange((event) => {
+        if (event === "SIGNED_IN" && hasBrowserSignedOutMarker()) {
+          void supabase.auth.signOut({ scope: "local" }).catch(() => {});
+          clearBrowserAuthStorage();
+        }
+      });
+      subscription = data.subscription;
+    } catch {
+      // env missing
+    }
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
     if (!magicLinkEnabled || !magicLinkOpen) return;
     const id = window.requestAnimationFrame(() => scrollToTurnstileChallenge());
     return () => window.cancelAnimationFrame(id);
@@ -168,6 +194,7 @@ function LoginForm({
     setMessage("");
     try {
       // Drop leftover walk-account cookies/session before minting this one.
+      clearBrowserSignedOut();
       const supabase = createClient();
       try {
         await supabase.auth.signOut({ scope: "local" });

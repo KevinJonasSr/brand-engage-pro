@@ -1,6 +1,17 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import { AUTH_COOKIE_OPTIONS, isAuthSignOutPath } from "@/lib/auth-cookies";
+import {
+  AUTH_COOKIE_OPTIONS,
+  ONBOARDED_COOKIE,
+  SIGNED_OUT_COOKIE,
+  expireAuthCookiesOnResponse,
+  isAuthSignOutPath,
+  isOnboardedMarkerValue,
+  isSignedOutMarkerValue,
+  shouldRedirectOnboardingHome,
+  shouldSkipSessionRefresh,
+  stampSignedOutCookie,
+} from "@/lib/auth-cookies";
 import { isBrandSlugAlias, resolveBrandSlug } from "@/lib/brand-aliases";
 import { resolveCommunityFromHost } from "@/lib/community";
 import { resolvePinnedCanonicalLocation } from "@/lib/site-url";
@@ -105,11 +116,37 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
-  // Do not refresh the session on sign-out doors. getUser() here would
-  // mint fresh sb-* cookies onto the /logout response and resurrect the
-  // session (or a leftover walk account) after Sign out.
-  if (isAuthSignOutPath(request.nextUrl.pathname)) {
-    return NextResponse.next({ request: { headers: requestHeaders } });
+  // Do not refresh the session on sign-out doors, signup/login, or while
+  // the sticky signed-out marker is set. getUser() here would mint fresh
+  // sb-* cookies onto prefetch / /signup and resurrect N24 mid-form.
+  const signedOut = isSignedOutMarkerValue(
+    request.cookies.get(SIGNED_OUT_COOKIE)?.value,
+  );
+  const onboarded = isOnboardedMarkerValue(
+    request.cookies.get(ONBOARDED_COOKIE)?.value,
+  );
+  const pathname = request.nextUrl.pathname;
+
+  if (shouldRedirectOnboardingHome(pathname, onboarded, signedOut)) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  if (shouldSkipSessionRefresh(pathname, signedOut)) {
+    const skipped = NextResponse.next({ request: { headers: requestHeaders } });
+    // Only wipe leftovers when logout is sticky. Expiring on every
+    // /signup visit would sign out a still-valid session that landed
+    // here via Join.
+    if (signedOut || isAuthSignOutPath(pathname)) {
+      expireAuthCookiesOnResponse(
+        skipped,
+        request.cookies.getAll().map((cookie) => cookie.name),
+        request.nextUrl.hostname,
+      );
+    }
+    if (signedOut) {
+      stampSignedOutCookie(skipped, request.nextUrl.hostname);
+    }
+    return skipped;
   }
 
   let response = NextResponse.next({ request: { headers: requestHeaders } });
@@ -144,7 +181,6 @@ export default async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const pathname = request.nextUrl.pathname;
   const isProtected = PROTECTED_PREFIXES.some((p) => pathname.startsWith(p));
 
   if (isProtected && !user) {

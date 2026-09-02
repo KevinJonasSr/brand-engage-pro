@@ -1,9 +1,19 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, Star } from "lucide-react";
 import FirstSessionChecklist from "@/components/first-session-checklist";
-import { FAVORITE_BRAND_OPTIONS } from "@/lib/onboard-profile";
+import {
+  EMPTY_FIRST_SESSION_FACTS,
+  type FirstSessionFacts,
+} from "@/lib/first-session";
+import {
+  FAVORITE_BRAND_OPTIONS,
+  isOnboardingComplete,
+  onboardingResumeStep,
+  wizardFormFromMember,
+  type OnboardingMemberRow,
+} from "@/lib/onboard-profile";
 
 type Field = {
   label: string;
@@ -113,12 +123,15 @@ const steps: { title: string; description: string; fields: Field[] }[] = [
 export default function OnboardingWizard({
   initialForm = {},
   initialStep = 0,
+  initialFacts = EMPTY_FIRST_SESSION_FACTS,
 }: {
   initialForm?: Record<string, string>;
   initialStep?: number;
+  initialFacts?: FirstSessionFacts;
 }) {
   const [stepIndex, setStepIndex] = useState(initialStep);
   const [formState, setFormState] = useState<Record<string, string>>(initialForm);
+  const [sessionFacts, setSessionFacts] = useState<FirstSessionFacts>(initialFacts);
   const [smsStatus, setSmsStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [smsMessage, setSmsMessage] = useState("Ready to send the confirmation text.");
   const [finishStatus, setFinishStatus] = useState<"idle" | "saving" | "error">("idle");
@@ -130,6 +143,51 @@ export default function OnboardingWizard({
   // self-redirected mid-form when the session cookie flickered.
   const [emailAutoFilled] = useState(Boolean(initialForm.email?.trim()));
   const [smsConsent, setSmsConsent] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/member-engage/onboard", { credentials: "same-origin" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((body: {
+        complete?: boolean;
+        member?: OnboardingMemberRow | null;
+        form?: Record<string, string>;
+        facts?: FirstSessionFacts;
+      } | null) => {
+        if (cancelled || !body) return;
+        if (body.complete || isOnboardingComplete(body.member ?? null)) {
+          window.location.replace("/");
+          return;
+        }
+        const nextForm =
+          body.form ??
+          wizardFormFromMember(body.member ?? null, initialForm.email);
+        if (!formState.firstName?.trim() && nextForm.firstName?.trim()) {
+          setFormState((prev) => ({ ...nextForm, ...prev, ...Object.fromEntries(
+            Object.entries(nextForm).filter(([, value]) => Boolean(value)),
+          ) }));
+          setStepIndex((prev) => Math.max(prev, onboardingResumeStep(nextForm)));
+        }
+        if (body.facts) {
+          setSessionFacts((prev) => ({
+            ...prev,
+            ...body.facts,
+            hasProfile:
+              Boolean(nextForm.firstName?.trim()) ||
+              Boolean(body.facts?.hasProfile) ||
+              prev.hasProfile,
+          }));
+        }
+      })
+      .catch(() => {
+        /* keep server-provided form; do not remount blank */
+      });
+    return () => {
+      cancelled = true;
+    };
+    // One-shot hard-reload recovery — do not re-run when the user types.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const currentStep = steps[stepIndex];
   const progress = useMemo(() => ((stepIndex + 1) / steps.length) * 100, [stepIndex]);
@@ -639,10 +697,9 @@ export default function OnboardingWizard({
           <FirstSessionChecklist
             dismissible={false}
             facts={{
-              hasProfile: Boolean(formState.firstName?.trim()),
-              hasJoinedBrand: false,
-              hasCheckinOrRedeem: false,
-              hasInvite: false,
+              ...sessionFacts,
+              hasProfile:
+                sessionFacts.hasProfile || Boolean(formState.firstName?.trim()),
             }}
           />
         </aside>

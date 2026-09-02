@@ -1,7 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { safeRelativePath } from "@/lib/safe-redirect";
-import { expireAuthCookiesOnResponse } from "@/lib/auth-cookies";
+import {
+  clearOnboardedCookie,
+  expireAuthCookiesOnResponse,
+  stampSignedOutCookie,
+} from "@/lib/auth-cookies";
 
 /**
  * Shared sign-out for /logout, /signout, and /auth/signout.
@@ -28,5 +32,7 @@ export async function signOutAndRedirect(request: NextRequest): Promise<NextResp
     request.cookies.getAll().map((cookie) => cookie.name),
     request.nextUrl.hostname,
   );
+  stampSignedOutCookie(response, request.nextUrl.hostname);
+  clearOnboardedCookie(response, request.nextUrl.hostname);
   return response;
 }
