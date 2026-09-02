@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentCommunityId } from "@/lib/community";
 import type { MemberKpis, MemberProfile, Tier, TierSlug } from "./types";
 import { getTiers } from "./tiers";
+import { sumLedgerDeltas } from "./member-points";
 
 /**
  * Per-community membership row — the authoritative source of a member's
@@ -76,6 +77,39 @@ const SOURCE_LABELS: Record<string, string> = {
 };
 
 /**
+ * Spendable / available points: SUM(points_ledger.delta) for this member.
+ * Admin read so RLS cannot hide adjustment rows. Returns 0 when signed out
+ * or the query fails.
+ */
+export async function getSpendablePoints(memberId?: string): Promise<number> {
+  try {
+    let id = memberId;
+    if (!id) {
+      const supabase = await createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return 0;
+      id = user.id;
+    }
+
+    const admin = createAdminClient();
+    const { data, error } = await admin
+      .from("points_ledger")
+      .select("delta")
+      .eq("member_id", id);
+    if (error) {
+      console.warn("getSpendablePoints: supabase error", error.message);
+      return 0;
+    }
+    return sumLedgerDeltas(data ?? []);
+  } catch (err) {
+    console.warn("getSpendablePoints: failed", err);
+    return 0;
+  }
+}
+
+/**
  * Sum of points the current member has earned, grouped by source. Returns an
  * empty array for signed-out users or when the member has no ledger entries.
  */
@@ -87,7 +121,8 @@ export async function getPointBreakdown(): Promise<PointBreakdownRow[]> {
     } = await supabase.auth.getUser();
     if (!user) return [];
 
-    const { data, error } = await supabase
+    const admin = createAdminClient();
+    const { data, error } = await admin
       .from("points_ledger")
       .select("source,delta")
       .eq("member_id", user.id);
@@ -143,8 +178,8 @@ export async function getCurrentMember(): Promise<MemberProfile | null> {
 }
 
 /**
- * Rolls up the member's headline KPIs for the current community: total
- * points (from the community membership, not the legacy members.total_points),
+ * Rolls up the member's headline KPIs: spendable points from the ledger
+ * (not membership.total_points / members.total_points — those drift),
  * community-scoped referrals and badges, distance to next tier.
  */
 export async function getCurrentMemberKpis(): Promise<MemberKpis | null> {
@@ -157,8 +192,8 @@ export async function getCurrentMemberKpis(): Promise<MemberKpis | null> {
 
     const communityId = await getCurrentCommunityId();
 
-    const [membership, referralsRes, badgesRes, tiers] = await Promise.all([
-      getCurrentMembership(communityId),
+    const [total_points, referralsRes, badgesRes, tiers] = await Promise.all([
+      getSpendablePoints(user.id),
       supabase
         .from("referrals")
         .select("id", { count: "exact", head: true })
@@ -171,8 +206,6 @@ export async function getCurrentMemberKpis(): Promise<MemberKpis | null> {
         .eq("community_id", communityId),
       getTiers(),
     ]);
-
-    const total_points = membership?.total_points ?? 0;
     const referral_count = referralsRes.count ?? 0;
     const badge_count = badgesRes.count ?? 0;
 

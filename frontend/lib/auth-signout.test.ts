@@ -43,9 +43,10 @@ describe("sign-out doors (FE /logout /signout 404 parity)", () => {
     }
   });
 
-  it("keeps the account-menu form on /auth/signout", () => {
-    assert.match(userMenu, /action="\/auth\/signout"/);
-    assert.match(userMenu, /method="post"/);
+  it("header Sign out uses client signOut then /logout", () => {
+    assert.match(userMenu, /supabase\.auth\.signOut/);
+    assert.match(userMenu, /window\.location\.assign\("\/logout"\)/);
+    assert.doesNotMatch(userMenu, /action="\/auth\/signout"/);
   });
 
   it("marks the new doors no-store like other auth routes", () => {

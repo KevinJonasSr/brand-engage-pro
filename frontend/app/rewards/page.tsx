@@ -64,7 +64,8 @@ export default async function RewardsPage() {
   const currentSlug = (member?.current_tier ?? "bronze") as TierSlug;
   const currentTier = tiers.find((t) => t.slug === currentSlug);
   const nextTier = isSignedIn ? kpis?.next_tier ?? null : null;
-  const totalPoints = isSignedIn ? (kpis?.total_points ?? 0) : 0;
+  const breakdownTotal = breakdown.reduce((sum, row) => sum + row.total, 0);
+  const totalPoints = isSignedIn ? (kpis?.total_points ?? breakdownTotal) : 0;
   const toNext = isSignedIn ? (kpis?.points_to_next_tier ?? 0) : (tiers.find((t) => t.slug === "silver")?.min_points ?? 0);
   const nextThreshold =
     nextTier?.min_points ?? (isSignedIn ? (currentTier?.min_points ?? 0) + toNext : toNext);
@@ -312,6 +313,12 @@ export default async function RewardsPage() {
                       </span>
                     </div>
                   ))}
+                  <div className="flex items-center justify-between border-t border-white/10 pt-3 text-sm text-white">
+                    <span>Available</span>
+                    <span className="font-semibold">
+                      {new Intl.NumberFormat("en-US").format(totalPoints)} pts
+                    </span>
+                  </div>
                 </div>
               ) : (
                 <div className="mt-4 rounded-2xl border border-dashed border-white/15 bg-black/20 p-4 text-center text-xs text-white/60">
