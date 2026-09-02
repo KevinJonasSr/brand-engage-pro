@@ -37,6 +37,7 @@ describe("signup consent review step", () => {
     assert.match(signupClient, /setConsentOpen\(true\)/);
     assert.match(signupClient, /gate === "fail-open"/);
     assert.match(signupClient, /CONSENT_COPY\.failOpen|You can still create an account/);
+    assert.match(signupClient, /challengeFailed: turnstileError/);
     assert.match(signupClient, /consent_accepted_at/);
     assert.match(signupClient, /consent_version/);
     assert.match(signupClient, /consentReviewTitle/);

@@ -173,12 +173,29 @@ export function nextSignupTurnstileGate(opts: {
   configured: boolean;
   token: string | null;
   loadState: TurnstileLoadState;
+  /** Widget onError — must fail-open even if loadState later flips to ready. */
+  challengeFailed?: boolean;
 }): SignupTurnstileGate {
   if (!opts.configured) return "not-configured";
   if (opts.token) return "ready";
+  if (opts.challengeFailed || opts.loadState === "error") return "fail-open";
   if (opts.loadState === "loading") return "wait-load";
-  if (opts.loadState === "error") return "fail-open";
   return "complete-check";
+}
+
+/**
+ * Hang-timeout decision. A hostname-mismatch iframe can paint without ever
+ * becoming interactive or issuing a token — that must not leave Create
+ * account grey forever. A visible checkbox (before-interactive) is allowed
+ * to wait for the member.
+ */
+export function turnstileShouldTreatAsFailedLoad(opts: {
+  hasToken: boolean;
+  becameInteractive: boolean;
+}): boolean {
+  if (opts.hasToken) return false;
+  if (opts.becameInteractive) return false;
+  return true;
 }
 
 export function signupAllowsSubmit(gate: SignupTurnstileGate): boolean {

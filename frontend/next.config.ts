@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import { brandAliasRedirects } from "./lib/brand-aliases";
+import { CONTENT_SECURITY_POLICY } from "./lib/csp";
 import {
   CANONICAL_PRODUCTION_ORIGIN,
   FORBIDDEN_LANDING_HOSTS,
@@ -14,6 +15,8 @@ const authSensitiveHeaders = [
 
 const authSensitiveRoutes = [
   "/auth/:path*",
+  "/logout",
+  "/signout",
   "/login",
   "/signup",
   "/forgot-password",
@@ -107,7 +110,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Content-Security-Policy",
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; frame-src https://challenges.cloudflare.com; frame-ancestors 'none';",
+            value: CONTENT_SECURITY_POLICY,
           },
           {
             key: "X-Frame-Options",
