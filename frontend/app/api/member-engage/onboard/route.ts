@@ -3,24 +3,15 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { emitNetworkEvent } from "@/lib/network";
 import { claimFreeFoundingOnJoin } from "@/lib/founding";
+import {
+  buildMemberProfileUpdates,
+  isOnboardDraft,
+  type OnboardProfilePayload,
+} from "@/lib/onboard-profile";
 
 export const runtime = "nodejs";
 
-type OnboardPayload = {
-  firstName?: string;
-  lastName?: string;
-  city?: string;
-  phone?: string;
-  handle?: string;
-  favoriteBrand?: string;
-  interest?: string;
-  referralCode?: string; // optional — the ref code that was passed in the invite link
-  smsOptedIn?: boolean;
-  emailOptedIn?: boolean;
-  consentAcceptedAt?: string;
-  consentVersion?: string;
-  birthdayMonth?: number | string | null;
-};
+type OnboardPayload = OnboardProfilePayload;
 
 /**
  * Finalizes an onboarding submission for the currently-signed-in member.
@@ -40,54 +31,77 @@ export async function POST(request: Request) {
     }
 
     const payload = (await request.json()) as OnboardPayload;
+    const draft = isOnboardDraft(payload);
 
-    // 1. Update the member's profile row (created by the auth trigger).
+    // 1. Persist profile fields via service role.
     //
-    // The onboarding wizard's "TikTok or Instagram handle" field arrives
-    // as payload.handle. We do NOT write that to members.handle (legacy)
-    // — instead we merge it into the socials jsonb column so social
-    // identifiers stay in their own field. The URL slug column,
-    // members.profile_slug, is owned by the BEFORE INSERT trigger.
-    let socialsMerge: Record<string, unknown> | undefined = undefined;
-    if (typeof payload.handle === "string" && payload.handle.trim()) {
-      const { data: existing } = await supabase
+    // User-JWT UPDATE + `.single()` is a silent fail mode: 0 rows (no
+    // member row yet) or the 0051 integrity trigger / column grants can
+    // 500 the wizard while the UI looks inert. Admin write is the same
+    // path birthday_month already used.
+    //
+    // Handle goes into socials jsonb — not members.handle (legacy).
+    const admin = createAdminClient();
+    const { data: existing } = await admin
+      .from("members")
+      .select("id, socials")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    const updates = buildMemberProfileUpdates(
+      payload,
+      (existing?.socials as Record<string, unknown> | null) ?? null,
+    );
+
+    let member: {
+      id: string;
+      first_name: string | null;
+      current_tier: string | null;
+      total_points: number | null;
+      profile_slug: string | null;
+    } | null = null;
+
+    if (Object.keys(updates).length > 0) {
+      const writer = existing
+        ? admin.from("members").update(updates).eq("id", user.id)
+        : admin.from("members").insert({
+            id: user.id,
+            email: user.email ?? null,
+            ...updates,
+          });
+      const { data, error: updateErr } = await writer
+        .select("id, first_name, current_tier, total_points, profile_slug")
+        .single();
+
+      if (updateErr) {
+        console.error("onboard: failed to save member", updateErr);
+        return NextResponse.json(
+          { error: "Unable to save profile." },
+          { status: 500 },
+        );
+      }
+      member = data;
+    } else if (existing) {
+      const { data } = await admin
         .from("members")
-        .select("socials")
+        .select("id, first_name, current_tier, total_points, profile_slug")
         .eq("id", user.id)
         .maybeSingle();
-      socialsMerge = {
-        ...((existing?.socials as Record<string, unknown> | null) ?? {}),
-        instagram_or_tiktok: payload.handle.trim(),
-      };
+      member = data;
     }
 
-    const updates: Record<string, unknown> = {
-      first_name: payload.firstName ?? null,
-      last_name: payload.lastName ?? null,
-      city: payload.city ?? null,
-      phone: payload.phone ?? null,
-      favorite_brand: payload.favoriteBrand ?? null,
-      interest: payload.interest ?? null,
-      sms_opted_in: Boolean(payload.smsOptedIn),
-      email_opted_in: Boolean(payload.emailOptedIn),
-      consent_accepted_at: payload.consentAcceptedAt ?? new Date().toISOString(),
-      consent_version: payload.consentVersion ?? null,
-    };
-    if (socialsMerge !== undefined) updates.socials = socialsMerge;
-
-    const { data: member, error: updateErr } = await supabase
-      .from("members")
-      .update(updates)
-      .eq("id", user.id)
-      .select("id, first_name, current_tier, total_points, profile_slug")
-      .single();
-
-    if (updateErr) {
-      console.error("onboard: failed to update member", updateErr);
-      return NextResponse.json(
-        { error: "Unable to save profile." },
-        { status: 500 },
-      );
+    if (draft) {
+      return NextResponse.json({
+        success: true,
+        draft: true,
+        member: {
+          id: member?.id,
+          first_name: member?.first_name,
+          current_tier: member?.current_tier,
+          total_points: member?.total_points,
+          profile_slug: member?.profile_slug,
+        },
+      });
     }
 
     const birthdayMonth = parseBirthdayMonth(payload.birthdayMonth);

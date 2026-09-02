@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getBrandFromDb } from "@/lib/data/brands";
 import { getMemberProfileSlug } from "@/lib/data/member-profile";
+import { getSpendablePoints } from "@/lib/data/member";
 import { listRewardsForCommunity, listMyRedemptions } from "@/lib/data/rewards";
 import { resolveBrandSlug } from "@/lib/brand-aliases";
 import { NELLIES_BRAND_SLUG } from "@/lib/nellies-launch";
@@ -23,23 +24,13 @@ async function MemberPoints({ isSignedIn }: { isSignedIn: boolean }) {
     );
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
-
-  const { data: member } = await supabase
-    .from("members")
-    .select("total_points")
-    .eq("id", user.id)
-    .maybeSingle();
+  const points = await getSpendablePoints();
 
   return (
     <div className="rounded-lg border border-white/10 bg-black/30 px-4 py-2">
       <p className="text-xs uppercase tracking-wide text-white/60">Your Points</p>
       <p className="mt-1 text-2xl font-bold text-white">
-        {(member?.total_points ?? 0).toLocaleString()}
+        {points.toLocaleString()}
       </p>
     </div>
   );

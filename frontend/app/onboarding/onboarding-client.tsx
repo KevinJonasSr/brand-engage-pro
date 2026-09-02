@@ -129,6 +129,7 @@ export default function OnboardingWizard() {
   const [smsStatus, setSmsStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [smsMessage, setSmsMessage] = useState("Ready to send the confirmation text.");
   const [finishStatus, setFinishStatus] = useState<"idle" | "saving" | "error">("idle");
+  const [finishMessage, setFinishMessage] = useState<string | null>(null);
   const [tosConsent, setTosConsent] = useState(false);
   // Tracks whether the email field was successfully auto-prefilled
   // from auth.users. When true, the field stays readOnly. When false
@@ -211,7 +212,27 @@ export default function OnboardingWizard() {
     });
   };
 
-  const nextStep = () => setStepIndex((prev) => Math.min(prev + 1, steps.length - 1));
+  const persistProfileDraft = () => {
+    const favoriteBrand = resolveFavoriteBrand();
+    fetch("/api/member-engage/onboard", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        firstName: formState.firstName,
+        city: formState.city,
+        ...(favoriteBrand ? { favoriteBrand } : {}),
+        ...(formState.interest ? { interest: formState.interest } : {}),
+        draft: true,
+      }),
+    }).catch((err) => {
+      console.warn("Onboarding draft did not persist:", err);
+    });
+  };
+
+  const nextStep = () => {
+    persistProfileDraft();
+    setStepIndex((prev) => Math.min(prev + 1, steps.length - 1));
+  };
   const prevStep = () => setStepIndex((prev) => Math.max(prev - 1, 0));
 
   const handleSmsOptIn = async () => {
@@ -285,8 +306,15 @@ export default function OnboardingWizard() {
   };
 
   const handleFinish = async () => {
+    if (!tosConsent) {
+      setFinishStatus("error");
+      setFinishMessage("Please agree to the Terms of Service and Privacy Policy to finish.");
+      return;
+    }
+
     try {
       setFinishStatus("saving");
+      setFinishMessage(null);
 
       const refFromUrl =
         typeof window !== "undefined"
@@ -587,12 +615,9 @@ export default function OnboardingWizard() {
                 </button>
                 {isLastStep ? (
                   <button
+                    type="button"
                     onClick={handleFinish}
-                    disabled={
-                      finishStatus === "saving" ||
-                      !tosConsent ||
-                      (Boolean(formState.phone) && !smsConsent)
-                    }
+                    disabled={finishStatus === "saving"}
                     className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white shadow-glass transition hover:brightness-110 disabled:opacity-50"
                   >
                     {finishStatus === "saving" ? "Saving…" : "Finish onboarding"}
@@ -617,8 +642,12 @@ export default function OnboardingWizard() {
             </div>
             {finishStatus === "error" && (
               <p className="text-sm text-rose-300">
-                Could not save your profile. Are you still signed in? Try{" "}
-                <a href="/login" className="underline">signing in</a> and retrying.
+                {finishMessage ?? (
+                  <>
+                    Could not save your profile. Are you still signed in? Try{" "}
+                    <a href="/login" className="underline">signing in</a> and retrying.
+                  </>
+                )}
               </p>
             )}
           </div>
