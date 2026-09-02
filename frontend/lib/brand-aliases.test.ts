@@ -46,6 +46,19 @@ describe("JGE brand slug aliases", () => {
     }
   });
 
+  it("keeps app modules free of .ts runtime imports (Next build)", () => {
+    const brandsSrc = readFileSync(
+      fileURLToPath(new URL("./brands.ts", import.meta.url)),
+      "utf8",
+    );
+    const featuredSrc = readFileSync(
+      fileURLToPath(new URL("./guest-home-featured-brands.ts", import.meta.url)),
+      "utf8",
+    );
+    assert.doesNotMatch(brandsSrc, /from ["'][^"']+\.ts["']/);
+    assert.doesNotMatch(featuredSrc, /from ["'][^"']+\.ts["']/);
+  });
+
   it("emits next.config-style redirects that preserve community/rewards/founders", () => {
     const redirects = brandAliasRedirects();
     assert.ok(redirects.some((r) => r.source === "/brands/jge"));

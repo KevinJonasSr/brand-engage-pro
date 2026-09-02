@@ -1,4 +1,16 @@
-import { resolveBrandSlug } from "./brand-aliases.ts";
+/** Inline alias map — do not import brand-aliases here (Node tests + Next). */
+const JGE_FALLBACK_ALIASES = new Set([
+  "jge",
+  "jonas-group-entertainment",
+  "jonasgroupent",
+  "jonasgroup",
+  "jonas-group",
+]);
+
+function resolveFallbackSlug(slug: string): string {
+  const normalized = slug.trim().toLowerCase();
+  return JGE_FALLBACK_ALIASES.has(normalized) ? "jonas-group-ent" : normalized;
+}
 
 export type Brand = {
   slug: string;
@@ -165,7 +177,7 @@ export const BRANDS: Record<string, Brand> = {
 };
 
 export function getBrand(slug: string): Brand | null {
-  return BRANDS[resolveBrandSlug(slug)] ?? null;
+  return BRANDS[resolveFallbackSlug(slug)] ?? null;
 }
 
 export function listBrands(): Brand[] {

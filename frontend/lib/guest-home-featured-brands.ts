@@ -1,8 +1,7 @@
 import type { Brand } from "./brands";
-import { JGE_CANONICAL_SLUG, NELLIES_SLUG } from "./brand-aliases.ts";
 
 /** Live brands guests should discover on `/` and `/for-brands`. */
-const GUEST_HOME_FEATURED_SLUGS = [NELLIES_SLUG, JGE_CANONICAL_SLUG] as const;
+const GUEST_HOME_FEATURED_SLUGS = ["nellies", "jonas-group-ent"] as const;
 
 export function isGuestHomeFeaturedBrand(brand: {
   slug: string;
