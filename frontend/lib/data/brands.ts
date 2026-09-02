@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { BRANDS as FALLBACK_BRANDS, type Brand } from "@/lib/brands";
 import { resolveBrandSlug } from "@/lib/brand-aliases";
-import { filterJgeLaunchEvents } from "@/lib/jge-launch";
+import { applyJgeLaunchBio, filterJgeLaunchEvents } from "@/lib/jge-launch";
 import {
   NELLIES_BRAND_SLUG,
   applyNelliesLaunchEvents,
@@ -90,7 +90,7 @@ function rowToBrand(row: BrandRow, events: BrandEvent[]): Brand {
     slug: row.slug,
     name: row.name,
     tagline: row.tagline ?? "",
-    bio: row.bio ?? "",
+    bio: applyJgeLaunchBio(row.slug, row.bio),
     heroImage: row.hero_image,
     heroFocalX: row.hero_focal_x ?? undefined,
     heroFocalY: row.hero_focal_y ?? undefined,
