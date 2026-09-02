@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { AUTH_COOKIE_OPTIONS, isAuthSignOutPath } from "@/lib/auth-cookies";
 import { isBrandSlugAlias, resolveBrandSlug } from "@/lib/brand-aliases";
 import { resolveCommunityFromHost } from "@/lib/community";
 import { resolvePinnedCanonicalLocation } from "@/lib/site-url";
@@ -104,9 +105,17 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.next({ request: { headers: requestHeaders } });
   }
 
+  // Do not refresh the session on sign-out doors. getUser() here would
+  // mint fresh sb-* cookies onto the /logout response and resurrect the
+  // session (or a leftover walk account) after Sign out.
+  if (isAuthSignOutPath(request.nextUrl.pathname)) {
+    return NextResponse.next({ request: { headers: requestHeaders } });
+  }
+
   let response = NextResponse.next({ request: { headers: requestHeaders } });
 
   const supabase = createServerClient(url, anon, {
+    cookieOptions: AUTH_COOKIE_OPTIONS,
     cookies: {
       getAll() {
         return request.cookies.getAll();
@@ -121,7 +130,11 @@ export default async function proxy(request: NextRequest) {
         // the default community.
         response = NextResponse.next({ request: { headers: requestHeaders } });
         cookiesToSet.forEach(({ name, value, options }) =>
-          response.cookies.set(name, value, options),
+          response.cookies.set(name, value, {
+            ...AUTH_COOKIE_OPTIONS,
+            ...options,
+            domain: undefined,
+          }),
         );
       },
     },

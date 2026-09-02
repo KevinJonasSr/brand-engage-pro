@@ -1,9 +1,11 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { AUTH_COOKIE_OPTIONS } from "@/lib/auth-cookies";
 
 /**
  * Supabase client for server components, route handlers, and server actions.
- * Reads + writes session cookies on the request so sessions survive refreshes.
+ * Cookie options stay host-only (no Domain=) so www and apex do not mint
+ * a second sb-* cookie that can swap walk accounts after logout.
  */
 export async function createClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -18,6 +20,7 @@ export async function createClient() {
   const cookieStore = await cookies();
 
   return createServerClient(url, anon, {
+    cookieOptions: AUTH_COOKIE_OPTIONS,
     cookies: {
       getAll() {
         return cookieStore.getAll();
@@ -25,7 +28,12 @@ export async function createClient() {
       setAll(cookiesToSet) {
         try {
           cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options),
+            cookieStore.set(name, value, {
+              ...AUTH_COOKIE_OPTIONS,
+              ...options,
+              // Never write Domain=.brandengagepro.com from the app.
+              domain: undefined,
+            }),
           );
         } catch {
           // setAll can be called from a server component where cookies cannot be

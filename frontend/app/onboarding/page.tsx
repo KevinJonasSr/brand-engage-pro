@@ -1,15 +1,22 @@
 /**
  * Server-component wrapper around the onboarding client.
  *
- * Auth is gated here (same pattern as /onboarding/chat) so anonymous
- * visitors never see a wizard flash before the client redirect runs.
- * Unauthenticated users are sent to signup with next=/onboarding so they
- * return to the profile wizard after creating an account.
+ * Auth is gated here so anonymous visitors never see a wizard flash.
+ * Finished profiles (name + consent) redirect home — reopening
+ * /onboarding must not reset to a blank 33% form.
+ * Drafts rehydrate Preferred name, lane, and favorite brand.
  */
 
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  isOnboardingComplete,
+  onboardingResumeStep,
+  wizardFormFromMember,
+  type OnboardingMemberRow,
+} from "@/lib/onboard-profile";
 import OnboardingWizard from "./onboarding-client";
 
 export const dynamic = "force-dynamic";
@@ -32,6 +39,33 @@ export default async function OnboardingPage({
     redirect(`/signup?${params.toString()}`);
   }
 
+  const memberSelect =
+    "first_name, city, interest, favorite_brand, phone, socials, birthday_month, consent_accepted_at, email";
+  let member: OnboardingMemberRow | null = null;
+  try {
+    const admin = createAdminClient();
+    const { data } = await admin
+      .from("members")
+      .select(memberSelect)
+      .eq("id", user.id)
+      .maybeSingle();
+    member = (data as OnboardingMemberRow | null) ?? null;
+  } catch {
+    const { data } = await supabase
+      .from("members")
+      .select(memberSelect)
+      .eq("id", user.id)
+      .maybeSingle();
+    member = (data as OnboardingMemberRow | null) ?? null;
+  }
+
+  if (isOnboardingComplete(member)) {
+    redirect("/");
+  }
+
+  const initialForm = wizardFormFromMember(member, user.email);
+  const initialStep = onboardingResumeStep(initialForm);
+
   return (
     <Suspense
       fallback={
@@ -42,7 +76,7 @@ export default async function OnboardingPage({
         </div>
       }
     >
-      <OnboardingWizard />
+      <OnboardingWizard initialForm={initialForm} initialStep={initialStep} />
     </Suspense>
   );
 }

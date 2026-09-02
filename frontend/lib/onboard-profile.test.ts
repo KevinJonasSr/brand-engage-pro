@@ -5,6 +5,9 @@ import { fileURLToPath } from "node:url";
 import {
   buildMemberProfileUpdates,
   isOnboardDraft,
+  isOnboardingComplete,
+  onboardingResumeStep,
+  wizardFormFromMember,
 } from "./onboard-profile.ts";
 
 const onboardRoute = readFileSync(
@@ -13,6 +16,10 @@ const onboardRoute = readFileSync(
 );
 const wizard = readFileSync(
   fileURLToPath(new URL("../app/onboarding/onboarding-client.tsx", import.meta.url)),
+  "utf8",
+);
+const pageSrc = readFileSync(
+  fileURLToPath(new URL("../app/onboarding/page.tsx", import.meta.url)),
   "utf8",
 );
 
@@ -70,5 +77,42 @@ describe("onboard profile persist", () => {
       wizard,
       /disabled=\{\s*finishStatus === "saving" \|\|[\s\S]*!tosConsent/,
     );
+  });
+
+  it("rehydrates name, lane, and favorite brand and does not self-redirect", () => {
+    const form = wizardFormFromMember(
+      {
+        first_name: "Lyra",
+        interest: "Rewards",
+        favorite_brand: "Restaurants & Food",
+        city: "Nashville, TN",
+        consent_accepted_at: null,
+      },
+      "lyra@example.com",
+    );
+    assert.equal(form.firstName, "Lyra");
+    assert.equal(form.interest, "Rewards");
+    assert.equal(form.favoriteBrand, "Restaurants & Food");
+    assert.equal(form.email, "lyra@example.com");
+    assert.equal(onboardingResumeStep(form), 2);
+    assert.equal(
+      isOnboardingComplete({
+        first_name: "Lyra",
+        consent_accepted_at: "2026-09-02T12:00:00.000Z",
+      }),
+      true,
+    );
+    assert.equal(
+      isOnboardingComplete({ first_name: "Lyra", consent_accepted_at: null }),
+      false,
+    );
+    assert.equal(onboardingResumeStep({ firstName: "Lyra" }), 1);
+    assert.match(wizard, /initialForm/);
+    assert.match(wizard, /window\.location\.assign\("\/"\)/);
+    assert.doesNotMatch(wizard, /router\.replace\(`\/signup/);
+    assert.doesNotMatch(wizard, /createClient\(\)/);
+    assert.match(onboardRoute, /Unable to save interests/);
+    assert.match(pageSrc, /isOnboardingComplete/);
+    assert.match(pageSrc, /wizardFormFromMember/);
   });
 });

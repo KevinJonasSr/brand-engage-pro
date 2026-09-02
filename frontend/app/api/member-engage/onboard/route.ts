@@ -56,10 +56,15 @@ export async function POST(request: Request) {
     let member: {
       id: string;
       first_name: string | null;
+      interest: string | null;
+      favorite_brand: string | null;
       current_tier: string | null;
       total_points: number | null;
       profile_slug: string | null;
     } | null = null;
+
+    const memberSelect =
+      "id, first_name, interest, favorite_brand, current_tier, total_points, profile_slug";
 
     if (Object.keys(updates).length > 0) {
       const writer = existing
@@ -70,7 +75,7 @@ export async function POST(request: Request) {
             ...updates,
           });
       const { data, error: updateErr } = await writer
-        .select("id, first_name, current_tier, total_points, profile_slug")
+        .select(memberSelect)
         .single();
 
       if (updateErr) {
@@ -84,10 +89,42 @@ export async function POST(request: Request) {
     } else if (existing) {
       const { data } = await admin
         .from("members")
-        .select("id, first_name, current_tier, total_points, profile_slug")
+        .select(memberSelect)
         .eq("id", user.id)
         .maybeSingle();
       member = data;
+    }
+
+    const { data: saved } = await admin
+      .from("members")
+      .select(memberSelect)
+      .eq("id", user.id)
+      .maybeSingle();
+    if (saved) member = saved;
+
+    const expectedName =
+      typeof payload.firstName === "string" ? payload.firstName.trim() : "";
+    const expectedInterest =
+      typeof payload.interest === "string" ? payload.interest.trim() : "";
+    if (expectedName && member?.first_name !== expectedName) {
+      console.error("onboard: first_name did not persist", {
+        expectedName,
+        saved: member?.first_name,
+      });
+      return NextResponse.json(
+        { error: "Unable to save profile name." },
+        { status: 500 },
+      );
+    }
+    if (expectedInterest && member?.interest !== expectedInterest) {
+      console.error("onboard: interest did not persist", {
+        expectedInterest,
+        saved: member?.interest,
+      });
+      return NextResponse.json(
+        { error: "Unable to save interests." },
+        { status: 500 },
+      );
     }
 
     if (draft) {
@@ -97,6 +134,8 @@ export async function POST(request: Request) {
         member: {
           id: member?.id,
           first_name: member?.first_name,
+          interest: member?.interest,
+          favorite_brand: member?.favorite_brand,
           current_tier: member?.current_tier,
           total_points: member?.total_points,
           profile_slug: member?.profile_slug,
@@ -273,7 +312,18 @@ export async function POST(request: Request) {
       }
     }
 
-    return NextResponse.json({ success: true, member: { id: member?.id, first_name: member?.first_name, current_tier: member?.current_tier, total_points: member?.total_points, profile_slug: member?.profile_slug } });
+    return NextResponse.json({
+      success: true,
+      member: {
+        id: member?.id,
+        first_name: member?.first_name,
+        interest: member?.interest,
+        favorite_brand: member?.favorite_brand,
+        current_tier: member?.current_tier,
+        total_points: member?.total_points,
+        profile_slug: member?.profile_slug,
+      },
+    });
   } catch (err) {
     console.error("onboard route error:", err);
     return NextResponse.json(

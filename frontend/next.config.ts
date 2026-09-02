@@ -23,6 +23,7 @@ const authSensitiveRoutes = [
   "/reset-password",
   "/onboarding",
   "/onboarding/:path*",
+  "/profile",
   "/premium",
   "/premium/:path*",
   "/settings/:path*",

@@ -7,6 +7,10 @@ const helper = readFileSync(
   fileURLToPath(new URL("./auth-signout.ts", import.meta.url)),
   "utf8",
 );
+const browser = readFileSync(
+  fileURLToPath(new URL("./auth-signout-browser.ts", import.meta.url)),
+  "utf8",
+);
 const logoutRoute = readFileSync(
   fileURLToPath(new URL("../app/logout/route.ts", import.meta.url)),
   "utf8",
@@ -29,10 +33,12 @@ const nextConfig = readFileSync(
 );
 
 describe("sign-out doors (FE /logout /signout 404 parity)", () => {
-  it("calls Supabase signOut and 303s to a safe path", () => {
-    assert.match(helper, /supabase\.auth\.signOut/);
+  it("revokes globally and expires sb-* cookies on the 303 response", () => {
+    assert.match(helper, /scope:\s*"global"/);
+    assert.match(helper, /expireAuthCookiesOnResponse/);
     assert.match(helper, /status: 303/);
     assert.match(helper, /safeRelativePath/);
+    assert.doesNotMatch(helper, /return NextResponse\.redirect[\s\S]*signOut/);
   });
 
   it("exposes GET+POST on /logout, /signout, and /auth/signout", () => {
@@ -43,9 +49,12 @@ describe("sign-out doors (FE /logout /signout 404 parity)", () => {
     }
   });
 
-  it("header Sign out uses client signOut then /logout", () => {
-    assert.match(userMenu, /supabase\.auth\.signOut/);
-    assert.match(userMenu, /window\.location\.assign\("\/logout"\)/);
+  it("header Sign out hard-navigates GET /logout after wiping stores", () => {
+    assert.match(userMenu, /hardSignOut/);
+    assert.match(browser, /scope:\s*"global"/);
+    assert.match(browser, /clearBrowserAuthStorage/);
+    assert.match(browser, /window\.location\.replace\("\/logout"\)/);
+    assert.doesNotMatch(userMenu, /window\.location\.assign\("\/logout"\)/);
     assert.doesNotMatch(userMenu, /action="\/auth\/signout"/);
   });
 
