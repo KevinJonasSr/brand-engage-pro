@@ -8,6 +8,7 @@ import {
   TURNSTILE_SLOW_LOAD_HINT_MS,
   TURNSTILE_WIDGET_ERROR_COPY,
   turnstileRequiredForClient,
+  turnstileShouldTreatAsFailedLoad,
   turnstileSlowLoadHint,
   type TurnstileLoadState,
 } from "@/lib/turnstile-ux";
@@ -63,6 +64,18 @@ function notifyTurnstileLoaded() {
   }
 }
 
+const failListeners = new Set<() => void>();
+
+function notifyTurnstileFailed() {
+  for (const listener of [...failListeners]) {
+    try {
+      listener();
+    } catch {
+      /* ignore listener errors */
+    }
+  }
+}
+
 /** True when a Turnstile site key is configured (widget iframe will render). */
 export function isTurnstileConfigured(): boolean {
   return Boolean(SITE_KEY);
@@ -96,6 +109,7 @@ export function prefetchTurnstileScript() {
   scriptRequested = true;
   injectTurnstileScript(0, () => {
     scriptRequested = false;
+    notifyTurnstileFailed();
   });
 }
 
@@ -131,12 +145,17 @@ export function TurnstileWidget({
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
+  const erroredRef = useRef(false);
+  const hasTokenRef = useRef(false);
+  const interactiveRef = useRef(false);
   const [loadState, setLoadState] = useState<TurnstileLoadState>("loading");
   const [retryNonce, setRetryNonce] = useState(0);
   const [slowLoad, setSlowLoad] = useState(false);
 
   const setState = useCallback(
     (state: TurnstileLoadState) => {
+      if (state === "error") erroredRef.current = true;
+      if (state === "loading") erroredRef.current = false;
       setLoadState(state);
       onLoadStateChange?.(state);
     },
@@ -144,6 +163,9 @@ export function TurnstileWidget({
   );
 
   const markReadyIfIframe = useCallback(() => {
+    // An error iframe (hostname mismatch / 110200) still paints. Do not
+    // promote that to "ready" — signup would grey Create account forever.
+    if (erroredRef.current) return false;
     if (!containerRef.current?.querySelector("iframe")) return false;
     setState("ready");
     return true;
@@ -162,10 +184,14 @@ export function TurnstileWidget({
         size: "normal",
         appearance: "always",
         callback: (token: string) => {
+          hasTokenRef.current = true;
+          erroredRef.current = false;
           setState("ready");
           onSuccess(token);
         },
         "before-interactive-callback": () => {
+          interactiveRef.current = true;
+          erroredRef.current = false;
           setState("ready");
         },
         "error-callback": () => {
@@ -173,6 +199,7 @@ export function TurnstileWidget({
           onError?.();
         },
         "expired-callback": () => {
+          hasTokenRef.current = false;
           onExpire?.();
         },
         "timeout-callback": () => {
@@ -212,7 +239,15 @@ export function TurnstileWidget({
       renderWidget();
     };
 
+    const onScriptFailed = () => {
+      if (!cancelled) {
+        setState("error");
+        onError?.();
+      }
+    };
+
     loadListeners.add(tryRender);
+    failListeners.add(onScriptFailed);
     window.onTurnstileLoad = () => {
       notifyTurnstileLoaded();
     };
@@ -230,17 +265,20 @@ export function TurnstileWidget({
     } else if (!scriptRequested) {
       scriptRequested = true;
       injectTurnstileScript(0, () => {
-        if (!cancelled) {
-          setState("error");
-          onError?.();
-        }
+        scriptRequested = false;
+        notifyTurnstileFailed();
       });
     }
 
     const timeout = window.setTimeout(() => {
       if (cancelled) return;
-      if (!widgetIdRef.current || !containerRef.current?.querySelector("iframe")) {
-        console.warn("[turnstile] load timed out — widget never rendered");
+      if (
+        turnstileShouldTreatAsFailedLoad({
+          hasToken: hasTokenRef.current,
+          becameInteractive: interactiveRef.current,
+        })
+      ) {
+        console.warn("[turnstile] load timed out — no token or interactive challenge");
         setState("error");
         onError?.();
       }
@@ -250,6 +288,7 @@ export function TurnstileWidget({
       cancelled = true;
       observer.disconnect();
       loadListeners.delete(tryRender);
+      failListeners.delete(onScriptFailed);
       window.clearTimeout(timeout);
       if (widgetIdRef.current && window.turnstile) {
         try {
@@ -274,6 +313,9 @@ export function TurnstileWidget({
   function handleRetry() {
     resetTurnstileScriptLoader();
     widgetIdRef.current = null;
+    hasTokenRef.current = false;
+    interactiveRef.current = false;
+    erroredRef.current = false;
     if (containerRef.current) containerRef.current.innerHTML = "";
     setSlowLoad(false);
     setState("loading");
@@ -288,9 +330,16 @@ export function TurnstileWidget({
           tabIndex={-1}
           className="space-y-2 outline-none"
         >
-          <p className="text-sm text-red-300">
-            Security check unavailable. Please try again later.
-          </p>
+          <div className="space-y-2 rounded-xl border border-rose-400/30 bg-rose-500/10 px-3 py-2">
+            <p className="text-xs text-rose-200">{TURNSTILE_WIDGET_ERROR_COPY}</p>
+            <button
+              type="button"
+              onClick={handleRetry}
+              className="rounded-full border border-white/20 px-3 py-1 text-xs font-medium text-white/80 hover:bg-white/10"
+            >
+              Retry security check
+            </button>
+          </div>
         </div>
       );
     }

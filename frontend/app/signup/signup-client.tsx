@@ -118,6 +118,7 @@ export default function SignupPage({
     configured: turnstileRequired,
     token: turnstileToken,
     loadState: turnstileLoadState,
+    challengeFailed: turnstileError,
   });
   const canSubmitSignup = signupAllowsSubmit(turnstileGate);
   const reviewTitle = consentReviewTitle({
@@ -131,6 +132,7 @@ export default function SignupPage({
       configured: turnstileRequired,
       token: turnstileToken,
       loadState: turnstileLoadState,
+      challengeFailed: turnstileError,
     });
     if (gate === "wait-load") {
       setStatus("error");

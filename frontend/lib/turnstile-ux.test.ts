@@ -16,6 +16,7 @@ import {
   signupAllowsSubmit,
   signupTurnstileButtonLabel,
   turnstileRequiredForClient,
+  turnstileShouldTreatAsFailedLoad,
   turnstileSlowLoadHint,
 } from "./turnstile-ux.ts";
 
@@ -313,6 +314,28 @@ describe("signup Turnstile gate", () => {
     );
   });
 
+  it("fail-opens when onError fired even if loadState later looks ready", () => {
+    const gate = nextSignupTurnstileGate({
+      configured: true,
+      token: null,
+      loadState: "ready",
+      challengeFailed: true,
+    });
+    assert.equal(gate, "fail-open");
+    assert.equal(signupAllowsSubmit(gate), true);
+  });
+
+  it("still requires a completed check when the widget is ready and clean", () => {
+    const gate = nextSignupTurnstileGate({
+      configured: true,
+      token: null,
+      loadState: "ready",
+      challengeFailed: false,
+    });
+    assert.equal(gate, "complete-check");
+    assert.equal(signupAllowsSubmit(gate), false);
+  });
+
   it("never puts security-check loading copy on Create account", () => {
     for (const gate of [
       "wait-load",
@@ -336,6 +359,35 @@ describe("signup Turnstile gate", () => {
     });
     assert.equal(gate, "ready");
     assert.equal(signupAllowsSubmit(gate), true);
+  });
+});
+
+describe("hang timeout vs hostname-mismatch iframe", () => {
+  it("fails a painted iframe that never became interactive or issued a token", () => {
+    assert.equal(
+      turnstileShouldTreatAsFailedLoad({
+        hasToken: false,
+        becameInteractive: false,
+      }),
+      true,
+    );
+  });
+
+  it("does not fail a visible checkbox or a completed token", () => {
+    assert.equal(
+      turnstileShouldTreatAsFailedLoad({
+        hasToken: false,
+        becameInteractive: true,
+      }),
+      false,
+    );
+    assert.equal(
+      turnstileShouldTreatAsFailedLoad({
+        hasToken: true,
+        becameInteractive: false,
+      }),
+      false,
+    );
   });
 });
 
