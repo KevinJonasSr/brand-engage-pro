@@ -1,5 +1,8 @@
 import { createBrowserClient } from "@supabase/ssr";
-import { AUTH_COOKIE_OPTIONS } from "@/lib/auth-cookies";
+import {
+  AUTH_COOKIE_OPTIONS,
+  hasBrowserSignedOutMarker,
+} from "@/lib/auth-cookies";
 
 /**
  * Supabase client for browser / client components.
@@ -16,8 +19,19 @@ export function createClient() {
     );
   }
 
+  const signedOut = hasBrowserSignedOutMarker();
+
   return createBrowserClient(url, anon, {
     cookieOptions: AUTH_COOKIE_OPTIONS,
-    isSingleton: true,
+    // Signed-out clients are throwaways so a later sign-up can mint a
+    // persist-enabled singleton after the marker is cleared.
+    isSingleton: !signedOut,
+    auth: signedOut
+      ? {
+          autoRefreshToken: false,
+          persistSession: false,
+          detectSessionInUrl: false,
+        }
+      : undefined,
   });
 }

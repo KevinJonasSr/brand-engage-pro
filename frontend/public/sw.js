@@ -19,6 +19,32 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(self.clients.claim());
 });
 
+const AUTH_NETWORK_ONLY = new Set([
+  "/signup",
+  "/login",
+  "/logout",
+  "/signout",
+  "/onboarding",
+  "/join",
+  "/forgot-password",
+]);
+
+self.addEventListener("fetch", (event) => {
+  try {
+    const url = new URL(event.request.url);
+    if (url.origin !== self.location.origin) return;
+    if (
+      AUTH_NETWORK_ONLY.has(url.pathname) ||
+      url.pathname.startsWith("/auth/") ||
+      url.pathname.startsWith("/onboarding/")
+    ) {
+      event.respondWith(fetch(event.request, { cache: "reload" }));
+    }
+  } catch {
+    // let the browser handle it
+  }
+});
+
 self.addEventListener("push", (event) => {
   if (!event.data) return;
 

@@ -53,16 +53,14 @@ export type OnboardingMemberRow = {
 };
 
 /**
- * Columns the /onboarding gate may request.
+ * Columns the /onboarding *gate* may request.
  *
- * Do NOT include birthday_month — that column is in migration 0052 but is
- * not on live members (enfpviapxvqyoarwwsuf). A typed PostgREST select of
- * a missing column returns data:null without throwing, which made #24's
- * completion gate treat finished rows (n24: first_name + consent) as a
- * blank 33% wizard.
+ * Only fields that exist on live members (enfpviapxvqyoarwwsuf) and that
+ * `isOnboardingComplete` reads. Do NOT include birthday_month (missing on
+ * live) or email/socials — extra typed columns were another silent-null
+ * path after #25. Draft rehydrate uses select("*") as fallback.
  */
-export const ONBOARDING_MEMBER_SELECT =
-  "first_name, city, interest, favorite_brand, phone, socials, consent_accepted_at, email";
+export const ONBOARDING_MEMBER_SELECT = "first_name, consent_accepted_at";
 
 export type OnboardingMemberQueryResult = {
   data: OnboardingMemberRow | null;
@@ -70,20 +68,25 @@ export type OnboardingMemberQueryResult = {
 };
 
 /**
- * Load the members row for the wizard gate. If a typed select errors
- * (schema cache miss / missing column), retry with `*` so a finished
- * profile still redirects home instead of remounting Step 1 empty.
+ * Load the members row for the wizard gate.
+ *
+ * PostgREST can return `{ data: null, error: null }` for a bad typed
+ * select (the #24/#25 birthday_month class) *or* `{ data: null, error }`.
+ * Always retry `*` when the gate select has no row so a finished n24/n24b
+ * profile still redirects home on hard reload.
  */
 export async function resolveOnboardingMember(
   query: (columns: string) => Promise<OnboardingMemberQueryResult>,
 ): Promise<OnboardingMemberRow | null> {
   const primary = await query(ONBOARDING_MEMBER_SELECT);
-  if (!primary.error) {
-    return primary.data ?? null;
+  if (primary.data && !primary.error) {
+    return primary.data;
   }
   const fallback = await query("*");
-  if (fallback.error) return null;
-  return fallback.data ?? null;
+  if (fallback.data && !fallback.error) {
+    return fallback.data;
+  }
+  return fallback.data ?? primary.data ?? null;
 }
 
 function trimOrNull(value: string | null | undefined): string | null | undefined {

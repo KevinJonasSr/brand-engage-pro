@@ -13,6 +13,14 @@ export const AUTH_COOKIE_OPTIONS = {
   sameSite: "lax" as const,
 };
 
+/** Sticky logout — leftover sb-* must not be adopted for 30 minutes. */
+export const SIGNED_OUT_COOKIE = "bep_signed_out";
+export const SIGNED_OUT_MAX_AGE = 30 * 60;
+
+/** Durable onboarding gate — finished profiles skip the blank wizard. */
+export const ONBOARDED_COOKIE = "bep_onboarded";
+export const ONBOARDED_MAX_AGE = 60 * 60 * 24 * 365;
+
 const AUTH_TOKEN_RE = /^sb-[a-z0-9]+-auth-token(?:\.\d+)?$/i;
 const AUTH_VERIFIER_RE = /^sb-[a-z0-9]+-auth-token-code-verifier$/i;
 
@@ -22,6 +30,159 @@ export function isAuthSignOutPath(pathname: string): boolean {
     pathname === "/signout" ||
     pathname === "/auth/signout"
   );
+}
+
+export function isAuthPublicPath(pathname: string): boolean {
+  return (
+    pathname === "/signup" ||
+    pathname === "/login" ||
+    pathname === "/join" ||
+    pathname === "/forgot-password" ||
+    pathname.startsWith("/signup/") ||
+    pathname.startsWith("/login/")
+  );
+}
+
+export function isSignedOutMarkerValue(value: string | undefined | null): boolean {
+  return value === "1" || value === "true";
+}
+
+export function isOnboardedMarkerValue(value: string | undefined | null): boolean {
+  return value === "1" || value === "true";
+}
+
+/**
+ * Proxy / server must not call getUser() or write sb-* while this is true.
+ * Covers /logout, /signup, /login, and the sticky signed-out window so a
+ * leftover N24 refresh cannot remint cookies onto prefetch or /signup.
+ */
+export function shouldSkipSessionRefresh(
+  pathname: string,
+  signedOut: boolean,
+): boolean {
+  return isAuthSignOutPath(pathname) || isAuthPublicPath(pathname) || signedOut;
+}
+
+export function shouldRedirectOnboardingHome(
+  pathname: string,
+  onboarded: boolean,
+  signedOut: boolean,
+): boolean {
+  return pathname === "/onboarding" && onboarded && !signedOut;
+}
+
+export function flowCookieHeader(
+  name: string,
+  value: string,
+  maxAge: number,
+  secure = false,
+): string {
+  const parts = [
+    `${name}=${value}`,
+    "Path=/",
+    `Max-Age=${maxAge}`,
+    "SameSite=Lax",
+  ];
+  if (secure) parts.push("Secure");
+  return parts.join("; ");
+}
+
+export function isSecureAuthHost(hostname: string): boolean {
+  const host = hostname.split(":")[0].toLowerCase();
+  return host !== "localhost" && host !== "127.0.0.1";
+}
+
+export function stampSignedOutCookie(
+  response: { headers: { append: (name: string, value: string) => void } },
+  hostname: string,
+): void {
+  response.headers.append(
+    "Set-Cookie",
+    flowCookieHeader(
+      SIGNED_OUT_COOKIE,
+      "1",
+      SIGNED_OUT_MAX_AGE,
+      isSecureAuthHost(hostname),
+    ),
+  );
+}
+
+export function clearSignedOutCookie(
+  response: { headers: { append: (name: string, value: string) => void } },
+  hostname: string,
+): void {
+  response.headers.append(
+    "Set-Cookie",
+    expireAuthCookieHeader(SIGNED_OUT_COOKIE, undefined, isSecureAuthHost(hostname)),
+  );
+}
+
+export function stampOnboardedCookie(
+  response: { cookies?: { set: (name: string, value: string, options: Record<string, unknown>) => void } },
+): void {
+  response.cookies?.set(ONBOARDED_COOKIE, "1", {
+    path: "/",
+    maxAge: ONBOARDED_MAX_AGE,
+    sameSite: "lax",
+  });
+}
+
+export function clearOnboardedCookie(
+  response: { headers: { append: (name: string, value: string) => void } },
+  hostname: string,
+): void {
+  response.headers.append(
+    "Set-Cookie",
+    expireAuthCookieHeader(ONBOARDED_COOKIE, undefined, isSecureAuthHost(hostname)),
+  );
+}
+
+export function readBrowserCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  const prefix = `${name}=`;
+  for (const part of document.cookie.split(";")) {
+    const trimmed = part.trim();
+    if (trimmed.startsWith(prefix)) {
+      return decodeURIComponent(trimmed.slice(prefix.length));
+    }
+  }
+  return null;
+}
+
+export function writeBrowserFlowCookie(
+  name: string,
+  value: string,
+  maxAge: number,
+): void {
+  if (typeof document === "undefined") return;
+  const secure = isSecureAuthHost(window.location.hostname);
+  document.cookie = flowCookieHeader(name, value, maxAge, secure);
+}
+
+export function stampBrowserSignedOut(): void {
+  writeBrowserFlowCookie(SIGNED_OUT_COOKIE, "1", SIGNED_OUT_MAX_AGE);
+}
+
+export function clearBrowserSignedOut(): void {
+  if (typeof document === "undefined") return;
+  document.cookie = expireAuthCookieHeader(
+    SIGNED_OUT_COOKIE,
+    undefined,
+    isSecureAuthHost(window.location.hostname),
+  );
+}
+
+export function clearBrowserOnboarded(): void {
+  if (typeof document === "undefined") return;
+  document.cookie = expireAuthCookieHeader(
+    ONBOARDED_COOKIE,
+    undefined,
+    isSecureAuthHost(window.location.hostname),
+  );
+}
+
+export function hasBrowserSignedOutMarker(): boolean {
+  return isSignedOutMarkerValue(readBrowserCookie(SIGNED_OUT_COOKIE));
 }
 
 export function isAuthCookieName(name: string): boolean {

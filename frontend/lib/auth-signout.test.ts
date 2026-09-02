@@ -36,6 +36,8 @@ describe("sign-out doors (FE /logout /signout 404 parity)", () => {
   it("revokes globally and expires sb-* cookies on the 303 response", () => {
     assert.match(helper, /scope:\s*"global"/);
     assert.match(helper, /expireAuthCookiesOnResponse/);
+    assert.match(helper, /stampSignedOutCookie|SIGNED_OUT_COOKIE/);
+    assert.match(helper, /clearOnboardedCookie|ONBOARDED_COOKIE/);
     assert.match(helper, /status: 303/);
     assert.match(helper, /safeRelativePath/);
     assert.doesNotMatch(helper, /return NextResponse\.redirect[\s\S]*signOut/);
@@ -53,6 +55,7 @@ describe("sign-out doors (FE /logout /signout 404 parity)", () => {
     assert.match(userMenu, /hardSignOut/);
     assert.match(browser, /scope:\s*"global"/);
     assert.match(browser, /clearBrowserAuthStorage/);
+    assert.match(browser, /stampBrowserSignedOut/);
     assert.match(browser, /window\.location\.replace\("\/logout"\)/);
     assert.doesNotMatch(userMenu, /window\.location\.assign\("\/logout"\)/);
     assert.doesNotMatch(userMenu, /action="\/auth\/signout"/);

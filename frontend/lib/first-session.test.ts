@@ -127,6 +127,7 @@ describe("first-session checklist", () => {
     assert.match(homeSrc, /getFirstSessionFacts/);
     assert.match(onboardingSrc, /FirstSessionChecklist/);
     assert.match(onboardingSrc, /dismissible=\{false\}/);
+    assert.match(onboardingSrc, /initialFacts/);
     assert.doesNotMatch(onboardingSrc, /Founders Weekend/);
     assert.doesNotMatch(onboardingSrc, /Marketplace Passport/);
     assert.match(referralsSrc, /FIRST_SESSION_BLURB|FIRST_SESSION_EYEBROW/);

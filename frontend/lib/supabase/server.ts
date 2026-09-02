@@ -1,6 +1,11 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { AUTH_COOKIE_OPTIONS } from "@/lib/auth-cookies";
+import {
+  AUTH_COOKIE_OPTIONS,
+  SIGNED_OUT_COOKIE,
+  isAuthCookieName,
+  isSignedOutMarkerValue,
+} from "@/lib/auth-cookies";
 
 /**
  * Supabase client for server components, route handlers, and server actions.
@@ -18,14 +23,24 @@ export async function createClient() {
   }
 
   const cookieStore = await cookies();
+  const signedOut = isSignedOutMarkerValue(
+    cookieStore.get(SIGNED_OUT_COOKIE)?.value,
+  );
 
   return createServerClient(url, anon, {
     cookieOptions: AUTH_COOKIE_OPTIONS,
     cookies: {
       getAll() {
-        return cookieStore.getAll();
+        const all = cookieStore.getAll();
+        // Hide leftover sb-* after Sign out so layout/signup getUser()
+        // cannot resurrect N24 onto /signup mid-form.
+        if (signedOut) {
+          return all.filter((cookie) => !isAuthCookieName(cookie.name));
+        }
+        return all;
       },
       setAll(cookiesToSet) {
+        if (signedOut) return;
         try {
           cookiesToSet.forEach(({ name, value, options }) =>
             cookieStore.set(name, value, {

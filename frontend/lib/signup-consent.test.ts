@@ -73,4 +73,11 @@ describe("signup consent review step", () => {
     assert.match(nextConfig, /source: "\/join"/);
     assert.match(nextConfig, /destination: "\/signup"/);
   });
+
+  it("refuses a leftover session mid-form after Sign out", () => {
+    assert.match(signupPage, /SIGNED_OUT_COOKIE|isSignedOutMarkerValue/);
+    assert.match(signupClient, /clearBrowserAuthStorage/);
+    assert.match(signupClient, /hasBrowserSignedOutMarker/);
+    assert.match(signupClient, /clearBrowserSignedOut/);
+  });
 });

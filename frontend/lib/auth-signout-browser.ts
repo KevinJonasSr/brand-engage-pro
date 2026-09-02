@@ -1,7 +1,11 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import { clearBrowserAuthStorage } from "@/lib/auth-cookies";
+import {
+  clearBrowserAuthStorage,
+  clearBrowserOnboarded,
+  stampBrowserSignedOut,
+} from "@/lib/auth-cookies";
 
 /**
  * Header Sign out: wipe every sb-* store the browser can see, revoke the
@@ -17,5 +21,7 @@ export async function hardSignOut(): Promise<void> {
     // still clear local stores and hit the GET door
   }
   clearBrowserAuthStorage();
+  stampBrowserSignedOut();
+  clearBrowserOnboarded();
   window.location.replace("/logout");
 }

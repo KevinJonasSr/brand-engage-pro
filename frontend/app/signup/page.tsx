@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { SIGNED_OUT_COOKIE, isSignedOutMarkerValue } from "@/lib/auth-cookies";
 import { safeRelativePath } from "@/lib/safe-redirect";
 import { getPolicy } from "@/lib/data/policies";
 import SignupClient, { type ReferrerBrand } from "./signup-client";
@@ -62,10 +63,15 @@ export default async function SignupPage({
 }: {
   searchParams?: Promise<{ ref?: string; next?: string }>;
 }) {
+  const cookieStore = await cookies();
+  const signedOut = isSignedOutMarkerValue(
+    cookieStore.get(SIGNED_OUT_COOKIE)?.value,
+  );
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const sp = (await searchParams) ?? {};
-  if (user) redirect(safeRelativePath(sp.next, "/"));
+  // After Sign out, leftover N24 must not bounce /signup mid-typing.
+  if (user && !signedOut) redirect(safeRelativePath(sp.next, "/"));
   const [referrerName, referrerBrand, terms, privacy] = await Promise.all([
     getReferrerName(),
     getReferrerBrand(sp.ref),
