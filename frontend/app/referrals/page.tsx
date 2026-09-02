@@ -6,6 +6,12 @@ import InviteQRCode from "@/components/invite-qr";
 import CopyLinkButton from "./copy-link-button";
 import PreviewSignupBanner from "@/components/preview-signup-banner";
 import NativeShareButton from "./native-share-button";
+import FirstSessionChecklist from "@/components/first-session-checklist";
+import { getFirstSessionFacts } from "@/lib/data/first-session";
+import {
+  FIRST_SESSION_BLURB,
+  FIRST_SESSION_EYEBROW,
+} from "@/lib/first-session";
 
 // Restaurant loyalty milestones — no music leftovers (e.g. “VIP livestream”).
 const ladder = [
@@ -29,10 +35,11 @@ async function buildInviteUrl(code: string | null | undefined): Promise<string> 
 export const metadata = { title: "Referrals" };
 
 export default async function ReferralsPage() {
-  const [member, myReferrals, leaderboard] = await Promise.all([
+  const [member, myReferrals, leaderboard, firstSession] = await Promise.all([
     getCurrentMember(),
     getMyReferrals(),
     getReferralLeaderboard(5),
+    getFirstSessionFacts(),
   ]);
 
   const isSignedIn = member !== null;
@@ -93,6 +100,17 @@ export default async function ReferralsPage() {
               )}
             </div>
           </section>
+
+          {isSignedIn && firstSession ? (
+            <FirstSessionChecklist facts={firstSession} />
+          ) : (
+            <section className="glass-card p-6">
+              <p className="text-sm uppercase tracking-wide text-white/60">
+                {FIRST_SESSION_EYEBROW}
+              </p>
+              <p className="mt-2 text-sm text-white/70">{FIRST_SESSION_BLURB}</p>
+            </section>
+          )}
 
           <section className="grid gap-6 md:grid-cols-2">
             <div className="glass-card p-6">

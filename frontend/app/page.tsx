@@ -7,6 +7,8 @@ import SignedOutLanding from "@/components/signed-out-landing";
 import { listBrandsFromDb } from "@/lib/data/brands";
 import { getCurrentMember, getCurrentMemberKpis } from "@/lib/data/member";
 import { getMemberHomeData } from "@/lib/data/member-home";
+import { getFirstSessionFacts } from "@/lib/data/first-session";
+import FirstSessionChecklist from "@/components/first-session-checklist";
 import { getFeaturedOffers } from "@/lib/data/offers";
 import { getTiers, tierIcon } from "@/lib/data/tiers";
 import type { TierSlug } from "@/lib/data/types";
@@ -54,18 +56,20 @@ export default async function Home({
 
   // Signed-in path — parallel-fetch everything the dashboard needs. Each
   // gracefully returns null / empty on error so the page never breaks.
-  const [kpis, featured, tiers, streak, recap, memberHome] = await Promise.all([
-    getCurrentMemberKpis(),
-    getFeaturedOffers(3),
-    getTiers(),
-    // Touch streak before reading home data so the dashboard
-    // sees the freshly-incremented streak counter on the same render.
-    member?.id ? touchStreak(member.id) : Promise.resolve(null),
+  const [kpis, featured, tiers, streak, recap, memberHome, firstSession] =
+    await Promise.all([
+      getCurrentMemberKpis(),
+      getFeaturedOffers(3),
+      getTiers(),
+      // Touch streak before reading home data so the dashboard
+      // sees the freshly-incremented streak counter on the same render.
+      member?.id ? touchStreak(member.id) : Promise.resolve(null),
       // Compute the past-7-day recap for the "Your week" tile. Returns a
-    // benign empty recap on error so Member Home never blocks.
-    member?.id ? gatherWeeklyRecap(member.id) : Promise.resolve(null),
+      // benign empty recap on error so Member Home never blocks.
+      member?.id ? gatherWeeklyRecap(member.id) : Promise.resolve(null),
       getMemberHomeData(),
-  ]);
+      getFirstSessionFacts(),
+    ]);
 
   // KPI grid — real data from Supabase. If kpis is null (DB hiccup), we
   // render zeros rather than fake marketing numbers so nothing ever lies.
@@ -128,7 +132,8 @@ export default async function Home({
     <div className="min-h-screen bg-midnight">
       <main className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-12 lg:flex-row">
         <div className="flex-1 space-y-6">
-          {needsProfile && (
+          {firstSession && <FirstSessionChecklist facts={firstSession} />}
+          {needsProfile && !firstSession && (
             <section className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-aurora/40 bg-gradient-to-r from-aurora/20 via-slate-900 to-ember/20 px-5 py-4">
               <div>
                 <p className="text-sm font-semibold">Finish setting up your profile</p>
