@@ -4,13 +4,16 @@ import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 import {
   JGE_HIDDEN_TITLES,
+  JGE_LAUNCH_BIO,
   JGE_PUBLISHED_SPECIAL_SLUGS,
   JGE_PUBLISHED_SPECIAL_TITLES,
+  applyJgeLaunchBio,
   applyJgeLaunchSpecials,
   filterJgeLaunchEvents,
   isJgeHiddenTitle,
   jgeLaunchSpecials,
 } from "./jge-launch.ts";
+import { getBrand } from "./brands.ts";
 
 describe("JGE Aug 30 specials lock", () => {
   it("surfaces house tour, early listens, and rotating live access", () => {
@@ -58,6 +61,24 @@ describe("JGE Aug 30 specials lock", () => {
       [...JGE_PUBLISHED_SPECIAL_TITLES],
     );
     assert.equal(shown[0].id, "4");
+  });
+
+  it("stamps the lock bio and does not market hidden offers", () => {
+    assert.match(JGE_LAUNCH_BIO, /Music Row house tour/);
+    assert.match(JGE_LAUNCH_BIO, /rotating live/);
+    assert.doesNotMatch(JGE_LAUNCH_BIO, /listening-party invites/);
+    assert.doesNotMatch(JGE_LAUNCH_BIO, /early ticket access for roster/);
+    assert.equal(
+      applyJgeLaunchBio("jonas-group-ent", "Members get listening-party invites"),
+      JGE_LAUNCH_BIO,
+    );
+    assert.equal(applyJgeLaunchBio("nellies", "Jackie stays"), "Jackie stays");
+    assert.equal(getBrand("jonas-group-ent")?.bio, JGE_LAUNCH_BIO);
+    const brandsDataSrc = readFileSync(
+      fileURLToPath(new URL("./data/brands.ts", import.meta.url)),
+      "utf8",
+    );
+    assert.match(brandsDataSrc, /applyJgeLaunchBio/);
   });
 
   it("does not rewrite Nellie's specials", () => {

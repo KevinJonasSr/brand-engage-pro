@@ -34,6 +34,18 @@ export const JGE_PUBLISHED_SPECIAL_SLUGS: readonly string[] =
 export const JGE_PUBLISHED_SPECIAL_TITLES: readonly string[] =
   JGE_PUBLISHED_SPECIALS.map((o) => o.title);
 
+/** Guest-facing brand bio. Do not market hidden Aug 30 offers. */
+export const JGE_LAUNCH_BIO = [
+  "Jonas Group Entertainment is a full-service entertainment company on Nashville's historic Music Row, owned by the Jonas family. We are a label, a publisher, an artist-management group, and a steward of some of the most influential catalogs in country and pop.",
+  "Under our roof: Red Van Records (label), Jonas Group Publishing (songwriter representation and catalog), and a management roster that includes Rhett Akins, Aaron Gillespie, Levi Hummon, RaeLynn, Bailee Madison, Franklin Jonas, Justin Ebach, David Kalmusky, Hunter Hawkins, Amy Stroup, and Dan Marshall. Jonas Group Publishing champions Music Row catalogs through signings, acquisitions, and sync — including the acquired Jonas Brothers catalog.",
+  "This page is for the people who've been on our list for years — fans of the artists, friends of the family, and members of the broader Jonas universe. Live access includes a Music Row house tour, early writer and artist listens, and capped rotating live sessions with Kevin, Leslie, Amanda, Abby, and Raymond.",
+].join("\n\n");
+
+export function applyJgeLaunchBio(brandSlug: string, bio: string | null): string {
+  if (brandSlug.toLowerCase() !== JGE_BRAND_SLUG) return bio ?? "";
+  return JGE_LAUNCH_BIO;
+}
+
 /** Must not show as live JGE offers (Aug 30 lock). */
 export const JGE_HIDDEN_TITLES: readonly string[] = [
   "Roster Presale Access",
