@@ -1,7 +1,7 @@
 /**
  * Site-wide Content-Security-Policy.
  *
- * Turnstile on www.brandengagepro.com/signup needs Cloudflare's script,
+ * Turnstile on www.brandengagepro.com/signup and /login needs Cloudflare's script,
  * iframe, worker, and connect endpoints. A missing worker-src/blob or
  * child-src fallback is a common "Security check couldn't load" cause
  * even when NEXT_PUBLIC_TURNSTILE_SITE_KEY is set.
