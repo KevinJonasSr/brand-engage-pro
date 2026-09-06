@@ -4,6 +4,11 @@ Signup (`/signup`) mounts Cloudflare Turnstile as **Security check**. If the
 widget cannot load, Create account stays grey until the check succeeds **or**
 the widget reports failure (then Retry + fail-open).
 
+Password login (`/login`) also mounts Turnstile when a site key is configured
+and binds `captchaToken` into `signInWithPassword`. Sign in stays **disabled**
+until a real token exists (fail-closed). Load error / expire / reset clears a
+stale token. Local `next dev` without a site key stays CAPTCHA-free.
+
 Magic-link and forgot-password doors stay **HOLD** in production. Do not set
 `NEXT_PUBLIC_MAGIC_LINK_ENABLED` or `NEXT_PUBLIC_FORGOT_PASSWORD_ENABLED`.
 
@@ -40,7 +45,7 @@ Dashboard: [Cloudflare Turnstile](https://dash.cloudflare.com/) → **Turnstile*
 
 | Hostname | Why |
 |---|---|
-| `www.brandengagepro.com` | Production signup. Required. |
+| `www.brandengagepro.com` | Production signup and password login. Required. |
 | `brandengagepro.com` | Apex 308s to www; add so a first-paint on apex cannot fail the widget before redirect. |
 | `brand-engage-pro.vercel.app` | Sibling production alias (also 308s to www). Optional but recommended. |
 | `localhost` | Local `next dev` only if you test with real keys. |
@@ -51,8 +56,9 @@ widget, and do not reuse FE’s site key (`0x4AAAAAAD1JKjkVoSDAz9k8`) here.
 Widget mode: **Managed** is fine. Domain matching is hostname-exact; `www` and
 apex are different entries.
 
-Save the widget, then hard-refresh `https://www.brandengagepro.com/signup`.
-Allowlist edits are live (no Vercel redeploy) once the key was already baked.
+Save the widget, then hard-refresh `https://www.brandengagepro.com/signup`
+and `/login`. Allowlist edits are live (no Vercel redeploy) once the key
+was already baked.
 
 ## Smoke (www)
 
@@ -61,7 +67,11 @@ Allowlist edits are live (no Vercel redeploy) once the key was already baked.
 3. Completing the check enables **Create account**.
 4. If the check fails: **Retry security check** appears; Create account is
    not a dead grey button (fail-open + “You can still create an account.”).
-5. Do not send marketing lists. Test accounts only (`+bep-turnstile@…` or
+5. Open `/login` signed out. **Sign in** stays disabled until Turnstile
+   issues a token. Completing the check enables Sign in and the request
+   includes `options.captchaToken`. A broken widget shows Retry and keeps
+   Sign in disabled.
+6. Do not send marketing lists. Test accounts only (`+bep-turnstile@…` or
    similar). Magic / forgot stay hidden.
 
 ## Sign-out doors

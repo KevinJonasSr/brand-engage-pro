@@ -11,18 +11,23 @@ import {
 } from "@/lib/auth-cookies";
 import {
   TurnstileWidget,
+  isTurnstileConfigured,
   isTurnstileRequired,
   prefetchTurnstileScript,
   turnstileFailureMessage,
   verifyTurnstileToken,
   type TurnstileLoadState,
 } from "@/components/turnstile-widget";
+import { buildPasswordAuthCredentials } from "@/lib/password-auth-credentials";
 import {
   emailReadyForMagicLink,
   magicLinkButtonLabel,
   magicLinkClickAction,
   magicLinkPersistentHelper,
   nextMagicLinkGate,
+  nextPasswordTurnstileGate,
+  passwordLoginAllowsSubmit,
+  passwordLoginTurnstileHelper,
   scrollToTurnstileChallenge,
   shouldShowParentChallengeError,
 } from "@/lib/turnstile-ux";
@@ -76,6 +81,7 @@ function LoginForm({
   const forgotHref = `/forgot-password${next !== "/" ? `?next=${encodeURIComponent(next)}` : ""}`;
 
   const turnstileRequired = isTurnstileRequired();
+  const turnstileConfigured = isTurnstileConfigured();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "error" | "magic-sent">("idle");
@@ -85,8 +91,8 @@ function LoginForm({
   const [turnstileLoadState, setTurnstileLoadState] =
     useState<TurnstileLoadState>("loading");
   const [turnstileKey, setTurnstileKey] = useState(0);
-  // Don't mount Turnstile until the guest chooses magic-link — keeps the
-  // password door above the fold and avoids a blank check on first paint.
+  // Magic link reuses the password door's challenge when that secondary
+  // option is enabled. Production keeps magic-link / forgot hidden.
   const [magicLinkOpen, setMagicLinkOpen] = useState(false);
   const pendingMagicSend = useRef(false);
 
@@ -94,10 +100,18 @@ function LoginForm({
     setTurnstileToken(token);
     setTurnstileError(false);
   }, []);
-  const handleTurnstileError = useCallback(() => setTurnstileError(true), []);
+  const handleTurnstileError = useCallback(() => {
+    setTurnstileError(true);
+    setTurnstileToken(null);
+  }, []);
   const handleTurnstileExpire = useCallback(() => setTurnstileToken(null), []);
   const handleTurnstileLoadState = useCallback((state: TurnstileLoadState) => {
     setTurnstileLoadState(state);
+    // Load / challenge failure must drop any leftover token so a
+    // `!!turnstileToken` ready check cannot re-enable Sign in.
+    if (state === "error") {
+      setTurnstileToken(null);
+    }
     // Retry remounts into loading while challengeFailed was still true —
     // clear it so "Security check failed…" cannot flash under the skeleton.
     if (state === "loading" || state === "ready") {
@@ -124,8 +138,9 @@ function LoginForm({
   }, []);
 
   useEffect(() => {
-    if (turnstileRequired && magicLinkEnabled) prefetchTurnstileScript();
-  }, [turnstileRequired, magicLinkEnabled]);
+    if (!turnstileConfigured) return;
+    prefetchTurnstileScript();
+  }, [turnstileConfigured]);
 
   useEffect(() => {
     if (!hasBrowserSignedOutMarker()) return;
@@ -169,10 +184,7 @@ function LoginForm({
     }, 1000);
   }
 
-  // Password sign-in intentionally skips Turnstile (Fan Engage parity /
-  // least-confused guest path). Magic-link below still verifies captcha.
-  // Do not reintroduce password Turnstile without an explicit product decision —
-  // open PR #6 conflicts by requiring it on password login.
+  // Supabase CAPTCHA enforcement applies to password sign-in as well as signup.
   async function handlePassword(e: React.FormEvent) {
     e.preventDefault();
     pendingMagicSend.current = false;
@@ -190,6 +202,20 @@ function LoginForm({
       );
       return;
     }
+    const passwordGate = nextPasswordTurnstileGate({
+      configured: turnstileConfigured,
+      token: turnstileToken,
+      loadState: turnstileLoadState,
+    });
+    if (!passwordLoginAllowsSubmit(passwordGate)) {
+      setStatus("error");
+      setMessage(
+        passwordLoginTurnstileHelper(passwordGate) ??
+          "Complete the security check, then try again.",
+      );
+      requestAnimationFrame(() => scrollToTurnstileChallenge());
+      return;
+    }
     setStatus("loading");
     setMessage("");
     try {
@@ -202,13 +228,21 @@ function LoginForm({
         // continue into password sign-in
       }
       clearBrowserAuthStorage();
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const credentials = buildPasswordAuthCredentials({
+        email,
+        password,
+        turnstileConfigured,
+        turnstileToken,
+      });
+      const { error } = await supabase.auth.signInWithPassword(credentials);
       if (error) throw error;
       router.push(next);
       router.refresh();
     } catch (err) {
       setStatus("error");
       setMessage(err instanceof Error ? err.message : "Unable to sign in.");
+    } finally {
+      resetChallenge();
     }
   }
 
@@ -264,7 +298,7 @@ function LoginForm({
     }
   }
 
-  // Secondary door: magic link. Turnstile only on this path.
+  // Secondary door: magic link reuses the same unconsumed challenge token.
   async function handleMagicLink() {
     if (!magicLinkEnabled) return;
     if (magicCooldown > 0 || status === "loading") return;
@@ -313,6 +347,13 @@ function LoginForm({
   }, [turnstileToken, magicLinkEnabled]);
 
   const magicLinkDisabled = status === "loading" || magicCooldown > 0;
+  const passwordGate = nextPasswordTurnstileGate({
+    configured: turnstileConfigured,
+    token: turnstileToken,
+    loadState: turnstileLoadState,
+  });
+  const passwordCaptchaReady = passwordLoginAllowsSubmit(passwordGate);
+  const passwordHelper = passwordLoginTurnstileHelper(passwordGate);
 
   return (
     <main className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center gap-6 px-6 py-12">
@@ -366,13 +407,37 @@ function LoginForm({
             />
           </label>
 
-          <button
-            type="submit"
-            disabled={status === "loading"}
-            className="w-full rounded-full bg-gradient-to-r from-aurora to-ember px-4 py-3 text-sm font-semibold text-white shadow-glass disabled:opacity-60"
-          >
-            {status === "loading" ? "Signing in…" : "Sign in"}
-          </button>
+          {turnstileConfigured && (
+            <div className="space-y-2">
+              <p className="text-xs uppercase tracking-wide text-white/45">Security check</p>
+              <TurnstileWidget
+                key={turnstileKey}
+                onSuccess={handleTurnstileSuccess}
+                onError={handleTurnstileError}
+                onExpire={handleTurnstileExpire}
+                onLoadStateChange={handleTurnstileLoadState}
+                theme="dark"
+              />
+              {showParentChallengeError && (
+                <p className="text-xs text-rose-300">
+                  Security check failed. Retry above to sign in.
+                </p>
+              )}
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <button
+              type="submit"
+              disabled={status === "loading" || !passwordCaptchaReady}
+              className="w-full rounded-full bg-gradient-to-r from-aurora to-ember px-4 py-3 text-sm font-semibold text-white shadow-glass disabled:opacity-60"
+            >
+              {status === "loading" ? "Signing in…" : "Sign in"}
+            </button>
+            {status !== "loading" && !passwordCaptchaReady && passwordHelper && (
+              <p className="text-center text-xs text-white/50">{passwordHelper}</p>
+            )}
+          </div>
         </form>
 
         {magicLinkEnabled && (
@@ -390,30 +455,11 @@ function LoginForm({
                 Prefer a passwordless email link? We&apos;ll send it to the{" "}
                 <span className="text-white/70">email above</span>
                 {magicLinkOpen && turnstileLoadState !== "error" && !turnstileError
-                  ? ". Complete the security check, then send."
+                  ? ". Complete the security check above, then send."
                   : "."}{" "}
                 Password can stay blank. Use the newest link — each request invalidates
                 the previous one.
               </p>
-
-              {turnstileRequired && magicLinkOpen && emailReadyForMagicLink(email) && (
-                <div className="space-y-2">
-                  <p className="text-xs uppercase tracking-wide text-white/45">Security check</p>
-                  <TurnstileWidget
-                    key={turnstileKey}
-                    onSuccess={handleTurnstileSuccess}
-                    onError={handleTurnstileError}
-                    onExpire={handleTurnstileExpire}
-                    onLoadStateChange={handleTurnstileLoadState}
-                    theme="dark"
-                  />
-                  {showParentChallengeError && (
-                    <p className="text-xs text-rose-300">
-                      Security check failed. Retry above, or sign in with your password.
-                    </p>
-                  )}
-                </div>
-              )}
 
               <button
                 type="button"
