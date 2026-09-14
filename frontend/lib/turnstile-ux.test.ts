@@ -20,6 +20,7 @@ import {
   shouldShowParentChallengeError,
   signupAllowsSubmit,
   signupTurnstileButtonLabel,
+  signupTurnstileHelper,
   turnstileRequiredForClient,
   turnstileShouldTreatAsFailedLoad,
   turnstileSlowLoadHint,
@@ -317,29 +318,39 @@ describe("signup Turnstile gate", () => {
     );
   });
 
-  it("fail-opens Create account when the widget never loads", () => {
+  it("keeps Create account disabled when the widget errors — no fail-open grant", () => {
     const gate = nextSignupTurnstileGate({
       configured: true,
       token: null,
       loadState: "error",
     });
-    assert.equal(gate, "fail-open");
-    assert.equal(signupAllowsSubmit(gate), true);
+    assert.equal(gate, "retry-required");
+    assert.equal(signupAllowsSubmit(gate), false);
     assert.equal(
       signupTurnstileButtonLabel({ cooldown: 0, status: "idle", gate }),
       "Create account",
     );
   });
 
-  it("fail-opens when onError fired even if loadState later looks ready", () => {
+  it("fail-closes when onError fired even if loadState later looks ready", () => {
     const gate = nextSignupTurnstileGate({
       configured: true,
       token: null,
       loadState: "ready",
       challengeFailed: true,
     });
-    assert.equal(gate, "fail-open");
-    assert.equal(signupAllowsSubmit(gate), true);
+    assert.equal(gate, "retry-required");
+    assert.equal(signupAllowsSubmit(gate), false);
+  });
+
+  it("fail-closes when a leftover token remains after load error", () => {
+    const gate = nextSignupTurnstileGate({
+      configured: true,
+      token: "stale-from-prior-success",
+      loadState: "error",
+    });
+    assert.equal(gate, "retry-required");
+    assert.equal(signupAllowsSubmit(gate), false);
   });
 
   it("still requires a completed check when the widget is ready and clean", () => {
@@ -357,7 +368,7 @@ describe("signup Turnstile gate", () => {
     for (const gate of [
       "wait-load",
       "complete-check",
-      "fail-open",
+      "retry-required",
       "ready",
       "not-configured",
     ] as const) {
@@ -376,6 +387,15 @@ describe("signup Turnstile gate", () => {
     });
     assert.equal(gate, "ready");
     assert.equal(signupAllowsSubmit(gate), true);
+  });
+
+  it("never fail-opens Create account after a stall or leftover grant", () => {
+    assert.equal(signupAllowsSubmit("retry-required"), false);
+    assert.equal(signupAllowsSubmit("fail-open" as never), false);
+    assert.match(signupTurnstileHelper("retry-required") ?? "", /Retry/i);
+    assert.match(signupTurnstileHelper("complete-check") ?? "", /Complete the security check/i);
+    assert.match(signupTurnstileHelper("wait-load") ?? "", /loading/i);
+    assert.equal(signupTurnstileHelper("ready"), null);
   });
 });
 
@@ -509,6 +529,22 @@ describe("password login Turnstile gate (fail-closed)", () => {
       login,
       /const passwordCaptchaReady = !turnstileConfigured \|\| !!turnstileToken/,
     );
+  });
+});
+
+describe("signup Turnstile stays closed until a token exists", () => {
+  it("Create stays disabled without a token and signup binds captchaToken", () => {
+    const signup = readFileSync(
+      fileURLToPath(new URL("../app/signup/signup-client.tsx", import.meta.url)),
+      "utf8",
+    );
+    assert.match(signup, /nextSignupTurnstileGate/);
+    assert.match(signup, /signupAllowsSubmit/);
+    assert.match(signup, /buildSignupAuthOptions/);
+    assert.match(signup, /disabled=\{status === "loading" \|\| !canSubmitSignup\}/);
+    assert.doesNotMatch(signup, /You can still create an account/);
+    assert.doesNotMatch(signup, /failOpenGranted/);
+    assert.doesNotMatch(signup, /gate === "fail-open"/);
   });
 });
 

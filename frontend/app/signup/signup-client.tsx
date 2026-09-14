@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -11,10 +11,9 @@ import {
 } from "@/lib/auth-cookies";
 import {
   TurnstileWidget,
+  isTurnstileConfigured,
   isTurnstileRequired,
   prefetchTurnstileScript,
-  turnstileFailureMessage,
-  verifyTurnstileToken,
   type TurnstileLoadState,
 } from "@/components/turnstile-widget";
 import {
@@ -23,11 +22,17 @@ import {
   shouldShowParentChallengeError,
   signupAllowsSubmit,
   signupTurnstileButtonLabel,
+  signupTurnstileHelper,
 } from "@/lib/turnstile-ux";
 import { safeRelativePath } from "@/lib/safe-redirect";
 import { ConsentModal, type ConsentDoc } from "@/components/consent-modal";
-import { CONSENT_COPY, consentReviewTitle } from "@/lib/consent-accept";
+import { consentReviewTitle } from "@/lib/consent-accept";
 import { continueAfterPasswordSignup } from "@/lib/password-signup-continue";
+import { buildSignupAuthOptions } from "@/lib/signup-auth-options";
+import {
+  interpretSignupCreate,
+  sanitizeSignupError,
+} from "@/lib/signup-outcome";
 import { resolveAppUrl } from "@/lib/site-url";
 
 export type ReferrerBrand = {
@@ -69,6 +74,7 @@ export default function SignupPage({
   const appOrigin = resolveAppUrl();
   const [message, setMessage] = useState("");
   const turnstileRequired = isTurnstileRequired();
+  const turnstileConfigured = isTurnstileConfigured();
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [turnstileError, setTurnstileError] = useState(false);
   const [turnstileLoadState, setTurnstileLoadState] =
@@ -76,18 +82,23 @@ export default function SignupPage({
   const [turnstileKey, setTurnstileKey] = useState(0);
   const [consentOpen, setConsentOpen] = useState(false);
   const reviewDocs = consentDocs ?? [];
-  // One-shot: Turnstile is verified before the consent modal opens so the
-  // ~5min token can't expire while the user scrolls ToS. createAccount
-  // consumes this flag instead of re-verifying after Accept.
-  const captchaVerifiedRef = useRef(false);
+  // Hold the unused Turnstile token through the consent modal. Tokens are
+  // single-use: /api/turnstile/verify would spend it before signUp, and
+  // Supabase CAPTCHA enforcement needs the same token on signUp.
   const handleTurnstileSuccess = useCallback((token: string) => {
     setTurnstileToken(token);
     setTurnstileError(false);
   }, []);
-  const handleTurnstileError = useCallback(() => setTurnstileError(true), []);
+  const handleTurnstileError = useCallback(() => {
+    setTurnstileError(true);
+    setTurnstileToken(null);
+  }, []);
   const handleTurnstileExpire = useCallback(() => setTurnstileToken(null), []);
   const handleTurnstileLoadState = useCallback((state: TurnstileLoadState) => {
     setTurnstileLoadState(state);
+    if (state === "error") {
+      setTurnstileToken(null);
+    }
     if (state === "loading" || state === "ready") {
       setTurnstileError(false);
     }
@@ -150,13 +161,13 @@ export default function SignupPage({
     challengeFailed: turnstileError,
   });
   const canSubmitSignup = signupAllowsSubmit(turnstileGate);
+  const signupHelper = signupTurnstileHelper(turnstileGate);
   const reviewTitle = consentReviewTitle({
     brandSlug: referrerBrand?.slug ?? ref,
     brandName: referrerBrand?.name,
   });
 
   async function ensureCaptcha(): Promise<boolean> {
-    if (captchaVerifiedRef.current) return true;
     const gate = nextSignupTurnstileGate({
       configured: turnstileRequired,
       token: turnstileToken,
@@ -169,28 +180,16 @@ export default function SignupPage({
       requestAnimationFrame(() => scrollToTurnstileChallenge());
       return false;
     }
-    if (gate === "complete-check") {
+    if (gate === "complete-check" || gate === "retry-required") {
       setStatus("error");
-      setMessage("Complete the security check, then try again.");
+      setMessage(
+        signupTurnstileHelper(gate) ??
+          "Complete the security check, then try again.",
+      );
       requestAnimationFrame(() => scrollToTurnstileChallenge());
       return false;
     }
-    // Widget failed / unavailable, or keys unset (preview/dev): do not block
-    // account create on a missing token — ConsentModal can still open.
-    if (gate === "fail-open" || gate === "not-configured") {
-      captchaVerifiedRef.current = true;
-      return true;
-    }
-    const captcha = await verifyTurnstileToken(turnstileToken);
-    resetChallenge();
-    if (!captcha.success) {
-      captchaVerifiedRef.current = false;
-      setStatus("error");
-      setMessage(turnstileFailureMessage(captcha.error));
-      requestAnimationFrame(() => scrollToTurnstileChallenge());
-      return false;
-    }
-    captchaVerifiedRef.current = true;
+    // Keys unset (local / preview without Turnstile): no widget, no token.
     return true;
   }
 
@@ -210,9 +209,8 @@ export default function SignupPage({
       return;
     }
 
-    // Verify Turnstile *before* the consent modal. Tokens are single-use and
-    // ~5min TTL; reading ToS behind the modal would otherwise race the
-    // widget (which sits under the overlay and can't be refreshed).
+    // Gate only — do not spend the Turnstile token before signUp.
+    // Consent modal holds the unused token; createAccount binds it.
     setStatus("loading");
     setMessage("");
     const ok = await ensureCaptcha();
@@ -228,11 +226,9 @@ export default function SignupPage({
     setStatus("loading");
     setMessage("");
 
-    // Prefer the pre-consent verification; fall back to a live verify when
-    // createAccount is reached without that one-shot (shouldn't happen in
-    // the normal consent path, but keeps the no-docs path safe on retry).
+    // Keep the unused token close to the Auth call. Supabase consumes it
+    // on signUp when CAPTCHA is enforced — do not spend it on /verify first.
     if (!(await ensureCaptcha())) return;
-    captchaVerifiedRef.current = false;
 
     try {
       clearBrowserSignedOut();
@@ -240,38 +236,56 @@ export default function SignupPage({
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: {
+        options: buildSignupAuthOptions({
           // Never $VERCEL_URL / vercel.app / apex — www only. Confirm-email
           // is not the member path (PKCE email links fail).
           emailRedirectTo: `${appOrigin}/auth/callback?next=${encodeURIComponent(postSignupHref)}`,
-          data: consentVersion
-            ? {
-                consent_accepted_at: new Date().toISOString(),
-                consent_version: consentVersion,
-              }
-            : undefined,
-        },
+          turnstileConfigured,
+          turnstileToken,
+          consentVersion,
+        }),
       });
-      if (error) throw error;
+      resetChallenge();
 
-      const continued = await continueAfterPasswordSignup({
+      let signInError: string | null = null;
+      let signInSession: unknown | null = null;
+      if (!error && data.session) {
+        signInSession = data.session;
+      } else if (!error) {
+        const continued = await continueAfterPasswordSignup({
+          session: data.session,
+          email,
+          password,
+          signInWithPassword: (credentials) =>
+            supabase.auth.signInWithPassword(credentials),
+        });
+        if (continued.ok) {
+          signInSession = { ok: true };
+        } else {
+          signInError = continued.message;
+        }
+      }
+
+      const decision = interpretSignupCreate({
+        signUpError: error?.message ?? null,
+        user: data.user,
         session: data.session,
-        email,
-        password,
-        signInWithPassword: (credentials) =>
-          supabase.auth.signInWithPassword(credentials),
+        signInError,
+        signInSession,
       });
-      if (continued.ok) {
-        router.push(postSignupHref);
-        router.refresh();
+      if (decision.action === "stay-error") {
+        setStatus("error");
+        setMessage(decision.message);
         return;
       }
 
-      setStatus("error");
-      setMessage(continued.message);
+      router.push(postSignupHref);
+      router.refresh();
     } catch (err) {
+      resetChallenge();
+      const raw = err instanceof Error ? err.message : null;
       setStatus("error");
-      setMessage(err instanceof Error ? err.message : "Unable to create account.");
+      setMessage(sanitizeSignupError(raw));
     }
   }
 
@@ -477,28 +491,29 @@ export default function SignupPage({
                 challengeFailed: turnstileError,
               }) && (
                 <p className="text-xs text-rose-300">
-                  Security check failed. Tap Retry above, or try again.
-                </p>
-              )}
-              {turnstileGate === "fail-open" && (
-                <p className="text-xs text-white/55">
-                  Security check is unavailable. {CONSENT_COPY.failOpen}
+                  Security check failed. Tap Retry above. Create account stays
+                  disabled until the security check succeeds.
                 </p>
               )}
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={status === "loading" || !canSubmitSignup}
-            className="w-full rounded-full bg-gradient-to-r from-aurora to-ember px-4 py-3 text-sm font-semibold text-white shadow-glass disabled:opacity-60"
-          >
-            {signupTurnstileButtonLabel({
-              cooldown: 0,
-              status,
-              gate: turnstileGate,
-            })}
-          </button>
+          <div className="space-y-2">
+            <button
+              type="submit"
+              disabled={status === "loading" || !canSubmitSignup}
+              className="w-full rounded-full bg-gradient-to-r from-aurora to-ember px-4 py-3 text-sm font-semibold text-white shadow-glass disabled:opacity-60"
+            >
+              {signupTurnstileButtonLabel({
+                cooldown: 0,
+                status,
+                gate: turnstileGate,
+              })}
+            </button>
+            {status !== "loading" && !canSubmitSignup && signupHelper && (
+              <p className="text-center text-xs text-white/50">{signupHelper}</p>
+            )}
+          </div>
         </form>
 
         {message && (
@@ -536,8 +551,6 @@ export default function SignupPage({
         title={reviewTitle}
         onCancel={() => {
           setConsentOpen(false);
-          // Token was already spent pre-modal; require a fresh check.
-          captchaVerifiedRef.current = false;
           resetChallenge();
           setStatus("idle");
         }}

@@ -158,36 +158,41 @@ export function scrollToTurnstileChallenge() {
   (focusable ?? el).focus({ preventScroll: true });
 }
 
+function hasRealTurnstileToken(token: string | null): boolean {
+  return Boolean(token?.trim());
+}
+
 /**
- * Password signup Turnstile gate. A failed / unavailable widget must not
- * trap Create account — fail-open so ConsentModal can still open.
+ * Password signup Turnstile gate. Create stays disabled until a real
+ * token exists (or Turnstile is not configured). Widget errors show
+ * Retry — never enable Create without a token.
  */
 export type SignupTurnstileGate =
   | "not-configured"
   | "wait-load"
   | "complete-check"
-  | "fail-open"
+  | "retry-required"
   | "ready";
 
 export function nextSignupTurnstileGate(opts: {
   configured: boolean;
   token: string | null;
   loadState: TurnstileLoadState;
-  /** Widget onError — must fail-open even if loadState later flips to ready. */
+  /** Widget onError — fail-closed even if loadState later flips to ready. */
   challengeFailed?: boolean;
 }): SignupTurnstileGate {
   if (!opts.configured) return "not-configured";
-  if (opts.token) return "ready";
-  if (opts.challengeFailed || opts.loadState === "error") return "fail-open";
+  if (opts.challengeFailed || opts.loadState === "error") return "retry-required";
+  if (hasRealTurnstileToken(opts.token)) return "ready";
   if (opts.loadState === "loading") return "wait-load";
   return "complete-check";
 }
 
 /**
  * Hang-timeout decision. A hostname-mismatch iframe can paint without ever
- * becoming interactive or issuing a token — that must not leave Create
- * account grey forever. A visible checkbox (before-interactive) is allowed
- * to wait for the member.
+ * becoming interactive or issuing a token. Treat that as a failed load so
+ * Retry appears; Create account stays disabled until a real token exists.
+ * A visible checkbox (before-interactive) is allowed to wait for the member.
  */
 export function turnstileShouldTreatAsFailedLoad(opts: {
   hasToken: boolean;
@@ -199,7 +204,20 @@ export function turnstileShouldTreatAsFailedLoad(opts: {
 }
 
 export function signupAllowsSubmit(gate: SignupTurnstileGate): boolean {
-  return gate === "not-configured" || gate === "ready" || gate === "fail-open";
+  return gate === "not-configured" || gate === "ready";
+}
+
+export function signupTurnstileHelper(gate: SignupTurnstileGate): string | null {
+  switch (gate) {
+    case "wait-load":
+      return "Security check is loading. Create account enables when it succeeds.";
+    case "complete-check":
+      return "Complete the security check above to enable Create account.";
+    case "retry-required":
+      return "Tap Retry above. Create account stays disabled until the security check succeeds.";
+    default:
+      return null;
+  }
 }
 
 export function signupTurnstileButtonLabel(opts: {
@@ -219,16 +237,7 @@ export function signupTurnstileButtonLabel(opts: {
  * beat a leftover token — a `!!turnstileToken` ready check fail-opens
  * after error-callback if the parent does not clear the token.
  */
-export type PasswordTurnstileGate =
-  | "not-configured"
-  | "wait-load"
-  | "complete-check"
-  | "retry-required"
-  | "ready";
-
-function hasRealTurnstileToken(token: string | null): boolean {
-  return Boolean(token?.trim());
-}
+export type PasswordTurnstileGate = SignupTurnstileGate;
 
 export function nextPasswordTurnstileGate(opts: {
   configured: boolean;
