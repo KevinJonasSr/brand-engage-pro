@@ -404,6 +404,7 @@ export function TurnstileWidget({
 export interface TurnstileVerifyResult {
   success: boolean;
   error?: string;
+  failedOpen?: boolean;
 }
 
 /**
@@ -416,9 +417,14 @@ export interface TurnstileVerifyResult {
  *
  * Tokens are single-use: after calling this the caller must remount the
  * widget (bump its `key`) before the next attempt.
+ *
+ * Password / signup must not call this — they bind the unused token into
+ * Supabase as captchaToken. Magic-link (preview only) passes failClosed
+ * so a Cloudflare outage cannot send OTP.
  */
 export async function verifyTurnstileToken(
   token: string | null,
+  opts?: { failClosed?: boolean },
 ): Promise<TurnstileVerifyResult> {
   if (!SITE_KEY) {
     if (process.env.NODE_ENV === "production") {
@@ -431,20 +437,43 @@ export async function verifyTurnstileToken(
   }
   if (!token) return { success: false, error: "missing_token" };
 
+  const failClosed = opts?.failClosed === true;
+
   try {
     const res = await fetch("/api/turnstile/verify", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token }),
+      body: JSON.stringify({ token, failClosed }),
     });
-    const data = (await res.json()) as { success: boolean; error?: string; message?: string };
+    if (res.status === 429) return { success: false, error: "rate_limited" };
+    const data = (await res.json()) as {
+      success: boolean;
+      error?: string;
+      message?: string;
+      failedOpen?: boolean;
+    };
     if (!data.success && data.message) {
       console.warn("[turnstile]", data.message);
     }
-    if (data.success === true) return { success: true };
+    if (data.success === true && !data.failedOpen) {
+      return { success: true };
+    }
+    if (
+      !failClosed &&
+      data.failedOpen === true &&
+      (data.error === "upstream_error" || data.error === "network_error")
+    ) {
+      console.warn(`[turnstile] ${data.error} from verify API — failing open`);
+      return { success: true, failedOpen: true, error: data.error };
+    }
     return { success: false, error: data.error ?? "challenge_failed" };
-  } catch {
-    return { success: false, error: "network_error" };
+  } catch (err) {
+    if (failClosed) {
+      console.warn("[turnstile] network_error calling verify API — failing closed", err);
+      return { success: false, error: "network_error" };
+    }
+    console.warn("[turnstile] network_error calling verify API — failing open", err);
+    return { success: true, failedOpen: true, error: "network_error" };
   }
 }
 
