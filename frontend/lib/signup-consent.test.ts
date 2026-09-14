@@ -32,15 +32,22 @@ describe("signup consent review step", () => {
     assert.doesNotMatch(buttonBlock, /Security check loading/);
   });
 
-  it("opens ConsentModal after email+password and fail-open Turnstile", () => {
+  it("opens ConsentModal after email+password and a fail-closed Turnstile token", () => {
     assert.match(signupClient, /ConsentModal/);
     assert.match(signupClient, /setConsentOpen\(true\)/);
-    assert.match(signupClient, /gate === "fail-open"/);
-    assert.match(signupClient, /CONSENT_COPY\.failOpen|You can still create an account/);
+    assert.match(signupClient, /signupAllowsSubmit/);
+    assert.match(signupClient, /buildSignupAuthOptions/);
+    assert.doesNotMatch(signupClient, /fail-open/);
+    assert.doesNotMatch(signupClient, /You can still create an account/);
     assert.match(signupClient, /challengeFailed: turnstileError/);
-    assert.match(signupClient, /consent_accepted_at/);
-    assert.match(signupClient, /consent_version/);
+    assert.match(signupClient, /consentVersion/);
     assert.match(signupClient, /consentReviewTitle/);
+    const signupOptions = readFileSync(
+      fileURLToPath(new URL("./signup-auth-options.ts", import.meta.url)),
+      "utf8",
+    );
+    assert.match(signupOptions, /consent_accepted_at/);
+    assert.match(signupOptions, /consent_version/);
   });
 
   it("loads non-draft terms and privacy on the signup page", () => {

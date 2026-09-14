@@ -1,8 +1,9 @@
 # Turnstile on www.brandengagepro.com
 
-Signup (`/signup`) mounts Cloudflare Turnstile as **Security check**. If the
-widget cannot load, Create account stays grey until the check succeeds **or**
-the widget reports failure (then Retry + fail-open).
+Signup (`/signup`) mounts Cloudflare Turnstile as **Security check**. Create
+account stays **disabled** until a real token exists (fail-closed). If the
+widget cannot load, Retry appears and Create stays disabled. The unused token
+is bound into `signUp` as `options.captchaToken`.
 
 Password login (`/login`) also mounts Turnstile when a site key is configured
 and binds `captchaToken` into `signInWithPassword`. Sign in stays **disabled**
@@ -65,8 +66,9 @@ was already baked.
 1. Open `https://www.brandengagepro.com/signup` signed out.
 2. Security check: Cloudflare iframe (not a permanent “couldn't load” card).
 3. Completing the check enables **Create account**.
-4. If the check fails: **Retry security check** appears; Create account is
-   not a dead grey button (fail-open + “You can still create an account.”).
+4. If the check fails: **Retry security check** appears; Create account stays
+   disabled until a new token exists. Duplicate-email errors show the friendly
+   in-use line — never raw GoTrue text or Turnstile blame.
 5. Open `/login` signed out. **Sign in** stays disabled until Turnstile
    issues a token. Completing the check enables Sign in and the request
    includes `options.captchaToken`. A broken widget shows Retry and keeps
