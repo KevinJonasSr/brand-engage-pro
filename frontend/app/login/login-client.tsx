@@ -266,7 +266,7 @@ function LoginForm({
     setStatus("loading");
     setMessage("");
 
-    const captcha = await verifyTurnstileToken(token);
+    const captcha = await verifyTurnstileToken(token, { failClosed: true });
     resetChallenge();
     if (!captcha.success) {
       pendingMagicSend.current = false;
