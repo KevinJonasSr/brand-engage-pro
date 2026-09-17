@@ -24,4 +24,11 @@ describe("Turnstile widget www-load robustness", () => {
     assert.match(widget, /Retry security check/);
     assert.match(widget, /TURNSTILE_WIDGET_ERROR_COPY/);
   });
+
+  it("stalls fail-closed when a painted widget never issues a token", () => {
+    assert.match(widget, /TURNSTILE_CHALLENGE_STALL_MS/);
+    assert.match(widget, /onStall\?: \(\) => void/);
+    assert.match(widget, /challenge stalled — no token after render/);
+    assert.match(widget, /onStall\?\.\(\)/);
+  });
 });

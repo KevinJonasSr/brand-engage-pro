@@ -93,13 +93,17 @@ export default function SignupPage({
     setTurnstileError(true);
     setTurnstileToken(null);
   }, []);
-  const handleTurnstileExpire = useCallback(() => setTurnstileToken(null), []);
+  const handleTurnstileExpire = useCallback(() => {
+    setTurnstileError(true);
+    setTurnstileToken(null);
+  }, []);
   const handleTurnstileLoadState = useCallback((state: TurnstileLoadState) => {
     setTurnstileLoadState(state);
     if (state === "error") {
       setTurnstileToken(null);
     }
-    if (state === "loading" || state === "ready") {
+    // Retry remounts into loading. Iframe paint is not success.
+    if (state === "loading") {
       setTurnstileError(false);
     }
   }, []);
@@ -482,6 +486,7 @@ export default function SignupPage({
                 key={turnstileKey}
                 onSuccess={handleTurnstileSuccess}
                 onError={handleTurnstileError}
+                onStall={handleTurnstileError}
                 onExpire={handleTurnstileExpire}
                 onLoadStateChange={handleTurnstileLoadState}
                 theme="dark"

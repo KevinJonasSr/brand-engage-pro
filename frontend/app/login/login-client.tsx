@@ -104,7 +104,10 @@ function LoginForm({
     setTurnstileError(true);
     setTurnstileToken(null);
   }, []);
-  const handleTurnstileExpire = useCallback(() => setTurnstileToken(null), []);
+  const handleTurnstileExpire = useCallback(() => {
+    setTurnstileError(true);
+    setTurnstileToken(null);
+  }, []);
   const handleTurnstileLoadState = useCallback((state: TurnstileLoadState) => {
     setTurnstileLoadState(state);
     // Load / challenge failure must drop any leftover token so a
@@ -112,9 +115,9 @@ function LoginForm({
     if (state === "error") {
       setTurnstileToken(null);
     }
-    // Retry remounts into loading while challengeFailed was still true —
-    // clear it so "Security check failed…" cannot flash under the skeleton.
-    if (state === "loading" || state === "ready") {
+    // Retry remounts into loading. Do not clear challengeFailed on
+    // "ready" — iframe paint / sad-face must not undo onError.
+    if (state === "loading") {
       setTurnstileError(false);
     }
   }, []);
@@ -138,9 +141,9 @@ function LoginForm({
   }, []);
 
   useEffect(() => {
-    if (!turnstileConfigured) return;
+    if (!turnstileRequired) return;
     prefetchTurnstileScript();
-  }, [turnstileConfigured]);
+  }, [turnstileRequired]);
 
   useEffect(() => {
     if (!hasBrowserSignedOutMarker()) return;
@@ -203,9 +206,10 @@ function LoginForm({
       return;
     }
     const passwordGate = nextPasswordTurnstileGate({
-      configured: turnstileConfigured,
+      configured: turnstileRequired,
       token: turnstileToken,
       loadState: turnstileLoadState,
+      challengeFailed: turnstileError,
     });
     if (!passwordLoginAllowsSubmit(passwordGate)) {
       setStatus("error");
@@ -348,9 +352,10 @@ function LoginForm({
 
   const magicLinkDisabled = status === "loading" || magicCooldown > 0;
   const passwordGate = nextPasswordTurnstileGate({
-    configured: turnstileConfigured,
+    configured: turnstileRequired,
     token: turnstileToken,
     loadState: turnstileLoadState,
+    challengeFailed: turnstileError,
   });
   const passwordCaptchaReady = passwordLoginAllowsSubmit(passwordGate);
   const passwordHelper = passwordLoginTurnstileHelper(passwordGate);
@@ -407,13 +412,14 @@ function LoginForm({
             />
           </label>
 
-          {turnstileConfigured && (
+          {turnstileRequired && (
             <div className="space-y-2">
               <p className="text-xs uppercase tracking-wide text-white/45">Security check</p>
               <TurnstileWidget
                 key={turnstileKey}
                 onSuccess={handleTurnstileSuccess}
                 onError={handleTurnstileError}
+                onStall={handleTurnstileError}
                 onExpire={handleTurnstileExpire}
                 onLoadStateChange={handleTurnstileLoadState}
                 theme="dark"

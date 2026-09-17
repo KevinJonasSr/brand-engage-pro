@@ -8,6 +8,8 @@ export type TurnstileLoadState = "loading" | "ready" | "error";
  * the skeleton is not silent for the full 12s.
  */
 export const TURNSTILE_LOAD_TIMEOUT_MS = 12_000;
+/** Painted iframe / checkbox that never issues a token (FE fail-closed stall). */
+export const TURNSTILE_CHALLENGE_STALL_MS = 15_000;
 export const TURNSTILE_SLOW_LOAD_HINT_MS = 6_000;
 /** Backoff between script inject attempts (3 delays → 4 tries). Sum ≈ 11s. */
 export const TURNSTILE_SCRIPT_RETRY_DELAYS_MS = [3_000, 4_000, 4_000] as const;
@@ -243,11 +245,13 @@ export function nextPasswordTurnstileGate(opts: {
   configured: boolean;
   token: string | null;
   loadState: TurnstileLoadState;
+  /** Widget onError / expire / stall — fail-closed even if loadState later looks ready. */
+  challengeFailed?: boolean;
 }): PasswordTurnstileGate {
   if (!opts.configured) return "not-configured";
-  // Error / broken widget wins over a stale token so Sign in cannot
-  // re-enable after onError / timeout / stall.
-  if (opts.loadState === "error") return "retry-required";
+  // Error / broken widget / leftover grant wins over a stale token so
+  // Sign in cannot re-enable after onError / expire / stall / sad-face iframe.
+  if (opts.challengeFailed || opts.loadState === "error") return "retry-required";
   if (hasRealTurnstileToken(opts.token)) return "ready";
   if (opts.loadState === "loading") return "wait-load";
   return "complete-check";
