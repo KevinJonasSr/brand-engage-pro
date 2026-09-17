@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 import {
+  TURNSTILE_CHALLENGE_STALL_MS,
   TURNSTILE_LOAD_TIMEOUT_MS,
   TURNSTILE_SCRIPT_RETRY_DELAYS_MS,
   TURNSTILE_SLOW_LOAD_HINT_MS,
@@ -485,6 +486,38 @@ describe("password login Turnstile gate (fail-closed)", () => {
     assert.equal(passwordLoginAllowsSubmit(expired), false);
   });
 
+  it("is not ready when configured and loadState is error", () => {
+    const gate = nextPasswordTurnstileGate({
+      configured: true,
+      token: null,
+      loadState: "error",
+    });
+    assert.equal(gate, "retry-required");
+    assert.equal(passwordLoginAllowsSubmit(gate), false);
+  });
+
+  it("is not ready on leftover token after error/expire/stall paints ready", () => {
+    // Sad-face / expire / stall often leave loadState="ready" while
+    // challengeFailed is set. A leftover token must not re-enable Sign in.
+    const leftover = nextPasswordTurnstileGate({
+      configured: true,
+      token: "stale-from-prior-success",
+      loadState: "ready",
+      challengeFailed: true,
+    });
+    assert.equal(leftover, "retry-required");
+    assert.equal(passwordLoginAllowsSubmit(leftover), false);
+
+    const stall = nextPasswordTurnstileGate({
+      configured: true,
+      token: null,
+      loadState: "ready",
+      challengeFailed: true,
+    });
+    assert.equal(stall, "retry-required");
+    assert.equal(passwordLoginAllowsSubmit(stall), false);
+  });
+
   it("is ready without a token when Turnstile is not configured", () => {
     const gate = nextPasswordTurnstileGate({
       configured: false,
@@ -529,6 +562,20 @@ describe("password login Turnstile gate (fail-closed)", () => {
       login,
       /const passwordCaptchaReady = !turnstileConfigured \|\| !!turnstileToken/,
     );
+    assert.match(
+      login,
+      /nextPasswordTurnstileGate\(\{\s*configured: turnstileRequired,[\s\S]*challengeFailed: turnstileError/,
+    );
+    assert.match(login, /onStall=\{handleTurnstileError\}/);
+    assert.match(
+      login,
+      /const handleTurnstileExpire = useCallback\(\(\) => \{\s*setTurnstileError\(true\);\s*setTurnstileToken\(null\);/,
+    );
+    assert.doesNotMatch(
+      login,
+      /if \(state === "loading" \|\| state === "ready"\) \{\s*setTurnstileError\(false\);/,
+    );
+    assert.match(login, /\{turnstileRequired && \(/);
   });
 });
 
@@ -545,14 +592,25 @@ describe("signup Turnstile stays closed until a token exists", () => {
     assert.doesNotMatch(signup, /You can still create an account/);
     assert.doesNotMatch(signup, /failOpenGranted/);
     assert.doesNotMatch(signup, /gate === "fail-open"/);
+    assert.match(signup, /onStall=\{handleTurnstileError\}/);
+    assert.match(
+      signup,
+      /const handleTurnstileExpire = useCallback\(\(\) => \{\s*setTurnstileError\(true\);\s*setTurnstileToken\(null\);/,
+    );
+    assert.doesNotMatch(
+      signup,
+      /if \(state === "loading" \|\| state === "ready"\) \{\s*setTurnstileError\(false\);/,
+    );
   });
 });
 
 describe("timeout alignment", () => {
-  it("keeps a 12s hang timeout and a 6s still-loading hint", () => {
+  it("keeps a 12s hang timeout, 15s no-token stall, and a 6s still-loading hint", () => {
     assert.equal(TURNSTILE_LOAD_TIMEOUT_MS, 12_000);
+    assert.equal(TURNSTILE_CHALLENGE_STALL_MS, 15_000);
     assert.equal(TURNSTILE_SLOW_LOAD_HINT_MS, 6_000);
     assert.ok(TURNSTILE_SLOW_LOAD_HINT_MS < TURNSTILE_LOAD_TIMEOUT_MS);
+    assert.ok(TURNSTILE_LOAD_TIMEOUT_MS < TURNSTILE_CHALLENGE_STALL_MS);
   });
 
   it("does not give up on script retries at ~6s", () => {

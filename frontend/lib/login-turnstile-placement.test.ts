@@ -16,9 +16,9 @@ const passwordFn = loginPage.slice(
 );
 
 describe("login Turnstile placement", () => {
-  it("mounts Turnstile inside the password form when configured", () => {
+  it("mounts Turnstile inside the password form when required", () => {
     assert.match(passwordForm, /handlePassword/);
-    assert.match(passwordForm, /turnstileConfigured/);
+    assert.match(passwordForm, /turnstileRequired/);
     assert.match(passwordForm, /TurnstileWidget/);
   });
 

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import {
   TURNSTILE_CHALLENGE_ID,
+  TURNSTILE_CHALLENGE_STALL_MS,
   TURNSTILE_LOAD_TIMEOUT_MS,
   TURNSTILE_SCRIPT_RETRY_DELAYS_MS,
   TURNSTILE_SLOW_LOAD_HINT_MS,
@@ -42,6 +43,8 @@ interface TurnstileOptions {
 interface Props {
   onSuccess: (token: string) => void;
   onError?: () => void;
+  /** Painted widget never issued a token (FE 15s stall). */
+  onStall?: () => void;
   onExpire?: () => void;
   onLoadStateChange?: (state: TurnstileLoadState) => void;
   theme?: "light" | "dark" | "auto";
@@ -139,6 +142,7 @@ function injectTurnstileScript(attempt = 0, onGiveUp?: () => void) {
 export function TurnstileWidget({
   onSuccess,
   onError,
+  onStall,
   onExpire,
   onLoadStateChange,
   theme = "dark",
@@ -200,6 +204,7 @@ export function TurnstileWidget({
         },
         "expired-callback": () => {
           hasTokenRef.current = false;
+          setState("error");
           onExpire?.();
         },
         "timeout-callback": () => {
@@ -284,12 +289,20 @@ export function TurnstileWidget({
       }
     }, TURNSTILE_LOAD_TIMEOUT_MS);
 
+    const stall = window.setTimeout(() => {
+      if (cancelled || hasTokenRef.current) return;
+      console.warn("[turnstile] challenge stalled — no token after render");
+      setState("error");
+      onStall?.();
+    }, TURNSTILE_CHALLENGE_STALL_MS);
+
     return () => {
       cancelled = true;
       observer.disconnect();
       loadListeners.delete(tryRender);
       failListeners.delete(onScriptFailed);
       window.clearTimeout(timeout);
+      window.clearTimeout(stall);
       if (widgetIdRef.current && window.turnstile) {
         try {
           window.turnstile.remove(widgetIdRef.current);
@@ -299,7 +312,7 @@ export function TurnstileWidget({
         widgetIdRef.current = null;
       }
     };
-  }, [renderWidget, setState, onError, retryNonce, markReadyIfIframe]);
+  }, [renderWidget, setState, onError, onStall, retryNonce, markReadyIfIframe]);
 
   useEffect(() => {
     if (loadState !== "loading") {
