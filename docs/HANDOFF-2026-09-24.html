@@ -78,7 +78,7 @@ footer{border-top:1px solid var(--line);padding-top:1.2rem;font-size:.8rem;color
 <tr><td>Framework</td><td>Next.js <b>16.3.6</b> (was 16.2.1), React 19.</td></tr>
 <tr><td>Migrations</td><td><code>supabase/migrations/</code> runs through <code>0058_nellies_perk_rules.sql</code>. <b>Next free number is 0059.</b> There is no rollbacks folder. The untracked 0049 problem from 2026-09-14 is gone.</td></tr>
 <tr><td>CI on main</td><td>Frontend tests and Secret Scan both passed on cc33356.</td></tr>
-<tr><td>Handoffs</td><td>This file is <code>docs/HANDOFF-2026-09-24.html</code>, untracked. The committed <code>HANDOFF.md</code> is dated 2026-06-20 and is stale (see open items).</td></tr>
+<tr><td>Handoffs</td><td>This file is <code>docs/HANDOFF-2026-09-24.html</code>, on main since PR #35 (b7ad3f0). The older committed <code>HANDOFF.md</code> is dated 2026-06-20 and is stale (see open items).</td></tr>
 </table></div>
 </section>
 
@@ -171,7 +171,6 @@ git checkout main && git pull</code></pre>
 <tr><td>Old remote branches</td><td>21 remote branches besides main. Confirm with Kevin which can go, especially the two <code>salvage/*</code> branches.</td><td><span class="owner kevin">Kevin</span></td></tr>
 <tr><td>Branch protection</td><td>Main has none. Consider requiring the Frontend tests and Secret Scan checks, the way Fan Engage does.</td><td><span class="owner kevin">Kevin</span></td></tr>
 <tr><td>Carried from 2026-09-14</td><td>About 28 admin actions still use inline checks instead of <code>getAdminContext</code>. Rate limiting is in memory, not Redis or KV. Homegrown Beauty Lounge still unconfirmed. Vercel env vars and Supabase settings not rechecked. None of these were re-verified today.</td><td><span class="owner kevin">Kevin</span> / <span class="owner">Next session</span></td></tr>
-<tr><td>Commit this handoff</td><td><code>docs/HANDOFF-2026-09-24.html</code> is untracked. Commit it if wanted.</td><td><span class="owner kevin">Kevin</span></td></tr>
 </table></div>
 <div class="callout">
 <span class="label">For the next agent</span>
