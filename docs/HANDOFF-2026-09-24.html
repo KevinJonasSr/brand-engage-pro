@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brand Engage Pro Handoff</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--paper:#faf7f2;--paper-2:#f1ece3;--ink:#241f18;--ink-2:#5c544a;--ink-3:#8a8073;--accent:#8a6132;--accent-deep:#6e4c25;--line:#ddd5c8;--code-bg:#efe9de;--good:#4a7040;--warn:#a05c1e;--danger:#9a3b2c;--danger-bg:#f6e6e0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#17140f;--paper-2:#1f1b15;--ink:#ece5d8;--ink-2:#b5ab9b;--ink-3:#847a6b;--accent:#c9995f;--accent-deep:#e0b57c;--line:#332c22;--code-bg:#221d16;--good:#8db57f;--warn:#d29450;--danger:#d8735f;--danger-bg:#2c1c17}}
+:root[data-theme="dark"]{--paper:#17140f;--paper-2:#1f1b15;--ink:#ece5d8;--ink-2:#b5ab9b;--ink-3:#847a6b;--accent:#c9995f;--accent-deep:#e0b57c;--line:#332c22;--code-bg:#221d16;--good:#8db57f;--warn:#d29450;--danger:#d8735f;--danger-bg:#2c1c17}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Archivo,"Helvetica Neue",Arial,sans-serif;font-size:15.5px;line-height:1.6;padding-block:0 4rem;padding-inline:16px}
+.page{max-width:760px;margin:0 auto}
+header.top{padding:3.2rem 0 2rem;border-bottom:1px solid var(--line);margin-bottom:2.4rem}
+.kicker{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600;margin:0 0 .9rem}
+h1{font-family:"Source Serif 4",Georgia,serif;font-weight:600;font-size:clamp(1.7rem,4vw,2.3rem);line-height:1.15;margin:0 0 1rem;text-wrap:balance}
+.meta{display:flex;flex-wrap:wrap;gap:.4rem 1.6rem;font-size:.86rem;color:var(--ink-2);margin:0;padding:0;list-style:none}
+.meta b{color:var(--ink);font-weight:600}
+section{margin-bottom:2.6rem}
+.eyebrow{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin:0 0 .3rem}
+h2{font-family:"Source Serif 4",Georgia,serif;font-weight:600;font-size:1.35rem;line-height:1.25;margin:0 0 1rem;text-wrap:balance}
+h3{font-family:Archivo,sans-serif;font-size:.95rem;font-weight:600;margin:1.4rem 0 .5rem;color:var(--ink)}
+p{margin:0 0 .9rem;max-width:66ch}
+ul,ol{margin:0 0 1rem;padding-left:1.3rem;max-width:66ch}
+li{margin-bottom:.35rem}
+a{color:var(--accent-deep);text-decoration-thickness:1px;text-underline-offset:2px}
+code{font-family:"IBM Plex Mono",Menlo,monospace;font-size:.84em;background:var(--code-bg);padding:.1em .35em;border-radius:3px}
+pre{font-family:"IBM Plex Mono",Menlo,monospace;font-size:.8rem;line-height:1.55;background:var(--code-bg);border:1px solid var(--line);border-radius:4px;padding:.9rem 1rem;overflow-x:auto;margin:0 0 1rem}
+pre code{background:none;padding:0;font-size:inherit}
+.tablewrap{overflow-x:auto;margin:0 0 1rem}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th{text-align:left;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:600;padding:.5rem .6rem .5rem 0;border-bottom:1px solid var(--line)}
+td{padding:.6rem .6rem .6rem 0;border-bottom:1px solid var(--line);vertical-align:top}
+td:first-child{font-weight:600;white-space:nowrap}
+table.items td:first-child{white-space:normal;min-width:9rem}
+.callout{border-left:3px solid var(--accent);background:var(--paper-2);padding:.9rem 1.1rem;margin:0 0 1.2rem;border-radius:0 4px 4px 0}
+.callout p:last-child{margin-bottom:0}
+.callout.danger{border-left-color:var(--danger);background:var(--danger-bg)}
+.callout .label{display:block;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--accent-deep);margin-bottom:.35rem}
+.callout.danger .label{color:var(--danger)}
+.rulelist{list-style:none;padding:0;margin:0 0 1rem;max-width:none}
+.rulelist li{display:grid;grid-template-columns:8.5rem 1fr;gap:.8rem;padding:.55rem 0;border-bottom:1px solid var(--line);margin:0}
+.rulelist .who{font-weight:600;font-size:.86rem;color:var(--accent-deep)}
+.rulelist .what{font-size:.92rem;color:var(--ink-2)}
+@media (max-width:520px){.rulelist li{grid-template-columns:1fr;gap:.2rem}}
+.owner{display:inline-block;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;font-weight:600;padding:.15em .55em;border-radius:999px;border:1px solid var(--line);color:var(--ink-2);white-space:nowrap}
+.owner.kevin{border-color:var(--accent);color:var(--accent-deep)}
+.owner.wait{color:var(--warn);border-color:var(--warn)}
+.status-good{color:var(--good);font-weight:600}
+.status-warn{color:var(--warn);font-weight:600}
+footer{border-top:1px solid var(--line);padding-top:1.2rem;font-size:.8rem;color:var(--ink-3)}
+</style>
+</head>
+<body>
+<div class="page">
+<header class="top">
+<p class="kicker">Jonas Group Entertainment · Operations Handoff</p>
+<h1>Brand Engage Pro: what landed on 2026-09-24 and what remains</h1>
+<ul class="meta">
+<li><b>Date</b> 2026-09-24</li>
+<li><b>Prepared for</b> Kevin Jonas Sr. and the next agent session</li>
+<li><b>Status</b> <span class="status-good">Live on www.brandengagepro.com</span>, main at cc33356, no open pull requests</li>
+<li><b>Supersedes</b> the 2026-09-14 handoff. Its product overview (stack, key paths, features) still applies; its orientation and open items do not.</li>
+</ul>
+</header>
+
+<section>
+<p class="eyebrow">Orientation</p>
+<h2>Where everything lives</h2>
+<div class="tablewrap"><table>
+<tr><th>Item</th><th>Value</th></tr>
+<tr><td>Live site</td><td><a href="https://www.brandengagepro.com">https://www.brandengagepro.com</a> (returned 200 after today's deploy). The old <code>brand-engage-pro.vercel.app</code> address still works.</td></tr>
+<tr><td>GitHub</td><td>KevinJonasSr/brand-engage-pro. Main is at <code>cc33356</code> (PR #34). 21 remote branches besides main, mostly old <code>cursor/*</code> branches plus two <code>salvage/*</code> branches from 2026-07-26. Main has no branch protection.</td></tr>
+<tr><td>Vercel</td><td>Team jonas-group, project brand-engage-pro, root <code>frontend</code>. <code>frontend/vercel.json</code> holds 13 cron schedules. The Production deploy for cc33356 succeeded.</td></tr>
+<tr><td>Supabase</td><td>Project ref <code>enfpviapxvqyoarwwsuf</code>. It shares an org with Fan Engage Pro (<code>uhovonrljcauaoctypbg</code>), so confirm the ref before any SQL.</td></tr>
+<tr><td>Local working copy</td><td><code>~/Developer/brand-engage-pro</code>, on <code>main</code>, clean. The old <code>~/Downloads</code> path in the 2026-09-14 handoff is out of date.</td></tr>
+<tr><td>Framework</td><td>Next.js <b>16.3.6</b> (was 16.2.1), React 19.</td></tr>
+<tr><td>Migrations</td><td><code>supabase/migrations/</code> runs through <code>0058_nellies_perk_rules.sql</code>. <b>Next free number is 0059.</b> There is no rollbacks folder. The untracked 0049 problem from 2026-09-14 is gone.</td></tr>
+<tr><td>CI on main</td><td>Frontend tests and Secret Scan both passed on cc33356.</td></tr>
+<tr><td>Handoffs</td><td>This file is <code>docs/HANDOFF-2026-09-24.html</code>, untracked. The committed <code>HANDOFF.md</code> is dated 2026-06-20 and is stale (see open items).</td></tr>
+</table></div>
+</section>
+
+<section>
+<p class="eyebrow">Current state</p>
+<h2>What landed on 2026-09-24</h2>
+<p>This session started from a Jev-routed review of Fan Engage Pro and Brand Engage Pro for security, launch readiness, and stickiness. Brand Engage Pro got three pull requests, merged in order with checks green and the Production deploy verified, plus a production cleanup of Nellie's content that Kevin approved.</p>
+
+<h3>Pull requests merged</h3>
+<div class="tablewrap"><table class="items">
+<tr><th>PR</th><th>What it did</th></tr>
+<tr><td>#32 (0f0c3d1)</td><td>Migration 0057. 40 SECURITY DEFINER functions in public could be called by anyone holding the public anon key. EXECUTE was revoked from PUBLIC, anon, and authenticated on all of them, kept for service_role, and granted back only where a browser session needs it: <code>is_admin_of</code> for anon and authenticated (RLS policies use it), <code>redeem_reward</code> and <code>is_member_of</code> for authenticated. Trigger functions keep working because Postgres does not check EXECUTE when a trigger fires. Applied to production first, then recorded.</td></tr>
+<tr><td>#33 (82ae9f4)</td><td>Next.js 16.3.6, the security patch release.</td></tr>
+<tr><td>#34 (cc33356)</td><td>Migration 0058, the Nellie's perk rules. The app already called these, so they had been failing quietly. Adds <code>members.birthday_month</code> (1 to 12, member-editable), a <code>member_perks</code> table where members can only read their own rows, a welcome dessert granted automatically when a Nellie's membership goes active, and <code>redeem_nellies_birthday_entree()</code>, which works once a year during the member's birthday month (New York time). New definer functions follow the 0057 rules. Applied to production on 2026-09-24.</td></tr>
+</table></div>
+
+<h3>Nellie's production cleanup (approved by Kevin)</h3>
+<ul>
+<li>19 offers hidden. 0 of 31 Nellie's offers are active now, so the homepage shows none until new ones are set up.</li>
+<li>Bourbon &amp; Cigar Night unpublished. 0 Nellie's events are active.</li>
+<li>Welcome dessert granted to the 4 members who already had an active Nellie's membership.</li>
+</ul>
+
+<h3>Housekeeping</h3>
+<ul>
+<li>The three feature branches were deleted on GitHub and locally.</li>
+</ul>
+</section>
+
+<section>
+<p class="eyebrow">Workflow</p>
+<h2>How changes land</h2>
+<div class="callout danger">
+<span class="label">Read this before pushing</span>
+<p>Main is not protected, but this session used pull requests anyway so CI ran first. Keep doing that. Kevin authorized pushing, opening, and merging PRs in chat for this session only; get the go-ahead again each session. Never turn on auto-merge.</p>
+<p>Before any destructive SQL, run <code>select 1 from public.brands limit 1;</code>. If it errors, you are in the Fan Engage database. Stop.</p>
+</div>
+<pre><code>cd ~/Developer/brand-engage-pro && git checkout main && git pull
+git checkout -b fix/short-description
+# make the change, run tests in frontend/, commit with a conventional message
+git push -u origin fix/short-description
+gh pr create --base main --head fix/short-description --title "..." --body "..."
+gh pr checks N --watch --fail-fast
+gh pr merge N --merge --delete-branch
+git checkout main && git pull</code></pre>
+<h3>Database changes</h3>
+<ol>
+<li>Confirm the ref is <code>enfpviapxvqyoarwwsuf</code> and run the brands check.</li>
+<li>Apply through the Supabase MCP first, then confirm with a select.</li>
+<li>Record it as <code>0059_short_name.sql</code>, idempotent, with the "already applied to production" header line.</li>
+<li>Enum changes get their own migration file. Postgres cannot use a new enum value in the same transaction that adds it.</li>
+<li>Any new SECURITY DEFINER function starts closed: revoke from PUBLIC, anon, and authenticated, grant service_role, and grant a browser role back only with a written reason.</li>
+</ol>
+</section>
+
+<section>
+<p class="eyebrow">Conventions</p>
+<h2>House rules</h2>
+<ul>
+<li>New admin actions go through <code>getAdminContext</code> in <code>lib/admin.ts</code>. No new inline admin checks.</li>
+<li>New cron routes need an entry in <code>frontend/vercel.json</code> and the crons table, behind <code>verifyCronAuth</code>.</li>
+<li>Member-editable columns must be added to the allowlist in <code>members_reject_integrity_column_updates()</code>, the way 0058 added <code>birthday_month</code>.</li>
+<li>Env var names only, never values: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, STRIPE_SECRET_KEY, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, MAILCHIMP_API_KEY, MANDRILL_API_KEY, ANTHROPIC_API_KEY, OPENAI_API_KEY, CRON_SECRET.</li>
+<li>Brand hero images are 1920 by 1080 with the focal point 32 percent from the top.</li>
+<li>Jev runs in shadow mode for non-trivial work. Report its action and reason in one line, then use judgment.</li>
+</ul>
+</section>
+
+<section>
+<p class="eyebrow">Guardrails</p>
+<h2>Who can do what</h2>
+<ul class="rulelist">
+<li><span class="who">Superadmins</span><span class="what">Kevin plus the standing group (Syncnatra, Hana, aiassistant, Carla Moore, Raymond Boyd) with community_id '*'.</span></li>
+<li><span class="who">Brand admins</span><span class="what">Scoped to one community_id. They see their members and nothing else.</span></li>
+<li><span class="who">Nellie's content</span><span class="what">Offers and events go live only with Kevin's say-so. Press images from Charlotte Magazine and the Chicago Tribune need rights cleared before public use.</span></li>
+<li><span class="who">Member data</span><span class="what">Phone numbers, emails, and birthday months stay in Supabase, Twilio, and Mailchimp. No exports.</span></li>
+<li><span class="who">Other product</span><span class="what">Brand Engage Pro is for businesses. Fan Engage Pro is for artist super fans. Never mix the two.</span></li>
+</ul>
+</section>
+
+<section>
+<p class="eyebrow">Handoff</p>
+<h2>Open items</h2>
+<div class="tablewrap"><table class="items">
+<tr><th>Item</th><th>Detail</th><th>Owner</th></tr>
+<tr><td>Nellie's offers and events</td><td>Nothing is live for Nellie's right now. Decide which offers and events to publish for launch.</td><td><span class="owner kevin">Kevin</span></td></tr>
+<tr><td>Birthday month in the app</td><td>Members need a place to set <code>birthday_month</code> before the birthday entree can work. Check that the profile or onboarding screen writes it, and test one redeem end to end.</td><td><span class="owner">Next session</span></td></tr>
+<tr><td>Stale HANDOFF.md</td><td>The committed <code>HANDOFF.md</code> (2026-06-20) still says Next 16.2.1, a <code>~/Downloads</code> path, and the vercel.app address. Update it or point it at this file.</td><td><span class="owner">Next session</span></td></tr>
+<tr><td>Rollback for 0057</td><td>There is no rollbacks folder. Add one for 0057 so the grants can be restored fast if a caller breaks.</td><td><span class="owner">Next session</span></td></tr>
+<tr><td>Old remote branches</td><td>21 remote branches besides main. Confirm with Kevin which can go, especially the two <code>salvage/*</code> branches.</td><td><span class="owner kevin">Kevin</span></td></tr>
+<tr><td>Branch protection</td><td>Main has none. Consider requiring the Frontend tests and Secret Scan checks, the way Fan Engage does.</td><td><span class="owner kevin">Kevin</span></td></tr>
+<tr><td>Carried from 2026-09-14</td><td>About 28 admin actions still use inline checks instead of <code>getAdminContext</code>. Rate limiting is in memory, not Redis or KV. Homegrown Beauty Lounge still unconfirmed. Vercel env vars and Supabase settings not rechecked. None of these were re-verified today.</td><td><span class="owner kevin">Kevin</span> / <span class="owner">Next session</span></td></tr>
+<tr><td>Commit this handoff</td><td><code>docs/HANDOFF-2026-09-24.html</code> is untracked. Commit it if wanted.</td><td><span class="owner kevin">Kevin</span></td></tr>
+</table></div>
+<div class="callout">
+<span class="label">For the next agent</span>
+<p>Start in ~/Developer/brand-engage-pro on a fresh main. Read this file first; HANDOFF.md is out of date. Run the brands check before touching the database. The next migration is 0059, and any new definer function starts closed. Businesses live here; super fans live in Fan Engage Pro.</p>
+</div>
+</section>
+
+<footer>Verified on 2026-09-24: PRs #32, #33, #34 merged, main at cc33356, no open pull requests, Frontend tests and Secret Scan green on cc33356, Production deploy succeeded and www.brandengagepro.com returned 200, migration filenames through 0058, 0057 and 0058 applied to enfpviapxvqyoarwwsuf, Nellie's offer, event, and welcome dessert counts in production, 13 cron schedules in frontend/vercel.json, no branch protection on main. Not verified: signed-in rendering, a real birthday entree redeem, Vercel env vars, the carried items from 2026-09-14.</footer>
+</div>
+
+</body>
+</html>
