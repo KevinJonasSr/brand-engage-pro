@@ -58,9 +58,9 @@ footer{border-top:1px solid var(--line);padding-top:1.2rem;font-size:.8rem;color
 <p class="kicker">Jonas Group Entertainment · Operations Handoff</p>
 <h1>Brand Engage Pro: what landed on 2026-09-24 and 2026-09-27, and what remains</h1>
 <ul class="meta">
-<li><b>Date</b> 2026-09-24, updated 2026-09-27 (after PR #46)</li>
+<li><b>Date</b> 2026-09-24, updated 2026-09-28 (after PR #49)</li>
 <li><b>Prepared for</b> Kevin Jonas Sr. and the next agent session</li>
-<li><b>Status</b> <span class="status-good">Live on www.brandengagepro.com</span>, main at ce61bdb (PR #46), no open pull requests</li>
+<li><b>Status</b> <span class="status-good">Live on www.brandengagepro.com</span>, main at 4561044 (PR #49), no open pull requests</li>
 <li><b>Supersedes</b> the 2026-09-14 handoff. Its product overview (stack, key paths, features) still applies; its orientation and open items do not.</li>
 </ul>
 </header>
@@ -71,13 +71,13 @@ footer{border-top:1px solid var(--line);padding-top:1.2rem;font-size:.8rem;color
 <div class="tablewrap"><table>
 <tr><th>Item</th><th>Value</th></tr>
 <tr><td>Live site</td><td><a href="https://www.brandengagepro.com">https://www.brandengagepro.com</a> (returned 200 after today's deploy). The old <code>brand-engage-pro.vercel.app</code> address still works.</td></tr>
-<tr><td>GitHub</td><td>KevinJonasSr/brand-engage-pro. Main is at <code>ce61bdb</code> (PR #46, this handoff, 2026-09-27). 20 remote branches besides main, mostly old <code>cursor/*</code> branches plus two <code>salvage/*</code> branches from 2026-07-26. Main has no branch protection.</td></tr>
+<tr><td>GitHub</td><td>KevinJonasSr/brand-engage-pro. Main is at <code>4561044</code> (PR #49, 2026-09-28). The other remote branches are mostly old <code>cursor/*</code> branches plus two <code>salvage/*</code> branches from 2026-07-26. Main has no branch protection.</td></tr>
 <tr><td>Vercel</td><td>Team jonas-group, project brand-engage-pro, root <code>frontend</code>. <code>frontend/vercel.json</code> holds 13 cron schedules. Production deploys on merge to main.</td></tr>
 <tr><td>Supabase</td><td>Project ref <code>enfpviapxvqyoarwwsuf</code>. It shares an org with Fan Engage Pro (<code>uhovonrljcauaoctypbg</code>), so confirm the ref before any SQL.</td></tr>
 <tr><td>Local working copy</td><td><code>~/Developer/brand-engage-pro</code>, on <code>main</code>, clean. The old <code>~/Downloads</code> path in the 2026-09-14 handoff is out of date.</td></tr>
 <tr><td>Framework</td><td>Next.js <b>16.3.6</b> (was 16.2.1), React 19.</td></tr>
 <tr><td>Migrations</td><td><code>supabase/migrations/</code> runs through <code>0063_offers_require_brand.sql</code>. 0059 to 0063 came in on 2026-09-27. <b>Next free number is 0064.</b> There is no rollbacks folder. The untracked 0049 problem from 2026-09-14 is gone.</td></tr>
-<tr><td>CI on main</td><td>Frontend tests and Secret Scan passed on each of PRs #43 to #45 before merge. Main at d1c93e1 went red because a test pinned the old 0063 header. PR #46 fixed that test, and Frontend tests, Secret Scan and the Production deploy are green on ce61bdb.</td></tr>
+<tr><td>CI on main</td><td>Frontend tests and Secret Scan passed on each of PRs #43 to #45 before merge. Main at d1c93e1 went red because a test pinned the old 0063 header. PR #46 fixed that test, and Frontend tests, Secret Scan and the Production deploy are green on ce61bdb. On 2026-09-28, PRs #47 to #49 passed the same checks, and main at 4561044 is green.</td></tr>
 <tr><td>Handoffs</td><td>This file is <code>docs/HANDOFF-2026-09-24.html</code>, on main since PR #35 (b7ad3f0). The older committed <code>HANDOFF.md</code> is dated 2026-06-20 and is stale (see open items).</td></tr>
 </table></div>
 </section>
@@ -151,6 +151,22 @@ footer{border-top:1px solid var(--line);padding-top:1.2rem;font-size:.8rem;color
 </section>
 
 <section>
+<p class="eyebrow">Update</p>
+<h2>What landed on 2026-09-28</h2>
+<p>Fan Engage Pro fixed its notification settings on 2026-09-28. The same problems existed in Brand Engage, so they were ported over. Kevin merged all three pull requests himself. None of them has a migration, and no production data was changed.</p>
+<div class="tablewrap"><table class="items">
+<tr><th>PR</th><th>What it did</th></tr>
+<tr><td>#47 (4dc6940)</td><td>Docs only. The 2026-09-27 update to this handoff.</td></tr>
+<tr><td>#48 (473fb7b)</td><td>Notification settings. <code>/me/notifications</code> is now the one preferences page, and <code>/settings/notifications</code> redirects to it. The server only lets Gold members and up turn SMS on, whatever the browser sends. Turning SMS on or off now keeps <code>members.sms_opted_in</code> in step, since the senders check both (<code>lib/sms-send-gate.ts</code>, tested in <code>lib/sms-opt-in-sync.test.ts</code>). The page shows how many points a member needs to reach Gold, read from <code>getTiers()</code>. The old <code>app/settings/notifications/actions.ts</code> and <code>components/notification-preferences-form.tsx</code> were deleted.</td></tr>
+<tr><td>#49 (4561044)</td><td>Tier fallback. <code>lib/data/tiers.ts</code> falls back to built-in tiers when Supabase cannot be reached, and those still had the old thresholds. They now match 0047: bronze 0, silver 750, gold 3500, platinum 8000. A new test, <code>lib/data/tiers.test.ts</code>, reads both files and fails if they drift apart again. 326 tests pass.</td></tr>
+</table></div>
+<h3>Housekeeping</h3>
+<ul>
+<li>The #47, #48 and #49 branches were deleted on GitHub and locally.</li>
+</ul>
+</section>
+
+<section>
 <p class="eyebrow">Workflow</p>
 <h2>How changes land</h2>
 <div class="callout danger">
@@ -211,7 +227,8 @@ git checkout main && git pull</code></pre>
 <tr><td>Birthday month in the app</td><td>Members need a place to set <code>birthday_month</code> before the birthday entree can work. Check that the profile or onboarding screen writes it, and test one redeem end to end.</td><td><span class="owner">Next session</span></td></tr>
 <tr><td>Stale HANDOFF.md</td><td>The committed <code>HANDOFF.md</code> (2026-06-20) still says Next 16.2.1, a <code>~/Downloads</code> path, and the vercel.app address. Update it or point it at this file.</td><td><span class="owner">Next session</span></td></tr>
 <tr><td>Rollback for 0057</td><td>There is no rollbacks folder. Add one for 0057 so the grants can be restored fast if a caller breaks.</td><td><span class="owner">Next session</span></td></tr>
-<tr><td>Old remote branches</td><td>21 remote branches besides main. Confirm with Kevin which can go, especially the two <code>salvage/*</code> branches.</td><td><span class="owner kevin">Kevin</span></td></tr>
+<tr><td>Test the 2026-09-28 notification changes signed in</td><td>Open <code>/me/notifications</code> as a member below Gold and confirm SMS stays locked. Then as a Gold member, turn SMS on and off and confirm <code>members.sms_opted_in</code> follows. Confirm <code>/settings/notifications</code> redirects. Only the unit tests covered this on 2026-09-28.</td><td><span class="owner">Next session</span></td></tr>
+<tr><td>Old remote branches</td><td>20 remote branches besides main (checked 2026-09-28). Confirm with Kevin which can go, especially the two <code>salvage/*</code> branches.</td><td><span class="owner kevin">Kevin</span></td></tr>
 <tr><td>Branch protection</td><td>Main has none. Consider requiring the Frontend tests and Secret Scan checks, the way Fan Engage does.</td><td><span class="owner kevin">Kevin</span></td></tr>
 <tr><td>Test the 2026-09-27 fixes signed in</td><td>Cancel one test redemption and confirm a single refund and the restock. Award points twice at once in a test and confirm both land. None of this was run end to end on 2026-09-27.</td><td><span class="owner">Next session</span></td></tr>
 <tr><td>Stripe checks</td><td>Replay test events with the Stripe CLI against the new webhook, and turn on the Stripe customer portal with cancellation, in both test and live mode. The billing portal link from #43 needs the portal enabled to work.</td><td><span class="owner kevin">Kevin</span></td></tr>
@@ -227,7 +244,7 @@ git checkout main && git pull</code></pre>
 </div>
 </section>
 
-<footer>Verified after PR #46 on 2026-09-27: PR #46 merged, main at ce61bdb, Frontend tests and Secret Scan green, Production deploy succeeded. Verified later on 2026-09-27: PRs #43 to #45 merged, no open pull requests, migration filenames through 0063, 0063 applied to enfpviapxvqyoarwwsuf with no default on offers.community_id, the five posts and one offer moved to their right brands. Not verified: a live Stripe event replay, the billing portal, the Turnstile challenge, a real brand admin session. Verified earlier on 2026-09-27: PRs #37 to #41 merged, main at 09e5c83, no open pull requests, Production deploy succeeded, migration filenames through 0062, 0059 to 0062 applied to enfpviapxvqyoarwwsuf. Not verified on 2026-09-27: a signed-in cancel, fulfill, or winner pick. Verified on 2026-09-24: PRs #32, #33, #34 merged, main at cc33356, no open pull requests, Frontend tests and Secret Scan green on cc33356, Production deploy succeeded and www.brandengagepro.com returned 200, migration filenames through 0058, 0057 and 0058 applied to enfpviapxvqyoarwwsuf, Nellie's offer, event, and welcome dessert counts in production, 13 cron schedules in frontend/vercel.json, no branch protection on main. Not verified: signed-in rendering, a real birthday entree redeem, Vercel env vars, the carried items from 2026-09-14.</footer>
+<footer>Verified on 2026-09-28: PRs #47, #48 and #49 merged, main at 4561044 with CI green, no open pull requests, their branches deleted, 326 frontend tests passing, migration filenames still end at 0063. Not verified on 2026-09-28: the notification page signed in. Verified after PR #46 on 2026-09-27: PR #46 merged, main at ce61bdb, Frontend tests and Secret Scan green, Production deploy succeeded. Verified later on 2026-09-27: PRs #43 to #45 merged, no open pull requests, migration filenames through 0063, 0063 applied to enfpviapxvqyoarwwsuf with no default on offers.community_id, the five posts and one offer moved to their right brands. Not verified: a live Stripe event replay, the billing portal, the Turnstile challenge, a real brand admin session. Verified earlier on 2026-09-27: PRs #37 to #41 merged, main at 09e5c83, no open pull requests, Production deploy succeeded, migration filenames through 0062, 0059 to 0062 applied to enfpviapxvqyoarwwsuf. Not verified on 2026-09-27: a signed-in cancel, fulfill, or winner pick. Verified on 2026-09-24: PRs #32, #33, #34 merged, main at cc33356, no open pull requests, Frontend tests and Secret Scan green on cc33356, Production deploy succeeded and www.brandengagepro.com returned 200, migration filenames through 0058, 0057 and 0058 applied to enfpviapxvqyoarwwsuf, Nellie's offer, event, and welcome dessert counts in production, 13 cron schedules in frontend/vercel.json, no branch protection on main. Not verified: signed-in rendering, a real birthday entree redeem, Vercel env vars, the carried items from 2026-09-14.</footer>
 </div>
 
 </body>
