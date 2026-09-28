@@ -54,10 +54,10 @@ describe("offers are always brand-scoped", () => {
 });
 
 describe("0063 migration", () => {
-  it("carries the not-yet-applied header", () => {
+  it("carries the already-applied header", () => {
     assert.match(
       migration,
-      /Not yet applied to production; apply via MCP before merge\./,
+      /Already applied to production via MCP on \d{4}-\d{2}-\d{2}\./,
     );
   });
 
