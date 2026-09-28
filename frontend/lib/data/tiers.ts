@@ -13,21 +13,21 @@ const FALLBACK: Tier[] = [
   {
     slug: "silver",
     display_name: "Silver",
-    min_points: 2500,
+    min_points: 750,
     perks: ["Recognized regular", "Priority on member specials when available"],
     sort_order: 2,
   },
   {
     slug: "gold",
     display_name: "Gold",
-    min_points: 10000,
+    min_points: 3500,
     perks: ["Top of the visit ladder", "Aligns with Premium club gating (≈ Gold+)"],
     sort_order: 3,
   },
   {
     slug: "platinum",
     display_name: "Platinum",
-    min_points: 25000,
+    min_points: 8000,
     perks: ["Highest loyalty tier", "Chef-table / invite windows when offered"],
     sort_order: 4,
   },
@@ -35,7 +35,8 @@ const FALLBACK: Tier[] = [
 
 /**
  * Tier list. Falls back to the seeded reference data if Supabase isn't
- * reachable — safe because those values are committed in 0001_init.sql.
+ * reachable. Thresholds must match 0047_economy_rebalance.sql
+ * (lib/data/tiers.test.ts checks this).
  *
  * Mapping for CS / soft launch:
  * - Bronze → Platinum = points ladder from visits
