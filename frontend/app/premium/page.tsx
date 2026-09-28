@@ -334,8 +334,11 @@ export default async function PremiumPage({
         </section>
 
         <p className="mt-12 text-xs text-white/40">
-          Secure checkout via Stripe. Cancel anytime from your account
-          settings. Full refund within 7 days of purchase if you change your
+          Secure checkout via Stripe. Cancel anytime from{" "}
+          <Link href="/me/billing" className="underline hover:text-white/70">
+            Account, Billing
+          </Link>
+          . Full refund within 7 days of purchase if you change your
           mind.
         </p>
       </div>

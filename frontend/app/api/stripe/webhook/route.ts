@@ -3,6 +3,14 @@ import type Stripe from "stripe";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripe } from "@/lib/stripe";
+import {
+  invoiceSubscriptionId,
+  subscriptionPeriodEndIso,
+} from "@/lib/stripe-moved-fields";
+import {
+  isStripeEventReplay,
+  stripeEventCompletionPatch,
+} from "@/lib/stripe-webhook-processed";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,7 +20,9 @@ export const dynamic = "force-dynamic";
  *
  * Stripe delivery endpoint. Every request is verified against
  * STRIPE_WEBHOOK_SECRET. Every event_id is recorded in stripe_events
- * for idempotency — replays are no-ops. Handled events:
+ * for idempotency. processed_at is only stamped when the handler
+ * succeeds, so a replay of a processed event is a no-op while a failed
+ * event returns 500 and Stripe retries it. Handled events:
  *
  *   customer.subscription.created  → flip membership to 'premium'
  *                                    (Founding 100 is claimed on join, not here)
@@ -65,20 +75,30 @@ export async function POST(request: Request) {
     .eq("id", event.id)
     .maybeSingle();
 
-  if (existing?.processed_at) {
+  if (isStripeEventReplay(existing?.processed_at)) {
     return NextResponse.json({ ok: true, replay: true });
   }
 
   // Record the raw event (first sight). We'll mark it processed after
   // the handler runs.
   if (!existing) {
-    await admin.from("stripe_events").insert({
+    const { error: insertErr } = await admin.from("stripe_events").insert({
       id: event.id,
       type: event.type,
       community_id: extractCommunityId(event),
       member_id: extractMemberId(event),
       payload: event as unknown as Record<string, unknown>,
     });
+    // A concurrent delivery may have inserted the row first (duplicate
+    // key). Anything else means we cannot track this event, so ask
+    // Stripe to retry rather than processing it untracked.
+    if (insertErr && insertErr.code !== "23505") {
+      console.error("stripe/webhook: event insert failed", insertErr.message);
+      return NextResponse.json(
+        { ok: false, error: "event log unavailable" },
+        { status: 500 },
+      );
+    }
   }
 
   let processError: string | null = null;
@@ -103,7 +123,11 @@ export async function POST(request: Request) {
         );
         break;
       case "invoice.paid":
-        await handleInvoicePaid(event.data.object as Stripe.Invoice, admin);
+        await handleInvoicePaid(
+          event.data.object as Stripe.Invoice,
+          event.id,
+          admin,
+        );
         break;
       case "invoice.payment_failed":
         await handleInvoicePaymentFailed(
@@ -121,18 +145,20 @@ export async function POST(request: Request) {
     console.error(`stripe/webhook: ${event.type} handler failed`, processError);
   }
 
-  await admin
+  // Only a successful run stamps processed_at. A failed run records the
+  // error and leaves processed_at null so Stripe's retry is processed.
+  const { error: markErr } = await admin
     .from("stripe_events")
-    .update({
-      processed_at: new Date().toISOString(),
-      error: processError,
-    })
+    .update(stripeEventCompletionPatch(processError))
     .eq("id", event.id);
+  if (markErr) {
+    console.error("stripe/webhook: could not record event outcome", markErr.message);
+  }
 
   if (processError) {
-    // Return non-2xx so Stripe retries — after retry limits are hit
-    // (72h) the event goes dead-letter but the row in stripe_events
-    // preserves the payload for manual replay.
+    // Return non-2xx so Stripe retries. After Stripe's retry window
+    // (about 3 days) the event stops retrying, but the row in
+    // stripe_events keeps the payload and error for manual replay.
     return NextResponse.json({ ok: false, error: processError }, { status: 500 });
   }
   return NextResponse.json({ ok: true });
@@ -212,10 +238,11 @@ async function handleSubscriptionUpdated(
     cancel_at_period_end: sub.cancel_at_period_end ?? false,
   };
 
-  await admin
+  const { error: updErr } = await admin
     .from("member_community_memberships")
     .update(updates)
     .eq("stripe_subscription_id", sub.id);
+  if (updErr) throw new Error(`membership update failed: ${updErr.message}`);
 }
 
 async function handleSubscriptionDeleted(
@@ -224,7 +251,7 @@ async function handleSubscriptionDeleted(
 ) {
   // Stripe fires this when the subscription ends (after cancel_at_period_end
   // runs out, or after payment_failed retries exhaust). Revert to free.
-  await admin
+  const { error: updErr } = await admin
     .from("member_community_memberships")
     .update({
       subscription_tier: "free",
@@ -234,26 +261,28 @@ async function handleSubscriptionDeleted(
       // resubscribe will overwrite it.
     })
     .eq("stripe_subscription_id", sub.id);
+  if (updErr) throw new Error(`membership update failed: ${updErr.message}`);
 }
 
 async function handleInvoicePaid(
   invoice: Stripe.Invoice,
+  eventId: string,
   admin: SupabaseClient,
 ) {
   // An invoice paid against an active subscription — the canonical
   // signal that the subscription is healthy. If the member was past_due,
   // this flips them back to premium. Also refresh the $5 monthly credit.
-  const subscriptionField = (invoice as unknown as { subscription?: string | null }).subscription;
-  const subId = typeof subscriptionField === "string" ? subscriptionField : null;
+  const subId = invoiceSubscriptionId(invoice);
   if (!subId) return; // Non-subscription invoice — ignore.
 
-  const { data: membership } = await admin
+  const { data: membership, error: readErr } = await admin
     .from("member_community_memberships")
     .select(
       "member_id, community_id, subscription_tier, monthly_credit_refreshed_at",
     )
     .eq("stripe_subscription_id", subId)
     .maybeSingle();
+  if (readErr) throw new Error(`membership read failed: ${readErr.message}`);
   if (!membership) return;
 
   const updates: Record<string, unknown> = {
@@ -266,23 +295,36 @@ async function handleInvoicePaid(
     ? new Date(membership.monthly_credit_refreshed_at as string).getTime()
     : 0;
   const daysSince = (Date.now() - lastRefreshed) / (1000 * 60 * 60 * 24);
-  if (daysSince >= 25) {
+  const refreshCredit = daysSince >= 25;
+  if (refreshCredit) {
     updates.monthly_credit_cents = 500;
     updates.monthly_credit_refreshed_at = new Date().toISOString();
+  }
 
-    await admin.from("credit_grants").insert({
+  // Membership first: if this fails we throw and Stripe retries, and no
+  // ledger row has been written yet.
+  const { error: updErr } = await admin
+    .from("member_community_memberships")
+    .update(updates)
+    .eq("stripe_subscription_id", subId);
+  if (updErr) throw new Error(`membership update failed: ${updErr.message}`);
+
+  if (refreshCredit) {
+    // Ledger row is best effort. stripe_event_id must be the Stripe event
+    // id (FK to stripe_events.id), not the invoice id. We log instead of
+    // throwing so a retry cannot double-grant: the membership row above
+    // already carries the refreshed credit and timestamp.
+    const { error: grantErr } = await admin.from("credit_grants").insert({
       member_id: membership.member_id,
       community_id: membership.community_id,
       amount_cents: 500,
       reason: "monthly_refresh",
-      stripe_event_id: invoice.id,
+      stripe_event_id: eventId,
     });
+    if (grantErr) {
+      console.error("invoice.paid: credit_grants insert failed", grantErr.message);
+    }
   }
-
-  await admin
-    .from("member_community_memberships")
-    .update(updates)
-    .eq("stripe_subscription_id", subId);
 }
 
 async function handleInvoicePaymentFailed(
@@ -294,14 +336,14 @@ async function handleInvoicePaymentFailed(
   // their card, but keep access alive during the grace window. When
   // retries are exhausted, Stripe fires subscription.deleted and we
   // revert to 'free'.
-  const subscriptionField = (invoice as unknown as { subscription?: string | null }).subscription;
-  const subId = typeof subscriptionField === "string" ? subscriptionField : null;
+  const subId = invoiceSubscriptionId(invoice);
   if (!subId) return;
 
-  await admin
+  const { error: updErr } = await admin
     .from("member_community_memberships")
     .update({ subscription_tier: "past_due" })
     .eq("stripe_subscription_id", subId);
+  if (updErr) throw new Error(`membership update failed: ${updErr.message}`);
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
@@ -318,8 +360,9 @@ function parseSubMetadata(sub: Stripe.Subscription) {
 }
 
 function subPeriodEnd(sub: Stripe.Subscription): string | null {
-  const end = (sub as unknown as { current_period_end?: number }).current_period_end;
-  return end ? new Date(end * 1000).toISOString() : null;
+  // current_period_end moved onto subscription items in newer Stripe API
+  // versions; the helper reads the new spot and falls back to the old one.
+  return subscriptionPeriodEndIso(sub);
 }
 
 /**
