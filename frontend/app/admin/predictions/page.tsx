@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getAdminUser } from "@/lib/admin";
+import { getAdminPageScope } from "@/lib/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   predictionPhase,
@@ -33,11 +33,12 @@ interface PredictionQueueRow {
 }
 
 export default async function AdminPredictionsPage() {
-  const adminUser = await getAdminUser();
-  if (!adminUser) redirect("/login");
+  const page = await getAdminPageScope();
+  if (!page) redirect("/login");
+  const { scope } = page;
 
   const admin = createAdminClient();
-  const { data: rows } = await admin
+  let query = admin
     .from("community_posts")
     .select(
       "id, brand_slug, title, prediction_type, prediction_closes_at, " +
@@ -46,6 +47,9 @@ export default async function AdminPredictionsPage() {
     .eq("kind", "prediction")
     .order("created_at", { ascending: false })
     .limit(200);
+  // Brand admins see only their own brand's predictions.
+  if (scope) query = query.eq("brand_slug", scope);
+  const { data: rows } = await query;
 
   const all = (rows ?? []) as unknown as PredictionQueueRow[];
   const now = new Date();

@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getAdminPageScope } from "@/lib/admin";
 import { adminDeleteEntryAction } from "@/app/admin/community/actions";
 import { pickWinnerAction } from "./actions";
 
@@ -23,29 +25,39 @@ type ChallengeWithEntries = {
   winner_id: string | null;
 };
 
-async function load(): Promise<ChallengeWithEntries[]> {
+async function load(scope: string | null): Promise<ChallengeWithEntries[]> {
   const admin = createAdminClient();
-  const { data: posts } = await admin
+  let postsQuery = admin
     .from("community_posts")
     .select("id,brand_slug,title,body,pinned,created_at")
     .eq("kind", "challenge")
     .order("created_at", { ascending: false })
     .limit(50);
+  // Brand admins see only their own brand's challenges.
+  if (scope) postsQuery = postsQuery.eq("brand_slug", scope);
+  const { data: posts } = await postsQuery;
   if (!posts || posts.length === 0) return [];
   const ids = posts.map((p) => p.id as string);
-  const [{ data: entries }, { data: members }, { data: winners }] = await Promise.all([
+  const [{ data: entries }, { data: winners }] = await Promise.all([
     admin
       .from("community_challenge_entries")
       .select("id,post_id,member_id,body,image_url, image_alt,created_at")
       .in("post_id", ids)
       .order("created_at", { ascending: false }),
-    admin.from("members").select("id,first_name"),
     admin
       .from("campaign_items")
       .select("metadata,ref_id")
       .eq("item_kind", "challenge_winner")
       .in("ref_id", ids),
   ]);
+  // Only look up the names of members who entered these challenges.
+  const entrantIds = [
+    ...new Set((entries ?? []).map((e) => e.member_id as string)),
+  ];
+  const { data: members } =
+    entrantIds.length > 0
+      ? await admin.from("members").select("id,first_name").in("id", entrantIds)
+      : { data: [] as { id: string; first_name: string | null }[] };
   const nameById = new Map<string, string | null>(
     (members ?? []).map((f) => [f.id as string, (f.first_name as string | null) ?? null]),
   );
@@ -82,7 +94,9 @@ async function load(): Promise<ChallengeWithEntries[]> {
 }
 
 export default async function AdminChallengesPage() {
-  const challenges = await load();
+  const access = await getAdminPageScope();
+  if (!access) redirect("/login?next=/admin/challenges");
+  const challenges = await load(access.scope);
 
   return (
     <div className="space-y-6">

@@ -6,7 +6,7 @@
 
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAdminContext } from "@/lib/admin";
+import { canAccessBrand, getAdminContext } from "@/lib/admin";
 import {
   generateAction,
   publishAction,
@@ -29,13 +29,8 @@ interface DraftRow {
 export default async function AdminPostDraftsPage() {
   const ctx = await getAdminContext();
   if (!ctx) redirect("/login");
-  const brandSlug =
-    (ctx as unknown as { brandSlug?: string }).brandSlug ??
-    (ctx as unknown as { brand_slug?: string }).brand_slug ??
-    (ctx as unknown as { communityId?: string }).communityId ??
-    (ctx as unknown as { activeBrandSlug?: string }).activeBrandSlug ??
-    "";
-  if (!brandSlug) redirect("/admin");
+  const brandSlug = ctx.currentCommunityId ?? "";
+  if (!brandSlug || !canAccessBrand(ctx, brandSlug)) redirect("/admin");
 
   const admin = createAdminClient();
   const { data: pending } = await admin

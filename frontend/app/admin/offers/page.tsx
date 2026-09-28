@@ -1,16 +1,23 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getAdminPageScope } from "@/lib/admin";
+import BrandField from "../_components/brand-field";
 import type { Offer } from "@/lib/data/types";
 import ImageUploader from "@/components/image-uploader";
 import { createOfferAction, toggleOfferActiveAction } from "./actions";
 import OfferImageEditor from "./offer-image-editor";
 
 async function listAllOffers(): Promise<Offer[]> {
+  // Brand admins see only their own brand's offers; super-admins see all.
+  const access = await getAdminPageScope();
+  if (!access) return [];
   try {
     const admin = createAdminClient();
-    const { data } = await admin
+    let query = admin
       .from("offers")
       .select("*")
       .order("created_at", { ascending: false });
+    if (access.scope) query = query.eq("community_id", access.scope);
+    const { data } = await query;
     return (data ?? []) as Offer[];
   } catch {
     return [];
@@ -36,6 +43,7 @@ export default async function AdminOffersPage() {
       <div className="rounded-2xl border border-white/10 bg-black/30 p-5">
         <h2 className="text-sm uppercase tracking-wide text-white/60">Add a new offer</h2>
         <form action={createOfferAction} className="mt-4 grid gap-3 md:grid-cols-2">
+          <BrandField />
           <input
             name="title"
             placeholder="Limited merch drop"

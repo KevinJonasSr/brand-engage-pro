@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPolicy } from "@/lib/data/policies";
+import { getAdminContext } from "@/lib/admin";
 import PolicyEditForm from "./edit-form";
 
 export const dynamic = "force-dynamic";
@@ -11,6 +12,9 @@ export default async function AdminPolicyEditPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  // Platform-wide legal text: owners only (matches updatePolicyAction).
+  const ctx = await getAdminContext();
+  if (!ctx?.isSuperAdmin) notFound();
   const policy = await getPolicy(slug);
   if (!policy) notFound();
 

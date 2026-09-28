@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getAdminContext } from "@/lib/admin";
 
 export const dynamic = "force-dynamic";
 
@@ -96,6 +98,14 @@ function KpiCard({ label, value, sub }: { label: string; value: string | number;
 }
 
 export default async function AdminAnalyticsPage() {
+  // These rollups are platform-wide, so only owners see them. Brand admins
+  // go to their own brand's analytics page instead.
+  const ctx = await getAdminContext();
+  if (!ctx) redirect("/login?next=/admin/analytics");
+  if (!ctx.isSuperAdmin) {
+    if (!ctx.currentCommunityId) notFound();
+    redirect(`/admin/analytics/${encodeURIComponent(ctx.currentCommunityId)}`);
+  }
   const a = await loadAnalytics();
 
   return (

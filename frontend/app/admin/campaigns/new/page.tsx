@@ -1,10 +1,17 @@
+import { redirect } from "next/navigation";
 import { listBrandsFromDb } from "@/lib/data/brands";
+import { canAccessBrand, getAdminContext } from "@/lib/admin";
 import CampaignBuilder from "./builder";
 
 export const dynamic = "force-dynamic";
 
 export default async function NewCampaignPage() {
-  const brands = await listBrandsFromDb();
+  const ctx = await getAdminContext();
+  if (!ctx) redirect("/login?next=/admin/campaigns/new");
+  // Only offer brands this admin may publish to.
+  const brands = (await listBrandsFromDb()).filter((b) =>
+    canAccessBrand(ctx, b.slug),
+  );
   return (
     <div className="space-y-6">
       <div>

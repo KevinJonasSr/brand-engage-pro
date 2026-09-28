@@ -1,9 +1,14 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { listPolicies } from "@/lib/data/policies";
+import { getAdminContext } from "@/lib/admin";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPoliciesPage() {
+  // Platform-wide legal text: owners only (matches updatePolicyAction).
+  const ctx = await getAdminContext();
+  if (!ctx?.isSuperAdmin) notFound();
   const policies = await listPolicies();
 
   return (

@@ -1,53 +1,88 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getAdminPageScope } from "@/lib/admin";
 import { adminSuspendMemberAction } from "@/app/admin/community/actions";
 import ModerationButton from "@/app/admin/community/moderation-button";
 
 export const dynamic = "force-dynamic";
 
-async function loadMember(id: string) {
+async function loadMember(id: string, scope: string | null) {
   const admin = createAdminClient();
+
+  // Brand admins may only open members of their own brand, and see only
+  // that brand's activity. Super-admins (scope null) see everything.
+  let membershipStatus: string | null = null;
+  if (scope) {
+    const { data: membership } = await admin
+      .from("member_community_memberships")
+      .select("status")
+      .eq("member_id", id)
+      .eq("community_id", scope)
+      .maybeSingle();
+    if (!membership) return null;
+    membershipStatus = (membership.status as string | null) ?? null;
+  }
+
+  let ledgerQ = admin
+    .from("points_ledger")
+    .select("delta,source,source_ref,note,created_at")
+    .eq("member_id", id)
+    .order("created_at", { ascending: false })
+    .limit(50);
+  let badgesQ = admin
+    .from("member_badges")
+    .select("badge_slug,earned_at,badges(slug,name,icon,category)")
+    .eq("member_id", id);
+  let postsQ = admin
+    .from("community_posts")
+    .select("id,brand_slug,kind,body,created_at")
+    .eq("author_id", id)
+    .order("created_at", { ascending: false })
+    .limit(20);
+  let commentsQ = admin
+    .from("community_comments")
+    .select("id,post_id,body,created_at,community_posts!inner(brand_slug)")
+    .eq("author_id", id)
+    .order("created_at", { ascending: false })
+    .limit(20);
+  let entriesQ = admin
+    .from("community_challenge_entries")
+    .select("id,post_id,body,created_at,community_posts!inner(brand_slug)")
+    .eq("member_id", id)
+    .order("created_at", { ascending: false })
+    .limit(20);
+  let referralsQ = admin
+    .from("referrals")
+    .select("id,referred_email,status,points_awarded,created_at,verified_at")
+    .eq("referrer_id", id)
+    .order("created_at", { ascending: false });
+  if (scope) {
+    ledgerQ = ledgerQ.eq("community_id", scope);
+    badgesQ = badgesQ.eq("community_id", scope);
+    postsQ = postsQ.eq("brand_slug", scope);
+    commentsQ = commentsQ.eq("community_posts.brand_slug", scope);
+    entriesQ = entriesQ.eq("community_posts.brand_slug", scope);
+    referralsQ = referralsQ.eq("community_id", scope);
+  }
+
   const [memberRes, ledgerRes, badgesRes, postsRes, commentsRes, entriesRes, referralsRes] = await Promise.all([
     admin.from("members").select("*").eq("id", id).maybeSingle(),
-    admin
-      .from("points_ledger")
-      .select("delta,source,source_ref,note,created_at")
-      .eq("member_id", id)
-      .order("created_at", { ascending: false })
-      .limit(50),
-    admin
-      .from("member_badges")
-      .select("badge_slug,earned_at,badges(slug,name,icon,category)")
-      .eq("member_id", id),
-    admin
-      .from("community_posts")
-      .select("id,brand_slug,kind,body,created_at")
-      .eq("author_id", id)
-      .order("created_at", { ascending: false })
-      .limit(20),
-    admin
-      .from("community_comments")
-      .select("id,post_id,body,created_at")
-      .eq("author_id", id)
-      .order("created_at", { ascending: false })
-      .limit(20),
-    admin
-      .from("community_challenge_entries")
-      .select("id,post_id,body,created_at")
-      .eq("member_id", id)
-      .order("created_at", { ascending: false })
-      .limit(20),
-    admin
-      .from("referrals")
-      .select("id,referred_email,status,points_awarded,created_at,verified_at")
-      .eq("referrer_id", id)
-      .order("created_at", { ascending: false }),
+    ledgerQ,
+    badgesQ,
+    postsQ,
+    commentsQ,
+    entriesQ,
+    referralsQ,
   ]);
 
   if (!memberRes.data) return null;
   return {
     member: memberRes.data,
+    // Brand admins suspend per brand; super-admins use the global flag.
+    isSuspended: scope
+      ? membershipStatus === "suspended"
+      : Boolean(memberRes.data.suspended),
     ledger: ledgerRes.data ?? [],
     badges: badgesRes.data ?? [],
     posts: postsRes.data ?? [],
@@ -63,9 +98,11 @@ export default async function AdminMemberDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const data = await loadMember(id);
+  const access = await getAdminPageScope();
+  if (!access) notFound();
+  const data = await loadMember(id, access.scope);
   if (!data) notFound();
-  const { member, ledger, badges, posts, comments, entries, referrals } = data;
+  const { member, isSuspended, ledger, badges, posts, comments, entries, referrals } = data;
 
   return (
     <div className="space-y-6">
@@ -105,7 +142,7 @@ export default async function AdminMemberDetailPage({
             {member.city && (
               <span className="rounded-full bg-white/10 px-2 py-0.5">{member.city}</span>
             )}
-            {member.suspended && (
+            {isSuspended && (
               <span className="rounded-full bg-rose-500/30 px-2 py-0.5 text-rose-200">
                 Suspended
               </span>
@@ -116,16 +153,18 @@ export default async function AdminMemberDetailPage({
           action={adminSuspendMemberAction}
           fields={{
             member_id: member.id as string,
-            suspend: member.suspended ? "false" : "true",
+            suspend: isSuspended ? "false" : "true",
           }}
-          label={member.suspended ? "Unsuspend" : "Suspend"}
+          label={isSuspended ? "Unsuspend" : "Suspend"}
           confirmMessage={
-            member.suspended
+            isSuspended
               ? "Lift the suspension on this member?"
-              : "Suspend this member? They won't be able to post or comment until unsuspended."
+              : access.scope
+                ? "Suspend this member in your brand? Other brands are not affected."
+                : "Suspend this member across every brand?"
           }
           className={`rounded-full px-4 py-2 text-xs font-semibold disabled:opacity-50 ${
-            member.suspended
+            isSuspended
               ? "bg-emerald-500/20 text-emerald-200 hover:bg-emerald-500/30"
               : "bg-rose-500/20 text-rose-200 hover:bg-rose-500/30"
           }`}

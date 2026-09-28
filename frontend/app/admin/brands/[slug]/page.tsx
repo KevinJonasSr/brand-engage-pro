@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { canAccessBrand, getAdminContext } from "@/lib/admin";
 import { listEventsForAdmin } from "@/lib/data/brands";
 import { listRsvpsForEvent } from "@/lib/data/events";
 import BrandEditForm from "./edit-form";
@@ -29,6 +30,8 @@ export default async function AdminBrandEditPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const ctx = await getAdminContext();
+  if (!canAccessBrand(ctx, slug)) notFound();
   const admin = createAdminClient();
   const { data: brand } = await admin
     .from("brands")

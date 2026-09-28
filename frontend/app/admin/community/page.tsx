@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getAdminPageScope } from "@/lib/admin";
 import {
   adminDeleteCommentAction,
   adminDeleteEntryAction,
@@ -41,26 +43,49 @@ type EntryRow = {
   member_first_name: string | null;
 };
 
-async function loadFeed() {
+async function loadFeed(scope: string | null) {
   const admin = createAdminClient();
-  const [postsRes, commentsRes, entriesRes, membersRes] = await Promise.all([
-    admin
-      .from("community_posts")
-      .select("id,brand_slug,kind,title,body,pinned,created_at,author_id")
-      .order("created_at", { ascending: false })
-      .limit(100),
-    admin
-      .from("community_comments")
-      .select("id,post_id,body,created_at,author_id")
-      .order("created_at", { ascending: false })
-      .limit(50),
-    admin
-      .from("community_challenge_entries")
-      .select("id,post_id,body,image_url, image_alt,created_at,member_id")
-      .order("created_at", { ascending: false })
-      .limit(50),
-    admin.from("members").select("id,first_name"),
+  let postsQ = admin
+    .from("community_posts")
+    .select("id,brand_slug,kind,title,body,pinned,created_at,author_id")
+    .order("created_at", { ascending: false })
+    .limit(100);
+  // Comments and entries carry no brand column, so filter through the
+  // parent post's brand_slug.
+  let commentsQ = admin
+    .from("community_comments")
+    .select("id,post_id,body,created_at,author_id,community_posts!inner(brand_slug)")
+    .order("created_at", { ascending: false })
+    .limit(50);
+  let entriesQ = admin
+    .from("community_challenge_entries")
+    .select("id,post_id,body,image_url, image_alt,created_at,member_id,community_posts!inner(brand_slug)")
+    .order("created_at", { ascending: false })
+    .limit(50);
+  // Brand admins see only their own brand's feed.
+  if (scope) {
+    postsQ = postsQ.eq("brand_slug", scope);
+    commentsQ = commentsQ.eq("community_posts.brand_slug", scope);
+    entriesQ = entriesQ.eq("community_posts.brand_slug", scope);
+  }
+  const [postsRes, commentsRes, entriesRes] = await Promise.all([
+    postsQ,
+    commentsQ,
+    entriesQ,
   ]);
+
+  // Only look up the names of the authors shown on this page.
+  const authorIds = [
+    ...new Set([
+      ...(postsRes.data ?? []).map((p) => p.author_id as string),
+      ...(commentsRes.data ?? []).map((c) => c.author_id as string),
+      ...(entriesRes.data ?? []).map((e) => e.member_id as string),
+    ]),
+  ].filter(Boolean);
+  const membersRes =
+    authorIds.length > 0
+      ? await admin.from("members").select("id,first_name").in("id", authorIds)
+      : { data: [] as { id: string; first_name: string | null }[] };
 
   const nameById = new Map<string, string | null>(
     (membersRes.data ?? []).map((f) => [f.id as string, (f.first_name as string | null) ?? null]),
@@ -110,7 +135,9 @@ function KindChip({ kind }: { kind: string }) {
 }
 
 export default async function AdminCommunityPage() {
-  const { posts, comments, entries } = await loadFeed();
+  const access = await getAdminPageScope();
+  if (!access) redirect("/login?next=/admin/community");
+  const { posts, comments, entries } = await loadFeed(access.scope);
 
   return (
     <div className="space-y-8">

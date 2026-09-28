@@ -1,16 +1,32 @@
+import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getAdminPageScope } from "@/lib/admin";
 
-async function getCounts() {
+/**
+ * Counts for the overview cards. Super-admins (scope null) see platform
+ * totals; brand admins see only their own brand's rows.
+ */
+async function getCounts(scope: string | null) {
   try {
     const admin = createAdminClient();
-    const [members, offers, referrals, purchases] = await Promise.all([
-      admin.from("members").select("id", { count: "exact", head: true }),
-      admin.from("offers").select("id", { count: "exact", head: true }),
-      admin.from("referrals").select("id", { count: "exact", head: true }),
-      admin.from("purchases").select("id", { count: "exact", head: true }),
+    const count = (table: "offers" | "referrals" | "purchases") => {
+      const q = admin.from(table).select("id", { count: "exact", head: true });
+      return scope ? q.eq("community_id", scope) : q;
+    };
+    const members = scope
+      ? admin
+          .from("member_community_memberships")
+          .select("member_id", { count: "exact", head: true })
+          .eq("community_id", scope)
+      : admin.from("members").select("id", { count: "exact", head: true });
+    const [membersRes, offers, referrals, purchases] = await Promise.all([
+      members,
+      count("offers"),
+      count("referrals"),
+      count("purchases"),
     ]);
     return {
-      members: members.count ?? 0,
+      members: membersRes.count ?? 0,
       offers: offers.count ?? 0,
       referrals: referrals.count ?? 0,
       purchases: purchases.count ?? 0,
@@ -21,7 +37,9 @@ async function getCounts() {
 }
 
 export default async function AdminOverviewPage() {
-  const counts = await getCounts();
+  const access = await getAdminPageScope();
+  if (!access) redirect("/login?next=/admin");
+  const counts = await getCounts(access.scope);
   const cards = [
     { label: "Members", value: counts.members, href: "/admin/members" },
     { label: "Offers", value: counts.offers, href: "/admin/offers" },

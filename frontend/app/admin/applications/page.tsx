@@ -1,4 +1,6 @@
+import { notFound } from "next/navigation";
 import { listApplications } from "@/lib/data/applications";
+import { getAdminContext } from "@/lib/admin";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +15,9 @@ const STATUS_BADGE: Record<string, string> = {
 };
 
 export default async function AdminApplicationsPage() {
+  // New-business intake is platform-level, so owners only.
+  const ctx = await getAdminContext();
+  if (!ctx?.isSuperAdmin) notFound();
   const apps = await listApplications();
   const counts = apps.reduce<Record<string, number>>((acc, a) => {
     acc[a.status] = (acc[a.status] ?? 0) + 1;

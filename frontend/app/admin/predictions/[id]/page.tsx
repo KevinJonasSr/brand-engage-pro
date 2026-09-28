@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
-import { getAdminUser } from "@/lib/admin";
+import { canAccessBrand, getAdminContext } from "@/lib/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { gatherPredictionTally } from "@/lib/predictions/tally";
 import {
@@ -53,8 +53,8 @@ export default async function ResolvePredictionPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const adminUser = await getAdminUser();
-  if (!adminUser) redirect("/login");
+  const ctx = await getAdminContext();
+  if (!ctx) redirect("/login");
 
   const { id } = await params;
   const admin = createAdminClient();
@@ -74,6 +74,8 @@ export default async function ResolvePredictionPage({
 
   if (!postRaw) notFound();
   const post = postRaw as unknown as PredictionRow;
+  // Brand admins may only view and resolve their own brand's predictions.
+  if (!canAccessBrand(ctx, post.brand_slug)) notFound();
 
   // Fetch options if multi
   let options: PollOption[] = [];

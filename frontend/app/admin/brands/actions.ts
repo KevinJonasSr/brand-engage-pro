@@ -2,14 +2,25 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAdminUser } from "@/lib/admin";
+import {
+  canAccessBrand,
+  requireAdminContext,
+  requireBrandAccess,
+  requireSuperAdmin,
+} from "@/lib/admin";
 import { sendEventReminder, type ReminderWindowEvent } from "@/lib/reminders";
 import { parseSocialLines } from "@/lib/socials/parse";
 
-async function requireAdmin() {
-  const admin = await getAdminUser();
-  if (!admin) throw new Error("Forbidden");
-  return admin;
+/** Throws unless the caller is an admin with access to `brandSlug`. */
+async function requireBrandAdmin(brandSlug: string) {
+  const ctx = await requireAdminContext();
+  return requireBrandAccess(ctx, brandSlug);
+}
+
+/** Same check for actions that report errors instead of throwing. */
+async function brandAccessError(brandSlug: string): Promise<string | null> {
+  const ctx = await requireAdminContext();
+  return canAccessBrand(ctx, brandSlug) ? null : "You can only manage your own brand.";
 }
 
 /**
@@ -19,7 +30,8 @@ async function requireAdmin() {
  * can work without the redirect throwing NEXT_REDIRECT mid-retry.
  */
 export async function createBrandAction(formData: FormData) {
-  await requireAdmin();
+  // New brands are an owner decision, not a brand admin one.
+  requireSuperAdmin(await requireAdminContext());
   const slug = String(formData.get("slug") ?? "")
     .toLowerCase()
     .trim()
@@ -40,9 +52,9 @@ export async function createBrandAction(formData: FormData) {
 }
 
 export async function updateBrandAction(formData: FormData) {
-  await requireAdmin();
   const slug = String(formData.get("slug") ?? "").trim();
   if (!slug) return;
+  await requireBrandAdmin(slug);
   const name = String(formData.get("name") ?? "").trim();
   const tagline = String(formData.get("tagline") ?? "").trim();
   const bio = String(formData.get("bio") ?? "").trim();
@@ -97,12 +109,13 @@ export async function updateBrandAction(formData: FormData) {
  * uses useFormSave for retry-on-503 + visible status feedback.
  */
 export async function createEventAction(formData: FormData) {
-  await requireAdmin();
   const brandSlug = String(formData.get("brand_slug") ?? "").trim();
   const title = String(formData.get("title") ?? "").trim();
   if (!brandSlug || !title) {
     return { error: "Title is required." };
   }
+  const denied = await brandAccessError(brandSlug);
+  if (denied) return { error: denied };
   const detail = String(formData.get("detail") ?? "").trim();
   const eventDate = String(formData.get("event_date") ?? "").trim();
   const startsAt = String(formData.get("starts_at") ?? "").trim();
@@ -115,6 +128,7 @@ export async function createEventAction(formData: FormData) {
   const supa = createAdminClient();
   const { error } = await supa.from("brand_events").insert({
     brand_slug: brandSlug,
+    community_id: brandSlug,
     title,
     detail: detail || null,
     event_date: eventDate || null,
@@ -150,12 +164,13 @@ export async function createEventAction(formData: FormData) {
  *    "premium" toggle.
  */
 export async function updateEventAction(formData: FormData) {
-  await requireAdmin();
   const eventId = String(formData.get("event_id") ?? "").trim();
   const brandSlug = String(formData.get("brand_slug") ?? "").trim();
   if (!eventId || !brandSlug) {
     return { error: "Missing event_id or brand_slug." };
   }
+  const denied = await brandAccessError(brandSlug);
+  if (denied) return { error: denied };
   const title = String(formData.get("title") ?? "").trim();
   if (!title) {
     return { error: "Title is required." };
@@ -197,16 +212,17 @@ export async function updateEventAction(formData: FormData) {
 }
 
 export async function sendReminderNowAction(formData: FormData) {
-  await requireAdmin();
   const eventId = String(formData.get("event_id") ?? "").trim();
   const brandSlug = String(formData.get("brand_slug") ?? "").trim();
   if (!eventId || !brandSlug) return;
+  await requireBrandAdmin(brandSlug);
   const supa = createAdminClient();
   const [{ data: event }, { data: brand }] = await Promise.all([
     supa
       .from("brand_events")
       .select("id, brand_slug, title, detail, starts_at, location, url, reminder_sms_template")
       .eq("id", eventId)
+      .eq("brand_slug", brandSlug)
       .maybeSingle(),
     supa.from("brands").select("name").eq("slug", brandSlug).maybeSingle(),
   ]);
@@ -227,12 +243,12 @@ export async function sendReminderNowAction(formData: FormData) {
 }
 
 export async function deleteEventAction(formData: FormData) {
-  await requireAdmin();
   const id = String(formData.get("event_id") ?? "");
-  const brandSlug = String(formData.get("brand_slug") ?? "");
-  if (!id) return;
+  const brandSlug = String(formData.get("brand_slug") ?? "").trim();
+  if (!id || !brandSlug) return;
+  await requireBrandAdmin(brandSlug);
   const supa = createAdminClient();
-  await supa.from("brand_events").delete().eq("id", id);
+  await supa.from("brand_events").delete().eq("id", id).eq("brand_slug", brandSlug);
   revalidatePath(`/admin/brands/${brandSlug}`);
   revalidatePath(`/brands/${brandSlug}`);
 }

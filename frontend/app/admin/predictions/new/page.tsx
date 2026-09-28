@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getAdminUser } from "@/lib/admin";
+import { canAccessBrand, getAdminContext } from "@/lib/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { CreatePredictionForm } from "./create-form";
 
@@ -13,8 +13,8 @@ interface BrandRow {
 }
 
 export default async function NewPredictionPage() {
-  const adminUser = await getAdminUser();
-  if (!adminUser) redirect("/login");
+  const ctx = await getAdminContext();
+  if (!ctx) redirect("/login");
 
   const admin = createAdminClient();
   const { data: brandRows } = await admin
@@ -23,7 +23,10 @@ export default async function NewPredictionPage() {
     .eq("active", true)
     .order("name", { ascending: true });
 
-  const brands = ((brandRows ?? []) as unknown as BrandRow[]).map((b) => ({
+  // Brand admins may only create predictions for their own brand.
+  const brands = ((brandRows ?? []) as unknown as BrandRow[])
+    .filter((b) => canAccessBrand(ctx, b.slug))
+    .map((b) => ({
     slug: b.slug,
     name: b.name,
   }));

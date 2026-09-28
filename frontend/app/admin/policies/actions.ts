@@ -2,12 +2,17 @@
 
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAdminUser } from "@/lib/admin";
+import { requireAdminContext, requireSuperAdmin } from "@/lib/admin";
 
+/**
+ * Policy pages (terms, privacy, cookie policy) are platform-wide legal text,
+ * so only super-admins (owners) may edit them. Note: there is no history
+ * table yet; updated_by records only the last editor.
+ */
 async function requireAdmin() {
-  const admin = await getAdminUser();
-  if (!admin) throw new Error("Forbidden");
-  return admin;
+  const ctx = await requireAdminContext();
+  requireSuperAdmin(ctx);
+  return ctx.user;
 }
 
 export async function updatePolicyAction(formData: FormData) {

@@ -1,4 +1,4 @@
-import { getAdminContext } from "@/lib/admin";
+import { canAccessBrand, getAdminContext } from "@/lib/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -300,11 +300,8 @@ export default async function AdminCommunityAnalyticsPage({
   const { communityId } = await params;
 
   // Verify admin has access to this community
-  if (
-    !ctx.isSuperAdmin &&
-    ctx.communities.length > 0 &&
-    !ctx.communities.includes(communityId)
-  ) {
+  // (An admin with no brand grants used to fall through; not any more.)
+  if (!canAccessBrand(ctx, communityId)) {
     notFound();
   }
 

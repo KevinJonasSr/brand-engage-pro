@@ -3,7 +3,12 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAdminUser } from "@/lib/admin";
+import {
+  AdminScopeError,
+  adminScope,
+  requireAdminContext,
+  requireBrandAccess,
+} from "@/lib/admin";
 import { broadcastEmail, broadcastSms } from "@/lib/broadcast";
 import { createNotification } from "@/lib/data/notifications";
 
@@ -12,11 +17,6 @@ import { createNotification } from "@/lib/data/notifications";
  * offers, member_actions (CTAs), optional email/SMS blasts, and records a
  * campaign_items row per side-effect for reporting.
  */
-async function requireAdmin() {
-  const admin = await getAdminUser();
-  if (!admin) throw new Error("Forbidden");
-  return admin;
-}
 
 function parseJsonBlock<T>(raw: FormDataEntryValue | null, fallback: T): T {
   if (typeof raw !== "string" || !raw.trim()) return fallback;
@@ -28,19 +28,36 @@ function parseJsonBlock<T>(raw: FormDataEntryValue | null, fallback: T): T {
 }
 
 export async function createAndPublishCampaign(formData: FormData) {
-  const admin = await requireAdmin();
+  const ctx = await requireAdminContext();
+  const admin = ctx.user;
   const supa = createAdminClient();
 
   const brandSlug = String(formData.get("brand_slug") ?? "").trim();
   const title = String(formData.get("title") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
   if (!brandSlug || !title) return;
+  // Brand admins publish only to their own brand. Every row below carries
+  // community_id so nothing falls back to the 'raelynn' column default.
+  requireBrandAccess(ctx, brandSlug);
+
+  // A reused event must belong to the same brand.
+  const existingEventIdRaw = String(formData.get("existing_event_id") ?? "").trim();
+  if (existingEventIdRaw) {
+    const { data: existing } = await supa
+      .from("brand_events")
+      .select("id")
+      .eq("id", existingEventIdRaw)
+      .eq("brand_slug", brandSlug)
+      .maybeSingle();
+    if (!existing) throw new AdminScopeError();
+  }
 
   // 1) Create the campaign row
   const { data: campaign } = await supa
     .from("campaigns")
     .insert({
       brand_slug: brandSlug,
+      community_id: brandSlug,
       title,
       description: description || null,
       created_by: admin.id,
@@ -69,6 +86,7 @@ export async function createAndPublishCampaign(formData: FormData) {
       .from("community_posts")
       .insert({
         brand_slug: brandSlug,
+        community_id: brandSlug,
         author_id: admin.id,
         kind: "announcement",
         title: announcementTitle || title,
@@ -90,6 +108,7 @@ export async function createAndPublishCampaign(formData: FormData) {
       .from("community_posts")
       .insert({
         brand_slug: brandSlug,
+        community_id: brandSlug,
         author_id: admin.id,
         kind: "poll",
         body: poll.question,
@@ -115,6 +134,7 @@ export async function createAndPublishCampaign(formData: FormData) {
       .from("community_posts")
       .insert({
         brand_slug: brandSlug,
+        community_id: brandSlug,
         author_id: admin.id,
         kind: "challenge",
         title: challengeTitle || null,
@@ -137,6 +157,7 @@ export async function createAndPublishCampaign(formData: FormData) {
     const { data: offer } = await supa
       .from("offers")
       .insert({
+        community_id: brandSlug,
         slug: offerSlug,
         title: offerTitle,
         description: String(formData.get("offer_description") ?? ""),
@@ -168,6 +189,7 @@ export async function createAndPublishCampaign(formData: FormData) {
       .insert({
         campaign_id: campaignId,
         brand_slug: brandSlug,
+        community_id: brandSlug,
         kind: cta.kind,
         title: cta.title,
         description: cta.description ?? null,
@@ -186,7 +208,7 @@ export async function createAndPublishCampaign(formData: FormData) {
   //    (instead of all brand followers) if "target_event_rsvpers" is on.
   let attachedEventId: string | null = null;
   const eventTitle = String(formData.get("event_title") ?? "").trim();
-  const existingEventId = String(formData.get("existing_event_id") ?? "").trim();
+  const existingEventId = existingEventIdRaw;
   if (eventTitle) {
     const capacity = parseInt(String(formData.get("event_capacity") ?? ""), 10);
     const startsAt = String(formData.get("event_starts_at") ?? "").trim();
@@ -198,6 +220,7 @@ export async function createAndPublishCampaign(formData: FormData) {
       .from("brand_events")
       .insert({
         brand_slug: brandSlug,
+        community_id: brandSlug,
         title: eventTitle,
         detail: detail || null,
         event_date: dateText || null,
@@ -221,10 +244,13 @@ export async function createAndPublishCampaign(formData: FormData) {
     String(formData.get("target_event_rsvpers") ?? "false") === "true" &&
     attachedEventId !== null;
 
-  // 8) Email blast — create + send a Mailchimp regular campaign
+  // 8) Email blast — create + send a Mailchimp regular campaign.
+  //    broadcastEmail targets the whole Mailchimp audience (every brand), so
+  //    only super-admins may trigger it. It is also switched off by default
+  //    (MAILCHIMP_BROADCAST_ENABLED).
   const emailSubject = String(formData.get("email_subject") ?? "").trim();
   const emailBody = String(formData.get("email_body") ?? "").trim();
-  if (emailSubject && emailBody) {
+  if (emailSubject && emailBody && ctx.isSuperAdmin) {
     const result = await broadcastEmail({ subject: emailSubject, body: emailBody });
     await recordItem("email", null, {
       subject: emailSubject,
@@ -302,10 +328,20 @@ export async function createAndPublishCampaign(formData: FormData) {
 }
 
 export async function deactivateCampaignAction(formData: FormData) {
-  await requireAdmin();
+  const scope = adminScope(await requireAdminContext());
   const campaignId = String(formData.get("campaign_id") ?? "");
   if (!campaignId) return;
   const supa = createAdminClient();
+  // Brand admins may only end their own brand's campaigns.
+  if (scope) {
+    const { data: owned } = await supa
+      .from("campaigns")
+      .select("id")
+      .eq("id", campaignId)
+      .eq("brand_slug", scope)
+      .maybeSingle();
+    if (!owned) throw new AdminScopeError();
+  }
   // Set ends_at to now + deactivate linked member_actions
   await supa
     .from("campaigns")
