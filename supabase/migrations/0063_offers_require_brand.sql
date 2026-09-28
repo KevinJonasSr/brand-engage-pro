@@ -1,5 +1,5 @@
 -- 0063_offers_require_brand.sql
--- Not yet applied to production; apply via MCP before merge.
+-- Already applied to production via MCP on 2026-09-27.
 --
 -- Offers must always belong to a brand chosen on purpose. Until now
 -- offers.community_id defaulted to 'raelynn', so an offer saved without a
