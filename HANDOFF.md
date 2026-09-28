@@ -1,5 +1,11 @@
 # Brand Engage Pro — Session Handoff
 
+> **Superseded.** This file is from 2026-06-20 and is out of date. Read
+> `docs/HANDOFF-2026-09-24.html` first (also published as the handoff Artifact).
+> Current facts: repo at `~/Developer/brand-engage-pro`, live at
+> https://www.brandengagepro.com, Next.js 16.3.6. Keep the rest below for history only.
+
+
 **Date:** 2026-06-20  
 **Purpose:** Drop-in context for starting a new Claude Code session on this project.
 
