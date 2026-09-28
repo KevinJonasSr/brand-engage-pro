@@ -60,7 +60,7 @@ footer{border-top:1px solid var(--line);padding-top:1.2rem;font-size:.8rem;color
 <ul class="meta">
 <li><b>Date</b> 2026-09-24, updated 2026-09-27</li>
 <li><b>Prepared for</b> Kevin Jonas Sr. and the next agent session</li>
-<li><b>Status</b> <span class="status-good">Live on www.brandengagepro.com</span>, main at 09e5c83, no open pull requests</li>
+<li><b>Status</b> <span class="status-good">Live on www.brandengagepro.com</span>, main at d1c93e1, no open pull requests</li>
 <li><b>Supersedes</b> the 2026-09-14 handoff. Its product overview (stack, key paths, features) still applies; its orientation and open items do not.</li>
 </ul>
 </header>
@@ -71,13 +71,13 @@ footer{border-top:1px solid var(--line);padding-top:1.2rem;font-size:.8rem;color
 <div class="tablewrap"><table>
 <tr><th>Item</th><th>Value</th></tr>
 <tr><td>Live site</td><td><a href="https://www.brandengagepro.com">https://www.brandengagepro.com</a> (returned 200 after today's deploy). The old <code>brand-engage-pro.vercel.app</code> address still works.</td></tr>
-<tr><td>GitHub</td><td>KevinJonasSr/brand-engage-pro. Main is at <code>09e5c83</code> (PR #41, 2026-09-27). 21 remote branches besides main, mostly old <code>cursor/*</code> branches plus two <code>salvage/*</code> branches from 2026-07-26. Main has no branch protection.</td></tr>
-<tr><td>Vercel</td><td>Team jonas-group, project brand-engage-pro, root <code>frontend</code>. <code>frontend/vercel.json</code> holds 13 cron schedules. The Production deploy for 09e5c83 succeeded.</td></tr>
+<tr><td>GitHub</td><td>KevinJonasSr/brand-engage-pro. Main is at <code>d1c93e1</code> (PR #45, 2026-09-27). 21 remote branches besides main, mostly old <code>cursor/*</code> branches plus two <code>salvage/*</code> branches from 2026-07-26. Main has no branch protection.</td></tr>
+<tr><td>Vercel</td><td>Team jonas-group, project brand-engage-pro, root <code>frontend</code>. <code>frontend/vercel.json</code> holds 13 cron schedules. Production deploys on merge to main.</td></tr>
 <tr><td>Supabase</td><td>Project ref <code>enfpviapxvqyoarwwsuf</code>. It shares an org with Fan Engage Pro (<code>uhovonrljcauaoctypbg</code>), so confirm the ref before any SQL.</td></tr>
 <tr><td>Local working copy</td><td><code>~/Developer/brand-engage-pro</code>, on <code>main</code>, clean. The old <code>~/Downloads</code> path in the 2026-09-14 handoff is out of date.</td></tr>
 <tr><td>Framework</td><td>Next.js <b>16.3.6</b> (was 16.2.1), React 19.</td></tr>
-<tr><td>Migrations</td><td><code>supabase/migrations/</code> runs through <code>0062_redeem_reward_ledger_community.sql</code>. 0059 to 0062 came in on 2026-09-27. <b>Next free number is 0063.</b> There is no rollbacks folder. The untracked 0049 problem from 2026-09-14 is gone.</td></tr>
-<tr><td>CI on main</td><td>Frontend tests and Secret Scan both passed on 09e5c83.</td></tr>
+<tr><td>Migrations</td><td><code>supabase/migrations/</code> runs through <code>0063_offers_require_brand.sql</code>. 0059 to 0063 came in on 2026-09-27. <b>Next free number is 0064.</b> There is no rollbacks folder. The untracked 0049 problem from 2026-09-14 is gone.</td></tr>
+<tr><td>CI on main</td><td>Frontend tests and Secret Scan passed on each of PRs #43 to #45 before merge.</td></tr>
 <tr><td>Handoffs</td><td>This file is <code>docs/HANDOFF-2026-09-24.html</code>, on main since PR #35 (b7ad3f0). The older committed <code>HANDOFF.md</code> is dated 2026-06-20 and is stale (see open items).</td></tr>
 </table></div>
 </section>
@@ -128,6 +128,22 @@ footer{border-top:1px solid var(--line);padding-top:1.2rem;font-size:.8rem;color
 <li>0059 to 0062 were applied to <code>enfpviapxvqyoarwwsuf</code> on 2026-09-27 and checked with selects. No existing rows broke the new constraints.</li>
 </ul>
 
+<h3>Later on 2026-09-27: PRs #43 to #45</h3>
+<p>The medium and low findings from the same review went out as three more pull requests. Kevin merged them himself.</p>
+<div class="tablewrap"><table class="items">
+<tr><th>PR</th><th>What it did</th></tr>
+<tr><td>#43 (9173dc9)</td><td>Stripe webhook and billing. A failed database write now returns an error so Stripe retries instead of dropping the event, and replays of finished events stay no-ops. The webhook reads the Stripe fields that moved in the newer API, so renewals and invoice events are not ignored. The monthly credit is keyed on the Stripe event id, which fixes a ledger insert that always failed quietly. A new <code>/me/billing</code> page opens the Stripe customer portal so members can cancel Premium or fix a card. The $5 credit copy now says spending it is coming soon. No migrations.</td></tr>
+<tr><td>#44 (680fc14)</td><td>Sign-in, consent, and copy. The sign-in redirect guard rejects control characters, backslashes, and encoded tricks. SMS consent is recorded only when the member ticks the box, stamped on the server, with consent version <code>2026-08-17.v1</code>. <code>/for-brands/apply</code> validates every field, allows 5 applications per IP per hour, and checks an optional Cloudflare Turnstile token. Member copy is plain English for diners and shoppers, and the referral page now promises only the inviter's 150 points, which is what the app pays. No migrations.</td></tr>
+<tr><td>#45 (d1c93e1)</td><td>Admin brand scoping. Brand admins now see and change only their own brand in the admin area. Superadmins keep the all-brands view. Migration 0063 drops the <code>raelynn</code> default on <code>offers.community_id</code>, so a new offer must name its brand.</td></tr>
+</table></div>
+
+<h3>Production database, later on 2026-09-27</h3>
+<ul>
+<li>0063 applied to <code>enfpviapxvqyoarwwsuf</code> before #45 merged. Checked: <code>offers.community_id</code> has no default.</li>
+<li>Five posts had been filed under RaeLynn by the old default. Four moved to <code>nellies</code> and one to <code>jonas-group-ent</code>, matched by exact id. No child tables carry their own brand, so nothing else needed moving.</li>
+<li>One offer, the Nellie's Bourbon and Cigar event (active, no purchases), was also filed under RaeLynn. It moved to <code>nellies</code>. Offer counts now: 22 for jonas-group-ent, 32 for nellies.</li>
+</ul>
+
 <h3>Lesson: stacked pull requests</h3>
 <ul>
 <li>#39 and #40 were stacked on #37 and #38. Deleting a base branch on merge closed them. They were recovered by recreating the branch refs, reopening, and pointing them at main. Nothing was lost. Next time, retarget child PRs to main before merging their base.</li>
@@ -154,7 +170,7 @@ git checkout main && git pull</code></pre>
 <ol>
 <li>Confirm the ref is <code>enfpviapxvqyoarwwsuf</code> and run the brands check.</li>
 <li>Apply through the Supabase MCP first, then confirm with a select.</li>
-<li>Record it as <code>0063_short_name.sql</code>, idempotent, with the "already applied to production" header line.</li>
+<li>Record it as <code>0064_short_name.sql</code>, idempotent, with the "already applied to production" header line.</li>
 <li>Enum changes get their own migration file. Postgres cannot use a new enum value in the same transaction that adds it.</li>
 <li>Any new SECURITY DEFINER function starts closed: revoke from PUBLIC, anon, and authenticated, grant service_role, and grant a browser role back only with a written reason.</li>
 </ol>
@@ -168,7 +184,7 @@ git checkout main && git pull</code></pre>
 <li>New admin actions go through <code>getAdminContext</code> in <code>lib/admin.ts</code>. No new inline admin checks.</li>
 <li>New cron routes need an entry in <code>frontend/vercel.json</code> and the crons table, behind <code>verifyCronAuth</code>.</li>
 <li>Member-editable columns must be added to the allowlist in <code>members_reject_integrity_column_updates()</code>, the way 0058 added <code>birthday_month</code>.</li>
-<li>Env var names only, never values: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, STRIPE_SECRET_KEY, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, MAILCHIMP_API_KEY, MANDRILL_API_KEY, ANTHROPIC_API_KEY, OPENAI_API_KEY, CRON_SECRET.</li>
+<li>Env var names only, never values: NEXT_PUBLIC_TURNSTILE_SITE_KEY, TURNSTILE_SECRET_KEY, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, STRIPE_SECRET_KEY, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, MAILCHIMP_API_KEY, MANDRILL_API_KEY, ANTHROPIC_API_KEY, OPENAI_API_KEY, CRON_SECRET.</li>
 <li>Brand hero images are 1920 by 1080 with the focal point 32 percent from the top.</li>
 <li>Jev runs in shadow mode for non-trivial work. Report its action and reason in one line, then use judgment.</li>
 </ul>
@@ -198,16 +214,20 @@ git checkout main && git pull</code></pre>
 <tr><td>Old remote branches</td><td>21 remote branches besides main. Confirm with Kevin which can go, especially the two <code>salvage/*</code> branches.</td><td><span class="owner kevin">Kevin</span></td></tr>
 <tr><td>Branch protection</td><td>Main has none. Consider requiring the Frontend tests and Secret Scan checks, the way Fan Engage does.</td><td><span class="owner kevin">Kevin</span></td></tr>
 <tr><td>Test the 2026-09-27 fixes signed in</td><td>Cancel one test redemption and confirm a single refund and the restock. Award points twice at once in a test and confirm both land. None of this was run end to end on 2026-09-27.</td><td><span class="owner">Next session</span></td></tr>
-<tr><td>Other review findings</td><td>The medium and low findings in the 2026-09-27 review (Artifact 49gUST6zCFi4rPWEb2t1qk) are still open. Work through them in order.</td><td><span class="owner">Next session</span></td></tr>
+<tr><td>Stripe checks</td><td>Replay test events with the Stripe CLI against the new webhook, and turn on the Stripe customer portal with cancellation, in both test and live mode. The billing portal link from #43 needs the portal enabled to work.</td><td><span class="owner kevin">Kevin</span></td></tr>
+<tr><td>Turnstile keys</td><td>Add <code>NEXT_PUBLIC_TURNSTILE_SITE_KEY</code> and <code>TURNSTILE_SECRET_KEY</code> in Vercel. Until both are set, the apply form runs without the challenge, though the rate limit and validation still apply.</td><td><span class="owner kevin">Kevin</span></td></tr>
+<tr><td>Referral decisions from #44</td><td>Should the invited friend also get a bonus? That needs a code change in the onboard route first. Should the referral milestones (a badge at 3, a boost at 5, recognition at 10) be built or dropped for good?</td><td><span class="owner kevin">Kevin</span></td></tr>
+<tr><td>Decisions left open by #45</td><td>Should suspended members be blocked from posting? Should broadcast counts leave out suspended members? Should the other <code>raelynn</code> column defaults on other tables be dropped the way 0063 did for offers? Should policy edits keep a history table? Should brand admins keep control of an item's active flag and sort order?</td><td><span class="owner kevin">Kevin</span></td></tr>
+<tr><td>Test brand-admin scoping live</td><td>No real brand admin account exists yet, so the #45 scoping has only been tested by unit tests. Create a test brand admin for one brand and confirm they cannot see or change another brand.</td><td><span class="owner">Next session</span></td></tr>
 <tr><td>Carried from 2026-09-14</td><td>About 28 admin actions still use inline checks instead of <code>getAdminContext</code>. Rate limiting is in memory, not Redis or KV. Homegrown Beauty Lounge still unconfirmed. Vercel env vars and Supabase settings not rechecked. None of these were re-verified today.</td><td><span class="owner kevin">Kevin</span> / <span class="owner">Next session</span></td></tr>
 </table></div>
 <div class="callout">
 <span class="label">For the next agent</span>
-<p>Start in ~/Developer/brand-engage-pro on a fresh main. Read this file first; HANDOFF.md is out of date. Run the brands check before touching the database. The next migration is 0063, and any new definer function starts closed. Businesses live here; super fans live in Fan Engage Pro.</p>
+<p>Start in ~/Developer/brand-engage-pro on a fresh main. Read this file first; HANDOFF.md is out of date. Run the brands check before touching the database. The next migration is 0064, and any new definer function starts closed. Businesses live here; super fans live in Fan Engage Pro.</p>
 </div>
 </section>
 
-<footer>Verified on 2026-09-27: PRs #37 to #41 merged, main at 09e5c83, no open pull requests, Production deploy succeeded, migration filenames through 0062, 0059 to 0062 applied to enfpviapxvqyoarwwsuf. Not verified on 2026-09-27: a signed-in cancel, fulfill, or winner pick. Verified on 2026-09-24: PRs #32, #33, #34 merged, main at cc33356, no open pull requests, Frontend tests and Secret Scan green on cc33356, Production deploy succeeded and www.brandengagepro.com returned 200, migration filenames through 0058, 0057 and 0058 applied to enfpviapxvqyoarwwsuf, Nellie's offer, event, and welcome dessert counts in production, 13 cron schedules in frontend/vercel.json, no branch protection on main. Not verified: signed-in rendering, a real birthday entree redeem, Vercel env vars, the carried items from 2026-09-14.</footer>
+<footer>Verified later on 2026-09-27: PRs #43 to #45 merged, main at d1c93e1, no open pull requests, migration filenames through 0063, 0063 applied to enfpviapxvqyoarwwsuf with no default on offers.community_id, the five posts and one offer moved to their right brands. Not verified: a live Stripe event replay, the billing portal, the Turnstile challenge, a real brand admin session. Verified earlier on 2026-09-27: PRs #37 to #41 merged, main at 09e5c83, no open pull requests, Production deploy succeeded, migration filenames through 0062, 0059 to 0062 applied to enfpviapxvqyoarwwsuf. Not verified on 2026-09-27: a signed-in cancel, fulfill, or winner pick. Verified on 2026-09-24: PRs #32, #33, #34 merged, main at cc33356, no open pull requests, Frontend tests and Secret Scan green on cc33356, Production deploy succeeded and www.brandengagepro.com returned 200, migration filenames through 0058, 0057 and 0058 applied to enfpviapxvqyoarwwsuf, Nellie's offer, event, and welcome dessert counts in production, 13 cron schedules in frontend/vercel.json, no branch protection on main. Not verified: signed-in rendering, a real birthday entree redeem, Vercel env vars, the carried items from 2026-09-14.</footer>
 </div>
 
 </body>
