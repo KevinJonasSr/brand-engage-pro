@@ -2,20 +2,44 @@
 
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAdminUser } from "@/lib/admin";
+import { getAdminContext } from "@/lib/admin";
+import { awardPoints } from "@/lib/points/award";
 import { createNotification } from "@/lib/data/notifications";
 
 const WINNER_BONUS_POINTS = 200;
 
 export async function pickWinnerAction(formData: FormData) {
-  const admin = await getAdminUser();
-  if (!admin) return;
+  const ctx = await getAdminContext();
+  if (!ctx) return;
+  // Brand admins may only pick winners on their own brand's posts.
+  const scope = ctx.isSuperAdmin ? null : ctx.currentCommunityId;
+  if (!ctx.isSuperAdmin && !scope) return;
+
   const postId = String(formData.get("post_id") ?? "");
   const entryId = String(formData.get("entry_id") ?? "");
   const memberId = String(formData.get("member_id") ?? "");
   if (!postId || !entryId || !memberId) return;
 
   const supa = createAdminClient();
+
+  const { data: post } = await supa
+    .from("community_posts")
+    .select("brand_slug, title, body")
+    .eq("id", postId)
+    .maybeSingle();
+  if (!post) return;
+  const brandSlug = (post.brand_slug as string | null) ?? "";
+  if (scope && brandSlug !== scope) return;
+
+  // The winner must have actually entered this challenge.
+  const { data: entry } = await supa
+    .from("community_challenge_entries")
+    .select("id")
+    .eq("id", entryId)
+    .eq("post_id", postId)
+    .eq("member_id", memberId)
+    .maybeSingle();
+  if (!entry) return;
 
   // Record the winner via campaign_items (item_kind='challenge_winner'), guard against dupes.
   const { data: existing } = await supa
@@ -33,48 +57,21 @@ export async function pickWinnerAction(formData: FormData) {
     metadata: { entry_id: entryId, member_id: memberId },
   });
 
-  // Award bonus points via ledger; idempotent guard.
-  const refId = `challenge_winner:${postId}:${memberId}`;
-  const { data: ledgerExists } = await supa
-    .from("points_ledger")
-    .select("id")
-    .eq("source_ref", refId)
-    .limit(1);
-  if (!ledgerExists || ledgerExists.length === 0) {
-    const { error: ledgerErr } = await supa.from("points_ledger").insert({
-      member_id: memberId,
-      delta: WINNER_BONUS_POINTS,
-      source: "challenge",
-      source_ref: refId,
-      note: "Challenge winner bonus",
-    });
-    // 23505 = a concurrent pick already paid this winner (0059 index).
-    if (ledgerErr) {
-      if (ledgerErr.code !== "23505") throw new Error(ledgerErr.message);
-      return;
-    }
-    // Fetch + update member total_points (trigger will auto-promote tier)
-    const { data: memberRow } = await supa
-      .from("members")
-      .select("total_points")
-      .eq("id", memberId)
-      .maybeSingle();
-    await supa
-      .from("members")
-      .update({ total_points: (memberRow?.total_points ?? 0) + WINNER_BONUS_POINTS })
-      .eq("id", memberId);
-  }
+  // Bonus points. awardPoints writes the ledger row first (the 0059 index
+  // rejects a repeat) and moves both totals atomically (0061).
+  await awardPoints(supa, {
+    memberId,
+    delta: WINNER_BONUS_POINTS,
+    source: "challenge",
+    sourceRef: `challenge_winner:${postId}:${memberId}`,
+    note: "Challenge winner bonus",
+    ...(brandSlug ? { communityId: brandSlug } : {}),
+  });
 
   // In-app notification for the winner — same dedup_key pattern as the
   // ledger guard, so repeated clicks never spam the member's inbox.
-  const { data: post } = await supa
-    .from("community_posts")
-    .select("brand_slug, title, body")
-    .eq("id", postId)
-    .maybeSingle();
-  const brandSlug = (post?.brand_slug as string | null) ?? "";
-  const postTitle = (post?.title as string | null) ?? null;
-  const postBody = (post?.body as string | null) ?? "";
+  const postTitle = (post.title as string | null) ?? null;
+  const postBody = (post.body as string | null) ?? "";
   await createNotification({
     memberId: memberId,
     kind: "challenge_winner",
