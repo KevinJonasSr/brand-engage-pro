@@ -12,7 +12,7 @@ create table public.checkins (
 
 -- Unique per member+brand+day — prevents double-award even if QR is scanned twice
 create unique index checkins_member_brand_day_idx
-  on public.checkins (member_id, brand_slug, (created_at at time zone 'America/New_York')::date);
+  on public.checkins (member_id, brand_slug, ((created_at at time zone 'America/New_York')::date));
 
 create index checkins_brand_recent_idx on public.checkins (brand_slug, created_at desc);
 

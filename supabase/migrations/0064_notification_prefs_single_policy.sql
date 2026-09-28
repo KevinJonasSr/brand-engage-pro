@@ -16,6 +16,30 @@
 
 begin;
 
+-- Fresh builds only: the table was created on prod outside the migrations
+-- folder, so a fresh database has no table to put policies on. Same shape
+-- as prod (2026-09-28). No-op on prod.
+create table if not exists public.notification_preferences (
+  member_id uuid primary key references public.members(id) on delete cascade,
+  push_enabled boolean not null default false,
+  sms_enabled boolean not null default false,
+  notify_new_post boolean not null default true,
+  notify_event_match boolean not null default true,
+  notify_comment_on_my_post boolean not null default true,
+  notify_redemption boolean not null default true,
+  notify_drops boolean not null default true,
+  notify_rsvp_confirmation boolean not null default true,
+  notify_predictions boolean not null default true,
+  notify_anniversaries boolean not null default true,
+  notify_leaderboard boolean not null default true,
+  notify_weekly_digest boolean not null default true,
+  quiet_start time,
+  quiet_end time,
+  timezone text not null default 'America/Chicago',
+  updated_at timestamptz not null default now()
+);
+alter table public.notification_preferences enable row level security;
+
 drop policy if exists notif_prefs_self on public.notification_preferences;
 drop policy if exists notification_prefs_self_read on public.notification_preferences;
 drop policy if exists notification_prefs_self_upsert on public.notification_preferences;

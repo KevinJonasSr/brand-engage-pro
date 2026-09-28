@@ -20,7 +20,7 @@ create table if not exists public.checkins (
 );
 
 create unique index if not exists checkins_member_brand_day_idx
-  on public.checkins (member_id, brand_slug, (created_at at time zone 'America/New_York')::date);
+  on public.checkins (member_id, brand_slug, ((created_at at time zone 'America/New_York')::date));
 
 create index if not exists checkins_brand_recent_idx
   on public.checkins (brand_slug, created_at desc);
