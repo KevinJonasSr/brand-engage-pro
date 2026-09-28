@@ -3,6 +3,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAdminContext } from "@/lib/admin";
 import { redirect } from "next/navigation";
+import { cancelRedemption } from "@/lib/rewards/cancel";
 
 export async function createRewardAction(formData: FormData) {
   const ctx = await getAdminContext();
@@ -137,55 +138,15 @@ export async function markFulfilledAction(redemptionId: string, fulfillmentNote:
   return { success: true };
 }
 
-export async function cancelRedemptionAction(
-  redemptionId: string,
-  memberId: string,
-  pointCost: number
-) {
+export async function cancelRedemptionAction(redemptionId: string) {
   const ctx = await getAdminContext();
   if (!ctx) redirect("/login");
 
-  const supabase = createAdminClient();
-
-  // Update redemption status
-  const { error: updateError } = await supabase
-    .from("reward_redemptions")
-    .update({
-      status: "cancelled",
-      cancelled_at: new Date().toISOString(),
-    })
-    .eq("id", redemptionId);
-
-  if (updateError) {
-    return { error: updateError.message };
+  // Super admins may cancel in any brand; everyone else only in their own.
+  const scope = ctx.isSuperAdmin ? null : ctx.currentCommunityId;
+  if (!ctx.isSuperAdmin && !scope) {
+    return { error: "Unauthorized" };
   }
 
-  // Refund points: read current, then update.
-  const { data: currentMember } = await supabase
-    .from("members")
-    .select("total_points")
-    .eq("id", memberId)
-    .maybeSingle();
-  const currentPoints = (currentMember?.total_points as number | null) ?? 0;
-  const { error: pointsError } = await supabase
-    .from("members")
-    .update({ total_points: currentPoints + pointCost })
-    .eq("id", memberId);
-
-  // Ledger entry for audit trail.
-  await supabase.from("points_ledger").insert([
-    {
-      member_id: memberId,
-      delta: pointCost,
-      source: "reward_redemption",
-      source_ref: `redemption:${redemptionId}:refund`,
-      note: `Refunded: redemption cancelled`,
-    },
-  ]);
-
-  if (pointsError) {
-    return { error: pointsError.message };
-  }
-
-  return { success: true };
+  return cancelRedemption(createAdminClient(), redemptionId, scope);
 }

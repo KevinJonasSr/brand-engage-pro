@@ -7,8 +7,6 @@ import { markFulfilledAction, cancelRedemptionAction } from "./actions";
 
 interface RedemptionActionProps {
   redemptionId: string;
-  memberId: string;
-  pointCost: number;
 }
 
 /**
@@ -20,8 +18,6 @@ interface RedemptionActionProps {
  */
 export default function RedemptionAction({
   redemptionId,
-  memberId,
-  pointCost,
 }: RedemptionActionProps) {
   const router = useRouter();
   const [showNote, setShowNote] = useState(false);
@@ -46,9 +42,7 @@ export default function RedemptionAction({
   async function handleCancel() {
     if (!confirm("Cancel this redemption? Points will be refunded.")) return;
     setBusinessError(null);
-    const result = await invoke(() =>
-      cancelRedemptionAction(redemptionId, memberId, pointCost),
-    );
+    const result = await invoke(() => cancelRedemptionAction(redemptionId));
     if (result?.error) {
       setBusinessError(result.error);
     }

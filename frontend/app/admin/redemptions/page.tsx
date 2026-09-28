@@ -65,11 +65,7 @@ export default async function AdminRedemptionsPage() {
                   </div>
                 </div>
 
-                <RedemptionAction
-                  redemptionId={redemption.id}
-                  memberId={redemption.member_id}
-                  pointCost={redemption.point_cost}
-                />
+                <RedemptionAction redemptionId={redemption.id} />
               </div>
             );
           })}
