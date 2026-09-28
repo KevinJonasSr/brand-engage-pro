@@ -100,4 +100,36 @@ describe("/me/birthday wiring", () => {
     assert.match(onboardRoute, /import \{ parseBirthdayMonth \} from "@\/lib\/birthday-month";/);
     assert.doesNotMatch(onboardRoute, /function parseBirthdayMonth/);
   });
+
+  it("onboarding only fills an unset month", () => {
+    assert.match(
+      onboardRoute,
+      /\.update\(\{ birthday_month: birthdayMonth \}\)\s+\.eq\("id", user\.id\)\s+(\/\/[^\n]*\s+)?\.is\("birthday_month", null\)/,
+    );
+  });
+});
+
+describe("0068 birthday month lock", () => {
+  const sql = src("../../supabase/migrations/0068_lock_birthday_month.sql");
+
+  it("rejects member changes once the month is set", () => {
+    assert.match(sql, /if current_user not in \('authenticated', 'anon'\) then\s+return new;/);
+    assert.match(
+      sql,
+      /old\.birthday_month is not null\s+and new\.birthday_month is distinct from old\.birthday_month/,
+    );
+    assert.match(sql, /errcode = '42501'/);
+  });
+
+  it("runs before updates of birthday_month on members", () => {
+    assert.match(
+      sql,
+      /create trigger members_lock_birthday_month\s+before update of birthday_month on public\.members\s+for each row execute function public\.members_lock_birthday_month\(\);/,
+    );
+  });
+
+  it("is not a definer function and is not callable by clients", () => {
+    assert.match(sql, /returns trigger\s+language plpgsql\s+set search_path to 'public'\s+as \$\$/);
+    assert.match(sql, /revoke all on function public\.members_lock_birthday_month\(\) from public, anon, authenticated;/);
+  });
 });
