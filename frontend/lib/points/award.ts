@@ -47,15 +47,22 @@ export async function awardPoints(
         : "nellies";
   }
 
-  // 1. Ledger entry (audit trail)
-  await admin.from("points_ledger").insert({
-    fan_id: memberId,
+  // 1. Ledger entry (audit trail). The 0059 unique index rejects a repeat
+  // source_ref; totals only move when the ledger row was written.
+  const { error: ledgerErr } = await admin.from("points_ledger").insert({
+    member_id: memberId,
     delta,
     source,
     community_id: communityId,
     ...(sourceRef ? { source_ref: sourceRef } : {}),
     ...(note ? { note } : {}),
   });
+  if (ledgerErr) {
+    if (ledgerErr.code !== "23505") {
+      console.warn("awardPoints: ledger insert failed", ledgerErr);
+    }
+    return;
+  }
 
   // 2. members.total_points (legacy denormalised column)
   const { data: memberRow } = await admin

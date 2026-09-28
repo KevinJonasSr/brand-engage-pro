@@ -17,6 +17,9 @@ import {
 
 export const runtime = "nodejs";
 
+/** Points the referrer earns, once, per new member they bring in. */
+const REFERRAL_POINTS = 150;
+
 type OnboardPayload = OnboardProfilePayload;
 
 /**
@@ -234,48 +237,11 @@ export async function POST(request: Request) {
           .maybeSingle();
 
         if (referrer && referrer.id !== user.id) {
-          await admin.from("referrals").upsert(
-            {
-              referrer_id: referrer.id,
-              referred_id: user.id,
-              referred_email: user.email ?? null,
-              status: "verified",
-              points_awarded: 150,
-              verified_at: new Date().toISOString(),
-            },
-            { onConflict: "referred_id" },
-          );
-          await admin.from("points_ledger").insert({
-            member_id: referrer.id,
-            delta: 150,
-            source: "referral",
-            source_ref: user.id,
-            note: `Referred by ${user.email}`,
-          });
-          await admin
-            .from("members")
-            .update({
-              total_points: ((await getTotal(admin, referrer.id)) ?? 0) + 150,
-            })
-            .eq("id", referrer.id);
-          await admin
-            .from("members")
-            .update({ referred_by: referrer.id })
-            .eq("id", user.id);
-
-          // Jonas Network: the referrer converted a new member. One event
-          // per referred member (upsert above is keyed the same way).
-          emitNetworkEvent({
-            event_type: "referral.converted",
-            local_actor_id: referrer.id,
-            entity_type: "member",
-            entity_id: user.id,
-            dedupe_key: `be:referral:${referrer.id}:${user.id}`,
-            metadata: {
-              referred_member_id: user.id,
-              referral_code: payload.referralCode,
-              points_awarded: 150,
-            },
+          await claimReferral(admin, {
+            referrerId: referrer.id,
+            referredId: user.id,
+            referredEmail: user.email ?? null,
+            referralCode: payload.referralCode,
           });
         }
       } catch (err) {
@@ -420,4 +386,79 @@ function parseBirthdayMonth(value: unknown): number | null | undefined {
   const n = typeof value === "number" ? value : Number.parseInt(String(value), 10);
   if (!Number.isInteger(n) || n < 1 || n > 12) return undefined;
   return n;
+}
+
+/**
+ * Record a referral and pay the referrer once. The referral row is the
+ * one-time claim: referrals_referred_unique (0059) rejects a second row
+ * for the same new member, so a replayed onboard POST pays nothing. The
+ * ledger unique index (0059) is a second guard, and the running total only
+ * moves when the ledger row was actually written.
+ */
+async function claimReferral(
+  admin: ReturnType<typeof createAdminClient>,
+  {
+    referrerId,
+    referredId,
+    referredEmail,
+    referralCode,
+  }: {
+    referrerId: string;
+    referredId: string;
+    referredEmail: string | null;
+    referralCode: string;
+  },
+): Promise<void> {
+  const { error: referralErr } = await admin.from("referrals").insert({
+    referrer_id: referrerId,
+    referred_id: referredId,
+    referred_email: referredEmail,
+    status: "verified",
+    points_awarded: REFERRAL_POINTS,
+    verified_at: new Date().toISOString(),
+  });
+  if (referralErr) {
+    if (referralErr.code !== "23505") {
+      console.warn("onboard: referral insert failed", referralErr);
+    }
+    return;
+  }
+
+  const { error: ledgerErr } = await admin.from("points_ledger").insert({
+    member_id: referrerId,
+    delta: REFERRAL_POINTS,
+    source: "referral",
+    source_ref: referredId,
+    note: `Referred by ${referredEmail}`,
+  });
+  if (!ledgerErr) {
+    await admin
+      .from("members")
+      .update({
+        total_points: ((await getTotal(admin, referrerId)) ?? 0) + REFERRAL_POINTS,
+      })
+      .eq("id", referrerId);
+  } else if (ledgerErr.code !== "23505") {
+    console.warn("onboard: referral ledger insert failed", ledgerErr);
+  }
+
+  await admin
+    .from("members")
+    .update({ referred_by: referrerId })
+    .eq("id", referredId);
+
+  // Jonas Network: the referrer converted a new member. One event per
+  // referred member (the referral insert above is the claim).
+  emitNetworkEvent({
+    event_type: "referral.converted",
+    local_actor_id: referrerId,
+    entity_type: "member",
+    entity_id: referredId,
+    dedupe_key: `be:referral:${referrerId}:${referredId}`,
+    metadata: {
+      referred_member_id: referredId,
+      referral_code: referralCode,
+      points_awarded: REFERRAL_POINTS,
+    },
+  });
 }

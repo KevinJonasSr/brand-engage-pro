@@ -45,6 +45,9 @@ export async function POST(req: Request) {
   const result = await recordCheckin(user.id, brandSlug);
 
   if (!result.ok) {
+    if (result.unknownBrand) {
+      return NextResponse.json({ error: "Unknown brand" }, { status: 404 });
+    }
     return NextResponse.json({ error: result.error }, { status: 500 });
   }
 

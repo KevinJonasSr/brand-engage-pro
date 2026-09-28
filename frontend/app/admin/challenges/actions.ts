@@ -41,13 +41,18 @@ export async function pickWinnerAction(formData: FormData) {
     .eq("source_ref", refId)
     .limit(1);
   if (!ledgerExists || ledgerExists.length === 0) {
-    await supa.from("points_ledger").insert({
+    const { error: ledgerErr } = await supa.from("points_ledger").insert({
       member_id: memberId,
       delta: WINNER_BONUS_POINTS,
       source: "challenge",
       source_ref: refId,
       note: "Challenge winner bonus",
     });
+    // 23505 = a concurrent pick already paid this winner (0059 index).
+    if (ledgerErr) {
+      if (ledgerErr.code !== "23505") throw new Error(ledgerErr.message);
+      return;
+    }
     // Fetch + update member total_points (trigger will auto-promote tier)
     const { data: memberRow } = await supa
       .from("members")
