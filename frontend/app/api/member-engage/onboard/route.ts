@@ -19,6 +19,7 @@ export const runtime = "nodejs";
 
 /** Points the referrer earns, once, per new member they bring in. */
 const REFERRAL_POINTS = 150;
+const SIGNUP_BONUS_POINTS = 100;
 
 type OnboardPayload = OnboardProfilePayload;
 
@@ -253,27 +254,21 @@ export async function POST(request: Request) {
     // 3. Award signup bonus — idempotent via source_ref = `signup:${userId}`.
     try {
       const admin = createAdminClient();
-      const sourceRef = `signup:${user.id}`;
-      const { data: existing } = await admin
-        .from("points_ledger")
-        .select("id")
-        .eq("source", "signup_bonus")
-        .eq("source_ref", sourceRef)
-        .maybeSingle();
-
-      if (!existing) {
-        await admin.from("points_ledger").insert({
-          member_id: user.id,
-          delta: 100,
-          source: "signup_bonus",
-          source_ref: sourceRef,
-          note: "Welcome to Brand Engage Pro",
-        });
-        const newTotal = ((await getTotal(admin, user.id)) ?? 0) + 100;
-        await admin
-          .from("members")
-          .update({ total_points: newTotal })
-          .eq("id", user.id);
+      // The 0059 unique index makes a repeat insert fail with 23505, so
+      // the total only moves when this request wrote the ledger row.
+      const { error: bonusErr } = await admin.from("points_ledger").insert({
+        member_id: user.id,
+        delta: SIGNUP_BONUS_POINTS,
+        source: "signup_bonus",
+        source_ref: `signup:${user.id}`,
+        note: "Welcome to Brand Engage Pro",
+      });
+      if (bonusErr) {
+        if (bonusErr.code !== "23505") {
+          console.warn("onboard: signup bonus ledger insert failed", bonusErr);
+        }
+      } else {
+        await addMemberPoints(admin, user.id, SIGNUP_BONUS_POINTS);
       }
     } catch (err) {
       console.warn("onboard: signup bonus failed", err);
@@ -368,16 +363,20 @@ export async function POST(request: Request) {
   }
 }
 
-async function getTotal(
+/**
+ * Atomic add to members.total_points (migration 0061). No community is
+ * passed, so only the member total moves, same as before.
+ */
+async function addMemberPoints(
   admin: ReturnType<typeof createAdminClient>,
   memberId: string,
-): Promise<number | null> {
-  const { data } = await admin
-    .from("members")
-    .select("total_points")
-    .eq("id", memberId)
-    .maybeSingle();
-  return (data?.total_points as number | null) ?? 0;
+  delta: number,
+): Promise<void> {
+  const { error } = await admin.rpc("add_member_points", {
+    p_member_id: memberId,
+    p_delta: delta,
+  });
+  if (error) console.warn("onboard: add_member_points failed", error);
 }
 
 function parseBirthdayMonth(value: unknown): number | null | undefined {
@@ -432,12 +431,7 @@ async function claimReferral(
     note: `Referred by ${referredEmail}`,
   });
   if (!ledgerErr) {
-    await admin
-      .from("members")
-      .update({
-        total_points: ((await getTotal(admin, referrerId)) ?? 0) + REFERRAL_POINTS,
-      })
-      .eq("id", referrerId);
+    await addMemberPoints(admin, referrerId, REFERRAL_POINTS);
   } else if (ledgerErr.code !== "23505") {
     console.warn("onboard: referral ledger insert failed", ledgerErr);
   }

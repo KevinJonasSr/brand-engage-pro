@@ -63,7 +63,7 @@ describe("onboard referral payout", () => {
 
   it("moves the total only when the ledger row was written", () => {
     const fn = onboard.slice(onboard.indexOf("async function claimReferral"));
-    assert.match(fn, /if \(!ledgerErr\) \{\s+await admin\s+\.from\("members"\)\s+\.update\(\{\s+total_points:/);
+    assert.match(fn, /if \(!ledgerErr\) \{\s+await addMemberPoints\(admin, referrerId, REFERRAL_POINTS\);/);
   });
 });
 
@@ -96,7 +96,8 @@ describe("other ledger writers", () => {
     assert.match(award, /if \(ledgerErr\) \{[\s\S]*?return;/);
   });
 
-  it("challenge winner bonus stops on a duplicate ledger row", () => {
-    assert.match(challenges, /ledgerErr\.code !== "23505"/);
+  it("challenge winner bonus goes through awardPoints with a source_ref", () => {
+    assert.match(challenges, /awardPoints\(supa, \{/);
+    assert.match(challenges, /sourceRef: `challenge_winner:\$\{postId\}:\$\{memberId\}`/);
   });
 });

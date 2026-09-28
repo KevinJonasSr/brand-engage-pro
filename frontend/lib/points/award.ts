@@ -4,7 +4,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
  * Award points to a member — the single authoritative function for all
  * point grants in Brand Engage Pro.
  *
- * Writes to three places atomically (best-effort):
+ * Writes to three places:
  *   1. points_ledger                        — immutable audit trail
  *   2. members.total_points                 — legacy denormalised total
  *   3. member_community_memberships.total_points — UI source of truth
@@ -64,32 +64,14 @@ export async function awardPoints(
     return;
   }
 
-  // 2. members.total_points (legacy denormalised column)
-  const { data: memberRow } = await admin
-    .from("members")
-    .select("total_points")
-    .eq("id", memberId)
-    .maybeSingle();
-  await admin
-    .from("members")
-    .update({ total_points: ((memberRow?.total_points as number) ?? 0) + delta })
-    .eq("id", memberId);
-
-  // 3. member_community_memberships.total_points (UI source of truth)
-  const { data: membership } = await admin
-    .from("member_community_memberships")
-    .select("total_points")
-    .eq("member_id", memberId)
-    .eq("community_id", communityId)
-    .maybeSingle();
-
-  if (membership) {
-    await admin
-      .from("member_community_memberships")
-      .update({
-        total_points: ((membership.total_points as number) ?? 0) + delta,
-      })
-      .eq("member_id", memberId)
-      .eq("community_id", communityId);
+  // 2 + 3. Both totals move in one atomic UPDATE each (migration 0061),
+  // so two awards landing together can no longer overwrite each other.
+  const { error: totalErr } = await admin.rpc("add_member_points", {
+    p_member_id: memberId,
+    p_delta: delta,
+    p_community_id: communityId,
+  });
+  if (totalErr) {
+    console.warn("awardPoints: add_member_points failed", totalErr);
   }
 }
