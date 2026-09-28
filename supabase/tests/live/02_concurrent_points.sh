@@ -11,9 +11,10 @@
 #      (points_ledger_member_source_ref_unique).
 #   3. Overdraft race: a member with 100 points redeems two different
 #      100-point rewards at the same time. At most one may succeed and the
-#      balance must never go below 0. EXPECTED TO FAIL TODAY: redeem_reward
-#      locks the reward row but not the member row, and there is no
-#      total_points >= 0 check, so both succeed and the balance hits -100.
+#      balance must never go below 0. Fails before migration 0070:
+#      redeem_reward locked the reward row but not the member row, and there
+#      was no total_points >= 0 check, so both succeeded and the balance hit
+#      -100.
 #
 # Unlike 01 and 03, this script COMMITS its fixtures, because parallel
 # sessions cannot see each other's uncommitted rows. That means:

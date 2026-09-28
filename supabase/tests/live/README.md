@@ -36,14 +36,19 @@ Each check prints `PASS  <label>`. The SQL scripts stop at the first `FAIL` and
 throw the transaction away. 02 runs every check, then exits 1 and prints the
 worker output if any failed.
 
-## Known results today (2026-09-28)
+## Known results (2026-09-28)
 
-- **02, overdraft race: expected to FAIL.** `redeem_reward` locks the reward row
-  but not the member row, and there is no `total_points >= 0` check, so two
-  redemptions at the same instant can both succeed and push a member below 0.
-  The fix (lock the member row, add a check constraint) would be migration 0070
-  and needs Kevin's yes.
-- **03, fraud_signals: prints a `FINDING` warning, not a failure.** The policy
-  `fraud_signals_super_admin_all` lets any row in `admin_users` through, so a
-  Nellie's-only admin can read and edit fraud signals for every member. It should
-  require `community_id = '*'`. Also a 0070 candidate.
+- **01 on prod: blocked by a real bug, fixed in 0070.** The fixture's first point
+  award failed with `42883 operator does not exist: tier_slug = text` inside
+  `bump_membership_points`. Since 0046 that function stored the tier in a `text`
+  variable, so every non-zero point award for a member who already belongs to the
+  brand fails (award triggers, `cancel_redemption` refunds, the 0067 pre-join
+  move). Re-run 01 after 0070 is applied.
+- **02, overdraft race: fails before 0070.** `redeem_reward` locked the reward row
+  but not the member row, and there was no `total_points >= 0` check, so two
+  redemptions at the same instant could both succeed and push a member below 0.
+  0070 locks the member row and adds the check. Not run on prod yet.
+- **03 on prod: all checks passed and rolled back.** Before 0070, a Nellie's-only
+  admin could read fraud_signals for every member (the policy let any
+  `admin_users` row through). 0070 limits it to `*` admins, and 03 now fails on
+  a database without 0070.

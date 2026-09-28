@@ -2,9 +2,8 @@
 --
 -- Live check that a brand admin scoped to one brand (admin_users row for
 -- 'nellies') cannot see or change another brand's data through RLS:
--- specials, reward redemptions, and admin_users itself. It also reports
--- whether a scoped admin can reach fraud_signals, which today's policy
--- (fraud_signals_super_admin_all) allows for ANY admin, not only '*' admins.
+-- specials, reward redemptions, admin_users itself, and fraud_signals
+-- (super admins only since 0070).
 --
 -- Everything runs in one transaction that ends in ROLLBACK, so nothing is
 -- kept and no network events are sent.
@@ -178,13 +177,10 @@ begin
   execute 'reset role';
   perform pg_temp.check(n = 2, 'member sees their own redemptions in both brands');
 
-  -- Known finding: fraud_signals_super_admin_all admits any admin.
-  n := pg_temp.admin_rows(format('select count(*) from fraud_signals where member_id = %L', member));
-  if n > 0 then
-    raise warning 'FINDING  scoped nellies admin can read fraud_signals for any member (policy fraud_signals_super_admin_all checks any admin_users row, not community_id = ''*'')';
-  else
-    raise notice 'PASS  scoped admin cannot read fraud_signals';
-  end if;
+  -- fraud_signals is for '*' admins only (0070).
+  perform pg_temp.check(pg_temp.admin_rows(format(
+      'select count(*) from fraud_signals where member_id = %L', member)) = 0,
+    'scoped admin cannot read fraud_signals');
 
   raise notice 'ALL CHECKS PASSED (rolling back)';
 end $$;
