@@ -224,7 +224,9 @@ export async function POST(request: Request) {
         await admin
           .from("members")
           .update({ birthday_month: birthdayMonth })
-          .eq("id", user.id);
+          .eq("id", user.id)
+          // Service role skips the 0068 lock, so only fill an unset month.
+          .is("birthday_month", null);
       } catch (err) {
         console.warn("onboard: birthday_month save failed", err);
       }
