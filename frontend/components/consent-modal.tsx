@@ -12,6 +12,7 @@ import {
   reviewedConsentCount,
   shouldShowKeepScrollingCue,
 } from "@/lib/consent-accept";
+import { CURRENT_CONSENT_VERSION } from "@/lib/consent-version";
 
 export type ConsentDoc = {
   slug: string;
@@ -19,7 +20,7 @@ export type ConsentDoc = {
   content_md: string;
 };
 
-export const CONSENT_VERSION = "2026-08-17.v1";
+export const CONSENT_VERSION = CURRENT_CONSENT_VERSION;
 
 function ConsentCheckboxLabel() {
   return (

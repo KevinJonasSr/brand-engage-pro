@@ -5,6 +5,7 @@ import { stampOnboardedCookie } from "@/lib/auth-cookies";
 import { getFirstSessionFacts } from "@/lib/data/first-session";
 import { emitNetworkEvent } from "@/lib/network";
 import { claimFreeFoundingOnJoin } from "@/lib/founding";
+import { CURRENT_CONSENT_VERSION } from "@/lib/consent-version";
 import {
   buildMemberProfileUpdates,
   isOnboardDraft,
@@ -122,6 +123,7 @@ export async function POST(request: Request) {
     const updates = buildMemberProfileUpdates(
       payload,
       (existing?.socials as Record<string, unknown> | null) ?? null,
+      { version: CURRENT_CONSENT_VERSION },
     );
 
     let member: {

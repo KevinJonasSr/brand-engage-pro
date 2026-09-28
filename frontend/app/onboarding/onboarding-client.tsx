@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, Star } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import FirstSessionChecklist from "@/components/first-session-checklist";
 import {
   EMPTY_FIRST_SESSION_FACTS,
@@ -31,8 +31,8 @@ type Field = {
 
 const steps: { title: string; description: string; fields: Field[] }[] = [
   {
-    title: "Member Profile",
-    description: "Capture the basics so the experience can personalize immediately.",
+    title: "About you",
+    description: "A few basics so we can greet you by name and show rewards near you.",
     fields: [
       {
         label: "Preferred name",
@@ -59,41 +59,41 @@ const steps: { title: string; description: string; fields: Field[] }[] = [
   },
   {
     title: "Interests",
-    description: "Members choose what they care about—rewards, marketplace drops, live moments.",
+    description: "Tell us what you like, such as rewards, specials, or events, so we show you the right perks.",
     fields: [
       {
-        label: "Pick a lane",
+        label: "What are you most interested in?",
         name: "interest",
-        placeholder: "Rewards, VIP, Marketplace",
+        placeholder: "Rewards, specials, events",
         type: "text",
         required: true,
       },
       {
-        label: "What are your favorite Brands?",
+        label: "What kinds of places do you like most?",
         name: "favoriteBrand",
         type: "radio",
         options: FAVORITE_BRAND_OPTIONS,
         otherOptionLabel: "Other",
         otherFieldName: "favoriteBrandOther",
-        otherPlaceholder: "Tell us your favorite brand or category",
+        otherPlaceholder: "Tell us your favorite place or category",
       },
     ],
   },
   {
-    title: "Access & Loyalty",
-    description: "Tie their phone and socials to automate points + referrals.",
+    title: "Stay in touch",
+    description: "Add your phone and birthday to get rewards and your birthday treat.",
     fields: [
       {
         label: "Phone number",
         name: "phone",
         placeholder: "+1 (615) 555-0123",
         type: "tel",
-        hint: "Recommended — unlocks SMS perks for brand drops, events, and rewards.",
+        hint: "Optional. We only text you if you tick the text message box on this step.",
       },
       {
-        label: "TikTok or Instagram handle",
+        label: "Instagram handle (optional)",
         name: "handle",
-        placeholder: "@supermember",
+        placeholder: "@yourname",
         type: "text",
       },
       {
@@ -132,8 +132,6 @@ export default function OnboardingWizard({
   const [stepIndex, setStepIndex] = useState(initialStep);
   const [formState, setFormState] = useState<Record<string, string>>(initialForm);
   const [sessionFacts, setSessionFacts] = useState<FirstSessionFacts>(initialFacts);
-  const [smsStatus, setSmsStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [smsMessage, setSmsMessage] = useState("Ready to send the confirmation text.");
   const [finishStatus, setFinishStatus] = useState<"idle" | "saving" | "error">("idle");
   const [finishMessage, setFinishMessage] = useState<string | null>(null);
   const [tosConsent, setTosConsent] = useState(false);
@@ -262,76 +260,6 @@ export default function OnboardingWizard({
   };
   const prevStep = () => setStepIndex((prev) => Math.max(prev - 1, 0));
 
-  const handleSmsOptIn = async () => {
-    if (!formState.phone) {
-      setSmsStatus("error");
-      setSmsMessage("Add a phone number to trigger the confirmation message.");
-      return;
-    }
-
-    try {
-      setSmsStatus("loading");
-      setSmsMessage("Sending confirmation text...");
-      const response = await fetch("/api/member-engage/sms", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          phone: formState.phone,
-          firstName: formState.firstName,
-          interest: formState.interest,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to send SMS");
-      }
-
-      setSmsStatus("success");
-      setSmsMessage("Confirmation text delivered. Member is live in the journey.");
-
-      if (formState.email) {
-        fetch("/api/member-engage/mailchimp", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: formState.email,
-            firstName: formState.firstName,
-            tags: formState.interest ? [formState.interest] : undefined,
-          }),
-        }).catch((err) => {
-          console.warn("Mailchimp subscribe did not complete:", err);
-        });
-      }
-
-      const refCode =
-        typeof window !== "undefined"
-          ? new URLSearchParams(window.location.search).get("ref") ?? undefined
-          : undefined;
-      fetch("/api/member-engage/onboard", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          firstName: formState.firstName,
-          city: formState.city,
-          phone: formState.phone,
-          handle: formState.handle,
-          favoriteBrand: resolveFavoriteBrand(),
-          interest: formState.interest,
-          referralCode: refCode,
-          birthdayMonth: formState.birthdayMonth || undefined,
-          smsOptedIn: true,
-          emailOptedIn: Boolean(formState.email),
-        }),
-      }).catch((err) => {
-        console.warn("Onboarding completion did not persist:", err);
-      });
-    } catch (error) {
-      console.error(error);
-      setSmsStatus("error");
-      setSmsMessage("Twilio did not accept the request. Double-check the number and try again.");
-    }
-  };
-
   const handleFinish = async () => {
     if (!tosConsent) {
       setFinishStatus("error");
@@ -368,10 +296,9 @@ export default function OnboardingWizard({
           interest: formState.interest,
           referralCode: refCode,
           birthdayMonth: formState.birthdayMonth || undefined,
-          smsOptedIn: Boolean(formState.phone) && smsConsent,
+          smsConsent: formState.phone ? smsConsent : false,
           emailOptedIn: Boolean(formState.email),
-          consentAcceptedAt: new Date().toISOString(),
-          consentVersion: "2026-04-22.v1",
+          tosConsent: true,
         }),
       });
 
@@ -419,16 +346,13 @@ export default function OnboardingWizard({
         }).catch((err) => console.warn("Mailchimp subscribe did not complete:", err));
       }
 
-      if (formState.phone) {
-        fetch("/api/member-engage/sms", {
+      // Only after the ticked SMS box has been saved. The server texts the
+      // number stored on this member's own profile, never one from the body.
+      if (formState.phone && smsConsent) {
+        await fetch("/api/member-engage/sms", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            phone: formState.phone,
-            firstName: formState.firstName,
-            interest: formState.interest,
-          }),
-        }).catch((err) => console.warn("Twilio SMS did not complete:", err));
+          credentials: "same-origin",
+        }).catch((err) => console.warn("Welcome text did not send:", err));
       }
 
       window.location.assign("/");
@@ -446,7 +370,7 @@ export default function OnboardingWizard({
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-12 lg:flex-row">
         <section className="w-full max-w-3xl rounded-3xl border border-white/10 bg-black/40 p-8">
           <div className="flex items-center justify-between text-sm uppercase tracking-[0.3em] text-white/60">
-            <span>Onboarding wizard</span>
+            <span>Set up your profile</span>
             <span>{Math.round(progress)}% complete</span>
           </div>
           <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-white/10">
@@ -612,35 +536,12 @@ export default function OnboardingWizard({
                       className="mt-0.5 h-4 w-4 accent-aurora"
                     />
                     <span>
-                      I consent to receive SMS from Brand Engage Pro about brand drops, events, and
-                      rewards. Msg &amp; data rates may apply. Reply STOP to opt out.
+                      Text me about rewards, specials, and events from the places I join. Message
+                      and data rates may apply. Reply STOP to opt out at any time.
                     </span>
                   </label>
                 )}
               </div>
-            )}
-
-            {isLastStep && (
-          <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-4">
-            <div className="flex items-center gap-3 text-sm text-white/70">
-              <Star className="text-amber-300" size={18} />
-              <p>SMS double opt-in</p>
-            </div>
-            <p className="mt-3 text-sm text-white/60">{smsMessage}</p>
-            <button
-              onClick={handleSmsOptIn}
-              className="mt-4 rounded-full border border-white/30 px-4 py-2 text-sm text-white/80 disabled:opacity-40"
-              disabled={smsStatus === "loading"}
-            >
-              {smsStatus === "loading" ? "Sending..." : "Send confirmation text"}
-            </button>
-            {smsStatus === "success" && (
-              <p className="mt-2 text-sm text-emerald-300">Opt-in confirmed via Twilio.</p>
-            )}
-            {smsStatus === "error" && (
-              <p className="mt-2 text-sm text-rose-300">Issue sending SMS. Try again.</p>
-            )}
-          </div>
             )}
 
             <div className="flex flex-col gap-2 pt-4">
@@ -659,7 +560,7 @@ export default function OnboardingWizard({
                     disabled={finishStatus === "saving"}
                     className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white shadow-glass transition hover:brightness-110 disabled:opacity-50"
                   >
-                    {finishStatus === "saving" ? "Saving…" : "Finish onboarding"}
+                    {finishStatus === "saving" ? "Saving…" : "Finish"}
                     <ArrowRight size={16} />
                   </button>
                 ) : (

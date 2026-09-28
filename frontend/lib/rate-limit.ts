@@ -73,6 +73,18 @@ export const apiRateLimiter = new RateLimiter({
   windowMs: 60 * 1000,
 });
 
+/** Welcome texts: a few per member per hour, so the route cannot spam a phone. */
+export const welcomeSmsRateLimiter = new RateLimiter({
+  maxRequests: 3,
+  windowMs: 60 * 60 * 1000,
+});
+
+/** Public brand applications: a handful per IP per hour. */
+export const brandApplyRateLimiter = new RateLimiter({
+  maxRequests: 5,
+  windowMs: 60 * 60 * 1000,
+});
+
 export function getClientIp(headers: Headers): string {
   const forwarded = headers.get("x-forwarded-for");
   if (forwarded) return forwarded.split(",")[0].trim();

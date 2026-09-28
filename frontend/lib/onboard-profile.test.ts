@@ -2,9 +2,11 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { CURRENT_CONSENT_VERSION } from "./consent-version.ts";
 import {
   ONBOARDING_MEMBER_SELECT,
   buildMemberProfileUpdates,
+  hasSmsConsent,
   isOnboardDraft,
   isOnboardingComplete,
   onboardingResumeStep,
@@ -36,7 +38,10 @@ describe("onboard profile persist", () => {
       interest: "Rewards",
       consentAcceptedAt: "2026-09-02T00:00:00.000Z",
       smsOptedIn: true,
-    });
+      smsConsent: true,
+      tosConsent: true,
+      phone: "+16155550123",
+    }, null, { version: CURRENT_CONSENT_VERSION });
     assert.equal(updates.first_name, "Lyra");
     assert.equal(updates.interest, "Rewards");
     assert.equal(updates.consent_accepted_at, undefined);
@@ -44,23 +49,81 @@ describe("onboard profile persist", () => {
     assert.equal(updates.email_opted_in, undefined);
   });
 
-  it("Finish writes name, interests, and consent", () => {
+  it("Finish writes name, interests, and a server-stamped consent", () => {
+    const now = new Date("2026-09-27T15:00:00.000Z");
     const updates = buildMemberProfileUpdates({
       firstName: "  Lyra  ",
       interest: "VIP",
       favoriteBrand: "Restaurants & Food",
-      consentAcceptedAt: "2026-09-02T12:00:00.000Z",
+      tosConsent: true,
+      consentAcceptedAt: "2020-01-01T00:00:00.000Z",
       consentVersion: "2026-04-22.v1",
       emailOptedIn: true,
       smsOptedIn: false,
-    });
+    }, null, { version: CURRENT_CONSENT_VERSION, now });
     assert.equal(updates.first_name, "Lyra");
     assert.equal(updates.interest, "VIP");
     assert.equal(updates.favorite_brand, "Restaurants & Food");
-    assert.equal(updates.consent_accepted_at, "2026-09-02T12:00:00.000Z");
-    assert.equal(updates.consent_version, "2026-04-22.v1");
+    assert.equal(updates.consent_accepted_at, "2026-09-27T15:00:00.000Z");
+    assert.equal(updates.consent_version, CURRENT_CONSENT_VERSION);
     assert.equal(updates.email_opted_in, true);
     assert.equal(updates.sms_opted_in, false);
+  });
+
+  it("Finish without the Terms box never invents a consent time", () => {
+    const updates = buildMemberProfileUpdates({
+      firstName: "Lyra",
+      consentAcceptedAt: "2026-09-02T12:00:00.000Z",
+      consentVersion: CURRENT_CONSENT_VERSION,
+    }, null, { version: CURRENT_CONSENT_VERSION });
+    assert.equal(updates.consent_accepted_at, undefined);
+    assert.equal(updates.consent_version, undefined);
+  });
+
+  it("SMS opt-in needs the ticked SMS box and a phone number", () => {
+    const base = { tosConsent: true, phone: "+16155550123" };
+    const opts = { version: CURRENT_CONSENT_VERSION };
+    assert.equal(
+      buildMemberProfileUpdates({ ...base, smsOptedIn: true }, null, opts).sms_opted_in,
+      false,
+    );
+    assert.equal(
+      buildMemberProfileUpdates({ ...base, smsConsent: false }, null, opts).sms_opted_in,
+      false,
+    );
+    assert.equal(
+      buildMemberProfileUpdates({ tosConsent: true, smsConsent: true, phone: " " }, null, opts)
+        .sms_opted_in,
+      false,
+    );
+    assert.equal(
+      buildMemberProfileUpdates({ ...base, smsConsent: true }, null, opts).sms_opted_in,
+      true,
+    );
+    assert.equal(hasSmsConsent({ smsConsent: true, phone: "+16155550123" }), true);
+    assert.equal(hasSmsConsent({ smsConsent: "yes" as unknown as boolean, phone: "+1615" }), false);
+  });
+
+  it("one consent version is used everywhere", () => {
+    assert.equal(CURRENT_CONSENT_VERSION, "2026-08-17.v1");
+    assert.doesNotMatch(wizard, /2026-04-22\.v1/);
+    assert.doesNotMatch(wizard, /consentAcceptedAt:/);
+    assert.match(onboardRoute, /CURRENT_CONSENT_VERSION/);
+    const modal = readFileSync(
+      fileURLToPath(new URL("../components/consent-modal.tsx", import.meta.url)),
+      "utf8",
+    );
+    assert.match(modal, /CONSENT_VERSION = CURRENT_CONSENT_VERSION/);
+  });
+
+  it("wizard only texts after a ticked SMS box and never sends the phone to the SMS route", () => {
+    assert.match(wizard, /smsConsent: formState\.phone \? smsConsent : false/);
+    assert.match(wizard, /tosConsent: true/);
+    assert.doesNotMatch(wizard, /smsOptedIn: true/);
+    assert.doesNotMatch(wizard, /handleSmsOptIn/);
+    const smsCall = wizard.slice(wizard.indexOf('"/api/member-engage/sms"'));
+    assert.ok(wizard.includes('"/api/member-engage/sms"'));
+    assert.doesNotMatch(smsCall.slice(0, 300), /phone/);
   });
 
   it("onboard route persists via service role and skips bonuses on draft", () => {
