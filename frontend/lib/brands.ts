@@ -104,24 +104,6 @@ export const BRANDS: Record<string, Brand> = {
       { label: "OpenTable", href: "https://www.opentable.com/nellies-southern-kitchen" },
     ],
   },
-  raelynn: {
-    slug: "raelynn",
-    name: "RaeLynn",
-    tagline: "Country, heart-first.",
-    bio: "Placeholder bio — awaiting final copy from marketing.",
-    heroImage: null,
-    accentFrom: "#f43f5e",
-    accentTo: "#fbbf24",
-    genres: ["Country", "Americana"],
-    upcoming: [
-      { title: "Nashville Listening Party", detail: "Brand Engage Pro members only", date: "Coming soon" },
-    ],
-    merch: [
-      { title: "Signed Vinyl Variant", tier: "Silver Priority", points: "3,200 pts" },
-      { title: "Tour Hoodie", tier: "Bronze+", points: "2,400 pts" },
-    ],
-    social: [{ label: "Instagram", href: "https://instagram.com/raelynn" }],
-  },
   bailee: {
     slug: "bailee",
     name: "Bailee",

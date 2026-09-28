@@ -140,10 +140,10 @@ describe("consentReviewTitle", () => {
   it("uses the referrer brand name when present", () => {
     assert.equal(
       consentReviewTitle({
-        brandSlug: "raelynn",
-        brandName: "RaeLynn",
+        brandSlug: "jonas-group-ent",
+        brandName: "Jonas Group Entertainment",
       }),
-      "Review before you join RaeLynn",
+      "Review before you join Jonas Group Entertainment",
     );
   });
 

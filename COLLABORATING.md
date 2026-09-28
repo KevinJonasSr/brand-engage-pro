@@ -110,7 +110,7 @@ For more complex changes (data backfills, function updates), the agent can drive
 
 ### Active customers
 - **Nellie's Experience** (BEP) — restaurant member-club, primary BEP design driver.
-- **RaeLynn** (FE) — country artist, primary FE launch artist (18 tour dates loaded, leopard accent palette, Luke Bryan tour mention live).
+- **RaeLynn** (FE only, never a BEP brand) — country artist, primary FE launch artist (18 tour dates loaded, leopard accent palette, Luke Bryan tour mention live).
 - **Jonas Group** (BEP) — entertainment brand seeded.
 
 ---

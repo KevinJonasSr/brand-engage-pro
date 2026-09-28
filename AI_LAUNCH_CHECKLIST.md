@@ -437,11 +437,11 @@ Until all of the above are done, signup is email-only.
 
 ### Manual smoke test after deploy
 
-1. Open `/brands/raelynn` (or any active brand) on mobile → tap Share → verify native sheet opens with brand name + tagline.
-2. Open `/brands/raelynn` on desktop → click Share → verify "Link copied" toast.
-3. Visit `/share/founder/raelynn/1` directly → verify certificate page renders.
-4. Visit OG card at `/brands/raelynn/opengraph-image` and `/share/founder/raelynn/1/opengraph-image` → verify both render to PNG without error.
-5. Paste `/brands/raelynn` URL in iMessage/Slack → verify the per-brand card appears in the unfurl.
+1. Open `/brands/nellies` (or any active brand) on mobile → tap Share → verify native sheet opens with brand name + tagline.
+2. Open `/brands/nellies` on desktop → click Share → verify "Link copied" toast.
+3. Visit `/share/founder/nellies/1` directly → verify certificate page renders.
+4. Visit OG card at `/brands/nellies/opengraph-image` and `/share/founder/nellies/1/opengraph-image` → verify both render to PNG without error.
+5. Paste `/brands/nellies` URL in iMessage/Slack → verify the per-brand card appears in the unfurl.
 
 ### Future wiring (Bundle 4)
 
@@ -501,7 +501,7 @@ Mirrors FE /for-artists Tier B audit content to BEP /for-brands. Replaces the si
 
 - [x] Hero with "Already approved? Sign in →" breadcrumb to `/login`.
 - [x] Proof section ("Already live on Brand Engage Pro") + "Browse all member clubs →" CTA.
-- [x] Featured Brands strip — Nellie's, RaeLynn, Jonas Group Entertainment. Cards link to `/brands/<slug>`.
+- [x] Featured Brands strip — Nellie's, Jonas Group Entertainment. Cards link to `/brands/<slug>`.
 - [x] 6-card "What you can launch" grid (Specials & founder tiers, AI-drafted replies, Rewards & redemptions, Weekly member digest, Referrals & predictions, Weekly admin brief).
 - [x] Data ownership block with interim "confirmed during onboarding" copy.
 - [x] 4-step "How launch works" (Apply → Review → Build → Launch).

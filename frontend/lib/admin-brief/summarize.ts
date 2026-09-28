@@ -89,7 +89,7 @@ across the platform" if nothing notable.
 Then, for each community that had ANY activity (this week or last):
   - Two short lines, dash-bulleted:
     • Numbers line — concrete WoW deltas. Match this format:
-      "RaeLynn: 12 posts (was 8), 47 reactions (was 22), 3 new
+      "Nellie's: 12 posts (was 8), 47 reactions (was 22), 3 new
        signups (was 1)."
     • Insight line — what's driving the move, in plain English.
       If a top_post is provided, name it. If posts dropped to 0,

@@ -29,7 +29,7 @@ const cache = new Map<string, CacheEntry>();
 
 /**
  * Wrapped embedText for the search path. Cache key is the trimmed,
- * lower-cased query string — so "Raelynn" and "raelynn " hit the same
+ * lower-cased query string — so "Nellies" and "nellies " hit the same
  * cache slot.
  *
  * Throws EmbeddingError on OpenAI auth/server failures (caller is the
