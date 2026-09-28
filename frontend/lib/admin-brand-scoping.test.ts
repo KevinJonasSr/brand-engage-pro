@@ -61,7 +61,7 @@ describe("0063 migration", () => {
     );
   });
 
-  it("drops the 'raelynn' default on offers.community_id", () => {
+  it("drops the old fork default on offers.community_id", () => {
     assert.match(
       migration,
       /alter table public\.offers alter column community_id drop default;/,

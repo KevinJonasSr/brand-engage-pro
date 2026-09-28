@@ -33,7 +33,7 @@ const KIND_COLOR: Record<CardKind, string> = {
 };
 
 /**
- * <LatestStrip slug="raelynn" />  (FE)
+ * <LatestStrip slug="<artist>" /> (FE)
  * <LatestStrip slug="nellies" />   (BEP)
  *
  * Repo-agnostic: tries FE table names first (artist_events, etc.),

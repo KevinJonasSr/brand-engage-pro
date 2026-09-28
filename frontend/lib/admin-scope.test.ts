@@ -30,17 +30,17 @@ const noBrandAdmin = {
 const staleCookieAdmin = {
   isSuperAdmin: false,
   communities: ["nellies"],
-  currentCommunityId: "raelynn",
+  currentCommunityId: "jonas-group-ent",
 };
 
 describe("canAccessBrand", () => {
   it("lets a super-admin into any brand", () => {
-    assert.equal(canAccessBrand(superAdmin, "raelynn"), true);
+    assert.equal(canAccessBrand(superAdmin, "jonas-group-ent"), true);
   });
 
   it("lets a brand admin into their own brand only", () => {
     assert.equal(canAccessBrand(nelliesAdmin, "nellies"), true);
-    assert.equal(canAccessBrand(nelliesAdmin, "raelynn"), false);
+    assert.equal(canAccessBrand(nelliesAdmin, "jonas-group-ent"), false);
   });
 
   it("refuses a missing context or an empty brand", () => {
@@ -62,7 +62,7 @@ describe("requireBrandAccess", () => {
 
   it("throws AdminScopeError for another brand", () => {
     assert.throws(
-      () => requireBrandAccess(nelliesAdmin, "raelynn"),
+      () => requireBrandAccess(nelliesAdmin, "jonas-group-ent"),
       (err: unknown) =>
         err instanceof AdminScopeError && err.message === ADMIN_FORBIDDEN,
     );
@@ -108,14 +108,14 @@ describe("resolveWriteBrand", () => {
 
   it("rejects a brand admin asking for another brand", () => {
     assert.throws(
-      () => resolveWriteBrand(nelliesAdmin, "raelynn"),
+      () => resolveWriteBrand(nelliesAdmin, "jonas-group-ent"),
       AdminScopeError,
     );
   });
 
   it("uses the brand a super-admin picked explicitly", () => {
-    assert.equal(resolveWriteBrand(superAdmin, "raelynn"), "raelynn");
-    assert.equal(resolveWriteBrand(superWithPick, "raelynn"), "raelynn");
+    assert.equal(resolveWriteBrand(superAdmin, "jonas-group-ent"), "jonas-group-ent");
+    assert.equal(resolveWriteBrand(superWithPick, "jonas-group-ent"), "jonas-group-ent");
   });
 
   it("falls back to the super-admin's switcher pick", () => {
@@ -137,13 +137,13 @@ describe("resolveWriteBrand", () => {
 
 describe("inScope", () => {
   it("accepts every row when scope is null", () => {
-    assert.equal(inScope(null, "raelynn"), true);
+    assert.equal(inScope(null, "jonas-group-ent"), true);
     assert.equal(inScope(null, null), true);
   });
 
   it("accepts only rows from the scoped brand", () => {
     assert.equal(inScope("nellies", "nellies"), true);
-    assert.equal(inScope("nellies", "raelynn"), false);
+    assert.equal(inScope("nellies", "jonas-group-ent"), false);
     assert.equal(inScope("nellies", null), false);
   });
 });

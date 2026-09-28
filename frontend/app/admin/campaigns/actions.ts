@@ -37,7 +37,7 @@ export async function createAndPublishCampaign(formData: FormData) {
   const description = String(formData.get("description") ?? "").trim();
   if (!brandSlug || !title) return;
   // Brand admins publish only to their own brand. Every row below carries
-  // community_id so nothing falls back to the 'raelynn' column default.
+  // community_id; the column has no default and inserts without one fail.
   requireBrandAccess(ctx, brandSlug);
 
   // A reused event must belong to the same brand.

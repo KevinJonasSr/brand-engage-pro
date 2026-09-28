@@ -19,7 +19,7 @@ const brandRewards = readFileSync(
 
 describe("spendable points source of truth", () => {
   it("sums every ledger delta including adjustments", () => {
-    // Lyra walk: welcome +25 (raelynn leftover) + RSVP +10 = 35
+    // Lyra walk: welcome +25 + RSVP +10 = 35
     assert.equal(
       sumLedgerDeltas([
         { delta: 25 },

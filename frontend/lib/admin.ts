@@ -172,7 +172,7 @@ export async function getAdminUser(): Promise<User | null> {
 /**
  * Returns the community the admin is currently scoped to, falling back to
  * the hostname-resolved community if the admin context hasn't picked one
- * yet. Used by server actions to avoid accidentally writing to 'raelynn'
+ * yet. Used by server actions to avoid writing to the wrong brand
  * on a super-admin request made from a non-memberengage hostname.
  */
 export async function getAdminCommunityId(): Promise<string> {
