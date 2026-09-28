@@ -38,17 +38,18 @@ worker output if any failed.
 
 ## Known results (2026-09-28)
 
-- **01 on prod: blocked by a real bug, fixed in 0070.** The fixture's first point
-  award failed with `42883 operator does not exist: tier_slug = text` inside
-  `bump_membership_points`. Since 0046 that function stored the tier in a `text`
-  variable, so every non-zero point award for a member who already belongs to the
-  brand fails (award triggers, `cancel_redemption` refunds, the 0067 pre-join
-  move). Re-run 01 after 0070 is applied.
+- **01 on prod: all 24 checks passed and rolled back after 0070.** Before 0070
+  the fixture's first point award failed with `42883 operator does not exist:
+  tier_slug = text` inside `bump_membership_points`. Since 0046 that function
+  stored the tier in a `text` variable, so every non-zero point award for a member
+  who already belongs to the brand failed (award triggers, `cancel_redemption`
+  refunds, the 0067 pre-join move). 0070 was applied to prod 2026-09-28.
 - **02, overdraft race: fails before 0070.** `redeem_reward` locked the reward row
   but not the member row, and there was no `total_points >= 0` check, so two
   redemptions at the same instant could both succeed and push a member below 0.
-  0070 locks the member row and adds the check. Not run on prod yet.
-- **03 on prod: all checks passed and rolled back.** Before 0070, a Nellie's-only
-  admin could read fraud_signals for every member (the policy let any
-  `admin_users` row through). 0070 limits it to `*` admins, and 03 now fails on
-  a database without 0070.
+  0070 locks the member row and adds the check. Not run on prod yet (it commits
+  fixtures and sends hub events, so it needs its own yes).
+- **03 on prod: all 13 checks passed and rolled back after 0070.** Before 0070, a
+  Nellie's-only admin could read fraud_signals for every member (the policy let
+  any `admin_users` row through). 0070 limits it to `*` admins, and 03 now fails
+  on a database without 0070.
