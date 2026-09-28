@@ -1,5 +1,5 @@
 -- 0064_notification_prefs_single_policy.sql
--- Not yet applied to production. Apply only after Kevin approves.
+-- Already applied to production via MCP on 2026-09-28.
 --
 -- public.notification_preferences had three permissive self policies that
 -- all said the same thing, "a member can only touch their own row":
