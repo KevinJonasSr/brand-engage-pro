@@ -6,6 +6,7 @@ import { getFirstSessionFacts } from "@/lib/data/first-session";
 import { emitNetworkEvent } from "@/lib/network";
 import { claimFreeFoundingOnJoin } from "@/lib/founding";
 import { CURRENT_CONSENT_VERSION } from "@/lib/consent-version";
+import { parseBirthdayMonth } from "@/lib/birthday-month";
 import {
   buildMemberProfileUpdates,
   isOnboardDraft,
@@ -379,14 +380,6 @@ async function addMemberPoints(
     p_delta: delta,
   });
   if (error) console.warn("onboard: add_member_points failed", error);
-}
-
-function parseBirthdayMonth(value: unknown): number | null | undefined {
-  if (value === undefined) return undefined;
-  if (value === null || value === "") return null;
-  const n = typeof value === "number" ? value : Number.parseInt(String(value), 10);
-  if (!Number.isInteger(n) || n < 1 || n > 12) return undefined;
-  return n;
 }
 
 /**

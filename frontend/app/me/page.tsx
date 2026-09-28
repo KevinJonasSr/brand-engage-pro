@@ -43,6 +43,11 @@ export default async function MeIndexPage() {
           body="Control whether your profile is publicly viewable. Email, phone, and address are always private."
         />
         <Row
+          href="/me/birthday"
+          title="Birthday"
+          body="Set your birthday month for the Nellie's birthday entrée."
+        />
+        <Row
           href="/me/anniversaries"
           title="Anniversaries"
           body="Every milestone with a community you follow."
