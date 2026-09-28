@@ -29,10 +29,7 @@ import { getActiveGoalsWithProgress } from "@/lib/goals/progress";
 import { resolveBrandSlug } from "@/lib/brand-aliases";
 import { getFoundingClaims } from "@/lib/founding";
 import { JGE_BRAND_SLUG } from "@/lib/jge-launch";
-import {
-  NELLIES_BRAND_SLUG,
-  jackieLaunchSpecials,
-} from "@/lib/nellies-launch";
+import { NELLIES_BRAND_SLUG } from "@/lib/nellies-launch";
 export const dynamic = "force-dynamic";
 
 // Per-brand hero focal-point now comes from brands.hero_focal_x /
@@ -86,7 +83,8 @@ export default async function BrandPage({
   const isSignedIn = member !== null;
   const needsProfile = isSignedIn && !member.first_name;
   const isNellies = slug.toLowerCase() === NELLIES_BRAND_SLUG;
-  const guestSpecials = isNellies ? jackieLaunchSpecials() : specials;
+  // Nellie's: listSpecialsForBrand already puts Jackie's three first.
+  const guestSpecials = specials;
 
   // Fetch activity pulse + stamp card in parallel (non-blocking — both fail gracefully)
   const [pulse, stampCardData, eventIds, goals] = await Promise.all([
@@ -338,13 +336,12 @@ export default async function BrandPage({
         brandSlug={slug}
         viewerMemberId={member?.id ?? null}
         />
-      {/* Nellie's member offers come from a hardcoded list in
-          lib/nellies-launch.ts (jackieLaunchSpecials), not the specials
-          table. Moving them into admin is a follow-up. */}
+      {/* Nellie's: Jackie's three member offers (lib/nellies-launch.ts)
+          come first, then active specials from the specials table. */}
       {guestSpecials.length > 0 && (
         <section id="offers" className="glass-card p-8 scroll-mt-24">
           <p className="text-sm uppercase tracking-wide text-white/60">
-            {isNellies ? "Member offers" : "Specials"}
+            {isNellies ? "Member offers & specials" : "Specials"}
           </p>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             {guestSpecials.map((s) => {
