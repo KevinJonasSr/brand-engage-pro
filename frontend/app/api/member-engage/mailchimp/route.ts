@@ -28,7 +28,7 @@ export async function POST(request: Request) {
   }
 
   const clientIp = getClientIp(request.headers as unknown as Headers);
-  const rl = memberDataRateLimiter.check(clientIp);
+  const rl = await memberDataRateLimiter.check(clientIp);
   if (!rl.success) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }

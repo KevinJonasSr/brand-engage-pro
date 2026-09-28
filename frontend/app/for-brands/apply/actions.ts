@@ -15,7 +15,7 @@ const APPLY_PATH = "/for-brands/apply";
  * Public form, no auth. Uses the admin client so the insert lands even when
  * the visitor is not signed in. Because anyone can post here directly, the
  * server enforces its own limits:
- *   1. per-IP rate limit (5 per hour, in memory per instance)
+ *   1. per-IP rate limit (5 per hour, shared across instances)
  *   2. optional Turnstile check, only when both keys are configured
  *   3. field validation and length limits (lib/brand-application.ts)
  */
@@ -24,7 +24,7 @@ export async function submitBrandApplicationAction(
 ): Promise<void> {
   const ip = getClientIp(await headers());
 
-  if (!brandApplyRateLimiter.check(`brand-apply:${ip}`).success) {
+  if (!(await brandApplyRateLimiter.check(`brand-apply:${ip}`)).success) {
     redirect(`${APPLY_PATH}?error=rate-limited`);
   }
 

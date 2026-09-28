@@ -28,7 +28,7 @@ export async function POST() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!welcomeSmsRateLimiter.check(`welcome-sms:${user.id}`).success) {
+  if (!(await welcomeSmsRateLimiter.check(`welcome-sms:${user.id}`)).success) {
     return NextResponse.json(
       { error: "Too many requests. Please try again later." },
       { status: 429 },
