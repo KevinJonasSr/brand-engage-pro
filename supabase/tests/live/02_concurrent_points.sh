@@ -4,8 +4,9 @@
 # Live concurrency checks. Each check starts several psql sessions at the
 # same instant and then looks at the totals.
 #
-#   1. 20 parallel add_member_points(+5) calls must add exactly +100 to the
-#      member and to the nellies membership (no lost updates).
+#   1. N parallel add_member_points(+5) calls (N = WORKERS, default 12) must
+#      add exactly N*5 to the member and to the nellies membership (no lost
+#      updates).
 #   2. Two parallel inserts of the same ledger row (same member, brand,
 #      source and source_ref) must leave exactly 1 row
 #      (points_ledger_member_source_ref_unique).
@@ -27,14 +28,24 @@
 #
 # Usage:
 #   DATABASE_URL=postgres://... supabase/tests/live/02_concurrent_points.sh
+#   WORKERS=8 DATABASE_URL=postgres://... supabase/tests/live/02_concurrent_points.sh
 #   (prod only: add BEP_LIVE_TEST_ALLOW_PROD=yes)
+#
+# Supabase branches cap the session pooler at 15 clients, and the script
+# needs WORKERS + 2 connections at once. Past that it fails with
+# EMAXCONNSESSION, so keep WORKERS at 12 or below on a branch.
 
 set -euo pipefail
 
 readonly FEP_REF="uhovonrljcauaoctypbg"
 readonly BEP_PROD_REF="enfpviapxvqyoarwwsuf"
 readonly BARRIER_KEY=4242
-readonly AWARD_WORKERS=20
+AWARD_WORKERS="${WORKERS:-12}"
+if ! [[ "$AWARD_WORKERS" =~ ^[1-9][0-9]*$ ]]; then
+  echo "WORKERS must be a positive integer." >&2
+  exit 2
+fi
+readonly AWARD_WORKERS
 readonly AWARD_POINTS=5
 readonly START_POINTS=100
 readonly REWARD_COST=100
