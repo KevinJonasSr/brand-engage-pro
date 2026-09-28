@@ -223,19 +223,25 @@ on conflict (slug) do update set
   threshold   = excluded.threshold,
   sort_order  = excluded.sort_order;
 
+-- 2026-09-28 fix: sections 4 and 5 used columns that do not exist on
+-- brand_events (description) and campaigns (body, cta_label, cta_url), so a
+-- fresh database failed here. Events now write detail + brand_slug, and
+-- campaigns write description; the CTA labels were dropped (the table has no
+-- CTA columns). Prod already has its rows and never reruns this file.
+
 -- ─── 4. EVENTS — Upcoming & Recurring ────────────────────────────────────────
 -- Seeded as upcoming events. Admins can edit dates/details via the admin UI.
 -- Recurring events (Happy Hour, Live Music) are seeded for the next occurrence;
 -- admin can duplicate as needed.
 
 insert into public.brand_events (
-  community_id, title, description, location,
+  community_id, brand_slug, title, detail, location,
   starts_at, ends_at, capacity, active
 )
 values
 
   -- ── Regular Weekly ────────────────────────────────────────────────────────
-  ('nellies',
+  ('nellies', 'nellies',
     'Happy Hour — 50% Off Appetizers',
     'Join us Monday through Friday from 4–6 PM for Happy Hour. 50% off all appetizers. Members earn bonus check-in points.',
     'Nellie''s Southern Kitchen — Main Dining Room & Bar',
@@ -243,7 +249,7 @@ values
     now() + interval '1 day' + interval '2 hours',
     null, true),
 
-  ('nellies',
+  ('nellies', 'nellies',
     'Live Music — Rooftop (Thursday)',
     'Live music every Thursday on the Rooftop. Earn bonus points for attending. Upstate New York Night runs alongside this.',
     'Nellie''s Southern Kitchen — Rooftop',
@@ -251,7 +257,7 @@ values
     now() + interval '4 days' + interval '4 hours',
     null, true),
 
-  ('nellies',
+  ('nellies', 'nellies',
     'Live Music — Rooftop (Friday)',
     'Friday night live music on the Rooftop. A perfect way to kick off the weekend.',
     'Nellie''s Southern Kitchen — Rooftop',
@@ -259,7 +265,7 @@ values
     now() + interval '5 days' + interval '4 hours',
     null, true),
 
-  ('nellies',
+  ('nellies', 'nellies',
     'Sunday Brunch with Live Music',
     'Brunch starts at 11 AM with live music. Members with Brunch Club badge earn double check-in points.',
     'Nellie''s Southern Kitchen — Main Dining Room',
@@ -267,7 +273,7 @@ values
     (date_trunc('week', now()) + interval '6 days' + interval '15 hours'),
     null, true),
 
-  ('nellies',
+  ('nellies', 'nellies',
     'Whiskey Wednesday',
     '20% off all whiskey bottles. A great night to explore the bar program. Members earn bonus points.',
     'Nellie''s Southern Kitchen — Bar',
@@ -275,7 +281,7 @@ values
     date_trunc('week', now()) + interval '2 days' + interval '22 hours',
     null, true),
 
-  ('nellies',
+  ('nellies', 'nellies',
     'Wine Wednesday — 50% Off Bottles',
     '50% off all wine bottles every Wednesday. Pairs well with good company.',
     'Nellie''s Southern Kitchen — Main Dining Room',
@@ -283,7 +289,7 @@ values
     date_trunc('week', now()) + interval '2 days' + interval '22 hours',
     null, true),
 
-  ('nellies',
+  ('nellies', 'nellies',
     'Del Webb Rooftop Happy Hour',
     'First Tuesday of each month, 4–7 PM. 50% off appetizers on the Rooftop and Patio. Special Del Webb member discount: 15% off food.',
     'Nellie''s Southern Kitchen — Rooftop & Patio',
@@ -296,7 +302,7 @@ values
     null, true),
 
   -- ── Featured Upcoming Events ──────────────────────────────────────────────
-  ('nellies',
+  ('nellies', 'nellies',
     'Bourbon & Cigar Night',
     'An exclusive evening of premium bourbon pours and hand-selected cigars. Invite-only for Platinum members; Gold members may request waitlist access. Earn the Bourbon Enthusiast badge.',
     'Nellie''s Southern Kitchen — Private Dining Room',
@@ -304,7 +310,7 @@ values
     now() + interval '14 days' + interval '3 hours',
     40, true),
 
-  ('nellies',
+  ('nellies', 'nellies',
     'Rooftop Karaoke Night',
     'Take the mic on the Rooftop. All members welcome — earn the Karaoke Star badge just for participating. Points awarded for check-ins.',
     'Nellie''s Southern Kitchen — Rooftop',
@@ -312,7 +318,7 @@ values
     now() + interval '10 days' + interval '4 hours',
     null, true),
 
-  ('nellies',
+  ('nellies', 'nellies',
     'Upstate New York Night (Rooftop)',
     'Every Thursday — the Rooftop transforms. Earn the Upstate New York Night badge on your first attendance.',
     'Nellie''s Southern Kitchen — Rooftop',
@@ -327,49 +333,42 @@ on conflict do nothing;
 -- bonus points. brand_slug defaults to 'nellies' for backward compat.
 
 insert into public.campaigns (
-  community_id, brand_slug, title, body, cta_label, cta_url, published_at
+  community_id, brand_slug, title, description, published_at
 )
 values
   ('nellies', 'nellies',
     '🍳 Brunch Challenge',
     'Visit Sunday Brunch with live music this month and earn 150 bonus points. Check in on the platform after you''re seated to claim your reward. Complete all four Sundays for a surprise bonus.',
-    'Log my brunch visit', null,
     now()),
 
   ('nellies', 'nellies',
     '🏙️ Rooftop Challenge',
     'Hit the Rooftop at least twice this month — any night works. Each check-in earns points, and completing this challenge unlocks the Rooftop Regular badge if you haven''t earned it yet.',
-    'Log my rooftop visit', null,
     now()),
 
   ('nellies', 'nellies',
     '🎸 Live Music Check-in Challenge',
     'Attend any live music night at Nellie''s this month and earn 100 bonus points. Thursday and Friday on the Rooftop, plus Saturday and Sunday in the Dining Room all count.',
-    'Log my live music visit', null,
     now()),
 
   ('nellies', 'nellies',
     '🥃 Featured Cocktail Challenge',
     'Try the featured cocktail of the month and share a photo in the community (tag us on social for bonus points). Members who complete this earn 75 bonus points + the Cocktail Explorer progress.',
-    'Log my cocktail', null,
     now()),
 
   ('nellies', 'nellies',
     '👥 Bring a First-Time Guest',
     'Bring someone who''s never been to Nellie''s and dine together this month. Earn 200 bonus points — and they''ll get a welcome bonus when they join the Rewards Club via your referral link.',
-    'Get my referral link', '/referrals',
     now()),
 
   ('nellies', 'nellies',
     '⭐ Leave a Google Review',
     'Haven''t left us a Google review yet? Do it this month and earn 75 bonus points. Self-report your review in the community with a screenshot — we''ll verify and award points within 48 hours.',
-    'I left a review', null,
     now()),
 
   ('nellies', 'nellies',
     '📸 Tag Us on Social',
     'Post a photo from your Nellie''s visit and tag us on Instagram or Facebook. Self-report it here to earn 25 bonus points per post, up to 3 posts per month (75 pts total).',
-    'Report my post', null,
     now())
 
 on conflict do nothing;

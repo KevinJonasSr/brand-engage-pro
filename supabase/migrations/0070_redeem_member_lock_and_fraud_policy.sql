@@ -185,6 +185,28 @@ alter table public.member_community_memberships
   add constraint member_community_memberships_total_points_nonneg check (total_points >= 0);
 
 -- ------------------------------------------------------------------ 3
+-- Fresh builds only: fraud_signals was created on prod outside the
+-- migrations folder. Same shape as prod (2026-09-28). No-op on prod.
+create table if not exists public.fraud_signals (
+  id uuid primary key default gen_random_uuid(),
+  member_id uuid not null references public.members(id) on delete cascade,
+  scanned_at timestamptz not null default now(),
+  verdict text not null check (verdict in ('legitimate', 'suspicious', 'unclear')),
+  confidence numeric not null default 0,
+  triggers text[] not null default '{}',
+  reasons text[] not null default '{}',
+  evidence_json jsonb,
+  status text not null default 'pending' check (status in ('pending', 'dismissed', 'confirmed')),
+  reviewed_by uuid references auth.users(id),
+  reviewed_at timestamptz,
+  created_at timestamptz not null default now()
+);
+alter table public.fraud_signals enable row level security;
+create index if not exists idx_fraud_signals_pending
+  on public.fraud_signals (status, scanned_at desc) where status = 'pending';
+create index if not exists idx_fraud_signals_member
+  on public.fraud_signals (member_id);
+
 drop policy if exists fraud_signals_super_admin_all on public.fraud_signals;
 create policy fraud_signals_super_admin_all on public.fraud_signals
   for all

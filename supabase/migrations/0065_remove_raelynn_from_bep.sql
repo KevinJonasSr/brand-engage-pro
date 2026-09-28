@@ -33,6 +33,19 @@
 --      does not exist, then drops the raelynn defaults and adds foreign
 --      keys to communities(slug), matching the existing ones.
 
+-- 0. jonas-group community -------------------------------------------------
+
+-- member_home_community, fill_community_id and the step 5 foreign keys all
+-- fall back to 'jonas-group'. Prod has had this row for a long time, but no
+-- earlier migration creates it, so fresh builds failed at step 5. Same
+-- values as the prod row (2026-09-28). No-op on prod.
+insert into public.communities
+  (slug, display_name, type, tagline, accent_from, accent_to, subdomain, active, sort_order)
+values
+  ('jonas-group', 'Jonas Group', 'brand', 'Music, Publishing, Artist Management',
+   '#7c3aed', '#f97316', 'jonasgroup', true, 1)
+on conflict (slug) do nothing;
+
 -- 1. Home brand ------------------------------------------------------------
 
 create or replace function public.member_home_community(p_member_id uuid)
@@ -539,6 +552,15 @@ revoke execute on function public.redeem_reward(uuid, uuid, text) from public, a
 grant execute on function public.redeem_reward(uuid, uuid, text) to authenticated, service_role;
 
 -- 4. Move the raelynn rows -------------------------------------------------
+
+-- Fresh builds only: 0006 seeds a 'TBD' placeholder event for every brand,
+-- including fork brands (bailee, konnor, dan, blake) that have no community,
+-- so the step 5 guard failed on them. Prod had none of these rows.
+delete from public.brand_events
+ where community_id = 'raelynn'
+   and title = 'TBD'
+   and detail = 'Dates to come'
+   and brand_slug not in (select slug from public.communities);
 
 -- Events take their own brand.
 update public.brand_events
