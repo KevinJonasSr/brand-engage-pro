@@ -4,25 +4,23 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getAdminContext } from "@/lib/admin";
 import { redirect } from "next/navigation";
 import { cancelRedemption } from "@/lib/rewards/cancel";
+import { markRedemptionFulfilled } from "@/lib/rewards/fulfill";
 import { notifyRedemptionFulfilled } from "@/lib/notifications/triggers/redemption-fulfilled";
 
 export async function markFulfilledAction(redemptionId: string, fulfillmentNote: string) {
   const ctx = await getAdminContext();
   if (!ctx) redirect("/login");
 
-  const supabase = createAdminClient();
-  const { error } = await supabase
-    .from("reward_redemptions")
-    .update({
-      status: "fulfilled",
-      fulfillment_note: fulfillmentNote || null,
-      fulfilled_at: new Date().toISOString(),
-    })
-    .eq("id", redemptionId)
-    .eq("community_id", ctx.currentCommunityId || "");
+  // Super admins may fulfill in any brand; everyone else only in their own.
+  const scope = ctx.isSuperAdmin ? null : ctx.currentCommunityId;
+  if (!ctx.isSuperAdmin && !scope) {
+    return { error: "Unauthorized" };
+  }
 
-  if (error) {
-    return { error: error.message };
+  const supabase = createAdminClient();
+  const result = await markRedemptionFulfilled(supabase, redemptionId, fulfillmentNote, scope);
+  if (result.error) {
+    return { error: result.error };
   }
 
   // Notify the fan. Best-effort; never block the action.
