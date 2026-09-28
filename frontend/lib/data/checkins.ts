@@ -6,7 +6,7 @@ export const CHECKIN_POINTS = 25;
 export type CheckinResult =
   | { ok: true; alreadyCheckedIn: false; pointsAwarded: number }
   | { ok: true; alreadyCheckedIn: true; pointsAwarded: 0 }
-  | { ok: false; error: string };
+  | { ok: false; error: string; unknownBrand?: true };
 
 /**
  * Record a visit check-in for a member at a brand location.
@@ -17,6 +17,16 @@ export async function recordCheckin(
   brandSlug: string,
 ): Promise<CheckinResult> {
   const admin = createAdminClient();
+
+  // The slug comes from the request body, so it must name a real brand
+  // (0059 also enforces this with a foreign key).
+  const { data: brand, error: brandErr } = await admin
+    .from("brands")
+    .select("slug")
+    .eq("slug", brandSlug)
+    .maybeSingle();
+  if (brandErr) return { ok: false, error: brandErr.message };
+  if (!brand) return { ok: false, error: "Unknown brand", unknownBrand: true };
 
   const todayET = new Date().toLocaleDateString("en-CA", {
     timeZone: "America/New_York",
@@ -41,25 +51,31 @@ export async function recordCheckin(
     brand_slug: brandSlug,
     points_awarded: CHECKIN_POINTS,
   });
-  if (checkinErr) return { ok: false, error: checkinErr.message };
+  if (checkinErr) {
+    // The per-day unique index caught a check-in the lookup above missed
+    // (a race, or the lookup's fixed -05:00 offset during daylight time).
+    if (checkinErr.code === "23505") {
+      return { ok: true, alreadyCheckedIn: true, pointsAwarded: 0 };
+    }
+    return { ok: false, error: checkinErr.message };
+  }
 
   // Award points with idempotency key
   const sourceRef = `checkin:${brandSlug}:${memberId}:${todayET}`;
-  const { data: existingPts } = await admin
-    .from("points_ledger")
-    .select("id")
-    .eq("source_ref", sourceRef)
-    .maybeSingle();
+  // The 0059 ledger unique index makes this insert the idempotency check:
+  // totals only move when the ledger row was actually written.
+  const { error: ledgerErr } = await admin.from("points_ledger").insert({
+    member_id: memberId,
+    delta: CHECKIN_POINTS,
+    source: "daily_checkin",
+    source_ref: sourceRef,
+    note: `Visit check-in at ${brandSlug}`,
+  });
+  if (ledgerErr && ledgerErr.code !== "23505") {
+    console.warn("recordCheckin: ledger insert failed", ledgerErr);
+  }
 
-  if (!existingPts) {
-    await admin.from("points_ledger").insert({
-      member_id: memberId,
-      delta: CHECKIN_POINTS,
-      source: "daily_checkin",
-      source_ref: sourceRef,
-      note: `Visit check-in at ${brandSlug}`,
-    });
-
+  if (!ledgerErr) {
     // Increment denormalized total — read-then-write is acceptable here since
     // the unique index on checkins already prevents concurrent check-ins.
     const { data: m } = await admin
