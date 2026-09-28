@@ -1,11 +1,18 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { listBrandsForAdmin } from "@/lib/data/brands";
+import { canAccessBrand, getAdminContext } from "@/lib/admin";
 import CreateBrandForm from "./create-brand-form";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminBrandsPage() {
-  const brands = await listBrandsForAdmin();
+  const ctx = await getAdminContext();
+  if (!ctx) redirect("/login?next=/admin/brands");
+  // Brand admins see only the brands they manage.
+  const brands = (await listBrandsForAdmin()).filter((b) =>
+    canAccessBrand(ctx, b.slug),
+  );
   return (
     <div className="space-y-6">
       <div>
@@ -61,6 +68,7 @@ export default async function AdminBrandsPage() {
         )}
       </section>
 
+      {ctx.isSuperAdmin && (
       <section className="rounded-2xl border border-dashed border-white/15 bg-black/20 p-4">
         <p className="text-sm font-semibold">Add a new brand</p>
         <p className="mt-1 text-xs text-white/60">
@@ -68,6 +76,7 @@ export default async function AdminBrandsPage() {
         </p>
         <CreateBrandForm />
       </section>
+      )}
     </div>
   );
 }

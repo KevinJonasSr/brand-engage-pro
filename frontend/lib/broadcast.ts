@@ -17,6 +17,7 @@ export type BroadcastResult = {
 async function loadRecipients(opts: {
   brandSlug?: string | null;
   eventId?: string | null;
+  memberIds?: string[] | null;
   channel: "email" | "sms";
 }) {
   const admin = createAdminClient();
@@ -53,11 +54,31 @@ async function loadRecipients(opts: {
     .not(contactColumn, "is", null);
 
   if (scopedIds) query = query.in("id", scopedIds);
+  // Optional narrower audience (for example a tier filter chosen by an admin).
+  if (opts.memberIds) {
+    if (opts.memberIds.length === 0) return [];
+    query = query.in("id", opts.memberIds);
+  }
 
   const { data, error } = await query;
 
   if (error) throw error;
-  return (data ?? []) as Array<{
+
+  // A brand admin suspends a member per brand (membership status), not
+  // globally. Leave those members out of that brand's blasts.
+  let rows = data ?? [];
+  if (opts.brandSlug && rows.length > 0) {
+    const { data: suspended, error: suspendedError } = await admin
+      .from("member_community_memberships")
+      .select("member_id")
+      .eq("community_id", opts.brandSlug)
+      .eq("status", "suspended");
+    if (suspendedError) throw suspendedError;
+    const blocked = new Set((suspended ?? []).map((m) => m.member_id as string));
+    rows = rows.filter((r) => !blocked.has(r.id as string));
+  }
+
+  return rows as Array<{
     id: string;
     first_name: string | null;
     email: string | null;
@@ -70,6 +91,7 @@ export async function broadcastSms(params: {
   body: string;
   brandSlug?: string | null;
   eventId?: string | null;
+  memberIds?: string[] | null;
 }): Promise<BroadcastResult> {
   const result: BroadcastResult = { attempted: 0, sent: 0, failed: 0, recipients: 0 };
 
@@ -84,6 +106,7 @@ export async function broadcastSms(params: {
   const recipients = await loadRecipients({
     brandSlug: params.brandSlug,
     eventId: params.eventId,
+    memberIds: params.memberIds,
     channel: "sms",
   });
   result.recipients = recipients.length;

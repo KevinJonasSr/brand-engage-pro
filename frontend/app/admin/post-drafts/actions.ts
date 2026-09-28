@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAdminContext, getAdminUser } from "@/lib/admin";
+import { canAccessBrand, getAdminContext } from "@/lib/admin";
 import {
   generateBrandPostDraft,
   type DraftContext,
@@ -14,16 +14,12 @@ async function requireAdminBrand(): Promise<{
   userId: string;
 }> {
   const ctx = await getAdminContext();
-  const user = await getAdminUser();
-  if (!ctx || !user) redirect("/login");
-  const brandSlug =
-    (ctx as unknown as { brandSlug?: string }).brandSlug ??
-    (ctx as unknown as { brand_slug?: string }).brand_slug ??
-    (ctx as unknown as { communityId?: string }).communityId ??
-    (ctx as unknown as { activeBrandSlug?: string }).activeBrandSlug ??
-    "";
-  if (!brandSlug) redirect("/admin");
-  return { brandSlug, userId: user.id };
+  if (!ctx) redirect("/login");
+  // The admin's current brand, validated against their grants. Super-admins
+  // pick a brand in the community switcher first.
+  const brandSlug = ctx.currentCommunityId ?? "";
+  if (!brandSlug || !canAccessBrand(ctx, brandSlug)) redirect("/admin");
+  return { brandSlug, userId: ctx.user.id };
 }
 
 export async function generateAction() {

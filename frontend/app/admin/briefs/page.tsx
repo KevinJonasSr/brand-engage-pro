@@ -6,7 +6,9 @@
  * with the most recent expanded by default.
  */
 
+import { notFound } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getAdminContext } from "@/lib/admin";
 import type { AdminBriefMetrics } from "@/lib/admin-brief";
 
 export const dynamic = "force-dynamic";
@@ -23,6 +25,9 @@ interface BriefRow {
 }
 
 export default async function AdminBriefsPage() {
+  // admin_briefs are platform-wide (no brand column), so owners only.
+  const ctx = await getAdminContext();
+  if (!ctx?.isSuperAdmin) notFound();
   const admin = createAdminClient();
   const { data, error } = await admin
     .from("admin_briefs")

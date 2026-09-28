@@ -58,9 +58,8 @@ export default function BroadcastPage() {
       </header>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Brand slug — hidden, pulled from admin context server-side.
-            For super-admins this could be a picker; for single-brand it's fixed. */}
-        <input type="hidden" name="brand_slug" value="nellies" />
+        {/* No brand field: the server sends to the admin's current brand
+            (picked in the community switcher) and checks access. */}
 
         {/* Tier filter */}
         <fieldset className="space-y-2">

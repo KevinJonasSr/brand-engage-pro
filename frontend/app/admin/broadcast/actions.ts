@@ -1,7 +1,7 @@
 "use server";
 
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAdminContext } from "@/lib/admin";
+import { canAccessBrand, getAdminContext, requireAdminContext, requireBrandAccess } from "@/lib/admin";
 import { broadcastSms } from "@/lib/broadcast";
 
 export type BroadcastFormResult = {
@@ -25,7 +25,11 @@ export async function sendBroadcast(
   const ctx = await getAdminContext();
   if (!ctx) return { ok: false, error: "Unauthorized" };
 
-  const brandSlug = String(formData.get("brand_slug") ?? "").trim();
+  // The brand comes from the admin's current brand (the community switcher),
+  // not a hard-coded form value. An explicit form value is still checked below.
+  const brandSlug =
+    String(formData.get("brand_slug") ?? "").trim() ||
+    (ctx.currentCommunityId ?? "").trim();
   const message = String(formData.get("message") ?? "").trim();
   const tierFilter = String(formData.get("tier_filter") ?? "all");
   const channelRaw = String(formData.get("channel") ?? "sms");
@@ -43,8 +47,8 @@ export async function sendBroadcast(
     };
   }
 
-  // If single-brand admin, ensure they only broadcast to their own brand
-  if (!ctx.isSuperAdmin && !ctx.communities.includes(brandSlug)) {
+  // Brand admins may only broadcast to their own brand.
+  if (!canAccessBrand(ctx, brandSlug)) {
     return { ok: false, error: "You can only broadcast to your own brand." };
   }
 
@@ -81,7 +85,12 @@ export async function sendBroadcast(
       ? ""
       : `[${tierFilter[0].toUpperCase() + tierFilter.slice(1)}+ members] `;
 
-  const result = await broadcastSms({ body: tierLabel + message, brandSlug });
+  // allowedMemberIds is null for "all", so the whole brand audience is used.
+  const result = await broadcastSms({
+    body: tierLabel + message,
+    brandSlug,
+    memberIds: allowedMemberIds,
+  });
   const smsSent = result.sent;
 
   // Record in campaigns table for audit trail
@@ -90,6 +99,7 @@ export async function sendBroadcast(
     .from("campaigns")
     .insert({
       brand_slug: brandSlug,
+      community_id: brandSlug,
       title: `Broadcast: ${message.slice(0, 60)}${message.length > 60 ? "…" : ""}`,
       description: `Tier: ${tierFilter} · Channel: sms`,
       created_by: ctx.user.id,
@@ -120,6 +130,9 @@ export async function previewRecipientCount(
   brandSlug: string,
   tierFilter: string,
 ): Promise<number> {
+  // Server actions are public endpoints: check the caller before counting.
+  const ctx = await requireAdminContext();
+  requireBrandAccess(ctx, brandSlug);
   const admin = createAdminClient();
 
   // Get members who follow this brand

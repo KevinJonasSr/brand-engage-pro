@@ -3,6 +3,7 @@ import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentCommunityId } from "@/lib/community";
+import { AdminScopeError, adminScope } from "@/lib/admin-scope";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────
@@ -99,8 +100,11 @@ export async function getAdminContext(): Promise<AdminContext | null> {
     currentCommunityId = communities[0];
   } else if (communities.length > 1) {
     const jar = await cookies();
+    const picked = jar.get(ACTIVE_ADMIN_COMMUNITY_COOKIE)?.value ?? null;
+    // Never trust the cookie alone: a brand admin can only land on a
+    // brand they hold a grant for.
     currentCommunityId =
-      jar.get(ACTIVE_ADMIN_COMMUNITY_COOKIE)?.value ?? communities[0];
+      picked && communities.includes(picked) ? picked : communities[0];
   }
 
   // Pick highest role for current community (owner > admin > editor > viewer).
@@ -173,6 +177,48 @@ export async function getAdminUser(): Promise<User | null> {
  */
 export async function getAdminCommunityId(): Promise<string> {
   const ctx = await getAdminContext();
-  if (ctx?.currentCommunityId) return ctx.currentCommunityId;
+  if (!ctx) throw new AdminScopeError();
+  // Brand admins: always their own validated brand, never a host fallback.
+  if (!ctx.isSuperAdmin) return adminScope(ctx) as string;
+  if (ctx.currentCommunityId) return ctx.currentCommunityId;
   return getCurrentCommunityId();
+}
+
+export {
+  ADMIN_FORBIDDEN,
+  AdminScopeError,
+  adminScope,
+  canAccessBrand,
+  inScope,
+  requireBrandAccess,
+  requireSuperAdmin,
+  resolveWriteBrand,
+} from "@/lib/admin-scope";
+
+/**
+ * Admin context for server actions and API routes. Throws AdminScopeError
+ * ("Forbidden") when the caller is not an admin. Pair it with the scoping
+ * helpers above; never check admin access inline.
+ */
+export async function requireAdminContext(): Promise<AdminContext> {
+  const ctx = await getAdminContext();
+  if (!ctx) throw new AdminScopeError();
+  return ctx;
+}
+
+/**
+ * Brand filter for admin pages: null for super-admins (all brands), the
+ * admin's own brand otherwise. Returns undefined when the caller is not an
+ * admin or has no usable brand, so the page can render nothing.
+ */
+export async function getAdminPageScope(): Promise<
+  { ctx: AdminContext; scope: string | null } | undefined
+> {
+  const ctx = await getAdminContext();
+  if (!ctx) return undefined;
+  try {
+    return { ctx, scope: adminScope(ctx) };
+  } catch {
+    return undefined;
+  }
 }

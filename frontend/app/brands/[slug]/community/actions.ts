@@ -4,11 +4,29 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAdminUser } from "@/lib/admin";
+import { canAccessBrand, getAdminContext } from "@/lib/admin";
 
 import { findNearestPost } from "@/lib/dedup/check";
 import { moderateRowAsync } from "@/lib/moderation";
 type Visibility = "public" | "premium" | "founder-only";
+
+/**
+ * True when this admin may act on the post, based on the post's stored
+ * brand. Super-admins may act on any post.
+ */
+async function adminCanActOnPost(
+  ctx: NonNullable<Awaited<ReturnType<typeof getAdminContext>>>,
+  postId: string,
+): Promise<boolean> {
+  if (ctx.isSuperAdmin) return true;
+  const { data } = await createAdminClient()
+    .from("community_posts")
+    .select("brand_slug")
+    .eq("id", postId)
+    .maybeSingle();
+  const brand = (data as { brand_slug: string | null } | null)?.brand_slug;
+  return canAccessBrand(ctx, brand);
+}
 
 async function requireUser() {
   const supabase = await createClient();
@@ -58,6 +76,7 @@ export async function createPostAction(formData: FormData) {
   const { data: created } = await supabase
     .from("community_posts").insert({
     brand_slug: brandSlug,
+    community_id: brandSlug,
     author_id: userId,
     kind: "post",
     body,
@@ -156,10 +175,12 @@ export async function deletePostAction(formData: FormData) {
   if (!postId || !brandSlug) return;
 
   const { supabase, userId } = await requireUser();
-  const adminUser = await getAdminUser();
+  const ctx = await getAdminContext();
 
-  // Author can delete own; admin can delete any (via service-role client).
-  if (adminUser) {
+  // Author can delete own. An admin can delete any post in a brand they
+  // manage (via service-role client); the brand check uses the stored row,
+  // not the form value.
+  if (ctx && (await adminCanActOnPost(ctx, postId))) {
     const admin = createAdminClient();
     await admin.from("community_posts").delete().eq("id", postId);
   } else {
@@ -177,8 +198,9 @@ export async function deletePostAction(formData: FormData) {
 
 export async function createPollAction(formData: FormData) {
   // Admin only — regular members can't create polls in Phase 2a.
-  const adminUser = await getAdminUser();
-  if (!adminUser) return;
+  const ctx = await getAdminContext();
+  if (!ctx) return;
+  const adminUser = ctx.user;
 
   const brandSlug = String(formData.get("brand_slug") ?? "").trim();
   const body = String(formData.get("body") ?? "").trim();
@@ -189,11 +211,15 @@ export async function createPollAction(formData: FormData) {
     .filter((o) => o.length > 0);
   if (!brandSlug || !body || options.length < 2 || options.length > 6) return;
 
+  // Brand admins may only post into their own brand.
+  if (!canAccessBrand(ctx, brandSlug)) return;
+
   const admin = createAdminClient();
   const { data: post } = await admin
     .from("community_posts")
     .insert({
       brand_slug: brandSlug,
+      community_id: brandSlug,
       author_id: adminUser.id,
       kind: "poll",
       body,
@@ -241,8 +267,9 @@ export async function votePollAction(formData: FormData) {
 // ─── Phase 2a: challenges ─────────────────────────────────────────────────
 
 export async function createChallengeAction(formData: FormData) {
-  const adminUser = await getAdminUser();
-  if (!adminUser) return;
+  const ctx = await getAdminContext();
+  if (!ctx) return;
+  const adminUser = ctx.user;
 
   const brandSlug = String(formData.get("brand_slug") ?? "").trim();
   const body = String(formData.get("body") ?? "").trim();
@@ -250,9 +277,13 @@ export async function createChallengeAction(formData: FormData) {
   const visibility = normalizeVisibility(formData.get("visibility"));
   if (!brandSlug || !body) return;
 
+  // Brand admins may only post into their own brand.
+  if (!canAccessBrand(ctx, brandSlug)) return;
+
   const admin = createAdminClient();
   await admin.from("community_posts").insert({
     brand_slug: brandSlug,
+    community_id: brandSlug,
     author_id: adminUser.id,
     kind: "challenge",
     title: title || null,
@@ -286,8 +317,9 @@ export async function submitEntryAction(formData: FormData) {
 // ─── Phase 2a: announcements ──────────────────────────────────────────────
 
 export async function createAnnouncementAction(formData: FormData) {
-  const adminUser = await getAdminUser();
-  if (!adminUser) return;
+  const ctx = await getAdminContext();
+  if (!ctx) return;
+  const adminUser = ctx.user;
 
   const brandSlug = String(formData.get("brand_slug") ?? "").trim();
   const body = String(formData.get("body") ?? "").trim();
@@ -302,9 +334,13 @@ export async function createAnnouncementAction(formData: FormData) {
   const videoUrl = normalizeUrl(videoUrlRaw);
   const videoPosterUrl = normalizeUrl(videoPosterUrlRaw);
 
+  // Brand admins may only post into their own brand.
+  if (!canAccessBrand(ctx, brandSlug)) return;
+
   const admin = createAdminClient();
   await admin.from("community_posts").insert({
     brand_slug: brandSlug,
+    community_id: brandSlug,
     author_id: adminUser.id,
     kind: "announcement",
     title: title || null,
@@ -326,8 +362,9 @@ export async function togglePinAction(formData: FormData) {
   const currentlyPinned = String(formData.get("currently_pinned") ?? "false") === "true";
   if (!postId || !brandSlug) return;
 
-  const adminUser = await getAdminUser();
-  if (!adminUser) return;
+  const ctx = await getAdminContext();
+  if (!ctx) return;
+  if (!(await adminCanActOnPost(ctx, postId))) return;
 
   const admin = createAdminClient();
   await admin

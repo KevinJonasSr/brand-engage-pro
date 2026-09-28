@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAdminUser } from "@/lib/admin";
+import { canAccessBrand, getAdminContext } from "@/lib/admin";
 import { resolveAndAwardPrediction } from "@/lib/predictions/resolve";
 import type {
   AwardStrategy,
@@ -43,10 +43,15 @@ interface ActionResult<T = unknown> {
 export async function createPredictionAction(
   formData: FormData,
 ): Promise<ActionResult<{ postId: string }>> {
-  const adminUser = await getAdminUser();
-  if (!adminUser) return { ok: false, error: "unauthorized" };
+  const ctx = await getAdminContext();
+  if (!ctx) return { ok: false, error: "unauthorized" };
+  const adminUser = ctx.user;
 
   const brandSlug = String(formData.get("brandSlug") ?? "").trim();
+  // Brand admins may only create predictions for their own brand.
+  if (brandSlug && !canAccessBrand(ctx, brandSlug)) {
+    return { ok: false, error: "forbidden" };
+  }
   const prediction_type = String(formData.get("prediction_type") ?? "") as PredictionType;
   const title = String(formData.get("title") ?? "").trim();
   const body = String(formData.get("body") ?? "").trim() || null;
@@ -265,11 +270,25 @@ export async function votePredictionAction(
 export async function resolvePredictionAction(
   formData: FormData,
 ): Promise<ActionResult<{ winners: number; pointsAwarded: number }>> {
-  const adminUser = await getAdminUser();
-  if (!adminUser) return { ok: false, error: "unauthorized" };
+  const ctx = await getAdminContext();
+  if (!ctx) return { ok: false, error: "unauthorized" };
+  const adminUser = ctx.user;
 
   const postId = String(formData.get("postId") ?? "").trim();
   if (!postId) return { ok: false, error: "missing_post" };
+
+  // Resolving awards points, so a brand admin may only resolve their own
+  // brand's predictions. Look the post up before any award runs.
+  const { data: scopePost } = await createAdminClient()
+    .from("community_posts")
+    .select("brand_slug")
+    .eq("id", postId)
+    .maybeSingle();
+  const scopeBrand = (scopePost as { brand_slug: string | null } | null)
+    ?.brand_slug;
+  if (!scopePost || !canAccessBrand(ctx, scopeBrand)) {
+    return { ok: false, error: "forbidden" };
+  }
 
   const correct_option_id =
     String(formData.get("correct_option_id") ?? "").trim() || undefined;

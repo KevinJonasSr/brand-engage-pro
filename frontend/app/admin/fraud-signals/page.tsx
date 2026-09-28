@@ -2,9 +2,9 @@
  * /admin/fraud-signals (BEP) — admin queue for AI-flagged member accounts.
  */
 
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAdminUser } from "@/lib/admin";
+import { getAdminContext } from "@/lib/admin";
 import { dismissFraudSignalAction, confirmFraudSignalAction } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -35,8 +35,10 @@ interface EvidenceShape {
 }
 
 export default async function FraudSignalsPage() {
-  const user = await getAdminUser();
-  if (!user) redirect("/login");
+  const ctx = await getAdminContext();
+  if (!ctx) redirect("/login");
+  // fraud_signals has no brand column, so this queue is owners only.
+  if (!ctx.isSuperAdmin) notFound();
 
   const admin = createAdminClient();
 

@@ -1,16 +1,21 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getAdminPageScope } from "@/lib/admin";
 import { deactivateCampaignAction } from "./actions";
 
 export const dynamic = "force-dynamic";
 
-async function loadCampaigns() {
+async function loadCampaigns(scope: string | null) {
   const admin = createAdminClient();
-  const { data: campaigns } = await admin
+  let query = admin
     .from("campaigns")
     .select("id,brand_slug,title,description,published_at,ends_at,created_at")
     .order("created_at", { ascending: false })
     .limit(100);
+  // Brand admins see only their own brand's campaigns.
+  if (scope) query = query.eq("brand_slug", scope);
+  const { data: campaigns } = await query;
 
   if (!campaigns || campaigns.length === 0) return [];
 
@@ -70,7 +75,9 @@ function itemBadge(kind: string, count: number) {
 }
 
 export default async function AdminCampaignsPage() {
-  const campaigns = await loadCampaigns();
+  const access = await getAdminPageScope();
+  if (!access) redirect("/login?next=/admin/campaigns");
+  const campaigns = await loadCampaigns(access.scope);
 
   return (
     <div className="space-y-6">

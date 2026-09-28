@@ -6,7 +6,7 @@
 
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAdminContext } from "@/lib/admin";
+import { canAccessBrand, getAdminContext } from "@/lib/admin";
 import type { SegmentFilter, SegmentRow } from "@/lib/segments";
 import {
   createSegmentAction,
@@ -19,13 +19,8 @@ export const dynamic = "force-dynamic";
 export default async function AdminSegmentsPage() {
   const ctx = await getAdminContext();
   if (!ctx) redirect("/login");
-  const brandSlug =
-    (ctx as unknown as { brandSlug?: string }).brandSlug ??
-    (ctx as unknown as { brand_slug?: string }).brand_slug ??
-    (ctx as unknown as { communityId?: string }).communityId ??
-    (ctx as unknown as { activeBrandSlug?: string }).activeBrandSlug ??
-    "";
-  if (!brandSlug) redirect("/admin");
+  const brandSlug = ctx.currentCommunityId ?? "";
+  if (!brandSlug || !canAccessBrand(ctx, brandSlug)) redirect("/admin");
 
   const admin = createAdminClient();
   const { data, error } = await admin

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAdminUser } from "@/lib/admin";
+import { getAdminPageScope } from "@/lib/admin";
 import {
   approveAction,
   hideAction,
@@ -44,29 +44,34 @@ const SEVERITY_TONE: Record<number, string> = {
 };
 
 export default async function AdminModerationPage() {
-  const adminUser = await getAdminUser();
-  if (!adminUser) redirect("/login");
+  const access = await getAdminPageScope();
+  if (!access) redirect("/login");
+  const { scope } = access;
 
   const admin = createAdminClient();
 
-  const [postsRes, commentsRes] = await Promise.all([
-    admin
+  let postsQ = admin
       .from("community_posts")
       .select(
         "id, brand_slug, body, title, moderation_status, moderation_severity, moderation_categories, moderation_reason, moderation_self_harm, moderation_classified_at, created_at, duplicate_of",
       )
       .in("moderation_status", ["flag_review", "auto_hide"])
       .order("moderation_classified_at", { ascending: false, nullsFirst: false })
-      .limit(100),
-    admin
+      .limit(100);
+  let commentsQ = admin
       .from("community_comments")
       .select(
         "id, post_id, body, moderation_status, moderation_severity, moderation_categories, moderation_reason, moderation_self_harm, moderation_classified_at, created_at, community_posts!inner(brand_slug)",
       )
       .in("moderation_status", ["flag_review", "auto_hide"])
       .order("moderation_classified_at", { ascending: false, nullsFirst: false })
-      .limit(100),
-  ]);
+      .limit(100);
+  // Brand admins see only their own brand's queue.
+  if (scope) {
+    postsQ = postsQ.eq("brand_slug", scope);
+    commentsQ = commentsQ.eq("community_posts.brand_slug", scope);
+  }
+  const [postsRes, commentsRes] = await Promise.all([postsQ, commentsQ]);
 
   const posts: QueueRow[] = (postsRes.data ?? []).map((p) => ({
     source_table: "community_posts" as const,

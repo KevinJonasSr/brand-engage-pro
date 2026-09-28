@@ -137,6 +137,7 @@ export async function sendEventReminder(
 
   await admin.from("event_reminders").insert({
     event_id: event.id,
+    community_id: event.brand_slug,
     kind,
     recipients_sms: smsResult.sent,
     recipients_email: emailResult.sent,

@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getAdminPageScope } from "@/lib/admin";
 
 type MemberRow = {
   id: string;
@@ -9,9 +10,40 @@ type MemberRow = {
   created_at: string;
 };
 
+type MembershipRow = {
+  total_points: number | null;
+  current_tier: string | null;
+  joined_at: string;
+  members: { id: string; email: string | null; first_name: string | null } | null;
+};
+
 async function listTopMembers(limit = 50): Promise<MemberRow[]> {
+  const access = await getAdminPageScope();
+  if (!access) return [];
   try {
     const admin = createAdminClient();
+    if (access.scope) {
+      // Brand admins see only members of their own brand, ranked by the
+      // points they earned in that brand.
+      const { data } = await admin
+        .from("member_community_memberships")
+        .select(
+          "total_points,current_tier,joined_at,members!inner(id,email,first_name)",
+        )
+        .eq("community_id", access.scope)
+        .order("total_points", { ascending: false })
+        .limit(limit);
+      return ((data ?? []) as unknown as MembershipRow[])
+        .filter((m) => m.members)
+        .map((m) => ({
+          id: m.members!.id,
+          email: m.members!.email,
+          first_name: m.members!.first_name,
+          current_tier: m.current_tier ?? "bronze",
+          total_points: m.total_points ?? 0,
+          created_at: m.joined_at,
+        }));
+    }
     const { data } = await admin
       .from("members")
       .select("id,email,first_name,current_tier,total_points,created_at")

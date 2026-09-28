@@ -1,22 +1,25 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAdminUser } from "@/lib/admin";
+import {
+  adminScope,
+  requireAdminContext,
+  resolveWriteBrand,
+} from "@/lib/admin";
 import type { OfferCategory, TierSlug } from "@/lib/data/types";
 
 const CATEGORIES: OfferCategory[] = ["merch", "experience", "collectible", "digital", "ticket"];
 const TIERS: TierSlug[] = ["bronze", "silver", "gold", "platinum"];
 
-async function requireAdmin() {
-  const admin = await getAdminUser();
-  if (!admin) redirect("/login?next=/admin");
-  return admin;
-}
-
 export async function createOfferAction(formData: FormData) {
-  await requireAdmin();
+  const ctx = await requireAdminContext();
+  // Every offer belongs to a brand. Brand admins always write to their own
+  // brand; super-admins must pick one. Never fall back to the DB default.
+  const communityId = resolveWriteBrand(
+    ctx,
+    String(formData.get("community_id") ?? ""),
+  );
 
   const title = String(formData.get("title") ?? "").trim();
   const slug = String(formData.get("slug") ?? "").trim();
@@ -38,6 +41,7 @@ export async function createOfferAction(formData: FormData) {
 
   const admin = createAdminClient();
   await admin.from("offers").insert({
+    community_id: communityId,
     title,
     slug,
     description: description || null,
@@ -60,16 +64,18 @@ export async function createOfferAction(formData: FormData) {
  * once the upload completes.
  */
 export async function updateOfferImageAction(formData: FormData) {
-  await requireAdmin();
+  const scope = adminScope(await requireAdminContext());
   const id = String(formData.get("id") ?? "");
   const imageUrl = String(formData.get("image_url") ?? "").trim();
   if (!id) return;
 
   const admin = createAdminClient();
-  await admin
+  let query = admin
     .from("offers")
     .update({ image_url: imageUrl || null })
     .eq("id", id);
+  if (scope) query = query.eq("community_id", scope);
+  await query;
 
   revalidatePath("/admin/offers");
   revalidatePath("/marketplace");
@@ -77,13 +83,15 @@ export async function updateOfferImageAction(formData: FormData) {
 }
 
 export async function toggleOfferActiveAction(formData: FormData) {
-  await requireAdmin();
+  const scope = adminScope(await requireAdminContext());
   const id = String(formData.get("id") ?? "");
   const active = String(formData.get("active") ?? "true") === "true";
   if (!id) return;
 
   const admin = createAdminClient();
-  await admin.from("offers").update({ active }).eq("id", id);
+  let query = admin.from("offers").update({ active }).eq("id", id);
+  if (scope) query = query.eq("community_id", scope);
+  await query;
 
   revalidatePath("/admin/offers");
   revalidatePath("/marketplace");
