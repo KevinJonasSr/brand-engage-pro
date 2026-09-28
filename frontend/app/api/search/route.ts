@@ -21,7 +21,7 @@ export const dynamic = "force-dynamic";
  * meaningfully, and we want fresh moderation/visibility filters.
  */
 export async function GET(request: NextRequest) {
-  const rl = apiRateLimiter.check(getClientIp(request.headers));
+  const rl = await apiRateLimiter.check(getClientIp(request.headers));
   if (!rl.success) {
     return NextResponse.json(
       { error: "Too many search requests. Please try again later." },

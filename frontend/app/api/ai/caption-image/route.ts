@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const rl = apiRateLimiter.check(user.id);
+  const rl = await apiRateLimiter.check(user.id);
   if (!rl.success) {
     return NextResponse.json(
       { error: "Too many requests. Please try again shortly." },

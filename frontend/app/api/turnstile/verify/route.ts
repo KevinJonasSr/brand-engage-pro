@@ -15,7 +15,7 @@ function failOpenResponse(reason: string, detail?: unknown) {
 
 export async function POST(request: NextRequest) {
   const ip = getClientIp(request.headers);
-  const rl = authRateLimiter.check(ip ?? "unknown");
+  const rl = await authRateLimiter.check(ip ?? "unknown");
   if (!rl.success) {
     return NextResponse.json({ success: false, error: "rate_limited" }, { status: 429 });
   }

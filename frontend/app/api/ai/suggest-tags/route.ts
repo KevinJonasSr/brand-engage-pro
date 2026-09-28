@@ -5,7 +5,9 @@
  * Returns: { tags: string[] }
  *
  * Auth: requires logged-in member (auth.getUser via server client).
- * Rate limit: 1 call / 1.5s per user, in-memory.
+ * Rate limit: 1 call / 1.5s per user, in-memory. This is a typing debounce,
+ * not abuse protection, so it stays per instance instead of using the shared
+ * limiter in lib/rate-limit.ts.
  */
 
 import { NextResponse } from "next/server";

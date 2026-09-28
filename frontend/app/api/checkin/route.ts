@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const rl = apiRateLimiter.check(user.id);
+  const rl = await apiRateLimiter.check(user.id);
   if (!rl.success) {
     return NextResponse.json(
       { error: "Too many requests. Please try again shortly." },
