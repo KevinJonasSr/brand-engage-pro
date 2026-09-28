@@ -305,7 +305,7 @@ describe("guest surfaces", () => {
       "utf8",
     );
     const nellies = brands.slice(brands.indexOf("nellies:"));
-    const block = nellies.slice(0, nellies.indexOf("bailee:"));
+    const block = nellies.slice(0, nellies.indexOf("\n};"));
     assert.match(block, /Bourbon & Cigar Night/);
     assert.match(block, /September 23/);
     assert.match(block, /Private Dining Room/);
@@ -348,7 +348,7 @@ describe("guest surfaces", () => {
     for (const file of files) {
       const source = readFileSync(file, "utf8");
       const nelliesBlock = file.endsWith("brands.ts")
-        ? source.slice(source.indexOf("nellies:"), source.indexOf("bailee:"))
+        ? source.slice(source.indexOf("nellies:"), source.indexOf("\n};", source.indexOf("nellies:")))
         : source;
       assert.doesNotMatch(
         nelliesBlock,
