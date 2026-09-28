@@ -1,27 +1,22 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { PreferencesForm, type Prefs } from "./preferences-form";
+import { smsTierAllowed } from "@/lib/sms-send-gate";
+import { getTiers } from "@/lib/data/tiers";
+import { PreferencesForm } from "./preferences-form";
+import { DEFAULT_PREFS, TOGGLE_KEYS, type Prefs } from "./prefs";
 
 export const metadata = { title: "Notifications" };
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-const DEFAULTS: Prefs = {
-  push_enabled: false,
-  sms_enabled: false,
-  notify_new_post: true,
-  notify_event_match: true,
-  notify_comment_on_my_post: true,
-  notify_redemption: true,
-  notify_drops: true,
-  notify_rsvp_confirmation: true,
-  notify_predictions: true,
-  notify_anniversaries: true,
-  notify_leaderboard: true,
-  notify_weekly_digest: true,
-};
+const PREFS_SELECT = [...TOGGLE_KEYS, "quiet_start", "quiet_end"].join(", ");
+
+// Postgres time comes back as 'HH:MM:SS'; <input type="time"> wants 'HH:MM'.
+function toHhMm(value: unknown): string | null {
+  return typeof value === "string" && value.length >= 5 ? value.slice(0, 5) : null;
+}
 
 export default async function NotificationPreferencesPage() {
   const supabase = await createClient();
@@ -30,48 +25,43 @@ export default async function NotificationPreferencesPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/me/notifications");
 
-  // Try fan_id first (FE), fall back to member_id (BEP).
-  let prefs: Prefs = DEFAULTS;
-  let foundRow = false;
-  const select =
-    "push_enabled, sms_enabled, " +
-    "notify_new_post, notify_event_match, notify_comment_on_my_post, " +
-    "notify_redemption, notify_drops, notify_rsvp_confirmation, " +
-    "notify_predictions, notify_anniversaries, notify_leaderboard, notify_weekly_digest";
-  for (const col of ["fan_id", "member_id"]) {
-    const { data, error } = await supabase
+  const [{ data: row }, { data: pushSubs }, { data: member }, tiers] = await Promise.all([
+    supabase
       .from("notification_preferences")
-      .select(select)
-      .eq(col, user.id)
-      .maybeSingle();
-    if (!error && data) {
-      prefs = { ...DEFAULTS, ...(data as Partial<Prefs>) } as Prefs;
-      foundRow = true;
-      break;
-    }
-  }
+      .select(PREFS_SELECT)
+      .eq("member_id", user.id)
+      .maybeSingle(),
+    supabase
+      .from("push_subscriptions")
+      .select("endpoint")
+      .eq("member_id", user.id)
+      .limit(1),
+    supabase
+      .from("members")
+      .select("phone, current_tier, total_points")
+      .eq("id", user.id)
+      .maybeSingle(),
+    getTiers(),
+  ]);
 
-  // Channel availability hint: did the user actually wire up push/sms?
-  const { data: pushSubs } = await supabase
-    .from("push_subscriptions")
-    .select("endpoint")
-    .or(`fan_id.eq.${user.id},member_id.eq.${user.id}`)
-    .limit(1);
+  const stored = row as Partial<Record<string, unknown>> | null;
+  const prefs: Prefs = stored
+    ? {
+        ...DEFAULT_PREFS,
+        ...(stored as Partial<Prefs>),
+        quiet_start: toHhMm(stored.quiet_start),
+        quiet_end: toHhMm(stored.quiet_end),
+      }
+    : DEFAULT_PREFS;
+
   const hasPush = !!(pushSubs && pushSubs.length > 0);
   const hasEmail = !!user.email;
+  const hasSms = !!member?.phone;
 
-  let hasSms = false;
-  for (const tbl of ["fans", "members"]) {
-    const { data: r } = await supabase
-      .from(tbl)
-      .select("phone")
-      .eq("id", user.id)
-      .maybeSingle();
-    if (r && (r as { phone?: string }).phone) {
-      hasSms = true;
-      break;
-    }
-  }
+  const smsAllowed = smsTierAllowed(member?.current_tier as string | null);
+  const goldMin = tiers.find((t) => t.slug === "gold")?.min_points ?? 0;
+  const ptsToGold = Math.max(0, goldMin - (Number(member?.total_points) || 0));
+  const smsCopy = `Reach Gold tier (${ptsToGold.toLocaleString("en-US")} pts to go) to unlock SMS alerts.`;
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-10 sm:py-14">
@@ -98,9 +88,14 @@ export default async function NotificationPreferencesPage() {
         </p>
       </header>
 
-      <PreferencesForm initial={prefs} hadRow={foundRow} />
+      <PreferencesForm
+        initial={prefs}
+        hadRow={!!stored}
+        smsAllowed={smsAllowed}
+        smsCopy={smsCopy}
+      />
 
-      <p className="mt-8 text-xs text-white/40">
+      <p className="mt-8 text-xs text-white/50">
         We never sell your data. You can unsubscribe from emails at any
         time via the link at the bottom of any email.
       </p>
@@ -121,7 +116,7 @@ function ChannelChip({
         "inline-flex items-center rounded-full border px-2 py-0.5 text-xs " +
         (available
           ? "border-emerald-400/30 text-emerald-300"
-          : "border-white/10 text-white/40")
+          : "border-white/10 text-white/50")
       }
       title={available ? `${label} is set up` : `${label} is not set up`}
     >
