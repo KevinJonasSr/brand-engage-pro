@@ -16,8 +16,9 @@
 --   lock the redemption row, require status 'pending', optionally require it
 --   to belong to the caller's community, mark it cancelled, write exactly one
 --   ledger row for the stored point_cost (no multiplier), then add the same
---   amount back to members.total_points and the brand membership total.
---   This mirrors what redeem_reward() takes away.
+--   amount back to members.total_points and the brand membership total,
+--   and put one unit back on limited stock. This mirrors what
+--   redeem_reward() takes away.
 --
 -- Prod check 2026-09-27: 0 redemptions, 0 refund ledger rows, so the refund
 -- unique index below builds cleanly.
@@ -74,6 +75,13 @@ begin
   update public.reward_redemptions
      set status = 'cancelled', cancelled_at = now()
    where id = p_redemption_id;
+
+  -- Put the unit back. redeem_reward() takes one off limited stock, so the
+  -- cancel gives it back; unlimited rewards (stock is null) are untouched.
+  update public.rewards_catalog
+     set stock = stock + 1
+   where id = v_redemption.reward_id
+     and stock is not null;
 
   if v_redemption.point_cost > 0 then
     insert into public.points_ledger (member_id, delta, source, source_ref, community_id, note)

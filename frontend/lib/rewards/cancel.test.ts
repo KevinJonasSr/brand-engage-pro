@@ -49,6 +49,13 @@ describe("0060 cancel_redemption", () => {
     assert.match(sqlBody, /public\.bump_membership_points\(\s*v_redemption\.member_id, v_community, v_redemption\.point_cost/);
   });
 
+  it("puts one unit of limited stock back", () => {
+    assert.match(
+      sqlBody,
+      /update public\.rewards_catalog\s+set stock = stock \+ 1\s+where id = v_redemption\.reward_id\s+and stock is not null/,
+    );
+  });
+
   it("allows only one refund row per redemption", () => {
     assert.match(
       migration,
