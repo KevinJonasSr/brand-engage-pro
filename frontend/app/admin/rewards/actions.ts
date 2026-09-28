@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getAdminContext } from "@/lib/admin";
 import { redirect } from "next/navigation";
 import { cancelRedemption } from "@/lib/rewards/cancel";
+import { markRedemptionFulfilled } from "@/lib/rewards/fulfill";
 
 export async function createRewardAction(formData: FormData) {
   const ctx = await getAdminContext();
@@ -121,20 +122,19 @@ export async function markFulfilledAction(redemptionId: string, fulfillmentNote:
   const ctx = await getAdminContext();
   if (!ctx) redirect("/login");
 
-  const supabase = createAdminClient();
-  const { error } = await supabase
-    .from("reward_redemptions")
-    .update({
-      status: "fulfilled",
-      fulfillment_note: fulfillmentNote || null,
-      fulfilled_at: new Date().toISOString(),
-    })
-    .eq("id", redemptionId);
-
-  if (error) {
-    return { error: error.message };
+  // Super admins may fulfill in any brand; everyone else only in their own.
+  const scope = ctx.isSuperAdmin ? null : ctx.currentCommunityId;
+  if (!ctx.isSuperAdmin && !scope) {
+    return { error: "Unauthorized" };
   }
 
+  const result = await markRedemptionFulfilled(
+    createAdminClient(),
+    redemptionId,
+    fulfillmentNote,
+    scope,
+  );
+  if (result.error) return { error: result.error };
   return { success: true };
 }
 
