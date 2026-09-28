@@ -93,7 +93,7 @@ export default async function PremiumPage({
     { icon: "💬", title: "Member Q&A", body: "Live Q&A with the brand — ask anything." },
     { icon: "🏆", title: "Premium badges", body: "The full status ladder — Silver, Gold, Platinum, and event badges." },
     { icon: "⚡", title: "1.5× points", body: "Every member action earns 1.5× more toward rewards." },
-    { icon: "💸", title: "$5/mo store credit", body: "Refreshed monthly — spend on merch, events, or bank it up." },
+    { icon: "💸", title: "$5 monthly store credit", body: "$5 store credit added every month. Spending it is coming soon." },
     { icon: "🎧", title: "VIP events", body: "Member-only events and previews reserved for Premium." },
   ];
 
