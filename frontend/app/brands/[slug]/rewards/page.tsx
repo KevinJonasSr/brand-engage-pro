@@ -74,8 +74,8 @@ export default async function RewardsPage({
               <>
                 Join Nellie&apos;s and earn points from visits and check-ins. You also get free
                 dessert with an entrée when you join, 1,500 bonus points after three visits, and a
-                birthday entrée up to $30. Bourbon &amp; Cigar Night is September 23 at 7:00 PM ET
-                in the Private Dining Room.
+                birthday entrée up to $30. Daily specials and upcoming events are on the
+                Nellie&apos;s page.
               </>
             ) : (
               <>
@@ -138,7 +138,7 @@ export default async function RewardsPage({
                 <>
                   Nellie&apos;s member offers are on the Nellie&apos;s page: a welcome dessert with an
                   entrée when you join, 1,500 bonus points after three visits, a birthday entrée up
-                  to $30, and Bourbon &amp; Cigar Night on September 23. Earn points from visits and
+                  to $30, plus daily specials and upcoming events. Earn points from visits and
                   check-ins.
                 </>
               ) : (

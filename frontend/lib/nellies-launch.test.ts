@@ -24,6 +24,9 @@ import {
   shouldAwardThreeVisitBonus,
 } from "./nellies-launch.ts";
 
+const BEFORE_BOURBON_ENDS = new Date("2026-09-20T00:00:00.000Z");
+const AFTER_BOURBON_ENDS = new Date("2026-09-28T00:00:00.000Z");
+
 describe("Nellie's Jackie launch fixture", () => {
   it("publishes Jackie’s three titles/slugs and not merch SKUs", () => {
     assert.deepEqual(NELLIES_PUBLISHED_OFFER_TITLES, [
@@ -213,7 +216,7 @@ describe("Bourbon & Cigar Night", () => {
         title: "Happy Hour — 50% Off Appetizers",
         active: true,
       },
-    ]);
+    ], BEFORE_BOURBON_ENDS);
     assert.equal(events.length, 1);
     assert.equal(events[0].title, "Bourbon & Cigar Night");
     assert.equal(events[0].date, NELLIES_BOURBON_WHEN);
@@ -222,6 +225,36 @@ describe("Bourbon & Cigar Night", () => {
     assert.doesNotMatch(events[0].detail, /rooftop/i);
     assert.doesNotMatch(events[0].location, /rooftop/i);
     assert.equal(events[0].startsAt, NELLIES_BOURBON_STARTS_AT);
+  });
+
+  it("stops pinning Bourbon once it has ended and shows DB events instead", () => {
+    const events = applyNelliesLaunchEvents(
+      "nellies",
+      [
+        { id: "b", title: "Bourbon & Cigar Night", active: true },
+        { id: "h", title: "Happy Hour — 50% Off Appetizers", active: true },
+        {
+          id: "o",
+          title: "Oyster Roast",
+          detail: "Fresh oysters.",
+          event_date: "Thursday, October 22",
+          starts_at: "2026-10-22T22:00:00.000Z",
+          url: "https://www.eventbrite.com/e/1998696261321",
+          tier: "public",
+          active: true,
+        },
+        { id: "p", title: "Past Party", starts_at: "2026-09-01T22:00:00.000Z", active: true },
+        { id: "i", title: "Trunk or Treat", active: false },
+      ],
+      AFTER_BOURBON_ENDS,
+    );
+    assert.deepEqual(
+      events.map((e) => e.title),
+      ["Oyster Roast"],
+    );
+    assert.equal(events[0].url, "https://www.eventbrite.com/e/1998696261321");
+    assert.equal(events[0].tier, "public");
+    assert.equal(events[0].startsAt, "2026-10-22T22:00:00.000Z");
   });
 
   it("drops rooftop extras from the signed-out Latest strip", () => {
@@ -262,6 +295,44 @@ describe("Bourbon & Cigar Night", () => {
   });
 });
 
+describe("launch content after Bourbon", () => {
+  it("lets new specials show after Jackie’s three, including rooftop and happy hour titles", () => {
+    const shown = applyNelliesLaunchSpecials("nellies", [
+      { id: "m", title: "Teachers & First Responders 10% Off", tier: "public", points_required: null },
+      { id: "x", title: "Happy Hour — 50% Off Appetizers", tier: "public", points_required: null },
+      { id: "a", title: "Half-Price Apps on the Rooftop", tier: "public", points_required: null },
+      { id: "d", title: "Free Dessert w/ Entree", tier: "public", points_required: null },
+    ]);
+    assert.deepEqual(
+      shown.map((s) => s.title),
+      [
+        ...NELLIES_PUBLISHED_OFFER_TITLES,
+        "Teachers & First Responders 10% Off",
+        "Half-Price Apps on the Rooftop",
+      ],
+    );
+  });
+
+  it("still hides the old titles by exact name", () => {
+    for (const title of NELLIES_HIDDEN_TITLES) {
+      assert.equal(isNelliesHiddenTitle(title), true, title);
+    }
+    assert.equal(isNelliesHiddenTitle("Howl-O-Ween After-Pawty"), false);
+    assert.equal(isNelliesHiddenTitle("Rooftop Oyster Roast"), false);
+  });
+
+  it("passes new events through the Latest strip", () => {
+    const cards = filterNelliesLaunchLatestCards("nellies", [
+      { kind: "event", title: "Rooftop Karaoke Night", when: "in 2d", ts: "2026-10-01T23:00:00.000Z" },
+      { kind: "event", title: "Oyster Roast", when: "in 3w", ts: "2026-10-22T22:00:00.000Z" },
+    ]);
+    assert.deepEqual(
+      cards.map((c) => c.title),
+      ["Oyster Roast"],
+    );
+  });
+});
+
 describe("guest surfaces", () => {
   it("keeps Jackie specials as non-SKU info cards", () => {
     const specials = jackieLaunchSpecials();
@@ -269,17 +340,16 @@ describe("guest surfaces", () => {
     assert.ok(specials.every((s) => s.points_required === null));
   });
 
-  it("ships a real /events page (not a 404) with Jackie + Bourbon date", () => {
+  it("ships a real /events page (not a 404) with Jackie’s offers and DB events", () => {
     const eventsPage = readFileSync(
       fileURLToPath(new URL("../app/events/page.tsx", import.meta.url)),
       "utf8",
     );
     assert.match(eventsPage, /NELLIES_PUBLISHED_OFFERS/);
-    assert.match(eventsPage, /Bourbon & Cigar Night/);
-    assert.match(eventsPage, /September 23/);
-    assert.match(eventsPage, /NELLIES_BOURBON_WHEN|7:00 PM ET/);
-    assert.match(eventsPage, /NELLIES_BOURBON_LOCATION|Private Dining Room/);
-    assert.doesNotMatch(eventsPage, /Rooftop/);
+    assert.match(eventsPage, /brand\?\.upcoming/);
+    assert.match(eventsPage, /Get tickets/);
+    assert.match(eventsPage, /rel="noopener noreferrer"/);
+    assert.doesNotMatch(eventsPage, /September 23/);
     assert.match(eventsPage, /Sign in to RSVP/);
     assert.match(eventsPage, /Join to RSVP/);
     assert.match(eventsPage, /\/login\?next=/);
@@ -291,7 +361,8 @@ describe("guest surfaces", () => {
       fileURLToPath(new URL("../app/brands/[slug]/page.tsx", import.meta.url)),
       "utf8",
     );
-    assert.match(brandPage, /jackieLaunchSpecials|NELLIES_PUBLISHED_OFFERS/);
+    assert.match(brandPage, /listSpecialsForBrand/);
+    assert.match(brandPage, /const guestSpecials = specials;/);
     assert.match(brandPage, /NELLIES_BRAND_SLUG/);
     assert.match(brandPage, /Sign in to RSVP/);
     assert.match(brandPage, /Join to RSVP/);

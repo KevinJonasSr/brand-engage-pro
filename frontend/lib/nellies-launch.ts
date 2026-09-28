@@ -5,7 +5,8 @@
  * They display on the brand page as specials; grants happen on join,
  * 3rd check-in, and birthday-month redeem.
  *
- * Launch set: those three + Bourbon & Cigar Night. Do not expand.
+ * Jackie's three always show first. After them, active DB specials and
+ * upcoming DB events show too, unless they are on the hide list below.
  */
 
 export const NELLIES_BRAND_SLUG = "nellies";
@@ -184,7 +185,6 @@ const HIDDEN_PATTERNS: RegExp[] = [
   /hallway/,
   /reserved booth/,
   /livebooth/,
-  /happy hour/,
   /biscuit making/,
   /music row/,
   /complimentary dessert/,
@@ -192,17 +192,23 @@ const HIDDEN_PATTERNS: RegExp[] = [
   /seasonal menu/,
   /branded merch/,
   /recipe card set/,
-  /rooftop/,
   /del webb/,
   /karaoke/,
 ];
 
+const HIDDEN_TITLE_KEYS = new Set(NELLIES_HIDDEN_TITLES.map(fold));
+
+/**
+ * Old titles are hidden by exact name, plus a few narrow patterns. Broad
+ * words like "rooftop" and "happy hour" are no longer blocked, so new
+ * specials such as the rooftop apps deal can be published.
+ */
 export function isNelliesHiddenTitle(title: string): boolean {
   if (isNelliesPublishedOfferTitle(title) || isBourbonCigarTitle(title)) {
     return false;
   }
   const t = fold(title);
-  return HIDDEN_PATTERNS.some((re) => re.test(t));
+  return HIDDEN_TITLE_KEYS.has(t) || HIDDEN_PATTERNS.some((re) => re.test(t));
 }
 
 export function shouldAwardThreeVisitBonus(
@@ -270,8 +276,9 @@ export function jackieLaunchSpecials(): LaunchSpecial[] {
 
 /**
  * Guest brand page reads specials, not catalog.active. Always return
- * Jackie's three as info cards (0 pt / not SKUs). Prefer matching DB
+ * Jackie's three first as info cards (0 pt / not SKUs). Prefer matching DB
  * rows only for stable ids — never copy point_cost from a 1-pt SKU.
+ * Other active DB specials follow in their own sort order, minus hidden ones.
  */
 export function applyNelliesLaunchSpecials<T extends { title: string; id: string }>(
   brandSlug: string,
@@ -282,10 +289,14 @@ export function applyNelliesLaunchSpecials<T extends { title: string; id: string
   }
   const seeded = jackieLaunchSpecials();
   const slots: Array<T | LaunchSpecial> = [...seeded];
+  const extras: T[] = [];
   for (const row of rows) {
     if (isNelliesHiddenTitle(row.title)) continue;
     const index = jackieOfferIndexForTitle(row.title);
-    if (index < 0) continue;
+    if (index < 0) {
+      if (!isBourbonCigarTitle(row.title)) extras.push(row);
+      continue;
+    }
     const seed = seeded[index];
     slots[index] = {
       ...row,
@@ -298,7 +309,7 @@ export function applyNelliesLaunchSpecials<T extends { title: string; id: string
       tier: "public",
     } as T;
   }
-  return slots;
+  return [...slots, ...extras];
 }
 
 export type LaunchEvent = {
@@ -340,8 +351,10 @@ export function applyNelliesLaunchEvents<
     starts_at?: string | null;
     event_starts_at?: string | null;
     capacity?: number | null;
+    url?: string | null;
+    tier?: string | null;
   },
->(brandSlug: string, rows: T[]): LaunchEvent[] {
+>(brandSlug: string, rows: T[], now: Date = new Date()): LaunchEvent[] {
   if (brandSlug.toLowerCase() !== NELLIES_BRAND_SLUG) {
     return rows
       .filter((row) => row.active !== false)
@@ -353,6 +366,33 @@ export function applyNelliesLaunchEvents<
         location: row.location ?? "",
         capacity: row.capacity ?? null,
       }));
+  }
+  const nowMs = now.getTime();
+  const upcoming = rows
+    .filter((row) => row.active !== false)
+    .filter((row) => !isBourbonCigarTitle(row.title))
+    .filter((row) => !isNelliesHiddenTitle(row.title))
+    .filter((row) => {
+      const start = row.starts_at ?? row.event_starts_at;
+      return !start || new Date(start).getTime() >= nowMs;
+    })
+    .map(
+      (row): LaunchEvent => ({
+        id: row.id,
+        title: row.title,
+        detail: row.detail ?? "",
+        date: row.event_date ?? "",
+        location: row.location ?? "",
+        startsAt: row.starts_at ?? row.event_starts_at ?? null,
+        capacity: row.capacity ?? null,
+        url: row.url ?? null,
+        tier: row.tier === "premium" ? "premium" : "public",
+        active: true,
+      }),
+    );
+  // Bourbon & Cigar Night stays pinned only until it ends.
+  if (new Date(NELLIES_BOURBON_ENDS_AT).getTime() <= nowMs) {
+    return upcoming;
   }
   const match = rows.find((row) => isBourbonCigarTitle(row.title));
   const copy = resolveBourbonGuestCopy({
@@ -372,6 +412,7 @@ export function applyNelliesLaunchEvents<
       endsAt: NELLIES_BOURBON_ENDS_AT,
       capacity: copy.capacity,
     },
+    ...upcoming,
   ];
 }
 
@@ -385,8 +426,8 @@ export type LaunchLatestCard = {
 };
 
 /**
- * LatestStrip queries brand_events directly. Drop extra rooftop recurrences;
- * stamp Bourbon with PDR, Sept 23 · 7:00 PM ET, cap 40.
+ * LatestStrip queries brand_events directly. Drop hidden titles; stamp
+ * Bourbon with PDR, Sept 23 · 7:00 PM ET, cap 40. Other events pass through.
  */
 export function filterNelliesLaunchLatestCards<T extends LaunchLatestCard>(
   brandSlug: string,
@@ -398,7 +439,6 @@ export function filterNelliesLaunchLatestCards<T extends LaunchLatestCard>(
   const out: T[] = [];
   for (const card of cards) {
     if (isNelliesHiddenTitle(card.title)) continue;
-    if (card.kind === "event" && !isBourbonCigarTitle(card.title)) continue;
     if (isBourbonCigarTitle(card.title)) {
       const copy = resolveBourbonGuestCopy({
         location: card.location,
