@@ -30,11 +30,11 @@ export default async function MarketplacePage() {
           <PreviewSignupBanner
             eyebrow="🛍️ Brand rewards"
             headline="Join to unlock brand rewards"
-            body="Earn points after you join, then redeem on each brand’s rewards page. Nellie's Jackie launch: free dessert with entrée on join, 1,500 bonus points after 3 visits, birthday entrée up to $30. Bourbon & Cigar Night — September 23, 7:00 PM ET, Private Dining Room."
+            body="Earn points after you join, then use them on each brand’s rewards page. At Nellie's: free dessert with an entrée when you join, 1,500 bonus points after 3 visits, and a birthday entrée up to $30. Bourbon & Cigar Night is September 23 at 7:00 PM ET in the Private Dining Room."
             bullets={[
-              "Ladder: Bronze → Platinum from points you earn after joining",
-              "Founding = free first 100 · Premium = separate paid club",
-              "Live unlocks sit on each brand page — this list is stocked catalog only",
+              "Move up from Bronze to Platinum as you earn points",
+              "The first 100 members of each brand join as Founders for free. Premium is a separate paid membership.",
+              "Each brand page shows its current offers. This page lists rewards you can use points on.",
             ]}
             primaryCta="Sign up free →"
             nextPath="/marketplace"
@@ -48,8 +48,8 @@ export default async function MarketplacePage() {
             Brand rewards
           </h1>
           <p className="mt-4 text-sm text-white/70">
-            Catalog items you can redeem with points you earn after joining. Jackie launch
-            perks and digital unlocks live on each{" "}
+            Rewards you can get with the points you earn. Welcome offers and other member
+            perks are on each{" "}
             <Link href={brandRewardsHref} className="text-aurora underline underline-offset-2">
               brand rewards
             </Link>{" "}
@@ -65,18 +65,18 @@ export default async function MarketplacePage() {
             <p className="mt-3 text-sm text-white/60">
               {communityId.toLowerCase() === NELLIES_BRAND_SLUG ? (
                 <>
-                  Nellie&apos;s Jackie launch perks (welcome dessert, 1,500 pts after 3 visits,
-                  birthday entrée, Bourbon &amp; Cigar Night) live on the brand page — they are
-                  not catalog SKUs. Jonas Group Entertainment lists member rewards (signed lyric
-                  sheets, catalog vinyl) on its brand rewards page.
+                  Nellie&apos;s member offers (welcome dessert, 1,500 bonus points after 3 visits,
+                  birthday entrée, Bourbon &amp; Cigar Night) are on the Nellie&apos;s page. Jonas
+                  Group Entertainment lists its member rewards, like signed lyric sheets and
+                  vinyl, on its rewards page.
                 </>
               ) : (
                 <>
-                  Check each brand&apos;s rewards page for live redeemables and digital unlocks.
-                  Nellie&apos;s Jackie launch perks sit on the brand page; JGE lists member
-                  rewards on{" "}
+                  Check each brand&apos;s rewards page for rewards you can use points on.
+                  Nellie&apos;s member offers are on the Nellie&apos;s page. Jonas Group
+                  Entertainment lists its member rewards on{" "}
                   <Link href="/brands/jonas-group-ent/rewards" className="text-aurora underline underline-offset-2">
-                    /brands/jonas-group-ent/rewards
+                    its rewards page
                   </Link>
                   .
                 </>

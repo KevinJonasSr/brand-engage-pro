@@ -101,28 +101,20 @@ export default async function BrandPage({
 
   const heroGradient = `linear-gradient(to bottom right, ${brand.accentFrom}66, #0f172a, #000000)`;
 
-  // Brand-type-aware premium paywall copy. Restaurants get food/drink
-  // language; music/entertainment brands get listening-party / drop
-  // language; everything else gets generic member-club copy.
+  // Brand-type-aware premium paywall copy. Restaurants get food and drink
+  // language; everything else gets plain member-club copy.
   const isRestaurant = brand.genres.some((g) =>
     ["Restaurants", "Hospitality", "Southern", "Soul food", "Family-style"].includes(g),
   );
-  const isMusic = brand.genres.some((g) =>
-    ["Music & Entertainment", "Country", "Pop", "Rock", "Americana", "Indie"].includes(g),
-  );
   const premiumDescriptionForBrand = {
     specials: isRestaurant
-      ? "Premium members get access to off-menu specials, member-only pours, and the small-batch stuff we don\u2019t put on the regular menu."
-      : isMusic
-        ? "Premium members get access to limited drops, member-only releases, and the behind-the-scenes recordings we don\u2019t put out everywhere else."
-        : "Premium members get access to member-only perks, exclusive drops, and the things we save for the inner circle.",
+      ? "Premium members get off-menu specials, member-only pours, and small-batch dishes we don\u2019t put on the regular menu."
+      : "Premium members get member-only perks and first access to new offers.",
     events: isRestaurant
-      ? "Premium members get access to intimate member events, early RSVPs, and behind-the-scenes-only moments."
+      ? "Premium members get small member events, early RSVPs, and behind-the-scenes moments."
       : slug === JGE_BRAND_SLUG
-        ? "Premium is a separate paid membership. Live JGE access is the house tour, early writer/artist listens, and capped rotating live sessions."
-        : isMusic
-          ? "Premium members get access to member-only sessions, early RSVPs, and backstage-only moments."
-          : "Premium members get access to member-only events, early RSVPs, and behind-the-scenes-only moments.",
+        ? "Premium is a separate paid membership. It includes the Music Row house tour, early listens from our writers and artists, and a limited number of live sessions."
+        : "Premium members get member-only events, early RSVPs, and behind-the-scenes moments.",
   };
   const ctaGradient = `linear-gradient(to right, ${brand.accentFrom}, ${brand.accentTo})`;
 
@@ -346,13 +338,13 @@ export default async function BrandPage({
         brandSlug={slug}
         viewerMemberId={member?.id ?? null}
         />
-      {/* Jackie launch perks — fixture, not 1-pt catalog SKUs. Always
-          render for Nellie's so guests see the three even if specials
-          rows are still the old fried-chicken / premium-teaser set. */}
+      {/* Nellie's member offers come from a hardcoded list in
+          lib/nellies-launch.ts (jackieLaunchSpecials), not the specials
+          table. Moving them into admin is a follow-up. */}
       {guestSpecials.length > 0 && (
         <section id="offers" className="glass-card p-8 scroll-mt-24">
           <p className="text-sm uppercase tracking-wide text-white/60">
-            {isNellies ? "Launch offers" : "Specials"}
+            {isNellies ? "Member offers" : "Specials"}
           </p>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             {guestSpecials.map((s) => {

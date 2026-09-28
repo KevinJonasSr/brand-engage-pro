@@ -81,12 +81,12 @@ export default async function RewardsPage() {
           {!isSignedIn && (
             <PreviewSignupBanner
               eyebrow="🎁 Member rewards"
-              headline="Join free — earn from real visits"
-              body="New members start at 0 and earn from visits, check-ins, and community. Nellie's Jackie launch: free dessert with entrée on join · 1,500 pts after 3 visits · birthday entrée up to $30. Bourbon & Cigar Night — September 23, 7:00 PM ET (Private Dining Room)."
+              headline="Join free and earn from real visits"
+              body="New members start at 0 points and earn from visits, check-ins, and the community. At Nellie's: free dessert with an entrée when you join, 1,500 bonus points after 3 visits, and a birthday entrée up to $30. Bourbon & Cigar Night is September 23 at 7:00 PM ET in the Private Dining Room."
               bullets={[
                 "+100 welcome points after you finish your profile",
-                "Ladder: Bronze → Platinum · Founding = free first 100 · Premium = separate paid",
-                "Nellie's Jackie launch: dessert on join · 1,500 pts after 3 visits · birthday entrée",
+                "Move up from Bronze to Platinum as you earn points",
+                "At Nellie's: dessert when you join, 1,500 bonus points after 3 visits, and a birthday entrée",
               ]}
               primaryCta="Sign up free →"
               nextPath="/rewards"
@@ -107,23 +107,23 @@ export default async function RewardsPage() {
               {isSignedIn && nextTier ? (
                 <>
                   Keep earning points to unlock {nextTier.display_name} loyalty perks.
-                  Higher loyalty tiers recognize regulars — redeem food and drink rewards on each brand&apos;s rewards page.
+                  Higher tiers recognize regulars. Use your points on food and drink rewards on each brand&apos;s rewards page.
                 </>
               ) : isSignedIn ? (
-                <>You&apos;ve reached the top of the points ladder. Keep checking in and redeeming brand rewards.</>
+                <>You&apos;ve reached the top tier. Keep checking in and using your points on brand rewards.</>
               ) : (
                 <>
-                  Loyalty tiers (Bronze → Platinum) come from points you earn after joining.
-                  Separate from paid club membership (Premium / Founding) — that&apos;s a different badge on specials and events.
+                  Your tier, from Bronze up to Platinum, comes from the points you earn after joining.
+                  Premium and Founder memberships are separate. They show up as their own badge on specials and events.
                 </>
               )}
             </p>
             <p className="mt-3 text-xs text-white/50">
-              Ladder: Bronze → Silver → Gold → Platinum (points from visits). Founding = free
-              first 100 who join. Premium is a separate paid club. Join Nellie&apos;s, earn from visits and
-              check-ins, then Jackie&apos;s welcome dessert, 1,500 pts after 3 visits, and birthday
-              entrée. Bourbon &amp; Cigar Night is September 23, 7:00 PM ET in the Private Dining
-              Room. We don&apos;t list empty Gold/Platinum redeemables.
+              Tiers go Bronze, Silver, Gold, then Platinum as you earn points from visits. The first
+              100 members of each brand join as Founders for free. Premium is a separate paid
+              membership. At Nellie&apos;s, you earn from visits and check-ins, and you also get a
+              welcome dessert, 1,500 bonus points after 3 visits, and a birthday entrée. Bourbon
+              &amp; Cigar Night is September 23 at 7:00 PM ET in the Private Dining Room.
             </p>
             <div className="mt-8 space-y-4">
               <div className="flex items-center justify-between text-sm text-white/70">

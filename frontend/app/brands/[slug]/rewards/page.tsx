@@ -72,21 +72,22 @@ export default async function RewardsPage({
           <p className="mt-2 text-sm text-white/60">
             {isNellies ? (
               <>
-                Join Nellie&apos;s and earn points from visits and check-ins. Jackie launch: free
-                dessert with entrée when you join, 1,500 bonus points after three visits, and a
-                birthday entrée up to $30. Bourbon &amp; Cigar Night is September 23, 7:00 PM ET
+                Join Nellie&apos;s and earn points from visits and check-ins. You also get free
+                dessert with an entrée when you join, 1,500 bonus points after three visits, and a
+                birthday entrée up to $30. Bourbon &amp; Cigar Night is September 23 at 7:00 PM ET
                 in the Private Dining Room.
               </>
             ) : (
               <>
-                Earn points from visits and check-ins, then redeem live brand rewards.
-                Digital unlocks and member perks for this club live here.
+                Earn points from visits and check-ins, then use them on the rewards below.
+                Member perks for this brand are listed here too.
               </>
             )}
           </p>
           <p className="mt-2 text-xs text-white/45">
-            Ladder: Bronze → Platinum (points). Founding = free first 100. Premium = separate paid.
-            specials. Your balance starts at 0 after you join.
+            Move up from Bronze to Platinum as you earn points. The first 100 members join as
+            Founders for free. Premium is a separate paid membership. Your balance starts at 0
+            when you join.
           </p>
         </div>
 
@@ -135,9 +136,10 @@ export default async function RewardsPage({
             <p className="text-sm text-white/60">
               {isNellies ? (
                 <>
-                  Jackie launch perks live on the brand page — welcome dessert with entrée when you
-                  join, 1,500 bonus points after three visits, birthday entrée up to $30, and
-                  Bourbon &amp; Cigar Night on September 23. Earn points from visits and check-ins.
+                  Nellie&apos;s member offers are on the Nellie&apos;s page: a welcome dessert with an
+                  entrée when you join, 1,500 bonus points after three visits, a birthday entrée up
+                  to $30, and Bourbon &amp; Cigar Night on September 23. Earn points from visits and
+                  check-ins.
                 </>
               ) : (
                 <>No rewards available yet. Check back soon!</>

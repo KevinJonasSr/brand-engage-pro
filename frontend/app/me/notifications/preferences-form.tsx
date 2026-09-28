@@ -40,7 +40,7 @@ const CHANNEL_ROWS: Array<{
     key: "sms_enabled",
     emoji: "📱",
     title: "SMS",
-    body: "Text messages for the most important updates (drops, anniversaries).",
+    body: "Text messages for the most important updates, like new offers and anniversaries.",
   },
 ];
 
@@ -53,8 +53,8 @@ const TYPE_ROWS: Array<{
   {
     key: "notify_drops",
     emoji: "🎁",
-    title: "Drops & releases",
-    body: "Limited-edition merch, exclusive drops, and surprise releases.",
+    title: "Offers & specials",
+    body: "Limited-time offers, member specials, and new rewards.",
   },
   {
     key: "notify_predictions",
@@ -84,7 +84,7 @@ const TYPE_ROWS: Array<{
     key: "notify_new_post",
     emoji: "📝",
     title: "New community posts",
-    body: "When a brand you follow drops a new community post.",
+    body: "When a brand you follow shares a new community post.",
   },
   {
     key: "notify_comment_on_my_post",

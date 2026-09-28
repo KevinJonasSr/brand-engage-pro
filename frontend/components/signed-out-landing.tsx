@@ -205,7 +205,7 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
             {
               n: "01",
               title: "Follow your brands",
-              body: "Pick the brands you love. You'll get their drops, events, polls, and challenges in one feed.",
+              body: "Pick the brands you love. You'll see their offers, events, polls, and challenges in one feed.",
               icon: <IconUsers />,
             },
             {
@@ -216,8 +216,8 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
             },
             {
               n: "03",
-              title: "Redeem what’s actually stocked",
-              body: "Points cash in for live brand rewards. Nellie's Jackie launch: dessert on join, 1,500 pts after 3 visits, birthday entrée. We don’t market empty Gold/Platinum SKUs.",
+              title: "Redeem real rewards",
+              body: "Use your points on rewards each brand has ready today. At Nellie's, that means free dessert when you join, 1,500 bonus points after 3 visits, and a birthday entrée.",
               icon: <IconGift />,
             },
           ].map((step) => (
@@ -263,7 +263,7 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
               {[
                 {
                   title: "Tier Journey",
-                  body: "Bronze → Platinum from points. Founding = free first 100. Premium is a separate paid club.",
+                  body: "Move up from Bronze to Platinum as you earn points. The first 100 members of each brand join as Founders for free. Premium is a separate paid membership.",
                   icon: <IconTrophy />,
                 },
                 {
@@ -277,8 +277,8 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
                   icon: <IconCalendar />,
                 },
                 {
-                  title: "Stocked rewards",
-                  body: "Jackie launch: free dessert with entrée on join, 1,500 pts after 3 visits, birthday entrée up to $30. New accounts start at 0 — no empty Gold/Platinum catalog.",
+                  title: "Real rewards",
+                  body: "At Nellie's: free dessert with an entrée when you join, 1,500 bonus points after 3 visits, and a birthday entrée up to $30. Everyone starts at 0 points.",
                   icon: <IconGift />,
                 },
               ].map((f) => (

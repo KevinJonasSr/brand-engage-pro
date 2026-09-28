@@ -177,7 +177,7 @@ export default async function Home({
                 <span>📅</span> Upcoming Events
               </p>
               <div className="rounded-2xl border border-dashed border-white/15 bg-black/20 p-6 text-center text-xs text-white/60">
-                No events scheduled yet. Brand drops and member events will show here.
+                No events scheduled yet. New offers and member events will show here.
               </div>
             </div>
             <div className="glass-card space-y-4 p-6">
@@ -186,7 +186,7 @@ export default async function Home({
               </p>
               {offers.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-white/15 bg-black/20 p-6 text-center text-xs text-white/60">
-                  No offers right now. Check back — new drops appear here automatically.
+                  No offers right now. New offers will show up here as soon as they go live.
                 </div>
               ) : (
                 offers.map((offer) => (

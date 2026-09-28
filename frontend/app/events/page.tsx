@@ -15,12 +15,12 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Events",
   description:
-    "Nellie's Southern Kitchen launch offers and Bourbon & Cigar Night — September 23, 7:00 PM ET.",
+    "Nellie's Southern Kitchen member offers and Bourbon & Cigar Night on September 23 at 7:00 PM ET.",
 };
 
 /**
  * Guest-visible events/offers surface so /events is not a 404.
- * Same Jackie launch set as /brands/nellies — do not expand.
+ * Same hardcoded Nellie's offer set as /brands/nellies (lib/nellies-launch.ts).
  */
 export default async function EventsPage() {
   const brand = await getBrandFromDb(NELLIES_BRAND_SLUG);
@@ -34,10 +34,10 @@ export default async function EventsPage() {
       <header className="space-y-2">
         <p className="text-sm uppercase tracking-wide text-white/60">Nellie&apos;s Southern Kitchen</p>
         <h1 className="text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
-          Launch offers &amp; events
+          Member offers &amp; events
         </h1>
         <p className="text-sm text-white/70">
-          Jackie&apos;s three member perks plus Bourbon &amp; Cigar Night.{" "}
+          Three member offers plus Bourbon &amp; Cigar Night.{" "}
           <Link href="/brands/nellies" className="text-aurora underline underline-offset-2">
             Open the Nellie&apos;s brand page
           </Link>
@@ -46,7 +46,7 @@ export default async function EventsPage() {
       </header>
 
       <section id="offers" className="glass-card space-y-4 p-6">
-        <p className="text-sm uppercase tracking-wide text-white/60">Launch offers</p>
+        <p className="text-sm uppercase tracking-wide text-white/60">Member offers</p>
         <ul className="space-y-4">
           {NELLIES_PUBLISHED_OFFERS.map((offer) => (
             <li key={offer.slug} className="rounded-2xl bg-black/30 p-5">

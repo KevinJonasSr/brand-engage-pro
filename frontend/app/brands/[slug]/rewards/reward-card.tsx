@@ -55,7 +55,7 @@ export default function RewardCardWithForm({
             {reward.requires_tier === "founder-only"
               ? "Founding"
               : reward.requires_tier === "premium"
-                ? "Premium (≈ Gold+)"
+                ? "Premium"
                 : reward.requires_tier}
           </div>
         )}

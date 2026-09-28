@@ -30,7 +30,7 @@ const TRIGGER_FIELDS: Array<{
   {
     key: "notify_new_post",
     label: "New post from a followed brand",
-    description: "Drops, announcements, photos.",
+    description: "New offers, announcements, and photos.",
   },
   {
     key: "notify_event_match",
@@ -49,8 +49,8 @@ const TRIGGER_FIELDS: Array<{
   },
   {
     key: "notify_drops",
-    label: "Limited-time drops & sales",
-    description: "Time-boxed rewards, exclusive merch.",
+    label: "Limited-time offers",
+    description: "Rewards and specials that are only around for a short time.",
   },
   {
     key: "notify_rsvp_confirmation",
