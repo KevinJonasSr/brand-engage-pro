@@ -93,7 +93,7 @@ export default async function PremiumPage({
     { icon: "💬", title: "Member Q&A", body: "Live Q&A with the brand — ask anything." },
     { icon: "🏆", title: "Premium badges", body: "The full status ladder — Silver, Gold, Platinum, and event badges." },
     { icon: "⚡", title: "1.5× points", body: "Every member action earns 1.5× more toward rewards." },
-    { icon: "💸", title: "$5/mo store credit", body: "Refreshed monthly — spend on merch, events, or bank it up." },
+    { icon: "💸", title: "$5 monthly store credit", body: "$5 store credit added every month. Spending it is coming soon." },
     { icon: "🎧", title: "VIP events", body: "Member-only events and previews reserved for Premium." },
   ];
 
@@ -334,8 +334,11 @@ export default async function PremiumPage({
         </section>
 
         <p className="mt-12 text-xs text-white/40">
-          Secure checkout via Stripe. Cancel anytime from your account
-          settings. Full refund within 7 days of purchase if you change your
+          Secure checkout via Stripe. Cancel anytime from{" "}
+          <Link href="/me/billing" className="underline hover:text-white/70">
+            Account, Billing
+          </Link>
+          . Full refund within 7 days of purchase if you change your
           mind.
         </p>
       </div>

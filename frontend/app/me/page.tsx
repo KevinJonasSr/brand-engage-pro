@@ -58,6 +58,11 @@ export default async function MeIndexPage() {
           body="Your shareable loyalty card — tier, points, and streak at a glance."
         />
         <Row
+          href="/me/billing"
+          title="Billing"
+          body="Manage Premium: update your card, see invoices, or cancel."
+        />
+        <Row
           href="/referrals"
           title="Referrals"
           body="Invite friends — earn points when they join."
