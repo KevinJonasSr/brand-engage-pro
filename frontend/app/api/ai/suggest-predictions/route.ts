@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAdminUser } from "@/lib/admin";
+import { canAccessBrand, getAdminContext } from "@/lib/admin";
 import { suggestPredictions } from "@/lib/ai/prediction-suggestions";
 import type { PredictionType } from "@/lib/predictions/types";
 
@@ -18,8 +18,8 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function POST(req: Request) {
-  const adminUser = await getAdminUser();
-  if (!adminUser) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const ctx = await getAdminContext();
+  if (!ctx) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   let body: {
     brandSlug?: string;
@@ -34,6 +34,9 @@ export async function POST(req: Request) {
 
   const brandSlug = (body.brandSlug ?? "").trim();
   if (!brandSlug) return NextResponse.json({ error: "missing_brand" }, { status: 400 });
+  if (!canAccessBrand(ctx, brandSlug)) {
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  }
 
   const types: PredictionType[] = Array.isArray(body.types)
     ? body.types.filter((t): t is PredictionType =>

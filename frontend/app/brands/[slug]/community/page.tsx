@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { listBrands } from "@/lib/brands";
 import { getBrandFromDb } from "@/lib/data/brands";
-import { getAdminUser } from "@/lib/admin";
+import { canAccessBrand, getAdminContext } from "@/lib/admin";
 import { getCurrentMember } from "@/lib/data/member";
 import { getActiveMemberActionsForBrand } from "@/lib/data/campaigns";
 import {
@@ -43,10 +43,10 @@ export default async function BrandCommunityPage({
   const brand = await getBrandFromDb(slug);
   if (!brand) notFound();
 
-  const [member, posts, adminUser, memberActions, entitlement] = await Promise.all([
+  const [member, posts, adminCtx, memberActions, entitlement] = await Promise.all([
     getCurrentMember(),
     getPostsByBrand(slug, 30),
-    getAdminUser(),
+    getAdminContext(),
     getActiveMemberActionsForBrand(slug),
     getViewerEntitlement(slug),
   ]);
@@ -67,7 +67,8 @@ export default async function BrandCommunityPage({
   ]);
 
   const isSignedIn = member !== null;
-  const isAdmin = adminUser !== null;
+  // Admin controls and the premium bypass apply only to admins of this brand.
+  const isAdmin = canAccessBrand(adminCtx, slug);
 
   const heroGradient = `linear-gradient(to bottom right, ${brand.accentFrom}40, #0f172a, #000000)`;
 
