@@ -13,7 +13,7 @@ import {
  * DropCountdown — live ticking pill that renders inside a reward card or
  * banner. Three visual states:
  *
- *   - Upcoming (drops_at > now)        → cyan/aurora "Drops in 2h 14m"
+ *   - Upcoming (drops_at > now)        → cyan/aurora "Starts in 2h 14m"
  *   - Live, normal (>1h remaining)     → amber "Ends in 11h 32m"
  *   - Live, final hour (≤1h remaining) → rose/red "47m 12s left"
  *   - Expired                          → dim "Expired" — caller usually
@@ -82,7 +82,7 @@ export default function DropCountdown({
         className={`inline-flex items-center gap-1.5 rounded-full border border-aurora/30 bg-aurora/10 px-2.5 py-1 text-xs font-semibold text-aurora ${className}`}
       >
         <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-aurora" aria-hidden />
-        Drops in {formatCountdown(secondsLeft)}
+        Starts in {formatCountdown(secondsLeft)}
       </span>
     );
   }

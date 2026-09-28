@@ -39,8 +39,10 @@ export async function finishAction(history: ChatMessage[]): Promise<void> {
   if (fields.city) updates.city = fields.city;
   if (fields.favorite_brand) updates.favorite_brand = fields.favorite_brand;
   if (fields.interest) updates.interest = fields.interest;
-  if (typeof fields.sms_opted_in === "boolean") {
-    updates.sms_opted_in = fields.sms_opted_in;
+  // A chat answer is not a ticked consent box, so chat can only turn texts
+  // off. Members opt in to texts only by ticking the box in the onboarding form.
+  if (fields.sms_opted_in === false) {
+    updates.sms_opted_in = false;
   }
 
   if (Object.keys(updates).length > 0) {

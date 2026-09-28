@@ -128,7 +128,7 @@ export default function PushOptInPrompt({
           </div>
           <div>
             <p className="text-sm font-semibold text-white">
-              Get the drop the second it lands
+              Hear about new offers right away
             </p>
             <p className="mt-0.5 text-xs text-white/70">
               Enable notifications to hear when a brand posts, opens an

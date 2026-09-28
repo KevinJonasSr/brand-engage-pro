@@ -32,9 +32,9 @@ describe("preview-theater copy hold", () => {
       assert.doesNotMatch(src, /not a real account/i, name);
       assert.doesNotMatch(src, /No stocked rewards yet/, name);
     }
-    assert.match(rewards, /Join free — earn from real visits/);
+    assert.match(rewards, /Join free and earn from real visits/);
     assert.match(marketplace, /Live unlocks are on brand pages/);
     assert.match(marketplace, /jonas-group-ent\/rewards/);
-    assert.match(referrals, /Invite friends — earn \+150 pts per signup/);
+    assert.match(referrals, /Invite friends and earn \+150 pts per signup/);
   });
 });

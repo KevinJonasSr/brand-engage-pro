@@ -90,8 +90,8 @@ function FollowedBrandsStrip({
       <div className="glass-card p-5">
         <p className="text-sm font-semibold">Follow your favorite brands</p>
         <p className="mt-2 text-xs text-white/60">
-          Tap an brand, hit <span className="text-white">+ Follow</span>, and you&apos;ll get
-          their posts, events, and drops here.
+          Tap a brand, hit <span className="text-white">+ Follow</span>, and you&apos;ll see
+          their posts, events, and offers here.
         </p>
         <Link
           href="/brands"

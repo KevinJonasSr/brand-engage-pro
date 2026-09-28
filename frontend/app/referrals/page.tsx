@@ -13,12 +13,14 @@ import {
   FIRST_SESSION_EYEBROW,
 } from "@/lib/first-session";
 
-// Restaurant loyalty milestones — no music leftovers (e.g. “VIP livestream”).
+// Only list what the app pays today: 150 points to the inviter for each
+// friend who finishes signup (REFERRAL_POINTS in the onboard route). There
+// are no badges or boosts for referral counts yet, so don't promise them.
 const ladder = [
   { level: "1 referral", reward: "+150 pts" },
-  { level: "3 referrals", reward: "Referral badge" },
-  { level: "5 referrals", reward: "Bonus point boost" },
-  { level: "10 referrals", reward: "Top-referrer recognition" },
+  { level: "3 referrals", reward: "+450 pts total" },
+  { level: "5 referrals", reward: "+750 pts total" },
+  { level: "10 referrals", reward: "+1,500 pts total" },
 ];
 
 async function buildInviteUrl(code: string | null | undefined): Promise<string> {
@@ -60,11 +62,11 @@ export default async function ReferralsPage() {
           {!isSignedIn && (
             <PreviewSignupBanner
               eyebrow="🎟️ Referrals"
-              headline="Invite friends — earn +150 pts per signup"
-              body="Create a free account to get your personal invite link. You earn +150 points for each friend who joins with it. New accounts start at 0 — no sample totals here."
+              headline="Invite friends and earn +150 pts per signup"
+              body="Create a free account to get your personal invite link. You earn +150 points for each friend who joins with it. Every account starts at 0 points."
               bullets={[
                 "+150 pts every verified signup",
-                "Milestones unlock badges as you go",
+                "Your points add up with every friend who joins",
                 "Share Nellie's or Jonas Group Entertainment with people you actually know",
               ]}
               primaryCta="Sign up to get my link →"

@@ -14,14 +14,27 @@ export type OnboardProfilePayload = {
   favoriteBrand?: string | null;
   interest?: string | null;
   referralCode?: string;
+  /** Legacy flag. Ignored unless smsConsent is also true. */
   smsOptedIn?: boolean;
+  /** True only when the member ticked the SMS consent box. */
+  smsConsent?: boolean;
   emailOptedIn?: boolean;
+  /** True only when the member ticked the Terms and Privacy box. */
+  tosConsent?: boolean;
+  /** Ignored. The server stamps the real consent time. */
   consentAcceptedAt?: string;
+  /** Ignored. The server records the current consent version. */
   consentVersion?: string;
   birthdayMonth?: number | string | null;
   /** True when Continue saves profile fields without completing onboarding. */
   draft?: boolean;
 };
+
+/** True only when the SMS box was ticked and a phone number was given. */
+export function hasSmsConsent(payload: OnboardProfilePayload): boolean {
+  const phone = typeof payload.phone === "string" ? payload.phone.trim() : "";
+  return payload.smsConsent === true && phone.length > 0;
+}
 
 export function isOnboardDraft(payload: {
   draft?: boolean;
@@ -150,7 +163,8 @@ export function wizardFormFromMember(
  */
 export function buildMemberProfileUpdates(
   payload: OnboardProfilePayload,
-  existingSocials?: Record<string, unknown> | null,
+  existingSocials: Record<string, unknown> | null | undefined,
+  consent: { version: string; now?: Date },
 ): Record<string, unknown> {
   const updates: Record<string, unknown> = {};
 
@@ -181,13 +195,14 @@ export function buildMemberProfileUpdates(
   }
 
   if (!isOnboardDraft(payload)) {
-    updates.sms_opted_in = Boolean(payload.smsOptedIn);
+    // SMS opt-in needs the ticked SMS box and a phone number. Never infer it.
+    updates.sms_opted_in = hasSmsConsent(payload);
     updates.email_opted_in = Boolean(payload.emailOptedIn);
-    if (payload.consentAcceptedAt) {
-      updates.consent_accepted_at = payload.consentAcceptedAt;
-    }
-    if (payload.consentVersion !== undefined) {
-      updates.consent_version = payload.consentVersion ?? null;
+    // Consent time is stamped here, on the server, at the moment the ticked
+    // box arrives. Client-supplied times and versions are never trusted.
+    if (payload.tosConsent === true) {
+      updates.consent_accepted_at = (consent.now ?? new Date()).toISOString();
+      updates.consent_version = consent.version;
     }
   }
 

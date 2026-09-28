@@ -1,82 +1,58 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { parseBrandApplication } from "@/lib/brand-application";
+import { verifyApplyTurnstile } from "@/lib/brand-apply-turnstile";
+import { brandApplyRateLimiter, getClientIp } from "@/lib/rate-limit";
+
+const APPLY_PATH = "/for-brands/apply";
 
 /**
  * Submit a brand application to public.applications.
  *
- * Public form, no auth — uses the admin client so the insert always
- * lands even when the visitor isn't signed in. RLS allows anon INSERT
- * either way; the admin client just bypasses any future tightening.
- *
- * Validates required fields server-side (the client form also enforces
- * but we treat that as UX, not security).
+ * Public form, no auth. Uses the admin client so the insert lands even when
+ * the visitor is not signed in. Because anyone can post here directly, the
+ * server enforces its own limits:
+ *   1. per-IP rate limit (5 per hour, in memory per instance)
+ *   2. optional Turnstile check, only when both keys are configured
+ *   3. field validation and length limits (lib/brand-application.ts)
  */
 export async function submitBrandApplicationAction(
   formData: FormData,
 ): Promise<void> {
-  const get = (k: string) => {
-    const v = formData.get(k);
-    return typeof v === "string" ? v.trim() : null;
-  };
-  const getBool = (k: string) => formData.get(k) === "on";
-  const getInt = (k: string) => {
-    const v = get(k);
-    if (!v) return null;
-    const n = parseInt(v, 10);
-    return Number.isFinite(n) ? n : null;
-  };
+  const ip = getClientIp(await headers());
 
-  const display_name = get("display_name");
-  const contact_name = get("contact_name");
-  const contact_email = get("contact_email");
-
-  if (!display_name || !contact_name || !contact_email) {
-    redirect("/for-brands/apply?error=missing-required");
+  if (!brandApplyRateLimiter.check(`brand-apply:${ip}`).success) {
+    redirect(`${APPLY_PATH}?error=rate-limited`);
   }
 
-  // Build social array from individual platform inputs the form submits.
-  const socialPairs: { label: string; href: string }[] = [];
-  for (const platform of [
-    "Instagram",
-    "Facebook",
-    "TikTok",
-    "YouTube",
-    "X",
-    "LinkedIn",
-  ]) {
-    const href = get(`social_${platform.toLowerCase()}`);
-    if (href) socialPairs.push({ label: platform, href });
+  const token = formData.get("cf-turnstile-response");
+  const humanOk = await verifyApplyTurnstile({
+    env: {
+      siteKey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+      secretKey: process.env.TURNSTILE_SECRET_KEY,
+    },
+    token: typeof token === "string" ? token : null,
+    ip,
+  });
+  if (!humanOk) {
+    redirect(`${APPLY_PATH}?error=verification-failed`);
+  }
+
+  const parsed = parseBrandApplication(formData);
+  if (!parsed.ok) {
+    redirect(`${APPLY_PATH}?error=${parsed.error}`);
   }
 
   const admin = createAdminClient();
-  const { error } = await admin.from("applications").insert({
-    display_name,
-    slug_suggestion: get("slug_suggestion"),
-    tagline: get("tagline"),
-    bio: get("bio"),
-    hero_image: get("hero_image"),
-    social: socialPairs,
-    contact_name,
-    contact_email,
-    contact_phone: get("contact_phone"),
-    category: get("category"),
-    location_count: getInt("location_count"),
-    primary_city: get("primary_city"),
-    years_in_business: getInt("years_in_business"),
-    monthly_transactions: getInt("monthly_transactions"),
-    loyalty_program_experience: get("loyalty_program_experience"),
-    has_street_team: getBool("has_street_team"),
-    expected_launch_date: get("expected_launch_date"),
-    referral_source: get("referral_source"),
-    community_pitch: get("community_pitch"),
-  });
+  const { error } = await admin.from("applications").insert(parsed.row);
 
   if (error) {
     console.error("submitBrandApplicationAction error:", error);
-    redirect("/for-brands/apply?error=submit-failed");
+    redirect(`${APPLY_PATH}?error=submit-failed`);
   }
 
-  redirect("/for-brands/apply/thanks");
+  redirect(`${APPLY_PATH}/thanks`);
 }

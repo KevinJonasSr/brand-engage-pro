@@ -39,21 +39,21 @@ export const NELLIES_PUBLISHED_OFFERS: readonly NelliesLaunchOffer[] = [
     slug: "nsk-free-dessert",
     title: "Free Dessert w/ Entree",
     description:
-      "Granted when you join — not a points redeemable. Complimentary dessert with an entrée. Show your member card.",
+      "Yours when you join, no points needed. Get a free dessert with any entrée. Just show your member card.",
     rule: "join-grant",
   },
   {
     slug: "nsk-3-visit-bonus",
     title: "1,500 Bonus Points",
     description:
-      "Awarded automatically after your third verified visit check-in — not a catalog SKU.",
+      "Added to your account automatically after you check in on your third visit.",
     rule: "third-checkin",
   },
   {
     slug: "nsk-birthday-entree",
     title: "Birthday Entree up to $30",
     description:
-      "Redeemable during your birthday month (entrée up to $30). Add your birthday month on your profile — not a 1-pt SKU.",
+      "Use it during your birthday month on an entrée up to $30. Add your birthday month to your profile to get it.",
     rule: "birthday-month",
   },
 ];

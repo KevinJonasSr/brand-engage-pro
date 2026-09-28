@@ -132,7 +132,7 @@ export default async function DropOpengraphImage({
           }}
         >
           <div style={{ maxWidth: 720 }}>
-            Members get first access to exclusive drops on Brand Engage Pro.
+            Members get first access to new offers on Brand Engage Pro.
           </div>
           <div
             style={{

@@ -55,8 +55,8 @@ export default async function InvitePage({
           {inviterName} invited you to Brand Engage Pro
         </h1>
         <p className="mt-4 text-sm text-white/75">
-          Join in under a minute — rewards, early drops, VIP experiences, and 150 bonus points
-          for you and {inviterName} once you finish signup.
+          Join in under a minute to earn points, get member rewards, and hear about new offers
+          first. When you finish signing up, {inviterName} gets 150 bonus points for inviting you.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link

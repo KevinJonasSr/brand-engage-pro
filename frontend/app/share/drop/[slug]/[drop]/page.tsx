@@ -83,7 +83,7 @@ export default async function DropSharePage({
           <p className="text-white/60 text-sm">from {brand.name}</p>
         </div>
         <p className="text-white/60 text-sm max-w-xs">
-          Premium members on Brand Engage Pro get first access to exclusive drops. Don&apos;t miss the next one.
+          Premium members on Brand Engage Pro get first access to new offers. Don&apos;t miss the next one.
         </p>
         <ShareButton
           title={shareTitle}
@@ -102,7 +102,7 @@ export default async function DropSharePage({
           Visit brand experience →
         </Link>
         <p className="text-xs text-white/30 max-w-xs text-center">
-          Unlock Premium to get first access to {brand.name}&apos;s drops on Brand Engage Pro.
+          Unlock Premium to get first access to {brand.name}&apos;s new offers on Brand Engage Pro.
         </p>
       </div>
     </main>

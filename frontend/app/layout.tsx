@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     template: "%s · Brand Engage Pro",
   },
   description:
-    "The member-loyalty platform. Follow the brands you love, earn points for every visit, and unlock real perks — exclusive drops, members-only events, and first access casual customers never get.",
+    "The member-loyalty platform. Follow the brands you love, earn points for every visit, and unlock real perks like member-only offers, member events, and early access.",
   applicationName: "Brand Engage Pro",
   keywords: [
     "member loyalty",

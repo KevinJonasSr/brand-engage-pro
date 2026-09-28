@@ -25,7 +25,13 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default function ApplyPage() {
+export default async function ApplyPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string | string[] }>;
+}) {
+  const { error } = await searchParams;
+  const errorCode = typeof error === "string" ? error : undefined;
   return (
     <main className="mx-auto max-w-3xl space-y-8 px-6 py-12">
       <header className="space-y-3">
@@ -42,7 +48,7 @@ export default function ApplyPage() {
           We review applications within 48 hours. Required fields are marked.
         </p>
       </header>
-      <ApplyForm />
+      <ApplyForm errorCode={errorCode} />
     </main>
   );
 }
