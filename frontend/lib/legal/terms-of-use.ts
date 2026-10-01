@@ -111,24 +111,30 @@ Changes to Messaging/Bouncebacks: BEP may change its Messaging at any time. Your
 Message Content: You shall be fully responsible for the content of any Messaging and to examine and review any Messaging before transmission. You shall protect and compensate BEP for any issues or disputes or claims brought by any third party due to the content of such Messaging. If any provisions in these Terms are violated, BEP shall have the right to immediately suspend or terminate the Services, at its sole discretion, without prejudice to any damages that BEP may be entitled to claim, and any penalties shall not be applicable to BEP in this case. Each User acknowledges that the commitments and obligations contained in these Terms are binding and valid. All of the content and message profiles sent by each User on the Service must comply with the terms of acceptable use described in these Terms. BEP reserves the right, at its sole discretion, to monitor any User's messaging traffic, and determine if Services are being used in compliance or in violation of the Terms. BEP reserves the right, at its sole discretion, to (i) delay the delivery of any Messaging from the User if additional approval for User's Messaging traffic is required from BEP's carrier or service provider partners, or (ii) cancel the delivery of any Messages from the User in case of any violations or attempted violations of these Terms by User. Each User acknowledges and agrees that Messages to or from such User may be blocked by carriers or other service provider partners for reasons known or unknown to BEP. BEP is under no obligation to investigate or remedy any such blockage for any User.
 
 `,
-  // LEGAL-REVIEW: Subscription, billing, auto-renewal, and nonrefundable fees are carried from FEP. Counsel must confirm they match how BEP actually charges members and brands before this is treated as live terms.
+  // LEGAL-REVIEW: Subscription. The "up to $100/month" brand fee is confirmed by Raymond. Raymond and Kevin want the "up to" language so the fee is not a fixed $100. The exact wording needs attorney review before launch. Different plans, promotional pricing, specials, and the price shown at checkout are part of that confirmed model.
   `
 
 ## SUBSCRIPTION & PAYMENT
 
 Your user account will be accessed through a user ID and password that you will create (your "ID") when you engage in the registration process. You are responsible for maintaining the confidentiality of your ID, and you are fully and solely responsible for all activities that occur under your ID. It is up to you to take adequate precautions with your ID, and to immediately notify BEP of any unauthorized use of your ID.
 
-By signing up for the Services, you agree to the current plans and pricing identified and charged at the time you register your account.
+Brand Engage Pro brands pay a monthly subscription of up to $100 per month. Fan Engage Pro LLC may offer different plans, promotional pricing, or specials. The price shown at checkout is the price that applies.
 
-You will be billed in advance on a recurring and periodic basis. Billing cycles are set on a monthly basis, depending on the type of subscription plan you select when purchasing a subscription. At the end of each billing cycle, your subscription will automatically renew under the exact same conditions unless you cancel it or BEP cancels it. In addition, you will be billed monthly for any Services that you purchase from BEP, including messaging usage, add-on subscriptions, one-time charges, and any other applicable costs, fees and charges. A valid payment method, including a credit card, is required to process the payment for your subscription or your purchase of other Services. You shall provide BEP with accurate and complete billing information including full name, address, state, zip code, telephone number, and valid payment method information. By providing a payment method, you represent and warrant that you are authorized to use such payment method. By submitting such payment information, you automatically authorize BEP to charge all Subscription fees incurred through your account to any such payment instruments.
+By signing up for the Services, you agree to the price shown at checkout.
+
+You will be billed in advance on a recurring and periodic basis. Billing cycles are set on a monthly basis. At the end of each billing cycle, your subscription will automatically renew for the next billing period unless you cancel it or BEP cancels it. A price change applies to the next billing period, as described under Price Changes. In addition, you will be billed monthly for any Services that you purchase from BEP, including messaging usage, add-on subscriptions, one-time charges, and any other applicable costs, fees and charges. A valid payment method, including a credit card, is required to process the payment for your subscription or your purchase of other Services. You shall provide BEP with accurate and complete billing information including full name, address, state, zip code, telephone number, and valid payment method information. By providing a payment method, you represent and warrant that you are authorized to use such payment method. By submitting such payment information, you automatically authorize BEP to charge all Subscription fees incurred through your account to any such payment instruments.
 
 If automatic billing fails to occur for any reason, BEP will suspend or terminate your use of the Services.
 
 We do not store your payment method information. They are processed by our payment processors ("Payment Processors"). The processing of your payments may be subject to the terms, conditions, and privacy policies of the Payment Processors in addition to this Agreement. We are not responsible for error by the Payment Processors. By choosing to use Services you are authorizing our Payment Processors to charge your payment for the Subscription fees associated with the Services that you sign up for. Any payment method that you provide must be valid, and kept current by you during the subscription term. We will begin billing your payment method for the Services on the day that you sign up for such Services, regardless of whether you have fully completed your account as of that date.
 
+`,
+  // LEGAL-REVIEW: Billing. Brands can cancel at any time from account settings, and access continues to the end of the paid period. That is part of the confirmed "up to $100/month" model. The exact wording needs attorney review before launch.
+  `
+
 Termination / Cancellation
 
-Your payment method will automatically be charged recurring renewal fees on the first day of the renewal term unless you cancel your subscription. You may change or cancel your subscription renewal either through your online account management page or by contacting BEP customer support at [raymond@jonasgroup.com](mailto:raymond@jonasgroup.com); however, you will be charged for all outstanding payments and charges, including any renewed subscription, before the cancellation of your subscription is processed. You agree to notify us of any changes required to keep your payment method-on-file current. You agree that failure to keep your payment method-on-file current may result in interruption to your use of the services.
+Brands can cancel a Brand Engage Pro subscription at any time from account settings. Access continues to the end of the paid period. You may also contact BEP customer support at [raymond@jonasgroup.com](mailto:raymond@jonasgroup.com). You agree to notify us of any changes required to keep your payment method-on-file current. You agree that failure to keep your payment method-on-file current may result in interruption to your use of the services.
 
 `,
   // LEGAL-REVIEW: Loyalty points. FEP also forfeited Founding Fan status on cancellation. That sentence was removed because founding-fan / founding-badge status is not a BEP term, and no replacement badge term was invented. The remaining rewards-points forfeiture sentence still needs review for BEP loyalty points.
@@ -136,15 +142,29 @@ Your payment method will automatically be charged recurring renewal fees on the 
 
 If you terminate or cancel your subscription you will lose any Brand Engage Pro Rewards Program rewards points.
 
+`,
+  // LEGAL-REVIEW: Billing. Advance notice (for example 30 days by email), applying a change to the next billing period, and avoiding the new price by cancelling before it takes effect are part of the confirmed "up to $100/month" model. The exact wording needs attorney review before launch.
+  `
+
 Price Changes
 
-BEP, in its sole discretion and at any time, may modify pricing or subscription fees for the subscriptions. Any subscription fee change or changes to any other fees, charges or costs will become effective at the end of the then-current billing cycle, unless any pricing change becomes effective at a different time or immediately. BEP will provide you with reasonable prior notice of any change in subscription fees or changes to any other fees, charges or costs to give you an opportunity to terminate your subscription before such change becomes effective.
+Fan Engage Pro LLC may change prices with advance notice, for example 30 days by email. A price change applies to the next billing period. Cancelling before the change takes effect avoids the new price.
 
-Your continued use of Services after any pricing or subscription fee change comes into effect constitutes your agreement to pay the modified pricing or subscription fee amount. We reserve the right to change the subscription fees that we charge for the Services, at any time in our sole discretion, provided that we give you reasonable prior notice of such changes.
+`,
+  // LEGAL-REVIEW: Billing. No refunds for partial billing periods, a 30-day window to report a charge made in error, and no refund right from a promotion or special match the Cancellation & Refund Policy draft. The exact wording needs attorney review before launch.
+  `
 
 Refunds
 
-SUBSCRIPTION FEES AND OTHER FEES, CHARGES AND COSTS ARE NONREFUNDABLE. YOU WILL BE BILLED IN FULL FOR THE SUBSCRIPTION TERM IN WHICH YOU CANCEL AND FOR OTHER FEES, CHARGES AND COSTS INCURRED AS OF THE EFFECTIVE DATE OF CANCELLATION AND NO REFUNDS WILL BE PROVIDED FOR THE UNUSED PORTION OF SUCH SUBSCRIPTION TERM OR FOR SUCH OTHER FEES, CHARGES AND COSTS. Following any cancellation, however, you will continue to have access to the subscription Services through the end of your current Subscription term.
+Fan Engage Pro LLC does not offer refunds for partial billing periods. If you believe you were charged in error, contact [raymond@jonasgroup.com](mailto:raymond@jonasgroup.com) within 30 days of the charge and we will investigate. A promotion or special does not create a refund right. Following any cancellation, you will continue to have access to the subscription Services through the end of the paid period.
+
+`,
+  // LEGAL-REVIEW: Billing. Specials and trials can carry their own terms, which apply to that offer. The exact wording needs attorney review before launch.
+  `
+
+Specials and trials
+
+Specials and trials can carry their own terms. Those terms apply to that offer.
 
 Termination or Restriction of Access
 
