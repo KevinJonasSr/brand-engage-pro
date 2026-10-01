@@ -10,11 +10,7 @@
  * // LEGAL-REVIEW: Effective date. Carried from the live FEP page chrome
  * // (Effective 8/3/2026; last updated 8/1/2026). Counsel should set the
  * // BEP dates. The effective date is later than the last-updated date.
- * // LEGAL-REVIEW: Contracting entity. The live page says "Fan Engage" and
- * // does not name an LLC or a state of formation. This draft says
- * // "Brand Engage Pro" and does not invent an LLC. Counsel should confirm
- * // the party is Brand Engage Pro ("BEP," "we," "us," or "our"), matching
- * // the published privacy policy.
+ * // LEGAL-REVIEW: Contracting entity. Raymond confirmed Fan Engage Pro LLC on 2026-10-01 (a Colorado limited liability company, the same entity as Fan Engage Pro). Kevin has not yet confirmed. The refunds sentence names Fan Engage Pro LLC as the company. The subscription sentence keeps the product name Brand Engage Pro. No other entity terms were added.
  * // LEGAL-REVIEW: Governing law. The live FEP page has no governing-law
  * // clause. None was added.
  */
@@ -32,7 +28,7 @@ You can cancel your Brand Engage Pro subscription at any time from your account 
   // LEGAL-REVIEW: Billing. The refusal of partial-period refunds and the 30-day charge-error window are carried from FEP. Confirm or change them once billing is known.
   `## 2. Refunds
 
-Brand Engage Pro does not offer refunds for partial billing periods. If you believe you were charged in error, contact [raymond@jonasgroup.com](mailto:raymond@jonasgroup.com) within 30 days of the charge and we will investigate.
+Fan Engage Pro LLC does not offer refunds for partial billing periods. If you believe you were charged in error, contact [raymond@jonasgroup.com](mailto:raymond@jonasgroup.com) within 30 days of the charge and we will investigate.
 
 `,
   // LEGAL-REVIEW: Founding Fan. The live FEP section "3. Founding Fan pricing" (lifetime founder rate, and the founder slot not held for returning fans) was removed. No replacement section or badge term was added. The following headings keep their FEP numbers so the remaining text stays as published.

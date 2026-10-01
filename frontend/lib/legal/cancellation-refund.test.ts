@@ -38,19 +38,26 @@ const legalPage = readFileSync(
 );
 
 const fepLeftovers = [
-  /Fan Engage/,
   /\bFEP\b/,
   /Founding Fan/,
   /founder slot/i,
   /returning fans/i,
-  /fanengage/i,
+  /fanengagepro\.com/i,
   /memberengage\.app/i,
   /LEGAL-REVIEW/,
 ];
 
 describe("published cancellation and refund policy", () => {
-  it("adapts the product name and keeps the privacy-page contact", () => {
-    assert.match(CANCELLATION_REFUND_MD, /Brand Engage Pro/);
+  it("keeps the product name and names Fan Engage Pro LLC as the company", () => {
+    assert.match(CANCELLATION_REFUND_MD, /your Brand Engage Pro subscription/);
+    assert.match(
+      CANCELLATION_REFUND_MD,
+      /Fan Engage Pro LLC does not offer refunds for partial billing periods/,
+    );
+    assert.doesNotMatch(
+      CANCELLATION_REFUND_MD.replaceAll("Fan Engage Pro LLC", ""),
+      /Fan Engage/,
+    );
     assert.match(CANCELLATION_REFUND_MD, /raymond@jonasgroup\.com/);
     assert.match(CANCELLATION_REFUND_MD, /mailto:raymond@jonasgroup\.com/);
     for (const leftover of fepLeftovers) {
@@ -75,6 +82,11 @@ describe("published cancellation and refund policy", () => {
     assert.doesNotMatch(CANCELLATION_REFUND_MD, /## 3\./);
     assert.match(cancellationSource, /LEGAL-REVIEW: Billing/);
     assert.match(cancellationSource, /LEGAL-REVIEW: Contracting entity/);
+    assert.match(
+      cancellationSource,
+      /Raymond confirmed Fan Engage Pro LLC on 2026-10-01/,
+    );
+    assert.match(cancellationSource, /Kevin has not yet confirmed/);
     assert.match(cancellationSource, /LEGAL-REVIEW: Effective date/);
     assert.match(cancellationSource, /LEGAL-REVIEW: Chargeback/);
     assert.match(cancellationSource, /LEGAL-REVIEW: Governing law/);
