@@ -49,7 +49,7 @@ const fepLeftovers = [
 
 describe("published cancellation and refund policy", () => {
   it("keeps the product name and names Fan Engage Pro LLC as the company", () => {
-    assert.match(CANCELLATION_REFUND_MD, /your Brand Engage Pro subscription/);
+    assert.match(CANCELLATION_REFUND_MD, /Brand Engage Pro subscription/);
     assert.match(
       CANCELLATION_REFUND_MD,
       /Fan Engage Pro LLC does not offer refunds for partial billing periods/,
@@ -65,21 +65,64 @@ describe("published cancellation and refund policy", () => {
     }
   });
 
+  it("states the confirmed brand price, cancellation, and refund rules", () => {
+    assert.match(
+      CANCELLATION_REFUND_MD,
+      /monthly subscription of up to \$100 per month/,
+    );
+    assert.match(
+      CANCELLATION_REFUND_MD,
+      /different plans, promotional pricing, or specials/,
+    );
+    assert.match(CANCELLATION_REFUND_MD, /price shown at checkout is the price that applies/);
+    assert.match(
+      CANCELLATION_REFUND_MD,
+      /change prices with advance notice, for example 30 days by email/,
+    );
+    assert.match(CANCELLATION_REFUND_MD, /applies to the next billing period/);
+    assert.match(
+      CANCELLATION_REFUND_MD,
+      /Cancelling before the change takes effect avoids the new price/,
+    );
+    assert.match(
+      CANCELLATION_REFUND_MD,
+      /Brands can cancel a Brand Engage Pro subscription at any time from account settings/,
+    );
+    assert.match(CANCELLATION_REFUND_MD, /Access continues to the end of the paid period/);
+    assert.match(CANCELLATION_REFUND_MD, /within 30 days of the charge/);
+    assert.match(
+      CANCELLATION_REFUND_MD,
+      /A promotion or special does not create a refund right/,
+    );
+    assert.match(
+      CANCELLATION_REFUND_MD,
+      /Specials and trials can carry their own terms\. Those terms apply to that offer/,
+    );
+    assert.doesNotMatch(CANCELLATION_REFUND_MD, /Premium access/);
+    assert.doesNotMatch(CANCELLATION_REFUND_MD, /within 7 days/);
+    assert.match(
+      cancellationSource,
+      /"up to \$100\/month" model is confirmed by Raymond \(Kevin informed via Raymond\)/,
+    );
+    assert.match(
+      cancellationSource,
+      /exact wording needs attorney review before launch/,
+    );
+  });
+
   it("keeps FEP clauses that still need counsel, outside the page text", () => {
     assert.match(CANCELLATION_REFUND_MD, /Cancelling your subscription/);
     assert.match(
       CANCELLATION_REFUND_MD,
       /does not offer refunds for partial billing periods/,
     );
-    assert.match(CANCELLATION_REFUND_MD, /within 30 days of the charge/);
-    assert.match(CANCELLATION_REFUND_MD, /you keep Premium access until then/);
     assert.match(
       CANCELLATION_REFUND_MD,
       /Chargebacks without prior contact may result in account suspension/,
     );
-    assert.match(CANCELLATION_REFUND_MD, /## 4\. Disputes/);
-    assert.match(CANCELLATION_REFUND_MD, /## 5\. Changes to this policy/);
-    assert.doesNotMatch(CANCELLATION_REFUND_MD, /## 3\./);
+    assert.match(CANCELLATION_REFUND_MD, /## 6\. Disputes/);
+    assert.match(CANCELLATION_REFUND_MD, /## 7\. Changes to this policy/);
+    assert.doesNotMatch(CANCELLATION_REFUND_MD, /Founding Fan|founder slot|returning fans/);
     assert.match(cancellationSource, /LEGAL-REVIEW: Billing/);
     assert.match(cancellationSource, /LEGAL-REVIEW: Contracting entity/);
     assert.match(
