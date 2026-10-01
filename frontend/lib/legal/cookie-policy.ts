@@ -20,8 +20,8 @@ Effective date: September 18, 2026
 Last updated: September 15, 2026
 
 `,
-  // LEGAL-REVIEW: Contracting party. Live FEP cookie policy names "Fan Engage Pro LLC" and the short name "Fan Engage." This draft uses Brand Engage Pro ("BEP"), matching the published BEP privacy policy, and does not add an LLC.
-  `Brand Engage Pro (“BEP,” “we,” “us,” or “our”) operates the Brand Engage Pro website and related services (the “Service”), including brandengagepro.com and related domains.
+  // LEGAL-REVIEW: Contracting party. Raymond confirmed on 2026-10-01 that Brand Engage Pro is operated by Fan Engage Pro LLC, a Colorado limited liability company, the same entity as Fan Engage Pro. Kevin has not yet confirmed. The defined short name in this sentence is "we," "us," or "our." The product name remains Brand Engage Pro.
+  `Fan Engage Pro LLC, a Colorado limited liability company (“we,” “us,” or “our”) operates the Brand Engage Pro website and related services (the “Service”), including brandengagepro.com and related domains.
 
 This Cookie Policy explains how we use cookies and similar technologies. It should be read with our [Privacy Policy](/privacy) and [Terms of Use](/terms).
 
@@ -80,7 +80,7 @@ Session — deleted when you close the browser Persistent — remain until they 
 Email: [raymond@jonasgroup.com](mailto:raymond@jonasgroup.com)
 
 `,
-  // LEGAL-REVIEW: Entity line. FEP says "Fan Engage Pro LLC." This draft says Brand Engage Pro, matching the privacy policy. Counsel must confirm the legal entity name.
-  `Entity: Brand Engage Pro
+  // LEGAL-REVIEW: Entity line. Raymond confirmed on 2026-10-01 that the operating entity is Fan Engage Pro LLC, a Colorado limited liability company. Kevin has not yet confirmed.
+  `Entity: Fan Engage Pro LLC
 `,
 ].join("");

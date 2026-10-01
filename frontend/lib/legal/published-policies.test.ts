@@ -45,16 +45,45 @@ const fepLeftovers = [
   /LEGAL-REVIEW/,
 ];
 
+/** Operating entity Raymond confirmed. Not a product-name leftover. */
+const CONFIRMED_ENTITY = "Fan Engage Pro LLC";
+
+function withoutConfirmedEntity(body: string): string {
+  return body.split(CONFIRMED_ENTITY).join("");
+}
+
 describe("published terms and cookie policy", () => {
   it("adapts FEP product names and keeps the privacy-page contact", () => {
     for (const body of [TERMS_OF_USE_MD, COOKIE_POLICY_MD]) {
       assert.match(body, /Brand Engage Pro/);
       assert.match(body, /raymond@jonasgroup\.com/);
       assert.match(body, /brandengagepro\.com/);
+      const productCopy = withoutConfirmedEntity(body);
       for (const leftover of fepLeftovers) {
-        assert.doesNotMatch(body, leftover);
+        assert.doesNotMatch(productCopy, leftover);
       }
     }
+  });
+
+  it("names Fan Engage Pro LLC as the operator and Brand Engage Pro as the product", () => {
+    assert.match(
+      TERMS_OF_USE_MD,
+      /Fan Engage Pro LLC, a Colorado limited liability company \("we," "us," or "our"\), which operates Brand Engage Pro/,
+    );
+    assert.doesNotMatch(
+      TERMS_OF_USE_MD,
+      /Brand Engage Pro \("BEP," "we," "us," or "our"\)/,
+    );
+    assert.match(
+      COOKIE_POLICY_MD,
+      /Fan Engage Pro LLC, a Colorado limited liability company \([“"]we,[”"] [“"]us,[”"] or [“"]our[”"]\) operates the Brand Engage Pro website/,
+    );
+    assert.match(COOKIE_POLICY_MD, /Entity: Fan Engage Pro LLC/);
+    assert.doesNotMatch(COOKIE_POLICY_MD, /Entity: Brand Engage Pro/);
+    assert.match(termsSource, /Raymond confirmed on 2026-10-01/);
+    assert.match(termsSource, /Kevin has not yet confirmed/);
+    assert.match(cookieSource, /Raymond confirmed on 2026-10-01/);
+    assert.match(cookieSource, /Kevin has not yet confirmed/);
   });
 
   it("keeps FEP legal clauses that still need counsel, outside the page text", () => {
