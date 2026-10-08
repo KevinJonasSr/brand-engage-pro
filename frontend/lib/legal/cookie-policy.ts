@@ -20,7 +20,7 @@ Effective date: September 18, 2026
 Last updated: September 15, 2026
 
 `,
-  // LEGAL-REVIEW: Contracting party. Raymond confirmed on 2026-10-01 that Brand Engage Pro is operated by Fan Engage Pro LLC, a Colorado limited liability company, the same entity as Fan Engage Pro. Kevin has not yet confirmed. The defined short name in this sentence is "we," "us," or "our." The product name remains Brand Engage Pro.
+  // LEGAL-REVIEW: Contracting party. Raymond confirmed on 2026-10-01 that Brand Engage Pro is operated by Fan Engage Pro LLC, a Colorado limited liability company, the same entity as Fan Engage Pro. Kevin confirmed on 2026-10-08. The defined short name in this sentence is "we," "us," or "our." The product name remains Brand Engage Pro.
   `Fan Engage Pro LLC, a Colorado limited liability company (“we,” “us,” or “our”) operates the Brand Engage Pro website and related services (the “Service”), including brandengagepro.com and related domains.
 
 This Cookie Policy explains how we use cookies and similar technologies. It should be read with our [Privacy Policy](/privacy) and [Terms of Use](/terms).
@@ -80,7 +80,7 @@ Session — deleted when you close the browser Persistent — remain until they 
 Email: [raymond@jonasgroup.com](mailto:raymond@jonasgroup.com)
 
 `,
-  // LEGAL-REVIEW: Entity line. Raymond confirmed on 2026-10-01 that the operating entity is Fan Engage Pro LLC, a Colorado limited liability company. Kevin has not yet confirmed.
+  // LEGAL-REVIEW: Entity line. Raymond confirmed on 2026-10-01 that the operating entity is Fan Engage Pro LLC, a Colorado limited liability company. Kevin confirmed on 2026-10-08.
   `Entity: Fan Engage Pro LLC
 `,
 ].join("");

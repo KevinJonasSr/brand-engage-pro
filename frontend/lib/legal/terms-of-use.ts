@@ -19,7 +19,7 @@ export const TERMS_OF_USE_MD = [
   `# Brand Engage Pro — Terms of Use
 
 `,
-  // LEGAL-REVIEW: Contracting party and sites. Raymond confirmed on 2026-10-01 that Brand Engage Pro is operated by Fan Engage Pro LLC, a Colorado limited liability company, the same entity as Fan Engage Pro. Kevin has not yet confirmed. The defined short name in this sentence is "we," "us," or "our." Sites still follow the published BEP privacy policy (brandengagepro.com, including www.brandengagepro.com) and do not add the FEP .net domain.
+  // LEGAL-REVIEW: Contracting party and sites. Raymond confirmed on 2026-10-01 that Brand Engage Pro is operated by Fan Engage Pro LLC, a Colorado limited liability company, the same entity as Fan Engage Pro. Kevin confirmed on 2026-10-08. The defined short name in this sentence is "we," "us," or "our." Sites still follow the published BEP privacy policy (brandengagepro.com, including www.brandengagepro.com) and do not add the FEP .net domain.
   `
 
 ## THIS IS A CONTRACT
@@ -252,20 +252,7 @@ You may submit a notification pursuant to the Digital Millennium Copyright Act (
 6. a statement by you, made under penalty of perjury, that the above information in your notice is accurate and that you are the copyright owner or authorized to act on the copyright owner's behalf.
 
 `,
-  // LEGAL-REVIEW: Analytics. The Google Analytics section is carried from FEP. BEP's published privacy policy says the site does not currently use advertising cookies or third-party analytics trackers, and the frontend has no Google Analytics, gtag, PostHog, or Vercel Analytics package. Do not read this section as a statement that BEP uses Google Analytics until counsel rewrites it.
   `
-
-## ANALYTICS
-
-We may use third-party service providers (as defined below) to monitor and analyze the use of our Services.
-
-Google Analytics. Google Analytics is a web analytics service offered by Google that tracks and reports website traffic. Google uses the data collected to track and monitor the use of our Service. This data is shared with other Google services. Google may use the collected data to contextualize and personalize the ads of its own advertising network.
-
-For more information on the privacy practices of Google, please visit the Google Privacy Terms web page: [https://policies.google.com/privacy?hl=en](https://policies.google.com/privacy?hl=en)
-
-We also encourage you to review the Google's policy for safeguarding your data: [https://support.google.com/analytics/answer/6004245](https://support.google.com/analytics/answer/6004245)
-
-Google Analytics and any other analytics vendors used.
 
 ## TRADEMARKS
 

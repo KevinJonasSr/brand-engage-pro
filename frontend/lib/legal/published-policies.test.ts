@@ -81,21 +81,21 @@ describe("published terms and cookie policy", () => {
     assert.match(COOKIE_POLICY_MD, /Entity: Fan Engage Pro LLC/);
     assert.doesNotMatch(COOKIE_POLICY_MD, /Entity: Brand Engage Pro/);
     assert.match(termsSource, /Raymond confirmed on 2026-10-01/);
-    assert.match(termsSource, /Kevin has not yet confirmed/);
+    assert.match(termsSource, /Kevin confirmed on 2026-10-08/);
     assert.match(cookieSource, /Raymond confirmed on 2026-10-01/);
-    assert.match(cookieSource, /Kevin has not yet confirmed/);
+    assert.match(cookieSource, /Kevin confirmed on 2026-10-08/);
   });
 
   it("keeps FEP legal clauses that still need counsel, outside the page text", () => {
     assert.match(TERMS_OF_USE_MD, /laws of the State of Colorado/);
     assert.match(TERMS_OF_USE_MD, /bhamilton@joneskeller\.com/);
-    assert.match(TERMS_OF_USE_MD, /Google Analytics/);
+    assert.doesNotMatch(TERMS_OF_USE_MD, /Google Analytics/);
+    assert.doesNotMatch(TERMS_OF_USE_MD, /## ANALYTICS/);
     assert.match(TERMS_OF_USE_MD, /under age 18/i);
     assert.match(TERMS_OF_USE_MD, /rewards points/);
     assert.doesNotMatch(TERMS_OF_USE_MD, /Founding/);
     assert.match(termsSource, /LEGAL-REVIEW: Age/);
     assert.match(termsSource, /LEGAL-REVIEW: Governing law/);
-    assert.match(termsSource, /LEGAL-REVIEW: Analytics/);
     assert.match(termsSource, /LEGAL-REVIEW: DMCA agent/);
     assert.match(termsSource, /LEGAL-REVIEW: Loyalty points/);
     assert.match(termsSource, /LEGAL-REVIEW: Subscription/);
