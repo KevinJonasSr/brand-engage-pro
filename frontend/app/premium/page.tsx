@@ -338,8 +338,14 @@ export default async function PremiumPage({
           <Link href="/me/billing" className="underline hover:text-white/70">
             Account, Billing
           </Link>
-          . Full refund within 7 days of purchase if you change your
-          mind.
+          . See our{" "}
+          <Link
+            href="/cancellation-refund"
+            className="underline hover:text-white/70"
+          >
+            Cancellation &amp; Refund Policy
+          </Link>
+          .
         </p>
       </div>
     </main>
