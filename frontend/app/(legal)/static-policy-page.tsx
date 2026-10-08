@@ -4,7 +4,7 @@ import { getPolicy, type PolicyPage } from "@/lib/data/policies";
 import { policyForDisplay } from "@/lib/legal/published-policies";
 
 /**
- * Same layout as the privacy policy page.
+ * Same layout as the privacy policy page, for Terms, Cookies and Cancellation.
  * Privacy stays on PolicyPage and is not rendered here.
  */
 export default async function StaticPolicyPage({
