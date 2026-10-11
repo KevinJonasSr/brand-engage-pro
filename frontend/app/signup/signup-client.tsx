@@ -25,6 +25,7 @@ import {
   signupTurnstileHelper,
 } from "@/lib/turnstile-ux";
 import { safeRelativePath } from "@/lib/safe-redirect";
+import { buildOnboardingHref } from "@/lib/onboarding-next";
 import { ConsentModal, type ConsentDoc } from "@/components/consent-modal";
 import { consentReviewTitle } from "@/lib/consent-accept";
 import { continueAfterPasswordSignup } from "@/lib/password-signup-continue";
@@ -58,10 +59,11 @@ export default function SignupPage({
   const ref = searchParams.get("ref");
   const rawNext = safeRelativePath(searchParams.get("next"), "");
   const next = rawNext || null;
-  // Where to send the user after a successful signup. Preserve any
-  // ?ref=<brand-slug> attribution from the brand-page Join CTA.
-  const onboardingHref = ref ? `/onboarding?ref=${encodeURIComponent(ref)}` : "/onboarding";
-  const postSignupHref = next ?? onboardingHref;
+  // Every new account goes through onboarding first (welcome bonus, home
+  // brand auto-join, SMS consent). Keep any ?ref=<brand-slug> attribution
+  // and carry `next` (for example a QR check-in page) so onboarding can
+  // send the member there when it is done.
+  const postSignupHref = buildOnboardingHref(ref, next);
   const loginParams = new URLSearchParams();
   if (next) loginParams.set("next", next);
   if (ref) loginParams.set("ref", ref);

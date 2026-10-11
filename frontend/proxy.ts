@@ -16,6 +16,8 @@ import { isLockedAdminWritePath } from "@/lib/brand-billing";
 import { isBrandSlugAlias, resolveBrandSlug } from "@/lib/brand-aliases";
 import { resolveCommunityFromHost } from "@/lib/community";
 import { resolvePinnedCanonicalLocation } from "@/lib/site-url";
+import { safeRelativePath } from "@/lib/safe-redirect";
+import { onboardingDoneHref } from "@/lib/onboarding-next";
 
 /**
  * Routes a signed-in user must be able to reach.
@@ -129,7 +131,10 @@ export default async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   if (shouldRedirectOnboardingHome(pathname, onboarded, signedOut)) {
-    return NextResponse.redirect(new URL("/", request.url));
+    const done = onboardingDoneHref(
+      safeRelativePath(request.nextUrl.searchParams.get("next"), ""),
+    );
+    return NextResponse.redirect(new URL(done, request.url));
   }
 
   if (shouldSkipSessionRefresh(pathname, signedOut)) {

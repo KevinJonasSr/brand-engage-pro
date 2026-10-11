@@ -175,7 +175,9 @@ describe("onboard profile persist", () => {
     );
     assert.equal(onboardingResumeStep({ firstName: "Lyra" }), 1);
     assert.match(wizard, /initialForm/);
-    assert.match(wizard, /window\.location\.assign\("\/"\)/);
+    // Finish goes home, or to the safe `next` target (QR check-in).
+    assert.match(wizard, /window\.location\.assign\(doneHrefFromUrl\(\)\)/);
+    assert.match(wizard, /onboardingDoneHref\(safeRelativePath\(/);
     assert.doesNotMatch(wizard, /router\.replace\(`\/signup/);
     assert.doesNotMatch(wizard, /createClient\(\)/);
     assert.match(onboardRoute, /Unable to save interests/);
@@ -253,7 +255,7 @@ describe("onboard profile persist", () => {
     assert.doesNotMatch(ONBOARDING_MEMBER_SELECT, /birthday_month/);
     assert.match(pageSrc, /bep_onboarded|ONBOARDED_COOKIE/);
     assert.match(wizard, /\/api\/member-engage\/onboard/);
-    assert.match(wizard, /location\.replace\("\/"\)/);
+    assert.match(wizard, /location\.replace\(doneHrefFromUrl\(\)\)/);
     assert.doesNotMatch(
       wizard,
       /hasJoinedBrand:\s*false,\s*hasCheckinOrRedeem:\s*false,\s*hasInvite:\s*false/,

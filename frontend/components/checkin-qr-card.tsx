@@ -7,16 +7,17 @@ import { QRCodeSVG } from "qrcode.react";
  * Print or display this at the register / entrance so members can scan.
  */
 export default function CheckinQrCard({
-  brandSlug,
   brandName,
+  checkinPath,
 }: {
-  brandSlug: string;
   brandName: string;
+  /** Relative check-in path, signed on the server (includes ?t= when configured). */
+  checkinPath: string;
 }) {
   const url =
     typeof window !== "undefined"
-      ? `${window.location.origin}/brands/${brandSlug}/checkin`
-      : `https://brand-engage-pro.vercel.app/brands/${brandSlug}/checkin`;
+      ? `${window.location.origin}${checkinPath}`
+      : `https://brand-engage-pro.vercel.app${checkinPath}`;
 
   return (
     <div className="glass-card space-y-4 p-6">
