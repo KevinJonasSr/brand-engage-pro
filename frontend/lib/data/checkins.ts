@@ -1,4 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isPremiumTier } from "@/lib/entitlements";
+import { ledgerNote, pointsMultiplier, scaledPoints } from "@/lib/founder-perks";
 import { emitNetworkEvent } from "@/lib/network";
 
 export const CHECKIN_POINTS = 25;
@@ -45,11 +47,18 @@ export async function recordCheckin(
     return { ok: true, alreadyCheckedIn: true, pointsAwarded: 0 };
   }
 
+  // Founders earn a flat 1.5x, including this QR check-in. A failed membership
+  // lookup still records the visit at the base rate.
+  const flags = await checkinPointFlags(admin, memberId, brandSlug);
+  const multiplier = pointsMultiplier(flags);
+  const pointsAwarded = scaledPoints(CHECKIN_POINTS, multiplier);
+  const note = ledgerNote(`Visit check-in at ${brandSlug}`, flags);
+
   // Insert checkin row
   const { error: checkinErr } = await admin.from("checkins").insert({
     member_id: memberId,
     brand_slug: brandSlug,
-    points_awarded: CHECKIN_POINTS,
+    points_awarded: pointsAwarded,
   });
   if (checkinErr) {
     // The per-day unique index caught a check-in the lookup above missed
@@ -66,10 +75,10 @@ export async function recordCheckin(
   // totals only move when the ledger row was actually written.
   const { error: ledgerErr } = await admin.from("points_ledger").insert({
     member_id: memberId,
-    delta: CHECKIN_POINTS,
+    delta: pointsAwarded,
     source: "daily_checkin",
     source_ref: sourceRef,
-    note: `Visit check-in at ${brandSlug}`,
+    note,
   });
   if (ledgerErr && ledgerErr.code !== "23505") {
     console.warn("recordCheckin: ledger insert failed", ledgerErr);
@@ -86,7 +95,7 @@ export async function recordCheckin(
     if (m) {
       await admin
         .from("members")
-        .update({ total_points: ((m.total_points as number) ?? 0) + CHECKIN_POINTS })
+        .update({ total_points: ((m.total_points as number) ?? 0) + pointsAwarded })
         .eq("id", memberId);
     }
 
@@ -100,7 +109,7 @@ export async function recordCheckin(
     if (mem) {
       await admin
         .from("member_community_memberships")
-        .update({ total_points: ((mem.total_points as number) ?? 0) + CHECKIN_POINTS })
+        .update({ total_points: ((mem.total_points as number) ?? 0) + pointsAwarded })
         .eq("member_id", memberId)
         .eq("community_id", brandSlug);
     }
@@ -113,11 +122,32 @@ export async function recordCheckin(
       entity_type: "community",
       entity_id: brandSlug,
       dedupe_key: `be:checkin:${brandSlug}:${memberId}:${todayET}`,
-      metadata: { community_id: brandSlug, points_awarded: CHECKIN_POINTS },
+      metadata: { community_id: brandSlug, points_awarded: pointsAwarded },
     });
   }
 
-  return { ok: true, alreadyCheckedIn: false, pointsAwarded: CHECKIN_POINTS };
+  return { ok: true, alreadyCheckedIn: false, pointsAwarded };
+}
+
+async function checkinPointFlags(
+  admin: ReturnType<typeof createAdminClient>,
+  memberId: string,
+  brandSlug: string,
+): Promise<{ isFounder: boolean; isPremium: boolean }> {
+  const { data, error } = await admin
+    .from("member_community_memberships")
+    .select("is_founder, subscription_tier")
+    .eq("member_id", memberId)
+    .eq("community_id", brandSlug)
+    .maybeSingle();
+  if (error) {
+    console.warn("recordCheckin: membership lookup failed", error.message);
+    return { isFounder: false, isPremium: false };
+  }
+  return {
+    isFounder: Boolean(data?.is_founder),
+    isPremium: isPremiumTier((data?.subscription_tier as string | null) ?? null),
+  };
 }
 
 /** Count a member's total check-ins at a specific brand (all time). */
