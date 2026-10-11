@@ -6,12 +6,14 @@ import {
   BEP_ACCENT_TO,
   IRON,
   LINEN,
+  blend,
   brandHeroBackground,
   brandWashBackground,
   contrastRatio,
   darkenUntil,
   normalizeHex,
   resolveBrandAccent,
+  sharePalette,
   withAlpha,
 } from "./brand-accent.ts";
 
@@ -107,5 +109,36 @@ describe("backgrounds", () => {
     const p = resolveBrandAccent("#1f2937", "#d4a857");
     assert.match(brandHeroBackground(p), /^radial-gradient\(.*#d4a85759.*linear-gradient\(160deg, #1f2937,/);
     assert.match(brandWashBackground(p), /#d4a85733/);
+  });
+});
+
+describe("blend", () => {
+  it("returns the ends at alpha 0 and 1", () => {
+    assert.equal(blend(IRON, LINEN, 1), IRON);
+    assert.equal(blend(IRON, LINEN, 0), LINEN);
+  });
+});
+
+describe("sharePalette", () => {
+  it("puts iron on linen with a muted tone that still reads", () => {
+    const s = sharePalette(null, null);
+    assert.equal(s.paper, LINEN);
+    assert.equal(s.text, IRON);
+    assert.ok(contrastRatio(s.muted, LINEN) >= 4.5);
+    assert.match(s.wash, /#d4a0173d/);
+  });
+
+  it("keeps ink and accent pills readable for any stored pair", () => {
+    const pairs: Array<[string, string]> = [
+      ["#1f2937", "#d4a857"],
+      ["#ffffff", "#fefefe"],
+      ["#fde047", "#a3e635"],
+      ["#7c3aed", "#f97316"],
+    ];
+    for (const [from, to] of pairs) {
+      const s = sharePalette(from, to);
+      assert.ok(contrastRatio(s.accentInk, s.paper) >= 4.5, `ink ${from}/${to}`);
+      assert.ok(contrastRatio(s.accent, s.onAccent) >= 4.5, `pill ${from}/${to}`);
+    }
   });
 });

@@ -1,17 +1,21 @@
 import { ImageResponse } from "next/og";
+import { LINEN, brandHeroBackground, sharePalette, withAlpha } from "@/lib/brand-accent";
 import { getBrandFromDb } from "@/lib/data/brands";
 
 // ─── Per-brand OG card ──────────────────────────────────────────────────
 // Generated at request time so links to /brands/<slug> render with the
-// brand's own identity: name + tagline laid over their accent gradient,
-// with the hero photo as a watermarked background. 1200x630 — canonical
-// Twitter/LinkedIn/Slack preview size.
+// brand's own identity: name and tagline in linen over the hero photo,
+// darkened with the brand's deep color so the text always reads. Brands
+// with no photo get the same deep hero the page uses. 1200x630, the
+// canonical Twitter/LinkedIn/Slack preview size.
 
 export const runtime = "edge";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export const alt = "Brand on Brand Engage Pro";
+
+const SAGE = "#7E8B6A";
 
 export default async function BrandOpengraphImage({
   params,
@@ -21,13 +25,12 @@ export default async function BrandOpengraphImage({
   const brand = await getBrandFromDb(params.slug).catch(() => null);
 
   // Fall back to a clean branded card if the slug doesn't resolve. We
-  // never want a 500 on the OG endpoint — broken share previews are
+  // never want a 500 on the OG endpoint; broken share previews are
   // worse than a generic one.
   const name = brand?.name ?? "Brand Engage Pro";
   const tagline =
     brand?.tagline ?? "Skip the line. Earn the perks. Become a regular.";
-  const accentFrom = brand?.accentFrom ?? "#D4A017";
-  const accentTo = brand?.accentTo ?? "#9B2335";
+  const palette = sharePalette(brand?.accentFrom, brand?.accentTo);
   const heroImage = brand?.heroImage ?? null;
 
   return new ImageResponse(
@@ -40,14 +43,13 @@ export default async function BrandOpengraphImage({
           width: "100%",
           height: "100%",
           padding: "80px",
-          background: "#050b1f",
-          color: "white",
+          background: brandHeroBackground(palette),
+          color: LINEN,
           fontFamily: "sans-serif",
           position: "relative",
         }}
       >
-        {/* Hero image as background, dimmed. Wrapped in conditional so a
-            missing hero gracefully falls back to gradient-only. */}
+        {/* Hero photo, when the brand has one. */}
         {heroImage ? (
           <div
             style={{
@@ -57,26 +59,23 @@ export default async function BrandOpengraphImage({
               backgroundImage: `url(${heroImage})`,
               backgroundSize: "cover",
               backgroundPosition: "center top",
-              opacity: 0.55,
             }}
           />
         ) : null}
 
-        {/* Brand accent overlay — pulls the brand's accent colors into a
-            corner-to-corner radial wash that keeps text legible. */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            display: "flex",
-            background:
-              `radial-gradient(circle at 15% 10%, ${accentFrom}cc, transparent 55%), ` +
-              `radial-gradient(circle at 85% 95%, ${accentTo}cc, transparent 60%), ` +
-              "linear-gradient(180deg, rgba(5,11,31,0.35), rgba(5,11,31,0.85))",
-          }}
-        />
+        {/* Deep scrim so linen text holds up over any photo. */}
+        {heroImage ? (
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              background: `linear-gradient(180deg, ${withAlpha(palette.deep, 0.55)}, ${withAlpha(palette.deep, 0.92)})`,
+            }}
+          />
+        ) : null}
 
-        {/* Brand mark — top-left "BEP" pill to anchor the design. */}
+        {/* Brand mark, top-left. */}
         <div
           style={{
             display: "flex",
@@ -93,27 +92,26 @@ export default async function BrandOpengraphImage({
               alignItems: "center",
               justifyContent: "center",
               borderRadius: 999,
-              background: `linear-gradient(135deg, ${accentFrom}, ${accentTo})`,
+              background: palette.accent,
+              color: palette.onAccent,
               fontSize: 22,
               fontWeight: 700,
-              color: "white",
             }}
           >
-            BEP
+            BE
           </div>
           <div
             style={{
               fontSize: 26,
               fontWeight: 600,
-              letterSpacing: "-0.02em",
-              opacity: 0.9,
+              letterSpacing: "-0.01em",
             }}
           >
             Brand Engage Pro
           </div>
         </div>
 
-        {/* Headline block — brand name, then tagline. */}
+        {/* Headline block: brand name, then tagline. */}
         <div
           style={{
             display: "flex",
@@ -128,7 +126,7 @@ export default async function BrandOpengraphImage({
               fontWeight: 500,
               letterSpacing: "0.18em",
               textTransform: "uppercase",
-              color: "rgba(255,255,255,0.7)",
+              opacity: 0.85,
             }}
           >
             Member Club
@@ -138,7 +136,7 @@ export default async function BrandOpengraphImage({
               fontSize: 110,
               fontWeight: 700,
               lineHeight: 0.98,
-              letterSpacing: "-0.04em",
+              letterSpacing: "-0.03em",
               maxWidth: 1040,
             }}
           >
@@ -150,9 +148,7 @@ export default async function BrandOpengraphImage({
                 fontSize: 32,
                 fontWeight: 400,
                 lineHeight: 1.25,
-                letterSpacing: "-0.01em",
                 maxWidth: 980,
-                color: "rgba(255,255,255,0.92)",
                 marginTop: 8,
               }}
             >
@@ -161,14 +157,13 @@ export default async function BrandOpengraphImage({
           ) : null}
         </div>
 
-        {/* Footer row — "Become a regular" CTA pill. */}
+        {/* Footer row: live dot and the "Become a regular" pill. */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             fontSize: 22,
-            color: "rgba(255,255,255,0.85)",
             position: "relative",
           }}
         >
@@ -179,7 +174,7 @@ export default async function BrandOpengraphImage({
                 width: 10,
                 height: 10,
                 borderRadius: 999,
-                background: "#10b981",
+                background: SAGE,
               }}
             />
             Live · Earn perks · Skip the line
@@ -188,12 +183,11 @@ export default async function BrandOpengraphImage({
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 8,
               padding: "12px 24px",
               borderRadius: 999,
-              background: `linear-gradient(135deg, ${accentFrom}, ${accentTo})`,
+              background: palette.accent,
+              color: palette.onAccent,
               fontWeight: 600,
-              color: "white",
             }}
           >
             Become a regular →
