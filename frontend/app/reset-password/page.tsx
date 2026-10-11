@@ -1,10 +1,11 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { safeRelativePath } from "@/lib/safe-redirect";
+import { parseRecoveryHash, type RecoveryHash } from "@/lib/recovery-hash";
 
 export default function ResetPasswordPage() {
   return (
@@ -29,6 +30,19 @@ function ResetPasswordForm() {
   const [confirm, setConfirm] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [message, setMessage] = useState("");
+  const recovery = useRef<RecoveryHash | null>(null);
+
+  // Read the recovery link's tokens once, then clear them from the address bar.
+  useEffect(() => {
+    const parsed = parseRecoveryHash(window.location.hash);
+    if (!parsed) return;
+    recovery.current = parsed;
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    if (parsed.kind === "error") {
+      setStatus("error");
+      setMessage(`${parsed.message}. Ask for a new reset link and open it right away.`);
+    }
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -46,6 +60,15 @@ function ResetPasswordForm() {
     setMessage("");
     try {
       const supabase = createClient();
+      const link = recovery.current;
+      if (link?.kind === "tokens") {
+        const { error: sessionError } = await supabase.auth.setSession({
+          access_token: link.accessToken,
+          refresh_token: link.refreshToken,
+        });
+        if (sessionError) throw sessionError;
+        recovery.current = null;
+      }
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
       router.push(next);

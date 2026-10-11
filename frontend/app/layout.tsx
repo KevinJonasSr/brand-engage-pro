@@ -5,6 +5,7 @@ import "./globals.css";
 import CookieBanner from "@/components/cookie-banner";
 import Footer from "@/components/footer";
 import InstallPrompt from "@/components/install-prompt";
+import RecoveryRedirect from "@/components/recovery-redirect";
 import PremiumBadge from "@/components/premium-badge";
 import AdminPill from "@/components/admin-pill";
 import UserMenu from "@/components/user-menu";
@@ -243,6 +244,7 @@ export default async function RootLayout({
         <Footer />
         <CookieBanner />
         <InstallPrompt />
+        <RecoveryRedirect />
       </body>
     </html>
   );
