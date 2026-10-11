@@ -1,4 +1,5 @@
 import type { StampCardData } from "@/lib/data/stamp-card";
+import { resolveBrandAccent } from "@/lib/brand-accent";
 
 /**
  * Visual stamp card shown to signed-in members on a brand page.
@@ -17,6 +18,7 @@ export default function StampCard({
   const { stampsRequired, rewardTitle, rewardDescription, stampsInCurrentRound, completedRounds } =
     data;
 
+  const palette = resolveBrandAccent(accentFrom, accentTo);
   const justCompleted = stampsInCurrentRound === 0 && completedRounds > 0;
 
   return (
@@ -31,8 +33,8 @@ export default function StampCard({
         </div>
         {completedRounds > 0 && (
           <span
-            className="shrink-0 rounded-full px-3 py-1 text-xs font-semibold text-iron"
-            style={{ backgroundImage: `linear-gradient(90deg, ${accentFrom}, ${accentTo})` }}
+            className="shrink-0 rounded-full px-3 py-1 text-xs font-semibold"
+            style={{ backgroundColor: palette.accent, color: palette.onAccent }}
           >
             {completedRounds}× earned
           </span>
@@ -53,12 +55,12 @@ export default function StampCard({
               aria-hidden
               className={`flex aspect-square items-center justify-center rounded-xl border text-lg transition ${
                 filled
-                  ? "border-transparent text-iron"
+                  ? "border-transparent"
                   : "border-iron/15 bg-parchment/20 text-iron/20"
               }`}
               style={
                 filled
-                  ? { backgroundImage: `linear-gradient(135deg, ${accentFrom}, ${accentTo})` }
+                  ? { backgroundColor: palette.accent, color: palette.onAccent }
                   : undefined
               }
             >

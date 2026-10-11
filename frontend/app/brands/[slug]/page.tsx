@@ -5,6 +5,7 @@ import { LatestStrip } from "@/components/latest-strip";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { listBrands } from "@/lib/brands";
+import { brandHeroBackground, resolveBrandAccent } from "@/lib/brand-accent";
 import {
   doesMemberFollowBrand,
   getBrandFromDb,
@@ -112,7 +113,8 @@ export default async function BrandPage({
   // RSVP meta: counts + whether the current member has RSVPed to each event.
   const { counts: rsvpCounts, mine: myRsvps } = await getRsvpMetaForEvents(eventIds);
 
-  const heroGradient = `linear-gradient(to bottom right, ${brand.accentFrom}66, #0f172a, #000000)`;
+  const palette = resolveBrandAccent(brand.accentFrom, brand.accentTo);
+  const heroBackground = brandHeroBackground(palette);
 
   // Brand-type-aware premium paywall copy. Restaurants get food and drink
   // language; everything else gets plain member-club copy.
@@ -129,7 +131,6 @@ export default async function BrandPage({
         ? "Select members get the Music Row house tour, early listens from our writers and artists, and a limited number of live sessions."
         : "Select members get member-only events, early RSVPs, and behind-the-scenes moments.",
   };
-  const ctaGradient = `linear-gradient(to right, ${brand.accentFrom}, ${brand.accentTo})`;
 
   // Primary CTA adapts to the viewer's state:
   // - anonymous  → "Join the member club" → /signup?ref=<slug>
@@ -148,7 +149,7 @@ export default async function BrandPage({
       {/* Hero */}
       <section
         className="group relative flex flex-col justify-end overflow-hidden rounded-lg border border-iron/10 min-h-[420px] md:min-h-[520px]"
-        style={!brand.heroImage ? { backgroundImage: heroGradient } : undefined}
+        style={!brand.heroImage ? { backgroundImage: heroBackground } : undefined}
       >
         {brand.heroImage && (
           <>
@@ -192,8 +193,8 @@ export default async function BrandPage({
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link
               href={primaryCta.href}
-              className="rounded-full px-6 py-3 text-sm font-semibold text-linen transition hover:brightness-110 bep-press"
-              style={{ backgroundImage: ctaGradient }}
+              className="rounded-full px-6 py-3 text-sm font-semibold transition hover:brightness-110 bep-press"
+              style={{ backgroundColor: palette.accent, color: palette.onAccent }}
             >
               {primaryCta.label}
             </Link>
@@ -285,7 +286,7 @@ export default async function BrandPage({
                     className="h-full rounded-full"
                     style={{
                       width: `${Math.max(2, g.pct)}%`,
-                      backgroundImage: ctaGradient,
+                      backgroundColor: palette.accent,
                     }}
                   />
                 </div>

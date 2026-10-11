@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { listBrands } from "@/lib/brands";
+import { brandWashBackground, resolveBrandAccent } from "@/lib/brand-accent";
 import { getBrandFromDb } from "@/lib/data/brands";
 import { canAccessBrand, getAdminContext } from "@/lib/admin";
 import { getCurrentMember } from "@/lib/data/member";
@@ -70,7 +71,8 @@ export default async function BrandCommunityPage({
   // Admin controls and the premium bypass apply only to admins of this brand.
   const isAdmin = canAccessBrand(adminCtx, slug);
 
-  const heroGradient = `linear-gradient(to bottom right, ${brand.accentFrom}40, #0f172a, #000000)`;
+  const palette = resolveBrandAccent(brand.accentFrom, brand.accentTo);
+  const heroBackground = brandWashBackground(palette);
 
   return (
     <main className="mx-auto max-w-3xl space-y-6 px-6 py-10">
@@ -80,11 +82,13 @@ export default async function BrandCommunityPage({
       )}
       <section
         className="rounded-lg border border-iron/10 p-8"
-        style={{ backgroundImage: heroGradient }}
+        style={{ backgroundImage: heroBackground }}
       >
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-iron/60">Community</p>
+            <p className="text-xs uppercase tracking-[0.3em]" style={{ color: palette.accentInk }}>
+              Community
+            </p>
             <h1
               className="mt-2 text-3xl font-semibold"
               style={{ fontFamily: "var(--font-display)" }}

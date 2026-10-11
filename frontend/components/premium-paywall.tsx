@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { resolveBrandAccent, withAlpha } from "@/lib/brand-accent";
 
 interface PremiumPaywallProps {
   /** What the user is trying to see. Used in the headline copy. */
@@ -34,8 +35,8 @@ export default function PremiumPaywall({
   reason = "needs-premium",
   compact = false,
 }: PremiumPaywallProps) {
-  const from = accentFrom ?? "#D4A017";
-  const to = accentTo ?? "#9B2335";
+  const palette = resolveBrandAccent(accentFrom, accentTo);
+  const solid = { backgroundColor: palette.accent, color: palette.onAccent };
   // Premium sales are closed (brands pay, guests join free), so the only
   // CTA left is the free join for signed-out viewers.
   const signupHref = `/signup${communityId ? `?ref=${encodeURIComponent(communityId)}` : ""}`;
@@ -51,11 +52,11 @@ export default function PremiumPaywall({
     return (
       <div
         className="flex items-center gap-3 rounded-lg border border-iron/10 bg-parchment/40 px-4 py-3 text-sm"
-        style={{ borderColor: `${from}33` }}
+        style={{ borderColor: withAlpha(palette.accent, 0.2) }}
       >
         <span
           className="inline-flex h-8 w-8 flex-none items-center justify-center rounded-full text-base"
-          style={{ backgroundImage: `linear-gradient(135deg, ${from}, ${to})` }}
+          style={solid}
         >
           {reason === "needs-founder" ? "👑" : "🔒"}
         </span>
@@ -68,8 +69,8 @@ export default function PremiumPaywall({
         {ctaHref && (
           <Link
             href={ctaHref}
-            className="flex-none rounded-full px-3 py-1.5 text-xs font-semibold text-iron shadow-glass transition hover:brightness-110"
-            style={{ backgroundImage: `linear-gradient(90deg, ${from}, ${to})` }}
+            className="flex-none rounded-full px-3 py-1.5 text-xs font-semibold shadow-glass transition hover:brightness-110"
+            style={solid}
           >
             Join
           </Link>
@@ -81,7 +82,7 @@ export default function PremiumPaywall({
   return (
     <section
       className="relative overflow-hidden rounded-lg border border-iron/10 bg-parchment/40 p-6"
-      style={{ borderColor: `${from}33`, backgroundImage: `linear-gradient(135deg, ${from}08, ${to}08)` }}
+      style={{ borderColor: withAlpha(palette.accent, 0.2), backgroundColor: withAlpha(palette.accent, 0.04) }}
     >
       <div className="relative z-10 space-y-4">
         <div className="flex items-start justify-between gap-4">
@@ -125,8 +126,8 @@ export default function PremiumPaywall({
         {ctaHref && (
           <Link
             href={ctaHref}
-            className="inline-block rounded-full px-5 py-2 text-sm font-semibold text-iron shadow-glass transition hover:brightness-110"
-            style={{ backgroundImage: `linear-gradient(90deg, ${from}, ${to})` }}
+            className="inline-block rounded-full px-5 py-2 text-sm font-semibold shadow-glass transition hover:brightness-110"
+            style={solid}
           >
             {ctaLabel}
           </Link>

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { listBrands } from "@/lib/brands";
+import { brandWashBackground, resolveBrandAccent, withAlpha } from "@/lib/brand-accent";
 import { getBrandFromDb } from "@/lib/data/brands";
 import { getFoundingClaims } from "@/lib/founding";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -142,18 +143,17 @@ export default async function FounderWallPage({
   const remainingCount = founderCap - claimedCount;
   const isFull = remainingCount <= 0;
 
-  const heroGradient = `linear-gradient(to bottom right, ${brand.accentFrom}66, #0f172a, #000000)`;
-  const numberGradient = (founderNumber: number) =>
-    `linear-gradient(${120 + (founderNumber % 40)}deg, ${brand.accentFrom}, ${brand.accentTo})`;
+  const palette = resolveBrandAccent(brand.accentFrom, brand.accentTo);
+  const heroBackground = brandWashBackground(palette);
 
   return (
     <main className="mx-auto max-w-7xl space-y-10 px-6 py-12">
       {/* Hero */}
       <section
         className="relative overflow-hidden rounded-lg border border-iron/10 p-10"
-        style={{ backgroundImage: heroGradient }}
+        style={{ backgroundImage: heroBackground }}
       >
-        <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
+        <p className="text-xs uppercase tracking-[0.3em]" style={{ color: palette.accentInk }}>
           Founding Members
         </p>
         <h1
@@ -213,7 +213,7 @@ export default async function FounderWallPage({
           </p>
           <Link
             href={`/signup?ref=${encodeURIComponent(slug)}&next=${encodeURIComponent(`/brands/${slug}/founders`)}`}
-            className="mt-6 inline-block rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-3 text-sm font-semibold text-linen shadow-lg hover:brightness-110"
+            className="mt-6 inline-block rounded-full bg-ember px-6 py-3 text-sm font-semibold text-linen shadow-lg hover:brightness-110"
           >
             Join free for a Founding badge →
           </Link>
@@ -231,8 +231,8 @@ export default async function FounderWallPage({
               >
                 {/* Founder Number */}
                 <div
-                  className="relative mb-3 text-2xl font-bold text-transparent bg-clip-text"
-                  style={{ backgroundImage: numberGradient(founder.founder_number) }}
+                  className="relative mb-3 text-2xl font-bold"
+                  style={{ color: palette.accentInk }}
                 >
                   #{founder.founder_number}
                 </div>
@@ -251,7 +251,7 @@ export default async function FounderWallPage({
                     <div
                       className="flex h-14 w-14 items-center justify-center rounded-full border border-iron/10 group-hover:border-iron/20 text-lg font-semibold text-iron/70"
                       style={{
-                        backgroundImage: `linear-gradient(135deg, ${brand.accentFrom}20, ${brand.accentTo}20)`,
+                        backgroundColor: withAlpha(palette.accent, 0.16),
                       }}
                     >
                       {getInitial(founder.first_name)}
@@ -288,7 +288,7 @@ export default async function FounderWallPage({
         </p>
         <Link
           href={`/signup?ref=${encodeURIComponent(slug)}`}
-          className="mt-6 inline-block rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-3 text-sm font-semibold text-linen shadow-lg hover:brightness-110"
+          className="mt-6 inline-block rounded-full bg-ember px-6 py-3 text-sm font-semibold text-linen shadow-lg hover:brightness-110"
         >
           {isFull ? "Join free →" : "Become a Founding Member →"}
         </Link>
