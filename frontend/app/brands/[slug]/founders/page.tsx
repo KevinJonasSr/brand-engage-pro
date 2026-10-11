@@ -165,6 +165,14 @@ export default async function FounderWallPage({
         <p className="mt-3 max-w-2xl text-lg text-white/80">
           The free first 100 who join — a Founding badge. Brands pay, guests join free.
         </p>
+        <ul className="mt-4 flex flex-wrap gap-2 text-sm text-white/85">
+          <li className="rounded-full border border-white/20 bg-white/10 px-3 py-1">
+            1.5x points for life
+          </li>
+          <li className="rounded-full border border-white/20 bg-white/10 px-3 py-1">
+            RSVP to events 48 hours before everyone else
+          </li>
+        </ul>
       </section>
 
       {/* Scarcity Counter */}

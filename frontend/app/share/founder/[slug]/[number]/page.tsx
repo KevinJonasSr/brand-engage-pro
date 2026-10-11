@@ -22,7 +22,7 @@ export async function generateMetadata({
   const brand = await getBrandFromDb(slug).catch(() => null);
   const brandName = brand?.name ?? "Brand Engage Pro";
   const title = `Founding Member #${number} of ${brandName}`;
-  const description = `One of 100 founding members of ${brandName} on Brand Engage Pro. Founder tier — perks multiplier, early specials access, members-only experiences.`;
+  const description = `One of 100 founding members of ${brandName} on Brand Engage Pro. Founders earn 1.5x points for life and RSVP to events 48 hours before everyone else.`;
   return {
     title,
     description,
@@ -91,8 +91,8 @@ export default async function FounderSharePage({
           </p>
           <p className="max-w-xl text-sm text-white/70">
             One of 100 founding members of {brand.name} on Brand Engage Pro.
-            Founder tier comes with a perks multiplier, early access to
-            specials, and members-only experiences.
+            Founders earn 1.5x points for life and RSVP to events 48 hours
+            before everyone else.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
             <ShareButton
@@ -117,8 +117,8 @@ export default async function FounderSharePage({
           Want to claim a slot at {brand.name}?
         </p>
         <p className="mt-2">
-          Founders are capped at 100 per brand. They earn perks 1.5x faster,
-          unlock founder-only specials, and get first access to events.{" "}
+          Founders are capped at 100 per brand. They earn 1.5x points for life
+          and RSVP to events 48 hours before everyone else.{" "}
           <Link
             href={`/brands/${brand.slug}`}
             className="text-aurora underline hover:text-white"

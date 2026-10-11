@@ -40,6 +40,8 @@ export type Brand = {
      * entries leave this undefined and are treated as public.
      */
     tier?: "public" | "premium";
+    /** When RSVPs open to non-founders (0074). Null or missing means open now. */
+    rsvpOpensAt?: string | null;
   }[];
   merch: { title: string; tier: string; points: string }[];
   social: { label: string; href: string }[];

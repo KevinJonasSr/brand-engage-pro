@@ -26,6 +26,8 @@ export interface BrandEvent {
   active: boolean;
   /** Access tier from migration 0015: 'public' (default) | 'premium'. */
   tier: "public" | "premium";
+  /** When RSVPs open to non-founders (0074). Null means open now. */
+  rsvp_opens_at?: string | null;
 }
 
 type BrandRow = {
@@ -63,6 +65,7 @@ function rowToBrand(row: BrandRow, events: BrandEvent[]): Brand {
         location: e.location,
         url: e.url ?? null,
         tier: (e.tier ?? "public") as "public" | "premium",
+        rsvpOpensAt: e.rsvpOpensAt ?? null,
       }))
     : filterJgeLaunchEvents(
         row.slug,
@@ -85,6 +88,7 @@ function rowToBrand(row: BrandRow, events: BrandEvent[]): Brand {
           location: e.location ?? null,
           url: e.url ?? null,
           tier: (e.tier ?? "public") as "public" | "premium",
+          rsvpOpensAt: e.rsvp_opens_at ?? null,
         }));
   return {
     slug: row.slug,
@@ -123,7 +127,7 @@ export async function getBrandFromDb(slug: string): Promise<Brand | null> {
         .maybeSingle(),
       supabase
         .from("brand_events")
-        .select("id, brand_slug, title, detail, event_date, url, location, image_url, capacity, starts_at, ends_at, sort_order, active, tier")
+        .select("id, brand_slug, title, detail, event_date, url, location, image_url, capacity, starts_at, ends_at, sort_order, active, tier, rsvp_opens_at")
         .eq("brand_slug", normalized)
         .eq("active", true)
         .or(`starts_at.is.null,starts_at.gte.${new Date().toISOString()}`)
@@ -155,7 +159,7 @@ export async function listBrandsFromDb(): Promise<Brand[]> {
     const slugs = brands.map((a) => a.slug as string);
     const { data: events } = await supabase
       .from("brand_events")
-      .select("id, brand_slug, title, detail, event_date, url, location, image_url, capacity, starts_at, ends_at, sort_order, active, tier")
+      .select("id, brand_slug, title, detail, event_date, url, location, image_url, capacity, starts_at, ends_at, sort_order, active, tier, rsvp_opens_at")
       .in("brand_slug", slugs)
       .eq("active", true)
       .or(`starts_at.is.null,starts_at.gte.${new Date().toISOString()}`)

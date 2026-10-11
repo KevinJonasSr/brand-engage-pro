@@ -323,6 +323,8 @@ export type LaunchEvent = {
   capacity?: number | null;
   url?: string | null;
   tier?: "public" | "premium";
+  /** When RSVPs open to non-founders (0074). Null or missing means open now. */
+  rsvpOpensAt?: string | null;
   active?: boolean;
 };
 
@@ -353,6 +355,7 @@ export function applyNelliesLaunchEvents<
     capacity?: number | null;
     url?: string | null;
     tier?: string | null;
+    rsvp_opens_at?: string | null;
   },
 >(brandSlug: string, rows: T[], now: Date = new Date()): LaunchEvent[] {
   if (brandSlug.toLowerCase() !== NELLIES_BRAND_SLUG) {
@@ -365,6 +368,7 @@ export function applyNelliesLaunchEvents<
         date: row.event_date ?? "",
         location: row.location ?? "",
         capacity: row.capacity ?? null,
+        rsvpOpensAt: row.rsvp_opens_at ?? null,
       }));
   }
   const nowMs = now.getTime();
@@ -387,6 +391,7 @@ export function applyNelliesLaunchEvents<
         capacity: row.capacity ?? null,
         url: row.url ?? null,
         tier: row.tier === "premium" ? "premium" : "public",
+        rsvpOpensAt: row.rsvp_opens_at ?? null,
         active: true,
       }),
     );
