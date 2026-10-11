@@ -58,7 +58,7 @@ export default async function RankSharePage({
       ? `${process.env.NEXT_PUBLIC_APP_URL}/share/rank/${slug}/${rank}`
       : `https://brand-engage-pro.vercel.app/share/rank/${slug}/${rank}`;
   const shareTitle = `I'm ranked ${rankDisplay} in the ${brand.name} member community`;
-  const shareText = `Climbing the leaderboard on Brand Engage Pro — currently ${rankDisplay}. Can you beat me? ${shareUrl}`;
+  const shareText = `Climbing the leaderboard on Brand Engage Pro, currently ${rankDisplay}. Can you beat me? ${shareUrl}`;
 
   return (
     <main className="min-h-screen bg-linen text-iron flex flex-col items-center justify-center px-6 py-16">
@@ -88,7 +88,7 @@ export default async function RankSharePage({
           <p className="text-iron/70 text-sm mt-1">{brand.name} member community</p>
         </div>
         <p className="text-iron/70 text-sm max-w-xs">
-          Earn points by engaging — posts, RSVPs, referrals, early badges. Climb the chart.
+          Earn points by engaging: posts, RSVPs, referrals, early badges. Climb the chart.
         </p>
         <ShareButton
           title={shareTitle}

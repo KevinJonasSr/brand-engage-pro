@@ -18,7 +18,7 @@ export async function generateMetadata({
   const dropLabel = decodeURIComponent(drop)
     .replace(/-/g, " ")
     .replace(/\b\w/g, (c) => c.toUpperCase());
-  const title = `Exclusive Drop: ${dropLabel} — ${brandName}`;
+  const title = `Exclusive Drop: ${dropLabel} · ${brandName}`;
   const description = `Members got first access to ${dropLabel} from ${brandName} on Brand Engage Pro.`;
   return {
     title,

@@ -19,7 +19,7 @@ export async function generateMetadata({
   ]);
   const brandName = brand?.name ?? "Brand Engage Pro";
   const title = goal
-    ? `${goal.title} — ${goal.pct}% there`
+    ? `${goal.title}: ${goal.pct}% there`
     : `${brandName} community goal`;
   const description = goal
     ? `The ${brandName} member community is ${goal.pct}% of the way to "${goal.title}" on Brand Engage Pro. Join in and push it over the line.`
@@ -55,7 +55,7 @@ export default async function GoalSharePage({
       ? `${process.env.NEXT_PUBLIC_APP_URL}/share/goal/${slug}/${goalId}`
       : `https://brand-engage-pro.vercel.app/share/goal/${slug}/${goalId}`;
   const shareTitle = goal.completed
-    ? `We did it — "${goal.title}" with ${brand.name}!`
+    ? `We did it! "${goal.title}" with ${brand.name}!`
     : `Help ${brand.name} hit "${goal.title}"`;
   const shareText = goal.completed
     ? `The ${brand.name} member community just hit its goal: ${goal.title}. ${shareUrl}`

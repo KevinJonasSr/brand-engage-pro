@@ -30,8 +30,8 @@ export async function generateMetadata({
   ]);
   const brandName = brand?.name ?? "Brand Engage Pro";
   const eventTitle = eventRow?.title ?? "Event";
-  const title = `Going to ${eventTitle} — ${brandName}`;
-  const description = `RSVP confirmed for ${eventTitle} via Brand Engage Pro — the ${brandName} community app.`;
+  const title = `Going to ${eventTitle} · ${brandName}`;
+  const description = `RSVP confirmed for ${eventTitle} via Brand Engage Pro, the ${brandName} community app.`;
   return {
     title,
     description,
@@ -110,7 +110,7 @@ export default async function RsvpSharePage({
           </div>
         )}
         <p className="text-iron/70 text-sm max-w-xs">
-          RSVP confirmed via Brand Engage Pro — the {brand.name} community app.
+          RSVP confirmed via Brand Engage Pro, the {brand.name} community app.
         </p>
         <div className="flex flex-col gap-3 w-full">
           <ShareButton
