@@ -78,7 +78,7 @@ export function ResolvePredictionForm({
     <form onSubmit={onSubmit} className="space-y-4">
       {predictionType === "multi" && (
         <fieldset className="space-y-2">
-          <legend className="mb-1 block text-xs font-semibold uppercase tracking-wider text-iron/55">
+          <legend className="mb-1 block text-xs font-semibold uppercase tracking-wider text-iron/70">
             Correct option
           </legend>
           {options.length === 0 && (
@@ -107,7 +107,7 @@ export function ResolvePredictionForm({
 
       {predictionType === "numeric" && (
         <label className="block">
-          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-iron/55">
+          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-iron/70">
             Correct number{numericUnit ? ` (${numericUnit})` : ""}
           </span>
           <input
@@ -122,7 +122,7 @@ export function ResolvePredictionForm({
 
       {predictionType === "date" && (
         <label className="block">
-          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-iron/55">
+          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-iron/70">
             Correct date
           </span>
           <input
@@ -135,7 +135,7 @@ export function ResolvePredictionForm({
       )}
 
       <label className="block">
-        <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-iron/55">
+        <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-iron/70">
           Resolution note (optional)
         </span>
         <textarea

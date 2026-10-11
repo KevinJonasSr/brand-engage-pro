@@ -30,7 +30,7 @@ export default async function BirthdayPage() {
       <header className="mb-8">
         <Link
           href="/me"
-          className="text-xs uppercase tracking-widest text-iron/60 hover:text-iron"
+          className="text-xs uppercase tracking-widest text-iron/70 hover:text-iron"
         >
           ← Account
         </Link>

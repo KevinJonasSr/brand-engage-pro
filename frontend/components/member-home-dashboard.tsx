@@ -29,7 +29,7 @@ export default function MemberHomeDashboard({ data, streak, recap }: { data: Mem
       {/* Greeting + quick stats */}
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
+          <p className="text-xs uppercase tracking-[0.3em] text-iron/70">
             Welcome back{member.first_name ? `, ${member.first_name.split(" ")[0]}` : ""}
           </p>
           <h1
@@ -89,7 +89,7 @@ function FollowedBrandsStrip({
     return (
       <div className="glass-card p-5">
         <p className="text-sm font-semibold">Follow your favorite brands</p>
-        <p className="mt-2 text-xs text-iron/60">
+        <p className="mt-2 text-xs text-iron/70">
           Tap a brand, hit <span className="text-iron">+ Follow</span>, and you&apos;ll see
           their posts, events, and offers here.
         </p>
@@ -105,10 +105,10 @@ function FollowedBrandsStrip({
   return (
     <div className="glass-card p-4">
       <div className="mb-3 flex items-center justify-between">
-        <p className="text-xs uppercase tracking-wide text-iron/60">
+        <p className="text-xs uppercase tracking-wide text-iron/70">
           Following · {brands.length}
         </p>
-        <Link href="/brands" className="text-xs text-iron/60 hover:text-iron">
+        <Link href="/brands" className="text-xs text-iron/70 hover:text-iron">
           Add more →
         </Link>
       </div>
@@ -192,7 +192,7 @@ function UpcomingEventsList({
   if (events.length === 0) {
     return (
       <div className="glass-card rounded-lg p-5">
-        <p className="text-xs uppercase tracking-wide text-iron/60">Upcoming</p>
+        <p className="text-xs uppercase tracking-wide text-iron/70">Upcoming</p>
         <p className="mt-3 text-sm text-iron/70">
           {hasFollows
             ? "No upcoming shows from your brands yet — check back soon."
@@ -205,7 +205,7 @@ function UpcomingEventsList({
   return (
     <div className="glass-card rounded-lg p-5">
       <div className="flex items-center justify-between">
-        <p className="text-xs uppercase tracking-wide text-iron/60">
+        <p className="text-xs uppercase tracking-wide text-iron/70">
           Upcoming · {events.length}
         </p>
       </div>
@@ -217,13 +217,13 @@ function UpcomingEventsList({
               className="group flex items-start justify-between gap-3 rounded-xl bg-parchment/20 p-3 transition hover:bg-parchment/30"
             >
               <div className="min-w-0 flex-1">
-                <p className="text-xs uppercase tracking-wide text-iron/50">
+                <p className="text-xs uppercase tracking-wide text-iron/70">
                   {e.event_date ?? "Date TBD"}
                 </p>
                 <p className="mt-1 line-clamp-2 text-sm font-semibold text-iron">
                   {e.title}
                 </p>
-                <p className="mt-1 text-xs text-iron/60">
+                <p className="mt-1 text-xs text-iron/70">
                   {e.brand_name ? `${e.brand_name} · ` : ""}
                   {e.location ? `📍 ${e.location}` : "Location TBA"}
                 </p>
@@ -234,7 +234,7 @@ function UpcomingEventsList({
                     ✓ Going
                   </span>
                 ) : (
-                  <span className="inline-flex text-xs text-iron/50 group-hover:text-iron/80">
+                  <span className="inline-flex text-xs text-iron/70 group-hover:text-iron/80">
                     RSVP →
                   </span>
                 )}
@@ -260,7 +260,7 @@ function ActiveCtasBlock({ ctas }: { ctas: MemberHomeData["ctas"] }) {
           <div className="text-xl">{cta.kind === "share" ? "📣" : "✨"}</div>
           <div>
             <p className="text-xs font-semibold">{cta.title}</p>
-            <p className="text-xs text-iron/60">{cta.description}</p>
+            <p className="text-xs text-iron/70">{cta.description}</p>
           </div>
         </Link>
       ))}
@@ -293,7 +293,7 @@ function RecentActivityFeed({
   if (posts.length === 0) {
     return (
       <div className="glass-card rounded-lg p-5">
-        <p className="text-xs uppercase tracking-wide text-iron/60">Recent activity</p>
+        <p className="text-xs uppercase tracking-wide text-iron/70">Recent activity</p>
         <p className="mt-3 text-sm text-iron/70">
           {hasFollows
             ? "Nothing new from your brands yet."
@@ -305,7 +305,7 @@ function RecentActivityFeed({
 
   return (
     <div className="glass-card rounded-lg p-5">
-      <p className="text-xs uppercase tracking-wide text-iron/60">Recent activity</p>
+      <p className="text-xs uppercase tracking-wide text-iron/70">Recent activity</p>
       <ul className="mt-4 space-y-3">
         {posts.slice(0, 3).map((post) => {
           const badge = postKindBadge(post.kind);
@@ -335,10 +335,10 @@ function RecentActivityFeed({
                 href={`/brands/${post.brand_slug}/community`}
                 className="group block"
               >
-                <p className="text-xs uppercase tracking-wide text-iron/50">
+                <p className="text-xs uppercase tracking-wide text-iron/70">
                   {badge.icon} {badge.label}
                   {post.pinned && (
-                    <span className="ml-2 rounded-full bg-iron/10 px-1.5 py-0.5 text-[9px] text-iron/60">
+                    <span className="ml-2 rounded-full bg-iron/10 px-1.5 py-0.5 text-[9px] text-iron/70">
                       📌 Pinned
                     </span>
                   )}
@@ -346,7 +346,7 @@ function RecentActivityFeed({
                 <p className="mt-1 line-clamp-2 text-xs font-semibold text-iron group-hover:text-iron">
                   {display}
                 </p>
-                <p className="mt-1 text-xs text-iron/40">
+                <p className="mt-1 text-xs text-iron/70">
                   {post.brand_name ?? post.brand_slug}
                   {post.author_first_name ? ` · ${post.author_first_name}` : ""}
                   {" · "}
@@ -413,7 +413,7 @@ function timeAgo(iso: string): string {
 function BadgesInProgressPanel({ items }: { items: MemberHomeData["badgesInProgress"] }) {
   return (
     <div className="glass-card rounded-lg p-5">
-      <p className="text-xs uppercase tracking-wide text-iron/60">Badges in progress</p>
+      <p className="text-xs uppercase tracking-wide text-iron/70">Badges in progress</p>
       {items.length > 0 ? (
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {items.slice(0, 6).map((badge) => {
@@ -443,7 +443,7 @@ function BadgesInProgressPanel({ items }: { items: MemberHomeData["badgesInProgr
                         style={{ width: `${pct}%` }}
                       />
                     </div>
-                    <span className="text-xs uppercase tracking-wide text-iron/50">
+                    <span className="text-xs uppercase tracking-wide text-iron/70">
                       {badge.progress}/{badge.threshold}
                     </span>
                   </>
@@ -453,7 +453,7 @@ function BadgesInProgressPanel({ items }: { items: MemberHomeData["badgesInProgr
           })}
         </div>
       ) : (
-        <p className="mt-3 text-xs text-iron/50">
+        <p className="mt-3 text-xs text-iron/70">
           Keep engaging — new badges will appear here as you make progress.
         </p>
       )}
@@ -470,10 +470,10 @@ function SpendPointsCard({
 }) {
   const rewardsHref = primaryCommunity ? `/brands/${primaryCommunity}/rewards` : "/rewards";
   return (
-    <div className="glass-card rounded-lg p-5 border border-gradient-to-r from-purple-500/30 to-blue-500/30">
+    <div className="glass-card rounded-lg p-5 border border-iron/10">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs uppercase tracking-wide text-iron/60">Spend your points</p>
+          <p className="text-xs uppercase tracking-wide text-iron/70">Spend your points</p>
           <p className="mt-1 text-sm font-semibold">{points.toLocaleString()} available</p>
         </div>
         <Link

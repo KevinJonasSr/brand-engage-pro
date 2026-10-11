@@ -186,7 +186,7 @@ export default async function PremiumWelcomePage({
                     🌟 Founding Member badge · +500 pts
                   </div>
                   {customerEmail && (
-                    <p className="mt-6 text-xs text-iron/50">
+                    <p className="mt-6 text-xs text-iron/70">
                       Receipt on its way to{" "}
                       <span className="text-iron/80">{customerEmail}</span>.
                     </p>
@@ -207,7 +207,7 @@ export default async function PremiumWelcomePage({
                     yours.
                   </p>
                   {customerEmail && (
-                    <p className="mt-6 text-xs text-iron/50">
+                    <p className="mt-6 text-xs text-iron/70">
                       Receipt on its way to{" "}
                       <span className="text-iron/80">{customerEmail}</span>.
                     </p>

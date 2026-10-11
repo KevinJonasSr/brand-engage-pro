@@ -42,9 +42,9 @@ export default async function MemberCardPage() {
   return (
     <main className="mx-auto max-w-lg px-4 py-10 sm:py-16 space-y-6">
       <header>
-        <p className="text-xs uppercase tracking-widest text-iron/60">Your card</p>
+        <p className="text-xs uppercase tracking-widest text-iron/70">Your card</p>
         <h1 className="mt-1 text-3xl font-semibold tracking-tight">Member Card</h1>
-        <p className="mt-2 text-sm text-iron/60">
+        <p className="mt-2 text-sm text-iron/70">
           Share this to flex your tier and invite friends.
         </p>
       </header>
@@ -53,20 +53,20 @@ export default async function MemberCardPage() {
       <div
         className="relative overflow-hidden rounded-lg border border-iron/10 p-8 shadow-glass"
         style={{
-          background: "linear-gradient(135deg, rgba(212,160,23,0.3) 0%, #0f172a 50%, rgba(245,101,40,0.2) 100%)",
+          background: "linear-gradient(135deg, rgba(212,160,23,0.28) 0%, #f5efe4 50%, rgba(155,35,53,0.14) 100%)",
         }}
       >
         {/* Glow */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -top-16 -right-16 h-48 w-48 rounded-full bg-aurora/30 blur-3xl"
+          className="pointer-events-none absolute -top-16 -right-16 h-48 w-48 rounded-full bg-aurora/20 blur-3xl"
         />
 
         <div className="relative space-y-6">
           {/* Header row */}
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-iron/50">
+              <p className="text-xs uppercase tracking-[0.3em] text-iron/70">
                 Brand Engage Pro
               </p>
               <p className="mt-2 text-2xl font-semibold">{displayName}</p>
@@ -87,13 +87,13 @@ export default async function MemberCardPage() {
             >
               {totalPoints.toLocaleString()}
             </p>
-            <p className="mt-1 text-sm text-iron/50">total points</p>
+            <p className="mt-1 text-sm text-iron/70">total points</p>
           </div>
 
           {/* Progress to next tier */}
           {nextTierData && kpis?.points_to_next_tier != null && (
             <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs text-iron/50">
+              <div className="flex items-center justify-between text-xs text-iron/70">
                 <span>{currentTierData?.display_name}</span>
                 <span>{nextTierData.display_name}</span>
               </div>
@@ -113,7 +113,7 @@ export default async function MemberCardPage() {
                   }}
                 />
               </div>
-              <p className="text-xs text-iron/40">
+              <p className="text-xs text-iron/70">
                 {kpis.points_to_next_tier.toLocaleString()} pts to{" "}
                 {nextTierData.display_name}
               </p>
@@ -124,17 +124,17 @@ export default async function MemberCardPage() {
           <div className="flex gap-4 border-t border-iron/10 pt-4 text-center">
             <div className="flex-1">
               <p className="text-lg font-semibold">{kpis?.badge_count ?? 0}</p>
-              <p className="text-xs text-iron/50">Badges</p>
+              <p className="text-xs text-iron/70">Badges</p>
             </div>
             <div className="flex-1">
               <p className="text-lg font-semibold">{kpis?.referral_count ?? 0}</p>
-              <p className="text-xs text-iron/50">Referrals</p>
+              <p className="text-xs text-iron/70">Referrals</p>
             </div>
             <div className="flex-1">
               <p className="text-lg font-semibold">
                 {currentTierData?.min_points?.toLocaleString() ?? "—"}
               </p>
-              <p className="text-xs text-iron/50">Tier min pts</p>
+              <p className="text-xs text-iron/70">Tier min pts</p>
             </div>
           </div>
         </div>
@@ -159,7 +159,7 @@ export default async function MemberCardPage() {
 
       <p className="text-center text-xs text-iron/35">
         Members can view your public profile at{" "}
-        <span className="text-iron/55">/members/{member.id}</span>
+        <span className="text-iron/70">/members/{member.id}</span>
       </p>
     </main>
   );

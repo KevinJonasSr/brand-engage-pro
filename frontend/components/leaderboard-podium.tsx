@@ -17,7 +17,7 @@ const TIER_COLOR: Record<string, string> = {
   bronze:   "from-amber-700/40 to-aurora/20",
   silver:   "from-slate-300/30 to-slate-500/20",
   gold:     "from-yellow-400/40 to-amber-600/30",
-  platinum: "from-violet-300/40 to-fuchsia-500/30",
+  platinum: "from-iron/20 to-iron/10",
   founder:  "from-rose-300/40 to-rose-600/30",
 };
 
@@ -113,16 +113,16 @@ export default function LeaderboardPodium({
                     </span>
                   )}
                 </p>
-                <p className="mt-0.5 text-xs uppercase tracking-wide text-iron/55">
+                <p className="mt-0.5 text-xs uppercase tracking-wide text-iron/70">
                   {entry.score.toLocaleString()} pts
                 </p>
               </>
             ) : (
               <>
-                <div className="mb-2 flex h-16 w-16 items-center justify-center rounded-full border border-dashed border-iron/15 text-2xl text-iron/30">
+                <div className="mb-2 flex h-16 w-16 items-center justify-center rounded-full border border-dashed border-iron/15 text-2xl text-iron/70">
                   ?
                 </div>
-                <p className="text-center text-xs text-iron/40">Open</p>
+                <p className="text-center text-xs text-iron/70">Open</p>
               </>
             )}
 

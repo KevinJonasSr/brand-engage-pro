@@ -108,12 +108,12 @@ export default function CommentComposer({ postId, brandSlug }: Props) {
       {/* Drafts panel — only rendered when we have drafts or an error. */}
       {(drafts !== null || draftError !== null || loadingDrafts) && (
         <div className="space-y-2 rounded-lg border border-iron/10 bg-iron/5 p-3">
-          <div className="flex items-center justify-between text-xs uppercase tracking-wide text-iron/60">
+          <div className="flex items-center justify-between text-xs uppercase tracking-wide text-iron/70">
             <span>✨ AI draft suggestions</span>
             <button
               type="button"
               onClick={dismissDrafts}
-              className="text-iron/50 hover:text-iron"
+              className="text-iron/70 hover:text-iron"
               aria-label="Dismiss drafts"
             >
               ×
@@ -121,7 +121,7 @@ export default function CommentComposer({ postId, brandSlug }: Props) {
           </div>
 
           {loadingDrafts && (
-            <p className="text-xs text-iron/50">Drafting 3 options…</p>
+            <p className="text-xs text-iron/70">Drafting 3 options…</p>
           )}
 
           {draftError && (
@@ -140,7 +140,7 @@ export default function CommentComposer({ postId, brandSlug }: Props) {
                   {d}
                 </button>
               ))}
-              <p className="text-xs text-iron/40">
+              <p className="text-xs text-iron/70">
                 Pick one to fill the box. You can still edit before
                 posting.
               </p>

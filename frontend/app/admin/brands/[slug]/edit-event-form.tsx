@@ -147,7 +147,7 @@ export default function EditEventForm({
         <button
           type="button"
           onClick={onCancel}
-          className="text-xs text-iron/60 hover:text-iron"
+          className="text-xs text-iron/70 hover:text-iron"
         >
           Cancel
         </button>

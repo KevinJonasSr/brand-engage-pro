@@ -78,14 +78,14 @@ export default async function InboxPage({
     <main className="mx-auto max-w-2xl px-6 py-10">
       <div className="mb-8 flex items-end justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-widest text-iron/50">Notifications</p>
+          <p className="text-xs uppercase tracking-widest text-iron/70">Notifications</p>
           <h1
             className="mt-1 text-3xl font-semibold"
             style={{ fontFamily: "var(--font-display)" }}
           >
             Inbox
           </h1>
-          <p className="mt-1 text-sm text-iron/60">
+          <p className="mt-1 text-sm text-iron/70">
             {unreadCount > 0
               ? `${unreadCount} unread`
               : "You're all caught up."}
@@ -105,7 +105,7 @@ export default async function InboxPage({
             )}
             {all.length > unreadCount && (
               <form action={archiveReadAction}>
-                <button type="submit" className="rounded-full border border-iron/20 px-4 py-2 text-xs font-medium text-iron/60 hover:bg-iron/10">
+                <button type="submit" className="rounded-full border border-iron/20 px-4 py-2 text-xs font-medium text-iron/70 hover:bg-iron/10">
                   Archive read
                 </button>
               </form>
@@ -120,7 +120,7 @@ export default async function InboxPage({
           className={`rounded-full px-3 py-1.5 ${
             filter === "all"
               ? "bg-iron/15 text-iron"
-              : "text-iron/60 hover:bg-iron/10 hover:text-iron"
+              : "text-iron/70 hover:bg-iron/10 hover:text-iron"
           }`}
         >
           All
@@ -130,7 +130,7 @@ export default async function InboxPage({
           className={`rounded-full px-3 py-1.5 ${
             filter === "unread"
               ? "bg-iron/15 text-iron"
-              : "text-iron/60 hover:bg-iron/10 hover:text-iron"
+              : "text-iron/70 hover:bg-iron/10 hover:text-iron"
           }`}
         >
           Unread
@@ -143,7 +143,7 @@ export default async function InboxPage({
       </div>
 
       {items.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-iron/15 p-10 text-center text-iron/60">
+        <div className="rounded-lg border border-dashed border-iron/15 p-10 text-center text-iron/70">
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-iron/5 text-2xl">
             🔔
           </div>
@@ -157,7 +157,7 @@ export default async function InboxPage({
         <div className="space-y-4">
         {Array.from(groupedKinds.entries()).map(([groupName, groupItems]) => (
           <section key={groupName}>
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-widest text-iron/40">
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-widest text-iron/70">
               {groupName}
             </h3>
             <ul className="divide-y divide-iron/10 overflow-hidden rounded-lg border border-iron/10 bg-parchment/30">
@@ -179,10 +179,10 @@ export default async function InboxPage({
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline gap-2">
-                      <span className="text-xs uppercase tracking-widest text-iron/40">
+                      <span className="text-xs uppercase tracking-widest text-iron/70">
                         {kindLabel(n.kind)}
                       </span>
-                      <span className="text-xs text-iron/40">
+                      <span className="text-xs text-iron/70">
                         · {relativeTime(n.created_at)}
                       </span>
                     </div>

@@ -104,7 +104,7 @@ export default async function AdminChallengesPage() {
         <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
           Challenges review
         </h1>
-        <p className="mt-1 text-sm text-iron/60">
+        <p className="mt-1 text-sm text-iron/70">
           Every active challenge and its entries. Pick a winner to grant a bonus badge + points.
         </p>
       </div>
@@ -134,14 +134,14 @@ export default async function AdminChallengesPage() {
                 </div>
                 <Link
                   href={`/brands/${c.brand_slug}/community`}
-                  className="text-xs text-iron/60 hover:text-iron"
+                  className="text-xs text-iron/70 hover:text-iron"
                 >
                   View live →
                 </Link>
               </header>
 
               {c.entries.length === 0 ? (
-                <p className="mt-3 text-xs text-iron/50">No entries yet.</p>
+                <p className="mt-3 text-xs text-iron/70">No entries yet.</p>
               ) : (
                 <div className="mt-3 grid gap-3 md:grid-cols-2">
                   {c.entries.map((e) => {
@@ -163,7 +163,7 @@ export default async function AdminChallengesPage() {
                             {e.member_first_name ?? "Anonymous"}
                             {isWinner && " 🏆"}
                           </Link>
-                          <span className="text-xs text-iron/40">
+                          <span className="text-xs text-iron/70">
                             {new Date(e.created_at).toLocaleString()}
                           </span>
                         </div>

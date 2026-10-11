@@ -86,7 +86,7 @@ export default async function AdminCampaignsPage() {
           <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
             Campaigns
           </h1>
-          <p className="mt-1 text-sm text-iron/60">
+          <p className="mt-1 text-sm text-iron/70">
             Bundle announcements, polls, challenges, offers, and member CTAs into a single coordinated drop.
           </p>
         </div>
@@ -101,7 +101,7 @@ export default async function AdminCampaignsPage() {
       {campaigns.length === 0 ? (
         <div className="rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-8 text-center">
           <p className="text-sm font-semibold">No campaigns yet</p>
-          <p className="mt-2 text-xs text-iron/60">
+          <p className="mt-2 text-xs text-iron/70">
             Create your first campaign to publish an announcement, poll, challenge, offer, and member CTAs in one shot.
           </p>
         </div>
@@ -125,7 +125,7 @@ export default async function AdminCampaignsPage() {
                           Live
                         </span>
                       ) : (
-                        <span className="rounded-full bg-iron/10 px-2 py-0.5 text-xs uppercase tracking-wide text-iron/50">
+                        <span className="rounded-full bg-iron/10 px-2 py-0.5 text-xs uppercase tracking-wide text-iron/70">
                           Ended
                         </span>
                       )}
@@ -136,12 +136,12 @@ export default async function AdminCampaignsPage() {
                     )}
                     <div className="mt-3 flex flex-wrap gap-1.5">
                       {Object.entries(c.items).length === 0 ? (
-                        <span className="text-xs text-iron/40">No items</span>
+                        <span className="text-xs text-iron/70">No items</span>
                       ) : (
                         Object.entries(c.items).map(([kind, count]) => itemBadge(kind, count))
                       )}
                     </div>
-                    <p className="mt-2 text-xs text-iron/40">
+                    <p className="mt-2 text-xs text-iron/70">
                       {c.published_at
                         ? `Published ${new Date(c.published_at as string).toLocaleString()}`
                         : "Draft"}

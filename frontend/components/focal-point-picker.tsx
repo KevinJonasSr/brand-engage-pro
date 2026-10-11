@@ -35,7 +35,7 @@ export default function FocalPointPicker({
 
   if (!imageUrl) {
     return (
-      <div className="rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-4 text-xs text-iron/50">
+      <div className="rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-4 text-xs text-iron/70">
         Upload a hero image first to set the focal point.
       </div>
     );
@@ -69,7 +69,7 @@ export default function FocalPointPicker({
   return (
     <div className="space-y-3">
       <div className="rounded-lg border border-iron/10 bg-parchment/20 p-3">
-        <p className="mb-2 text-xs text-iron/60">
+        <p className="mb-2 text-xs text-iron/70">
           Click or drag anywhere on the photo to set the focal point. The
           dot marks the spot that stays in view when the image is cropped
           to different aspect ratios on the public pages.
@@ -103,7 +103,7 @@ export default function FocalPointPicker({
 
         <div className="mt-3 flex flex-wrap items-end gap-3">
           <label className="block">
-            <span className="text-xs uppercase tracking-wide text-iron/50">x %</span>
+            <span className="text-xs uppercase tracking-wide text-iron/70">x %</span>
             <input
               type="number"
               min={0}
@@ -116,7 +116,7 @@ export default function FocalPointPicker({
             />
           </label>
           <label className="block">
-            <span className="text-xs uppercase tracking-wide text-iron/50">y %</span>
+            <span className="text-xs uppercase tracking-wide text-iron/70">y %</span>
             <input
               type="number"
               min={0}
@@ -135,14 +135,14 @@ export default function FocalPointPicker({
           >
             Reset to center
           </button>
-          <p className="ml-auto text-xs text-iron/40">
+          <p className="ml-auto text-xs text-iron/70">
             Saves with the rest of the form.
           </p>
         </div>
       </div>
 
       <div>
-        <p className="mb-2 text-xs uppercase tracking-wide text-iron/60">
+        <p className="mb-2 text-xs uppercase tracking-wide text-iron/70">
           Live preview · {focalX}% {focalY}%
         </p>
         <div className="grid grid-cols-3 gap-2">
@@ -178,7 +178,7 @@ function PreviewTile({
           aria-hidden
         />
       </div>
-      <p className="text-center text-xs uppercase tracking-wide text-iron/50">
+      <p className="text-center text-xs uppercase tracking-wide text-iron/70">
         {label}
       </p>
     </div>

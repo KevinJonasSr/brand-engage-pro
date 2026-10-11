@@ -33,7 +33,7 @@ export default async function AdminApplicationsPage() {
         >
           Brand applications
         </h1>
-        <p className="mt-2 text-sm text-iron/60">
+        <p className="mt-2 text-sm text-iron/70">
           Submissions from /for-brands/apply. Approve / reject actions land in
           Phase F.1.B — for now this is read-only intake.
         </p>
@@ -53,7 +53,7 @@ export default async function AdminApplicationsPage() {
       </div>
 
       {apps.length === 0 ? (
-        <div className="glass-card rounded-lg p-8 text-center text-sm text-iron/55">
+        <div className="glass-card rounded-lg p-8 text-center text-sm text-iron/70">
           No applications yet. Submissions land here as soon as someone hits
           the form at /for-brands/apply.
         </div>
@@ -70,11 +70,11 @@ export default async function AdminApplicationsPage() {
                   {a.tagline && (
                     <p className="mt-1 text-sm text-iron/70">{a.tagline}</p>
                   )}
-                  <p className="mt-2 text-xs text-iron/50">
+                  <p className="mt-2 text-xs text-iron/70">
                     {a.contact_name} · {a.contact_email}
                     {a.contact_phone ? ` · ${a.contact_phone}` : ""}
                   </p>
-                  <p className="mt-1 text-xs text-iron/40">
+                  <p className="mt-1 text-xs text-iron/70">
                     {new Date(a.created_at).toLocaleString()}
                     {a.category ? ` · ${a.category}` : ""}
                     {a.primary_city ? ` · ${a.primary_city}` : ""}
@@ -92,7 +92,7 @@ export default async function AdminApplicationsPage() {
                 </p>
               )}
               {a.social.length > 0 && (
-                <p className="mt-3 text-xs text-iron/55">
+                <p className="mt-3 text-xs text-iron/70">
                   Social:{" "}
                   {a.social
                     .map((s) => `${s.label} (${s.href})`)

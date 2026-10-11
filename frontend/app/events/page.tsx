@@ -24,7 +24,7 @@ export default async function EventsPage() {
   return (
     <main className="mx-auto max-w-3xl space-y-8 px-6 py-12">
       <header className="space-y-2">
-        <p className="text-sm uppercase tracking-wide text-iron/60">Nellie&apos;s Southern Kitchen</p>
+        <p className="text-sm uppercase tracking-wide text-iron/70">Nellie&apos;s Southern Kitchen</p>
         <h1 className="text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
           Member offers &amp; events
         </h1>
@@ -38,7 +38,7 @@ export default async function EventsPage() {
       </header>
 
       <section id="offers" className="glass-card space-y-4 p-6">
-        <p className="text-sm uppercase tracking-wide text-iron/60">Member offers</p>
+        <p className="text-sm uppercase tracking-wide text-iron/70">Member offers</p>
         <ul className="space-y-4">
           {NELLIES_PUBLISHED_OFFERS.map((offer) => (
             <li key={offer.slug} className="rounded-lg bg-parchment/30 p-5">
@@ -50,9 +50,9 @@ export default async function EventsPage() {
       </section>
 
       <section id="upcoming" className="glass-card space-y-3 p-6">
-        <p className="text-sm uppercase tracking-wide text-iron/60">Upcoming</p>
+        <p className="text-sm uppercase tracking-wide text-iron/70">Upcoming</p>
         {events.length === 0 ? (
-          <p className="text-sm text-iron/60">New events are coming soon. Check back shortly.</p>
+          <p className="text-sm text-iron/70">New events are coming soon. Check back shortly.</p>
         ) : (
           <ul className="space-y-4">
             {events.map((event) => (
@@ -60,13 +60,13 @@ export default async function EventsPage() {
                 <p className="text-sm font-semibold">{event.title}</p>
                 {event.detail && <p className="mt-1 text-xs text-iron/70">{event.detail}</p>}
                 {event.location && (
-                  <p className="mt-2 text-xs text-iron/60">📍 {event.location}</p>
+                  <p className="mt-2 text-xs text-iron/70">📍 {event.location}</p>
                 )}
                 {event.date && (
-                  <p className="mt-3 text-xs uppercase tracking-wide text-iron/40">{event.date}</p>
+                  <p className="mt-3 text-xs uppercase tracking-wide text-iron/70">{event.date}</p>
                 )}
                 {event.capacity != null && (
-                  <p className="mt-1 text-xs text-iron/50">Cap {event.capacity}</p>
+                  <p className="mt-1 text-xs text-iron/70">Cap {event.capacity}</p>
                 )}
                 {event.url && (
                   <a

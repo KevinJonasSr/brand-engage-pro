@@ -54,7 +54,7 @@ export default function ChallengeBlock({
   return (
     <div className="space-y-3 rounded-lg border border-iron/10 bg-parchment/30 p-4">
       <div className="flex items-center justify-between">
-        <p className="text-xs uppercase tracking-wide text-iron/50">
+        <p className="text-xs uppercase tracking-wide text-iron/70">
           🏆 Challenge · {entries.length}{" "}
           {entries.length === 1 ? "entry" : "entries"}
         </p>
@@ -107,7 +107,7 @@ export default function ChallengeBlock({
       )}
 
       {!currentUserId && (
-        <p className="text-xs text-iron/50">
+        <p className="text-xs text-iron/70">
           Sign in to submit an entry (+3 pts).
         </p>
       )}
@@ -120,7 +120,7 @@ export default function ChallengeBlock({
                 <p className="text-xs font-semibold">
                   {e.member_first_name?.trim() || "Member"}
                 </p>
-                <p className="text-xs uppercase tracking-wide text-iron/40">
+                <p className="text-xs uppercase tracking-wide text-iron/70">
                   {timeAgo(e.created_at)}
                 </p>
               </div>
@@ -140,7 +140,7 @@ export default function ChallengeBlock({
             </div>
           ))}
           {entries.length > 6 && (
-            <p className="text-xs text-iron/50">
+            <p className="text-xs text-iron/70">
               + {entries.length - 6} more{" "}
               {entries.length - 6 === 1 ? "entry" : "entries"}
             </p>

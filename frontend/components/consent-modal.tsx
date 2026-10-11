@@ -177,7 +177,7 @@ export function ConsentModal({
                     "rounded-full px-3 py-1 text-xs font-medium transition " +
                     (activeTab === i
                       ? "bg-aurora/20 text-aurora-ink"
-                      : "text-iron/50 hover:text-iron/80")
+                      : "text-iron/70 hover:text-iron/80")
                   }
                 >
                   {d.title}
@@ -222,7 +222,7 @@ export function ConsentModal({
             <button
               type="button"
               onClick={onCancel}
-              className="rounded-full px-4 py-2 text-sm text-iron/60 hover:text-iron"
+              className="rounded-full px-4 py-2 text-sm text-iron/70 hover:text-iron"
             >
               Cancel
             </button>

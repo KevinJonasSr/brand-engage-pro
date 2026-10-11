@@ -34,14 +34,14 @@ export default async function AdminOffersPage() {
           <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
             Offers
           </h1>
-          <p className="mt-2 text-sm text-iron/60">
+          <p className="mt-2 text-sm text-iron/70">
             Active offers appear on the marketplace. Inactive ones are hidden but not deleted.
           </p>
         </div>
       </div>
 
       <div className="rounded-lg border border-iron/10 bg-parchment/30 p-5">
-        <h2 className="text-sm uppercase tracking-wide text-iron/60">Add a new offer</h2>
+        <h2 className="text-sm uppercase tracking-wide text-iron/70">Add a new offer</h2>
         <form action={createOfferAction} className="mt-4 grid gap-3 md:grid-cols-2">
           <BrandField />
           <input
@@ -100,7 +100,7 @@ export default async function AdminOffersPage() {
             className="rounded-xl border border-iron/10 bg-parchment/40 px-3 py-2 text-sm md:col-span-2"
           />
           <div className="md:col-span-2">
-            <p className="mb-2 text-xs uppercase tracking-wide text-iron/60">
+            <p className="mb-2 text-xs uppercase tracking-wide text-iron/70">
               Image / ad mat (optional)
             </p>
             <ImageUploader
@@ -108,7 +108,7 @@ export default async function AdminOffersPage() {
               name="image_url"
               label="Add image or ad mat"
             />
-            <p className="mt-1 text-xs text-iron/50">
+            <p className="mt-1 text-xs text-iron/70">
               Recommended: landscape, 1200×800 or larger. JPEG, PNG, WebP, or GIF.
             </p>
           </div>
@@ -123,7 +123,7 @@ export default async function AdminOffersPage() {
 
       <div className="overflow-hidden rounded-lg border border-iron/10">
         <table className="w-full text-sm">
-          <thead className="bg-parchment/40 text-left text-xs uppercase tracking-wide text-iron/50">
+          <thead className="bg-parchment/40 text-left text-xs uppercase tracking-wide text-iron/70">
             <tr>
               <th className="px-4 py-3">Image</th>
               <th className="px-4 py-3">Title</th>
@@ -137,7 +137,7 @@ export default async function AdminOffersPage() {
           <tbody>
             {offers.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-6 text-center text-iron/50">
+                <td colSpan={7} className="px-4 py-6 text-center text-iron/70">
                   No offers yet — create one above.
                 </td>
               </tr>
@@ -162,7 +162,7 @@ export default async function AdminOffersPage() {
                 <td className="px-4 py-3">
                   <span
                     className={`rounded-full px-2 py-1 text-xs ${
-                      o.active ? "bg-emerald-500/20 text-sage-ink" : "bg-iron/10 text-iron/50"
+                      o.active ? "bg-emerald-500/20 text-sage-ink" : "bg-iron/10 text-iron/70"
                     }`}
                   >
                     {o.active ? "active" : "hidden"}

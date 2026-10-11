@@ -15,9 +15,9 @@ async function MemberPoints({ isSignedIn }: { isSignedIn: boolean }) {
   if (!isSignedIn) {
     return (
       <div className="rounded-lg border border-dashed border-iron/15 bg-parchment/30 px-4 py-3">
-        <p className="text-xs uppercase tracking-wide text-iron/60">Your points</p>
+        <p className="text-xs uppercase tracking-wide text-iron/70">Your points</p>
         <p className="mt-1 text-2xl font-bold text-iron">0</p>
-        <p className="mt-1 text-xs text-iron/50">
+        <p className="mt-1 text-xs text-iron/70">
           Sign in to earn and redeem. New accounts start at 0.
         </p>
       </div>
@@ -28,7 +28,7 @@ async function MemberPoints({ isSignedIn }: { isSignedIn: boolean }) {
 
   return (
     <div className="rounded-lg border border-iron/10 bg-parchment/30 px-4 py-2">
-      <p className="text-xs uppercase tracking-wide text-iron/60">Your Points</p>
+      <p className="text-xs uppercase tracking-wide text-iron/70">Your Points</p>
       <p className="mt-1 text-2xl font-bold text-iron">
         {points.toLocaleString()}
       </p>
@@ -69,7 +69,7 @@ export default async function RewardsPage({
           <h1 className="text-3xl font-bold" style={{ fontFamily: "var(--font-display)" }}>
             Rewards · {brand.name}
           </h1>
-          <p className="mt-2 text-sm text-iron/60">
+          <p className="mt-2 text-sm text-iron/70">
             {isNellies ? (
               <>
                 Join Nellie&apos;s and earn points from visits and check-ins. You also get free
@@ -133,7 +133,7 @@ export default async function RewardsPage({
           </div>
         ) : (
           <div className="glass-card mb-12 rounded-lg p-8 text-center">
-            <p className="text-sm text-iron/60">
+            <p className="text-sm text-iron/70">
               {isNellies ? (
                 <>
                   Nellie&apos;s member offers are on the Nellie&apos;s page: a welcome dessert with an
@@ -159,7 +159,7 @@ export default async function RewardsPage({
                 >
                   <div>
                     <p className="text-sm font-medium">{r.reward.title}</p>
-                    <p className="text-xs text-iron/60">
+                    <p className="text-xs text-iron/70">
                       {r.point_cost.toLocaleString()} points • {r.status}
                     </p>
                   </div>

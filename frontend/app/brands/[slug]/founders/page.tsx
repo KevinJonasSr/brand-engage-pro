@@ -179,9 +179,9 @@ export default async function FounderWallPage({
       <section className="rounded-lg border border-iron/10 bg-iron/5 backdrop-blur p-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <p className="text-sm text-iron/60">Founder slots</p>
+            <p className="text-sm text-iron/70">Founder slots</p>
             <p className="mt-1 text-3xl font-semibold">
-              {claimedCount} <span className="text-lg text-iron/60">/ {founderCap}</span>
+              {claimedCount} <span className="text-lg text-iron/70">/ {founderCap}</span>
             </p>
           </div>
           <div className="text-right">
@@ -194,7 +194,7 @@ export default async function FounderWallPage({
                 <p className="text-3xl font-semibold text-sage-ink">
                   {remainingCount}
                 </p>
-                <p className="mt-1 text-xs text-iron/60">
+                <p className="mt-1 text-xs text-iron/70">
                   {remainingCount === 1 ? "spot" : "spots"} remaining
                 </p>
               </>
@@ -220,7 +220,7 @@ export default async function FounderWallPage({
         </section>
       ) : (
         <section>
-          <p className="mb-6 text-sm text-iron/60">
+          <p className="mb-6 text-sm text-iron/70">
             {claimedCount} {claimedCount === 1 ? "founder" : "founders"}
           </p>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
@@ -265,7 +265,7 @@ export default async function FounderWallPage({
                 </p>
 
                 {/* Joined date */}
-                <p className="mt-2 text-xs text-iron/50">
+                <p className="mt-2 text-xs text-iron/70">
                   Member since {formatDate(founder.joined_at)}
                 </p>
               </div>
@@ -298,7 +298,7 @@ export default async function FounderWallPage({
       <div className="text-center">
         <Link
           href={`/brands/${slug}`}
-          className="text-xs text-iron/50 hover:text-iron/70 transition"
+          className="text-xs text-iron/70 hover:text-iron/70 transition"
         >
           ← Back to {brand.name}
         </Link>

@@ -96,7 +96,7 @@ export default function WeeklyRecapTile({
   }
 
   return (
-    <div className="relative overflow-hidden rounded-lg border border-iron/10 bg-gradient-to-br from-violet-500/15 via-fuchsia-500/10 to-rose-500/10 p-5 shadow-lg shadow-fuchsia-500/5">
+    <div className="relative overflow-hidden rounded-lg border border-iron/10 bg-gradient-to-br from-aurora/15 via-parchment/40 to-ember/10 p-5 shadow-lg shadow-ember/5">
       {/* Subtle decorative glow */}
       <div
         aria-hidden
@@ -109,7 +109,7 @@ export default function WeeklyRecapTile({
 
       <header className="relative flex flex-wrap items-baseline justify-between gap-2">
         <div>
-          <p className="text-xs uppercase tracking-[0.25em] text-iron/55">
+          <p className="text-xs uppercase tracking-[0.25em] text-iron/70">
             Your week
           </p>
           <p className="mt-1 text-base font-semibold text-iron">
@@ -140,7 +140,7 @@ export default function WeeklyRecapTile({
                 ? `+${s.value.toLocaleString()}`
                 : s.value.toLocaleString()}
             </p>
-            <p className="mt-1 text-xs uppercase tracking-wide text-iron/55">
+            <p className="mt-1 text-xs uppercase tracking-wide text-iron/70">
               {s.label}
             </p>
           </div>
@@ -160,7 +160,7 @@ export default function WeeklyRecapTile({
             <span />
           )}
           {recap.currentStreakDays > 0 && (
-            <span className="text-iron/55">
+            <span className="text-iron/70">
               🔥 {recap.currentStreakDays}-day streak
             </span>
           )}

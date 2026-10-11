@@ -113,7 +113,7 @@ export default async function ResolvePredictionPage({
     <div className="space-y-6">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-iron/55">
+          <p className="text-xs font-medium uppercase tracking-wider text-iron/70">
             {post.brand_slug} · {post.prediction_type ?? "—"}
           </p>
           <h1
@@ -136,12 +136,12 @@ export default async function ResolvePredictionPage({
               </span>
             )}
             {post.allow_vote_changes && (
-              <span className="rounded-full bg-iron/5 px-2 py-1 text-iron/55">
+              <span className="rounded-full bg-iron/5 px-2 py-1 text-iron/70">
                 vote changes allowed
               </span>
             )}
             {!post.show_live_tally && (
-              <span className="rounded-full bg-iron/5 px-2 py-1 text-iron/55">
+              <span className="rounded-full bg-iron/5 px-2 py-1 text-iron/70">
                 tally hidden
               </span>
             )}
@@ -158,7 +158,7 @@ export default async function ResolvePredictionPage({
       {/* Live tally summary */}
       {tally && tally.total_votes > 0 && (
         <section className="glass-card rounded-lg p-5">
-          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-iron/55">
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-iron/70">
             Tally · {tally.total_votes} vote{tally.total_votes === 1 ? "" : "s"}
           </h2>
           {post.prediction_type === "multi" && tally.by_option.length > 0 && (
@@ -197,7 +197,7 @@ export default async function ResolvePredictionPage({
                   className="flex items-center justify-between text-iron/80"
                 >
                   <span>{b.date}</span>
-                  <span className="text-iron/55">×{b.count}</span>
+                  <span className="text-iron/70">×{b.count}</span>
                 </li>
               ))}
             </ul>
@@ -221,7 +221,7 @@ export default async function ResolvePredictionPage({
               {post.resolution_note}
             </p>
           )}
-          <p className="mt-3 text-xs text-iron/55">
+          <p className="mt-3 text-xs text-iron/70">
             {awards.length} winner{awards.length === 1 ? "" : "s"} ·{" "}
             {awards.reduce((sum, a) => sum + (a.points ?? 0), 0)} pts awarded
           </p>
@@ -290,7 +290,7 @@ function PhaseChip({
     );
   }
   return (
-    <span className="rounded-full bg-iron/10 px-2 py-1 text-iron/60">
+    <span className="rounded-full bg-iron/10 px-2 py-1 text-iron/70">
       Resolved
     </span>
   );

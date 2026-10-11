@@ -66,13 +66,13 @@ export default async function NotificationPreferencesPage() {
   return (
     <main className="mx-auto max-w-2xl px-4 py-10 sm:py-14">
       <nav className="mb-6 text-sm">
-        <Link href="/inbox" className="text-iron/50 hover:text-iron">
+        <Link href="/inbox" className="text-iron/70 hover:text-iron">
           ← Inbox
         </Link>
       </nav>
 
       <header className="mb-8">
-        <p className="text-xs uppercase tracking-widest text-iron/60">
+        <p className="text-xs uppercase tracking-widest text-iron/70">
           Notifications
         </p>
         <h1 className="mt-1 text-3xl font-semibold tracking-tight">
@@ -95,7 +95,7 @@ export default async function NotificationPreferencesPage() {
         smsCopy={smsCopy}
       />
 
-      <p className="mt-8 text-xs text-iron/50">
+      <p className="mt-8 text-xs text-iron/70">
         We never sell your data. You can unsubscribe from emails at any
         time via the link at the bottom of any email.
       </p>
@@ -116,7 +116,7 @@ function ChannelChip({
         "inline-flex items-center rounded-full border px-2 py-0.5 text-xs " +
         (available
           ? "border-emerald-400/30 text-sage-ink"
-          : "border-iron/10 text-iron/50")
+          : "border-iron/10 text-iron/70")
       }
       title={available ? `${label} is set up` : `${label} is not set up`}
     >

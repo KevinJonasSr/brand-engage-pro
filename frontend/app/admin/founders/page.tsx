@@ -133,7 +133,7 @@ function getTierBadgeColor(
     case "cancelled":
       return { bg: "bg-rose-500/20", text: "text-ember" };
     default:
-      return { bg: "bg-iron/10", text: "text-iron/50" };
+      return { bg: "bg-iron/10", text: "text-iron/70" };
   }
 }
 
@@ -153,12 +153,12 @@ export default async function AdminFoundersPage() {
           >
             Founder rosters
           </h1>
-          <p className="mt-2 text-sm text-iron/60">
+          <p className="mt-2 text-sm text-iron/70">
             View founding members per community.
           </p>
         </div>
         <div className="rounded-lg border border-iron/10 bg-parchment/30 p-8 text-center">
-          <p className="text-iron/50">No communities found or no access.</p>
+          <p className="text-iron/70">No communities found or no access.</p>
         </div>
       </div>
     );
@@ -173,7 +173,7 @@ export default async function AdminFoundersPage() {
         >
           Founder rosters
         </h1>
-        <p className="mt-2 text-sm text-iron/60">
+        <p className="mt-2 text-sm text-iron/70">
           Founding members per community. Sorted by founder number within each community.
         </p>
       </div>
@@ -193,21 +193,21 @@ export default async function AdminFoundersPage() {
             >
               {community.display_name}
             </h2>
-            <span className="ml-auto text-xs text-iron/60">
+            <span className="ml-auto text-xs text-iron/70">
               {community.founders.length} / {community.founder_cap} slots
             </span>
           </div>
 
           {community.founders.length === 0 ? (
             <div className="rounded-lg border border-iron/10 bg-parchment/30 p-6 text-center">
-              <p className="text-sm text-iron/50">
+              <p className="text-sm text-iron/70">
                 No founders yet in this community.
               </p>
             </div>
           ) : (
             <div className="overflow-hidden rounded-lg border border-iron/10">
               <table className="w-full text-sm">
-                <thead className="bg-parchment/40 text-left text-xs uppercase tracking-wide text-iron/50">
+                <thead className="bg-parchment/40 text-left text-xs uppercase tracking-wide text-iron/70">
                   <tr>
                     <th className="px-4 py-3 w-12">#</th>
                     <th className="px-4 py-3">Member</th>

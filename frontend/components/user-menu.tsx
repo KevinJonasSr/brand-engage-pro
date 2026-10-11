@@ -86,7 +86,7 @@ export default function UserMenu({ member, isAdmin, unreadCount = 0 }: UserMenuP
         )}
         <span>{displayName}</span>
         <span
-          className="text-iron/60 transition"
+          className="text-iron/70 transition"
           style={{
             transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
           }}

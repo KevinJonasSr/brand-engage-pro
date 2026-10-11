@@ -17,7 +17,7 @@ const TIER_BADGE: Record<string, string> = {
   bronze:   "bg-amber-700/30 text-aurora-ink",
   silver:   "bg-slate-400/25 text-iron/70",
   gold:     "bg-yellow-500/25 text-aurora-ink",
-  platinum: "bg-violet-500/30 text-violet-800",
+  platinum: "bg-iron/15 text-iron",
   founder:  "bg-rose-500/30 text-ember",
 };
 
@@ -33,7 +33,7 @@ export default function LeaderboardList({
       {entries.map((entry) => {
         const isViewer = viewerMemberId === entry.member_id;
         const tierBadgeClass =
-          TIER_BADGE[entry.current_tier ?? ""] ?? "bg-iron/10 text-iron/60";
+          TIER_BADGE[entry.current_tier ?? ""] ?? "bg-iron/10 text-iron/70";
 
         return (
           <li
@@ -81,7 +81,7 @@ export default function LeaderboardList({
                 )}
               </p>
               {showBreakdown && (
-                <p className="mt-0.5 text-xs text-iron/55">
+                <p className="mt-0.5 text-xs text-iron/70">
                   {entry.reactions > 0 && `${entry.reactions} reactions`}
                   {entry.comments > 0 && ` · ${entry.comments} comments`}
                   {entry.rsvps > 0 && ` · ${entry.rsvps} RSVPs`}

@@ -22,7 +22,7 @@ export default async function MemberRecapPage() {
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-12">
-      <p className="text-xs uppercase tracking-widest text-iron/50">
+      <p className="text-xs uppercase tracking-widest text-iron/70">
         Your last 7 days
         {recap.topBrandName ? ` · ${recap.topBrandName}` : ""}
       </p>
@@ -49,7 +49,7 @@ export default async function MemberRecapPage() {
       )}
 
       {!recap.hasActivity && (
-        <p className="mt-6 rounded-xl border border-iron/10 bg-parchment/30 px-4 py-3 text-sm text-iron/60">
+        <p className="mt-6 rounded-xl border border-iron/10 bg-parchment/30 px-4 py-3 text-sm text-iron/70">
           Nothing logged this week yet — a visit, a comment, or a check-in
           gets your streak moving again.
         </p>
@@ -64,10 +64,10 @@ export default async function MemberRecapPage() {
         >
           Keep the streak going →
         </Link>
-        <Link href="/rewards" className="text-sm text-iron/60 hover:text-iron">
+        <Link href="/rewards" className="text-sm text-iron/70 hover:text-iron">
           Spend your points
         </Link>
-        <Link href="/me" className="text-sm text-iron/60 hover:text-iron">
+        <Link href="/me" className="text-sm text-iron/70 hover:text-iron">
           Back to my profile
         </Link>
       </div>
@@ -86,7 +86,7 @@ function Big({
 }) {
   return (
     <div className="rounded-lg border border-iron/10 bg-parchment/40 px-4 py-4">
-      <p className="text-xs uppercase tracking-wide text-iron/40">{label}</p>
+      <p className="text-xs uppercase tracking-wide text-iron/70">{label}</p>
       <p className="mt-1 text-2xl font-bold text-iron">
         {value.toLocaleString()}
         {suffix}

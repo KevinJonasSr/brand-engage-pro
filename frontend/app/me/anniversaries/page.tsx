@@ -87,13 +87,13 @@ export default async function AnniversariesPage() {
   return (
     <main className="mx-auto max-w-2xl px-4 py-10 sm:py-14">
       <nav className="mb-6 text-sm">
-        <Link href="/me" className="text-iron/50 hover:text-iron">
+        <Link href="/me" className="text-iron/70 hover:text-iron">
           ← Account
         </Link>
       </nav>
 
       <header className="mb-8">
-        <p className="text-xs uppercase tracking-widest text-iron/60">
+        <p className="text-xs uppercase tracking-widest text-iron/70">
           Milestones
         </p>
         <h1 className="mt-1 text-3xl font-semibold tracking-tight">
@@ -123,7 +123,7 @@ export default async function AnniversariesPage() {
               </span>
               <div className="flex-1">
                 <div className="font-medium">{e.label}</div>
-                <p className="mt-0.5 text-sm text-iron/60">
+                <p className="mt-0.5 text-sm text-iron/70">
                   {absoluteDate(e.celebrated_at)}
                   {e.points_awarded > 0 && (
                     <>

@@ -48,7 +48,7 @@ export default function SearchInput({
       <div className="relative">
         <span
           aria-hidden
-          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-iron/40"
+          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-iron/70"
         >
           {/* Plain magnifier glyph — no icon dependency. */}
           ⌕

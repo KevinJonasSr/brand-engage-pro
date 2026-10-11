@@ -24,7 +24,7 @@ export function PredictionTallyView({
   highlightOptionId,
 }: Props) {
   if (tally.total_votes === 0) {
-    return <p className="text-xs text-iron/55">No votes yet.</p>;
+    return <p className="text-xs text-iron/70">No votes yet.</p>;
   }
 
   if (type === "multi") {
@@ -43,7 +43,7 @@ export function PredictionTallyView({
                     </span>
                   )}
                 </span>
-                <span className="text-iron/60">
+                <span className="text-iron/70">
                   {row.count} · {row.pct}%
                 </span>
               </div>
@@ -81,7 +81,7 @@ export function PredictionTallyView({
             <li key={b.date}>
               <div className="mb-0.5 flex items-center justify-between text-xs">
                 <span className="text-iron/80">{b.date}</span>
-                <span className="text-iron/55">×{b.count}</span>
+                <span className="text-iron/70">×{b.count}</span>
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-iron/5">
                 <div

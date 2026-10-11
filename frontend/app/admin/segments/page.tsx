@@ -44,7 +44,7 @@ export default async function AdminSegmentsPage() {
   return (
     <main className="space-y-8">
       <header className="space-y-2">
-        <p className="text-sm uppercase tracking-wide text-iron/60">
+        <p className="text-sm uppercase tracking-wide text-iron/70">
           Admin · Segments
         </p>
         <h1
@@ -65,7 +65,7 @@ export default async function AdminSegmentsPage() {
         <h2 className="text-lg font-semibold">Create a new segment</h2>
         <form action={createSegmentAction} className="space-y-4">
           <div>
-            <label className="mb-1 block text-xs uppercase tracking-wide text-iron/60">
+            <label className="mb-1 block text-xs uppercase tracking-wide text-iron/70">
               Segment name
             </label>
             <input
@@ -78,7 +78,7 @@ export default async function AdminSegmentsPage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs uppercase tracking-wide text-iron/60">
+            <label className="mb-1 block text-xs uppercase tracking-wide text-iron/70">
               Describe your audience
             </label>
             <textarea
@@ -89,7 +89,7 @@ export default async function AdminSegmentsPage() {
               placeholder="super-engaged gold/platinum members in Tennessee who've posted in the last month"
               className="w-full rounded-xl border border-iron/10 bg-parchment/40 px-3 py-2 text-sm placeholder-iron/40 outline-none focus:border-aurora/40"
             />
-            <p className="mt-1 text-xs text-iron/40">
+            <p className="mt-1 text-xs text-iron/70">
               Examples: &quot;new bronze members this month&quot;, &quot;loyal
               members willing to receive SMS&quot;, &quot;high-points members
               in California&quot;.
@@ -107,7 +107,7 @@ export default async function AdminSegmentsPage() {
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">Saved segments</h2>
         {segments.length === 0 ? (
-          <p className="rounded-lg border border-iron/10 bg-parchment/30 p-6 text-sm text-iron/60">
+          <p className="rounded-lg border border-iron/10 bg-parchment/30 p-6 text-sm text-iron/70">
             No segments yet. Use the form above to create one.
           </p>
         ) : (
@@ -138,11 +138,11 @@ function SegmentCard({ segment }: { segment: SegmentRow }) {
         <div className="min-w-0 flex-1 space-y-2">
           <p className="text-base font-semibold text-iron">{segment.name}</p>
           {segment.description_input && (
-            <p className="text-xs italic text-iron/60">
+            <p className="text-xs italic text-iron/70">
               &ldquo;{segment.description_input}&rdquo;
             </p>
           )}
-          <p className="text-xs text-iron/50">
+          <p className="text-xs text-iron/70">
             <span className="font-semibold text-aurora-ink">
               {segment.member_count}
             </span>{" "}
@@ -151,7 +151,7 @@ function SegmentCard({ segment }: { segment: SegmentRow }) {
           </p>
           <FilterChips filter={segment.filter_json} />
           <details>
-            <summary className="cursor-pointer text-xs uppercase tracking-wide text-iron/40">
+            <summary className="cursor-pointer text-xs uppercase tracking-wide text-iron/70">
               Filter JSON
             </summary>
             <pre className="mt-2 overflow-x-auto rounded-xl bg-parchment/50 p-3 text-xs text-iron/70">
@@ -206,7 +206,7 @@ function FilterChips({ filter }: { filter: SegmentFilter }) {
 
   if (chips.length === 0) {
     return (
-      <p className="text-xs text-iron/40">(no filters — matches all members)</p>
+      <p className="text-xs text-iron/70">(no filters — matches all members)</p>
     );
   }
 

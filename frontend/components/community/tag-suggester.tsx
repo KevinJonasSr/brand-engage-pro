@@ -88,7 +88,7 @@ export default function TagSuggester({
       {error && <p className="text-xs text-ember/80">{error}</p>}
 
       {suggestions && suggestions.length === 0 && (
-        <p className="text-xs text-iron/60">
+        <p className="text-xs text-iron/70">
           No tag ideas — your post might be a bit short or off-topic for the
           existing taxonomy. You can submit without tags.
         </p>
@@ -96,7 +96,7 @@ export default function TagSuggester({
 
       {suggestions && suggestions.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-wide text-iron/50">
+          <p className="text-xs uppercase tracking-wide text-iron/70">
             Tap to toggle:
           </p>
           <div className="flex flex-wrap gap-1.5">
@@ -110,7 +110,7 @@ export default function TagSuggester({
                   className={`rounded-full border px-3 py-1 text-xs transition ${
                     on
                       ? "border-aurora/40 bg-aurora/15 text-aurora-ink"
-                      : "border-iron/15 bg-iron/5 text-iron/60 hover:bg-iron/10"
+                      : "border-iron/15 bg-iron/5 text-iron/70 hover:bg-iron/10"
                   }`}
                 >
                   {on ? "✓ " : "+ "}
@@ -123,7 +123,7 @@ export default function TagSuggester({
             type="button"
             onClick={handleSuggest}
             disabled={loading}
-            className="text-xs text-iron/50 hover:text-iron"
+            className="text-xs text-iron/70 hover:text-iron"
           >
             {loading ? "Refreshing…" : "↻ Refresh suggestions"}
           </button>

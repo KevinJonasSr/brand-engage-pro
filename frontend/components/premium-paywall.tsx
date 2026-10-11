@@ -63,7 +63,7 @@ export default function PremiumPaywall({
         <div className="min-w-0 flex-1">
           <p className="truncate font-medium text-iron">{featureCopy}</p>
           {description && (
-            <p className="truncate text-xs text-iron/55">{description}</p>
+            <p className="truncate text-xs text-iron/70">{description}</p>
           )}
         </div>
         {ctaHref && (
@@ -105,7 +105,7 @@ export default function PremiumPaywall({
         <div className="space-y-2">
           {reason === "needs-founder" ? (
             <>
-              <p className="text-xs text-iron/60">
+              <p className="text-xs text-iron/70">
                 Founding is a free first-100 badge. Founders get:
               </p>
               <ul className="space-y-1 text-xs text-iron/70">
@@ -116,7 +116,7 @@ export default function PremiumPaywall({
             </>
           ) : (
             <>
-              <p className="text-xs text-iron/60">
+              <p className="text-xs text-iron/70">
                 Brands pay, guests join free. Join to earn points toward every reward.
               </p>
             </>

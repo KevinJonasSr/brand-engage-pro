@@ -76,7 +76,7 @@ export default async function ReferralsPage() {
           )}
 
           <section className="rounded-lg border border-iron/10 bg-gradient-to-br from-aurora/20 via-parchment to-linen p-6 shadow-glass">
-            <p className="text-sm uppercase tracking-wide text-iron/60">Referrals</p>
+            <p className="text-sm uppercase tracking-wide text-iron/70">Referrals</p>
             <h1 className="mt-2 text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
               Bring the regulars in
             </h1>
@@ -107,7 +107,7 @@ export default async function ReferralsPage() {
             <FirstSessionChecklist facts={firstSession} />
           ) : (
             <section className="glass-card p-6">
-              <p className="text-sm uppercase tracking-wide text-iron/60">
+              <p className="text-sm uppercase tracking-wide text-iron/70">
                 {FIRST_SESSION_EYEBROW}
               </p>
               <p className="mt-2 text-sm text-iron/70">{FIRST_SESSION_BLURB}</p>
@@ -116,7 +116,7 @@ export default async function ReferralsPage() {
 
           <section className="grid gap-6 md:grid-cols-2">
             <div className="glass-card p-6">
-              <p className="text-sm uppercase tracking-wide text-iron/60">Reward ladder</p>
+              <p className="text-sm uppercase tracking-wide text-iron/70">Reward ladder</p>
               <div className="mt-4 space-y-4">
                 {ladder.map((step, i) => {
                   const threshold = [1, 3, 5, 10][i];
@@ -131,7 +131,7 @@ export default async function ReferralsPage() {
                       <div className="flex items-center justify-between gap-3">
                         <div>
                           <p className="text-sm font-semibold">{step.level}</p>
-                          <p className="text-xs text-iron/60">{step.reward}</p>
+                          <p className="text-xs text-iron/70">{step.reward}</p>
                         </div>
                         {unlocked && (
                           <span className="text-xs font-medium text-sage-ink">Unlocked</span>
@@ -144,7 +144,7 @@ export default async function ReferralsPage() {
             </div>
 
             <div className="glass-card p-6">
-              <p className="text-sm uppercase tracking-wide text-iron/60">Top referrers</p>
+              <p className="text-sm uppercase tracking-wide text-iron/70">Top referrers</p>
               {leaderboardRows.length > 0 ? (
                 <ul className="mt-4 space-y-3">
                   {leaderboardRows.map((row) => (
@@ -153,12 +153,12 @@ export default async function ReferralsPage() {
                       className="flex items-center justify-between rounded-lg bg-parchment/30 px-4 py-3 text-sm"
                     >
                       <span>{row.name}</span>
-                      <span className="text-iron/60">{row.total}</span>
+                      <span className="text-iron/70">{row.total}</span>
                     </li>
                   ))}
                 </ul>
               ) : (
-                <div className="mt-4 rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-6 text-center text-xs text-iron/60">
+                <div className="mt-4 rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-6 text-center text-xs text-iron/70">
                   {isSignedIn
                     ? "No referral leaders yet — be the first."
                     : "Leaderboard stays empty for guests. Sign up to earn real referral counts (start at 0)."}
@@ -171,16 +171,16 @@ export default async function ReferralsPage() {
         <aside className="w-full max-w-sm space-y-6">
           {isSignedIn && member?.referral_code && (
             <section className="glass-card p-6">
-              <p className="text-sm uppercase tracking-wide text-iron/60">Your QR</p>
+              <p className="text-sm uppercase tracking-wide text-iron/70">Your QR</p>
               <div className="mt-4 flex justify-center">
                 <InviteQRCode url={inviteUrl} />
               </div>
-              <p className="mt-4 break-all text-center text-xs text-iron/50">{inviteUrl}</p>
+              <p className="mt-4 break-all text-center text-xs text-iron/70">{inviteUrl}</p>
             </section>
           )}
 
           <section className="glass-card p-6">
-            <p className="text-sm uppercase tracking-wide text-iron/60">Recent activity</p>
+            <p className="text-sm uppercase tracking-wide text-iron/70">Recent activity</p>
             {isSignedIn ? (
               myReferrals.length > 0 ? (
                 <ul className="mt-4 space-y-3 text-sm text-iron/70">
@@ -192,12 +192,12 @@ export default async function ReferralsPage() {
                   ))}
                 </ul>
               ) : (
-                <div className="mt-4 rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-6 text-center text-xs text-iron/60">
+                <div className="mt-4 rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-6 text-center text-xs text-iron/70">
                   No activity yet — share your invite link to get started.
                 </div>
               )
             ) : (
-              <div className="mt-4 rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-6 text-center text-xs text-iron/60">
+              <div className="mt-4 rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-6 text-center text-xs text-iron/70">
                 No sample activity. After you join, real referrals appear here.
               </div>
             )}

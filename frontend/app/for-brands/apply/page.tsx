@@ -35,7 +35,7 @@ export default async function ApplyPage({
   return (
     <main className="mx-auto max-w-3xl space-y-8 px-6 py-12">
       <header className="space-y-3">
-        <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
+        <p className="text-xs uppercase tracking-[0.3em] text-iron/70">
           For Brands · Apply
         </p>
         <h1

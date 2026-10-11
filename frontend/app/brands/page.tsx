@@ -51,7 +51,7 @@ export default async function BrandsIndexPage({ searchParams }: { searchParams?:
   return (
     <main className="mx-auto max-w-6xl space-y-6 px-6 py-12">
       <header className="space-y-2">
-        <p className="text-sm uppercase tracking-wide text-iron/60">Brands</p>
+        <p className="text-sm uppercase tracking-wide text-iron/70">Brands</p>
         <h1 className="text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
           Member clubs on Brand Engage Pro
         </h1>

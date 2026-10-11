@@ -6,6 +6,7 @@ import ImageUploader from "@/components/image-uploader";
 import FocalPointPicker from "@/components/focal-point-picker";
 import { useFormSave, SaveStatusIndicator } from "@/lib/use-form-save";
 import { updateBrandAction } from "../actions";
+import { brandHeroBackground, resolveBrandAccent } from "@/lib/brand-accent";
 
 type InitialValues = {
   name: string;
@@ -35,6 +36,7 @@ export default function BrandEditForm({
   const [focalY, setFocalY] = useState(initial.heroFocalY);
   const [accentFrom, setAccentFrom] = useState(initial.accentFrom);
   const [accentTo, setAccentTo] = useState(initial.accentTo);
+  const previewPalette = resolveBrandAccent(accentFrom, accentTo);
 
   const { status, submit, submitting } = useFormSave({
     onSuccess: () => router.refresh(),
@@ -135,27 +137,30 @@ export default function BrandEditForm({
           />
         </Field>
       </div>
-      {/* Live preview of accent gradient */}
+      {/* Live preview: same palette the public brand page uses */}
       <div
-        className="rounded-lg border border-iron/10 p-4"
-        style={{
-          backgroundImage: `linear-gradient(to bottom right, ${accentFrom}66, #0f172a, #000000)`,
-        }}
+        className="rounded-lg border border-iron/10 p-4 text-linen"
+        style={{ background: brandHeroBackground(previewPalette) }}
       >
-        <p className="text-xs uppercase tracking-[0.3em] text-iron/60">{initial.genresText}</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-linen/80">{initial.genresText}</p>
         <p
           className="mt-2 text-2xl font-semibold"
           style={{ fontFamily: "var(--font-display)" }}
         >
           {initial.name}
         </p>
-        <p className="text-sm text-iron/70">{initial.tagline}</p>
+        <p className="text-sm text-linen/85">{initial.tagline}</p>
         <span
-          className="mt-3 inline-flex rounded-full px-4 py-1.5 text-xs font-semibold text-iron"
-          style={{ backgroundImage: `linear-gradient(to right, ${accentFrom}, ${accentTo})` }}
+          className="mt-3 inline-flex rounded-full px-4 py-1.5 text-xs font-semibold"
+          style={{ backgroundColor: previewPalette.accent, color: previewPalette.onAccent }}
         >
           CTA preview
         </span>
+        {previewPalette.isBepDefault && (
+          <p className="mt-3 text-xs text-linen/80">
+            These colors are placeholders, so the page uses BEP gold and crimson.
+          </p>
+        )}
       </div>
       <Field label="Social links">
         <textarea
@@ -165,7 +170,7 @@ export default function BrandEditForm({
           placeholder="One link per line. Paste full URLs — labels auto-detect:&#10;https://instagram.com/brand&#10;https://tiktok.com/@brand&#10;https://facebook.com/brand"
           className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
         />
-        <p className="mt-1 text-xs text-iron/50">
+        <p className="mt-1 text-xs text-iron/70">
           Recognized brands: Instagram, TikTok, Facebook, YouTube, X / Twitter,
           Threads, Spotify, Apple Music, SoundCloud, LinkedIn, Pinterest,
           Snapchat. Other URLs render as a labeled pill. Explicit format
@@ -202,7 +207,7 @@ export default function BrandEditForm({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="text-xs uppercase tracking-wide text-iron/60">{label}</span>
+      <span className="text-xs uppercase tracking-wide text-iron/70">{label}</span>
       <div className="mt-1">{children}</div>
     </label>
   );

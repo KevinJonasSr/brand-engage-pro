@@ -61,7 +61,7 @@ export default async function AdminPostDraftsPage() {
   return (
     <main className="space-y-8">
       <header className="space-y-2">
-        <p className="text-sm uppercase tracking-wide text-iron/60">
+        <p className="text-sm uppercase tracking-wide text-iron/70">
           Admin · Post drafts
         </p>
         <h1
@@ -94,7 +94,7 @@ export default async function AdminPostDraftsPage() {
           Pending review ({pendingDrafts.length})
         </h2>
         {pendingDrafts.length === 0 ? (
-          <p className="rounded-lg border border-iron/10 bg-parchment/30 p-6 text-sm text-iron/60">
+          <p className="rounded-lg border border-iron/10 bg-parchment/30 p-6 text-sm text-iron/70">
             No pending drafts. Click &ldquo;Generate a new draft&rdquo;
             above to create one.
           </p>
@@ -123,12 +123,12 @@ export default async function AdminPostDraftsPage() {
                     className={`rounded-full border px-2 py-0.5 uppercase tracking-wide ${
                       d.status === "published"
                         ? "border-emerald-300/30 bg-emerald-300/10 text-sage-ink"
-                        : "border-iron/15 bg-iron/5 text-iron/60"
+                        : "border-iron/15 bg-iron/5 text-iron/70"
                     }`}
                   >
                     {d.status}
                   </span>
-                  <span className="text-iron/40">
+                  <span className="text-iron/70">
                     {d.reviewed_at
                       ? new Date(d.reviewed_at).toLocaleString()
                       : new Date(d.created_at).toLocaleString()}
@@ -139,7 +139,7 @@ export default async function AdminPostDraftsPage() {
                     {d.suggested_title}
                   </p>
                 )}
-                <p className="mt-1 text-iron/60 line-clamp-2">
+                <p className="mt-1 text-iron/70 line-clamp-2">
                   {d.suggested_body.length > 200
                     ? d.suggested_body.slice(0, 200) + "…"
                     : d.suggested_body}
@@ -161,14 +161,14 @@ function PendingDraftCard({ draft }: { draft: DraftRow }) {
           <span className="rounded-full border border-aurora/30 bg-aurora/10 px-2 py-0.5 uppercase tracking-wide text-aurora-ink">
             {draft.kind === "announcement" ? "📢 Announcement" : "Post"}
           </span>
-          <span className="text-iron/40">
+          <span className="text-iron/70">
             Drafted {new Date(draft.created_at).toLocaleString()}
           </span>
         </div>
 
         {draft.context_summary && (
           <p className="rounded-xl border border-iron/10 bg-parchment/30 p-3 text-xs text-iron/70">
-            <span className="text-iron/50">Based on: </span>
+            <span className="text-iron/70">Based on: </span>
             {draft.context_summary}
           </p>
         )}
@@ -177,7 +177,7 @@ function PendingDraftCard({ draft }: { draft: DraftRow }) {
           <input type="hidden" name="draft_id" value={draft.id} />
 
           <div>
-            <label className="mb-1 block text-xs uppercase tracking-wide text-iron/50">
+            <label className="mb-1 block text-xs uppercase tracking-wide text-iron/70">
               Title (optional)
             </label>
             <input
@@ -191,7 +191,7 @@ function PendingDraftCard({ draft }: { draft: DraftRow }) {
           </div>
 
           <div>
-            <label className="mb-1 block text-xs uppercase tracking-wide text-iron/50">
+            <label className="mb-1 block text-xs uppercase tracking-wide text-iron/70">
               Body
             </label>
             <textarea
@@ -217,7 +217,7 @@ function PendingDraftCard({ draft }: { draft: DraftRow }) {
           <input type="hidden" name="draft_id" value={draft.id} />
           <button
             type="submit"
-            className="rounded-full border border-iron/15 bg-iron/5 px-4 py-1.5 text-xs text-iron/60 hover:bg-iron/10"
+            className="rounded-full border border-iron/15 bg-iron/5 px-4 py-1.5 text-xs text-iron/70 hover:bg-iron/10"
           >
             Discard
           </button>

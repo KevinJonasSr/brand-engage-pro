@@ -352,7 +352,7 @@ export default function SignupPage({
 
       <div className="glass-card space-y-6 p-8">
         <div className="space-y-2">
-          <p className="text-sm uppercase tracking-wide text-iron/60">Brand Engage Pro</p>
+          <p className="text-sm uppercase tracking-wide text-iron/70">Brand Engage Pro</p>
           <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
             {next === "/onboarding"
               ? "Create your account to continue"
@@ -405,7 +405,7 @@ export default function SignupPage({
 
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-wide text-iron/60">Email</span>
+            <span className="text-xs uppercase tracking-wide text-iron/70">Email</span>
             <input
               type="email"
               required
@@ -430,7 +430,7 @@ export default function SignupPage({
             )}
           </label>
           <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-wide text-iron/60">Password</span>
+            <span className="text-xs uppercase tracking-wide text-iron/70">Password</span>
             <input
               type="password"
               required
@@ -475,7 +475,7 @@ export default function SignupPage({
                   <span className="h-1 flex-1 overflow-hidden rounded bg-iron/10">
                     <span className={"block h-1 " + t.color} style={{ width: t.w }} />
                   </span>
-                  <span className="text-xs text-iron/50">{t.label}</span>
+                  <span className="text-xs text-iron/70">{t.label}</span>
                 </div>
               );
             })()}
@@ -518,7 +518,7 @@ export default function SignupPage({
               })}
             </button>
             {status !== "loading" && !canSubmitSignup && signupHelper && (
-              <p className="text-center text-xs text-iron/50">{signupHelper}</p>
+              <p className="text-center text-xs text-iron/70">{signupHelper}</p>
             )}
           </div>
         </form>
@@ -533,7 +533,7 @@ export default function SignupPage({
           </p>
         )}
 
-        <p className="text-center text-xs text-iron/55">
+        <p className="text-center text-xs text-iron/70">
           By creating an account, you agree to our{" "}
           <Link href="/terms" className="text-iron/80 underline underline-offset-4 hover:text-iron">
             Terms
@@ -544,7 +544,7 @@ export default function SignupPage({
           </Link>
           .
         </p>
-        <p className="text-center text-sm text-iron/60">
+        <p className="text-center text-sm text-iron/70">
           Already have an account?{" "}
           <Link href={loginHref} className="text-iron underline-offset-4 hover:underline">
             Sign in

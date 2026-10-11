@@ -277,11 +277,11 @@ function KpiCard({
 }) {
   return (
     <div className="rounded-lg border border-iron/10 bg-parchment/30 p-4">
-      <p className="text-xs uppercase tracking-wide text-iron/60">{label}</p>
+      <p className="text-xs uppercase tracking-wide text-iron/70">{label}</p>
       <p className="mt-1 font-mono text-2xl font-semibold tabular-nums">
         {typeof value === "number" ? value.toLocaleString() : value}
       </p>
-      {sub && <p className="mt-1 text-xs text-iron/50">{sub}</p>}
+      {sub && <p className="mt-1 text-xs text-iron/70">{sub}</p>}
     </div>
   );
 }
@@ -313,14 +313,14 @@ export default async function AdminCommunityAnalyticsPage({
         <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
           Analytics
         </h1>
-        <p className="mt-1 text-sm text-iron/60">
+        <p className="mt-1 text-sm text-iron/70">
           {data.community.display_name} — community health dashboard
         </p>
       </div>
 
       {/* KPI Row */}
       <section>
-        <p className="mb-2 text-xs uppercase tracking-wide text-iron/50">
+        <p className="mb-2 text-xs uppercase tracking-wide text-iron/70">
           Key Metrics
         </p>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -382,7 +382,7 @@ export default async function AdminCommunityAnalyticsPage({
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-iron/5 text-left text-xs uppercase tracking-wide text-iron/50">
+              <tr className="border-b border-iron/5 text-left text-xs uppercase tracking-wide text-iron/70">
                 <th className="px-2 py-2">Date</th>
                 <th className="px-2 py-2 text-right">New Members</th>
                 <th className="px-2 py-2 text-right">New Posts</th>
@@ -412,7 +412,7 @@ export default async function AdminCommunityAnalyticsPage({
         <div className="rounded-lg border border-iron/10 bg-parchment/30 p-4">
           <p className="mb-3 text-sm font-semibold">Top Members by Points</p>
           {data.topMembers.length === 0 ? (
-            <p className="text-xs text-iron/50">No members yet.</p>
+            <p className="text-xs text-iron/70">No members yet.</p>
           ) : (
             <div className="divide-y divide-iron/5">
               {data.topMembers.map((member) => (
@@ -430,7 +430,7 @@ export default async function AdminCommunityAnalyticsPage({
                     <p className="text-sm font-medium text-iron truncate">
                       {member.first_name} {member.last_name}
                     </p>
-                    <p className="text-xs text-iron/50">{member.subscription_tier}</p>
+                    <p className="text-xs text-iron/70">{member.subscription_tier}</p>
                   </div>
                   <p className="font-mono text-sm font-semibold tabular-nums text-right">
                     {member.total_points.toLocaleString()}
@@ -444,7 +444,7 @@ export default async function AdminCommunityAnalyticsPage({
         <div className="rounded-lg border border-iron/10 bg-parchment/30 p-4">
           <p className="mb-3 text-sm font-semibold">Recent Subscriptions</p>
           {data.subscriptions.length === 0 ? (
-            <p className="text-xs text-iron/50">No recent activity.</p>
+            <p className="text-xs text-iron/70">No recent activity.</p>
           ) : (
             <div className="divide-y divide-iron/5">
               {data.subscriptions.map((sub) => (
@@ -454,7 +454,7 @@ export default async function AdminCommunityAnalyticsPage({
                       <p className="font-medium text-iron truncate">
                         {sub.first_name} {sub.last_name}
                       </p>
-                      <p className="text-xs text-iron/50 mt-0.5">
+                      <p className="text-xs text-iron/70 mt-0.5">
                         {sub.subscription_tier}
                         {sub.is_founder && (
                           <span className="ml-1 inline-block rounded bg-amber-500/20 px-1.5 py-0.5 text-xs font-semibold text-aurora-ink">
@@ -464,7 +464,7 @@ export default async function AdminCommunityAnalyticsPage({
                       </p>
                     </div>
                   </div>
-                  <p className="text-xs text-iron/40 mt-1">
+                  <p className="text-xs text-iron/70 mt-1">
                     Joined {formatDate(sub.joined_at)}
                     {sub.current_period_end && (
                       <> • Renews {formatDate(sub.current_period_end)}</>

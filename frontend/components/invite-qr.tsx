@@ -15,7 +15,7 @@ export default function InviteQRCode({
         value={url}
         size={size}
         bgColor="#ffffff"
-        fgColor="#050b1f"
+        fgColor="#1E1B17"
         level="M"
       />
     </div>

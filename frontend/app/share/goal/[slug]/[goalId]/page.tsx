@@ -73,15 +73,15 @@ export default async function GoalSharePage({
           boxShadow: `0 0 60px ${brand.accentFrom}22`,
         }}
       >
-        <p className="text-[10px] tracking-[0.2em] uppercase text-iron/30 font-medium">
+        <p className="text-[10px] tracking-[0.2em] uppercase text-iron/70 font-medium">
           Brand Engage Pro
         </p>
         <div className="flex flex-col gap-1">
-          <p className="text-xs tracking-widest uppercase text-iron/50">
+          <p className="text-xs tracking-widest uppercase text-iron/70">
             {goal.completed ? "Goal complete 🏆" : "Community goal"}
           </p>
           <h1 className="text-2xl font-bold">{goal.title}</h1>
-          <p className="text-iron/60 text-sm mt-1">
+          <p className="text-iron/70 text-sm mt-1">
             {brand.name} member community
           </p>
         </div>
@@ -97,7 +97,7 @@ export default async function GoalSharePage({
           >
             {goal.pct}%
           </div>
-          <p className="mt-2 text-sm text-iron/60">
+          <p className="mt-2 text-sm text-iron/70">
             {goal.current.toLocaleString()} of {goal.target.toLocaleString()}
           </p>
           <div className="mt-3 h-3 w-full overflow-hidden rounded-full bg-iron/10">
@@ -112,7 +112,7 @@ export default async function GoalSharePage({
         </div>
 
         {goal.description && (
-          <p className="text-iron/60 text-sm max-w-xs">{goal.description}</p>
+          <p className="text-iron/70 text-sm max-w-xs">{goal.description}</p>
         )}
 
         <ShareButton
@@ -127,11 +127,11 @@ export default async function GoalSharePage({
       <div className="mt-8 flex flex-col items-center gap-3">
         <Link
           href={`/brands/${brand.slug}`}
-          className="text-sm text-iron/50 hover:text-iron transition-colors"
+          className="text-sm text-iron/70 hover:text-iron transition-colors"
         >
           Visit brand experience →
         </Link>
-        <p className="text-xs text-iron/30 max-w-xs text-center">
+        <p className="text-xs text-iron/70 max-w-xs text-center">
           Join {brand.name}&apos;s community on Brand Engage Pro and help push
           this over the line.
         </p>

@@ -25,7 +25,7 @@ export default function GuestResultsSection({
 
   return (
     <section className="mx-auto max-w-6xl px-6 py-20">
-      <p className="text-xs uppercase tracking-widest text-iron/50">Results</p>
+      <p className="text-xs uppercase tracking-widest text-iron/70">Results</p>
       <h2
         className="mt-2 text-3xl font-semibold md:text-4xl"
         style={{ fontFamily: "var(--font-display)" }}
@@ -43,7 +43,7 @@ export default function GuestResultsSection({
             className="rounded-lg border border-iron/10 bg-parchment/30 p-5"
           >
             <p className="text-3xl font-semibold">{s.value}</p>
-            <p className="mt-1 text-xs uppercase tracking-wide text-iron/50">
+            <p className="mt-1 text-xs uppercase tracking-wide text-iron/70">
               {s.label}
             </p>
           </div>

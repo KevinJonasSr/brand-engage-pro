@@ -17,7 +17,7 @@ export default async function AdminPoliciesPage() {
         <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
           Policies
         </h1>
-        <p className="mt-1 text-sm text-iron/60">
+        <p className="mt-1 text-sm text-iron/70">
           Edit Terms of Service, Privacy Policy, and Cookie Policy. Once counsel delivers
           the final text, paste it here and flip the DRAFT banner off — no code deploy needed.
         </p>
@@ -25,7 +25,7 @@ export default async function AdminPoliciesPage() {
 
       <div className="space-y-3">
         {policies.length === 0 ? (
-          <p className="text-xs text-iron/50">No policies found. Re-run migration 0009.</p>
+          <p className="text-xs text-iron/70">No policies found. Re-run migration 0009.</p>
         ) : (
           policies.map((p) => {
             const publicSlug = p.slug === "cookie_policy" ? "cookie-policy" : p.slug;
@@ -38,7 +38,7 @@ export default async function AdminPoliciesPage() {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <p className="text-base font-semibold">{p.title}</p>
-                    <p className="text-xs text-iron/60">/{publicSlug}</p>
+                    <p className="text-xs text-iron/70">/{publicSlug}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     {p.is_draft ? (
@@ -51,11 +51,11 @@ export default async function AdminPoliciesPage() {
                       </span>
                     )}
                     {p.effective_date && (
-                      <span className="text-xs text-iron/50">
+                      <span className="text-xs text-iron/70">
                         Effective {new Date(p.effective_date).toLocaleDateString()}
                       </span>
                     )}
-                    <span className="text-xs text-iron/50">
+                    <span className="text-xs text-iron/70">
                       Updated {new Date(p.updated_at).toLocaleDateString()}
                     </span>
                   </div>

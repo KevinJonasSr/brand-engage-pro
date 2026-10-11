@@ -43,7 +43,7 @@ export default function PolicyEditForm({
     <form action={handleSubmit} className="space-y-4">
       <div className="grid gap-3 md:grid-cols-2">
         <label className="block">
-          <span className="text-xs uppercase tracking-wide text-iron/60">Title</span>
+          <span className="text-xs uppercase tracking-wide text-iron/70">Title</span>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -52,7 +52,7 @@ export default function PolicyEditForm({
           />
         </label>
         <label className="block">
-          <span className="text-xs uppercase tracking-wide text-iron/60">Effective date</span>
+          <span className="text-xs uppercase tracking-wide text-iron/70">Effective date</span>
           <input
             type="date"
             value={effectiveDate}
@@ -74,7 +74,7 @@ export default function PolicyEditForm({
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div>
-          <p className="mb-1 text-xs uppercase tracking-wide text-iron/60">Markdown</p>
+          <p className="mb-1 text-xs uppercase tracking-wide text-iron/70">Markdown</p>
           <textarea
             value={contentMd}
             onChange={(e) => setContentMd(e.target.value)}
@@ -82,12 +82,12 @@ export default function PolicyEditForm({
             spellCheck={false}
             className="w-full rounded-lg border border-iron/10 bg-parchment/60 px-3 py-2 font-mono text-xs text-iron/90"
           />
-          <p className="mt-1 text-xs text-iron/40">
+          <p className="mt-1 text-xs text-iron/70">
             Supports # headings, **bold**, *italic*, [links](url), -/1. lists, &gt; blockquotes, --- rules.
           </p>
         </div>
         <div>
-          <p className="mb-1 text-xs uppercase tracking-wide text-iron/60">Live preview</p>
+          <p className="mb-1 text-xs uppercase tracking-wide text-iron/70">Live preview</p>
           <div className="rounded-lg border border-iron/10 bg-parchment/30 p-4">
             <SimpleMarkdown source={contentMd} />
           </div>

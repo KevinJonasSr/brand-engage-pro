@@ -104,7 +104,7 @@ export default async function AdminLaunchPage() {
     <main className="mx-auto max-w-5xl px-6 py-10 space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-iron">Brand launch</h1>
-        <p className="mt-2 text-sm text-iron/60">
+        <p className="mt-2 text-sm text-iron/70">
           Guided checklist for taking a brand community live. Super-admin
           only. A brand goes live when it has a brand page, at least one
           reward, a welcome post, and an owner.
@@ -117,7 +117,7 @@ export default async function AdminLaunchPage() {
           action={initializeCommunityAction}
           className="mt-4 flex flex-wrap items-end gap-3"
         >
-          <label className="flex flex-col gap-1 text-xs text-iron/50">
+          <label className="flex flex-col gap-1 text-xs text-iron/70">
             Slug
             <input
               name="slug"
@@ -126,7 +126,7 @@ export default async function AdminLaunchPage() {
               className="w-48 rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm text-iron"
             />
           </label>
-          <label className="flex flex-col gap-1 text-xs text-iron/50">
+          <label className="flex flex-col gap-1 text-xs text-iron/70">
             Display name
             <input
               name="display_name"
@@ -142,7 +142,7 @@ export default async function AdminLaunchPage() {
             Create (hidden)
           </button>
         </form>
-        <p className="mt-3 text-xs text-iron/40">
+        <p className="mt-3 text-xs text-iron/70">
           Creates the community row inactive. Add the brand page, rewards, and
           a welcome announcement, then flip it live below.
         </p>
@@ -164,11 +164,11 @@ export default async function AdminLaunchPage() {
                 <div>
                   <h3 className="text-lg font-semibold text-iron">
                     {s.displayName}
-                    <span className="ml-2 text-xs text-iron/40">
+                    <span className="ml-2 text-xs text-iron/70">
                       /{s.slug}
                     </span>
                   </h3>
-                  <p className="mt-1 text-xs text-iron/50">
+                  <p className="mt-1 text-xs text-iron/70">
                     {s.memberCount.toLocaleString()} member
                     {s.memberCount === 1 ? "" : "s"}
                     {s.owners.length > 0 &&
@@ -179,7 +179,7 @@ export default async function AdminLaunchPage() {
                   className={`rounded-full px-3 py-1 text-xs font-semibold ${
                     s.active
                       ? "bg-emerald-500/20 text-sage-ink"
-                      : "bg-iron/10 text-iron/50"
+                      : "bg-iron/10 text-iron/70"
                   }`}
                 >
                   {s.active ? "LIVE" : "HIDDEN"}
@@ -207,7 +207,7 @@ export default async function AdminLaunchPage() {
                   className="flex items-end gap-2"
                 >
                   <input type="hidden" name="community_id" value={s.slug} />
-                  <label className="flex flex-col gap-1 text-xs text-iron/50">
+                  <label className="flex flex-col gap-1 text-xs text-iron/70">
                     Assign owner by email
                     <input
                       type="email"
@@ -239,7 +239,7 @@ export default async function AdminLaunchPage() {
                         ? "border border-iron/15 text-iron/70 hover:text-iron"
                         : readyToLaunch
                           ? "bg-ember text-linen"
-                          : "cursor-not-allowed bg-iron/5 text-iron/30"
+                          : "cursor-not-allowed bg-iron/5 text-iron/70"
                     }`}
                   >
                     {s.active
@@ -260,7 +260,7 @@ export default async function AdminLaunchPage() {
 
 function Check({ ok, label }: { ok: boolean; label: string }) {
   return (
-    <p className={ok ? "text-sage-ink/90" : "text-iron/40"}>
+    <p className={ok ? "text-sage-ink/90" : "text-iron/70"}>
       <span className="mr-2">{ok ? "✓" : "○"}</span>
       {label}
     </p>

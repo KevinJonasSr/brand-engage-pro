@@ -43,7 +43,7 @@ export default async function MarketplacePage() {
         )}
 
         <section className="rounded-lg border border-iron/10 bg-gradient-to-br from-aurora/20 via-parchment to-linen p-6 shadow-glass">
-          <p className="text-sm uppercase tracking-wide text-iron/60">Marketplace</p>
+          <p className="text-sm uppercase tracking-wide text-iron/70">Marketplace</p>
           <h1 className="mt-2 text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
             Brand rewards
           </h1>
@@ -62,7 +62,7 @@ export default async function MarketplacePage() {
             <h2 className="text-xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
               Live unlocks are on brand pages
             </h2>
-            <p className="mt-3 text-sm text-iron/60">
+            <p className="mt-3 text-sm text-iron/70">
               {communityId.toLowerCase() === NELLIES_BRAND_SLUG ? (
                 <>
                   Nellie&apos;s member offers (welcome dessert, 1,500 bonus points after 3 visits,
@@ -101,7 +101,7 @@ export default async function MarketplacePage() {
           <section className="grid gap-4 md:grid-cols-2">
             {rewards.map((item) => (
               <div key={item.id} className="glass-card p-5">
-                <p className="text-xs uppercase tracking-wide text-iron/50">Stocked · soft launch</p>
+                <p className="text-xs uppercase tracking-wide text-iron/70">Stocked · soft launch</p>
                 <h3 className="mt-3 text-xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
                   {item.title}
                 </h3>

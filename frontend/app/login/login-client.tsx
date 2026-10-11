@@ -56,7 +56,7 @@ export default function LoginClient({
 function LoginFallback() {
   return (
     <main className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center px-6 py-12">
-      <div className="glass-card p-8 text-center text-sm text-iron/60">Loading…</div>
+      <div className="glass-card p-8 text-center text-sm text-iron/70">Loading…</div>
     </main>
   );
 }
@@ -364,7 +364,7 @@ function LoginForm({
     <main className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center gap-6 px-6 py-12">
       <div className="glass-card space-y-6 p-8">
         <div className="space-y-2">
-          <p className="text-sm uppercase tracking-wide text-iron/60">Brand Engage Pro</p>
+          <p className="text-sm uppercase tracking-wide text-iron/70">Brand Engage Pro</p>
           <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
             Welcome back
           </h1>
@@ -374,7 +374,7 @@ function LoginForm({
         {/* Shared email — outside the password form so magic-link never hits
             browser constraint validation on an empty password field. */}
         <label className="block space-y-1">
-          <span className="text-xs uppercase tracking-wide text-iron/60">Email</span>
+          <span className="text-xs uppercase tracking-wide text-iron/70">Email</span>
           <input
             type="email"
             autoComplete="email"
@@ -390,11 +390,11 @@ function LoginForm({
         <form onSubmit={handlePassword} className="space-y-4">
           <label className="block space-y-1">
             <div className="flex items-center justify-between gap-3">
-              <span className="text-xs uppercase tracking-wide text-iron/60">Password</span>
+              <span className="text-xs uppercase tracking-wide text-iron/70">Password</span>
               {forgotPasswordEnabled && (
                 <Link
                   href={forgotHref}
-                  className="text-xs text-iron/60 underline-offset-2 hover:text-iron hover:underline"
+                  className="text-xs text-iron/70 underline-offset-2 hover:text-iron hover:underline"
                 >
                   Forgot password?
                 </Link>
@@ -441,14 +441,14 @@ function LoginForm({
               {status === "loading" ? "Signing in…" : "Sign in"}
             </button>
             {status !== "loading" && !passwordCaptchaReady && passwordHelper && (
-              <p className="text-center text-xs text-iron/50">{passwordHelper}</p>
+              <p className="text-center text-xs text-iron/70">{passwordHelper}</p>
             )}
           </div>
         </form>
 
         {magicLinkEnabled && (
           <>
-            <div className="flex items-center gap-3 text-xs uppercase tracking-wide text-iron/50">
+            <div className="flex items-center gap-3 text-xs uppercase tracking-wide text-iron/70">
               <div className="h-px flex-1 bg-iron/10" />
               or
               <div className="h-px flex-1 bg-iron/10" />
@@ -498,7 +498,7 @@ function LoginForm({
           </p>
         )}
 
-        <p className="text-center text-sm text-iron/60">
+        <p className="text-center text-sm text-iron/70">
           New member?{" "}
           <Link href={signupHref} className="text-iron underline-offset-4 hover:underline">
             Create an account

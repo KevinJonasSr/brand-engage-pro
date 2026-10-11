@@ -16,7 +16,7 @@ export default function AvatarUploadCard({
 
   return (
     <section className="glass-card p-6">
-      <p className="text-sm uppercase tracking-wide text-iron/60">Your profile</p>
+      <p className="text-sm uppercase tracking-wide text-iron/70">Your profile</p>
       <div className="mt-4 flex items-center gap-4">
         {url ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -32,7 +32,7 @@ export default function AvatarUploadCard({
         )}
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold">{firstName ?? "Member"}</p>
-          <p className="truncate text-xs text-iron/50">
+          <p className="truncate text-xs text-iron/70">
             <a href="/me/privacy" className="hover:text-iron/80 underline-offset-2 hover:underline">
               Privacy settings →
             </a>

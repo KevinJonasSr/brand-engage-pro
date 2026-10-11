@@ -67,7 +67,7 @@ function PickedCard({ post }: { post: PickedPost }) {
           {post.tags.slice(0, 2).map((t) => (
             <span
               key={t}
-              className="rounded-full border border-iron/10 bg-iron/5 px-2 py-0.5 text-[9px] uppercase tracking-wide text-iron/60"
+              className="rounded-full border border-iron/10 bg-iron/5 px-2 py-0.5 text-[9px] uppercase tracking-wide text-iron/70"
             >
               {t}
             </span>

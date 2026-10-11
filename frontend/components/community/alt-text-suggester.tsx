@@ -75,10 +75,10 @@ export default function AltTextSuggester({
   return (
     <div className="space-y-1.5 rounded-lg border border-iron/10 bg-parchment/30 p-3">
       <div className="flex items-center justify-between gap-2">
-        <label className="text-xs uppercase tracking-wide text-iron/50">
+        <label className="text-xs uppercase tracking-wide text-iron/70">
           Alt text {aiGenerated && <span className="text-aurora-ink">· AI-suggested, edit if you'd like</span>}
         </label>
-        {loading && <span className="text-xs text-iron/40">Thinking…</span>}
+        {loading && <span className="text-xs text-iron/70">Thinking…</span>}
       </div>
       <input
         type="text"

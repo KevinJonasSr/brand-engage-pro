@@ -19,14 +19,14 @@ export default async function AdminBrandsPage() {
         <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
           Brands
         </h1>
-        <p className="mt-1 text-sm text-iron/60">
+        <p className="mt-1 text-sm text-iron/70">
           Manage brand pages, hero images, bios, events, and social links — no code deploys required.
         </p>
       </div>
 
       <section className="space-y-3">
         {brands.length === 0 ? (
-          <p className="text-xs text-iron/50">No brands yet.</p>
+          <p className="text-xs text-iron/70">No brands yet.</p>
         ) : (
           brands.map((a) => (
             <Link
@@ -51,7 +51,7 @@ export default async function AdminBrandsPage() {
                   )}
                   <div>
                     <p className="text-base font-semibold">{a.name}</p>
-                    <p className="text-xs text-iron/60">/{a.slug}</p>
+                    <p className="text-xs text-iron/70">/{a.slug}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4 text-xs text-iron/70">
@@ -71,7 +71,7 @@ export default async function AdminBrandsPage() {
       {ctx.isSuperAdmin && (
       <section className="rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-4">
         <p className="text-sm font-semibold">Add a new brand</p>
-        <p className="mt-1 text-xs text-iron/60">
+        <p className="mt-1 text-xs text-iron/70">
           Slug is the URL segment (lowercase letters, digits, dashes). Can&apos;t be changed later.
         </p>
         <CreateBrandForm />

@@ -240,7 +240,7 @@ export async function PredictionCard({
       </div>
 
       {/* Footer */}
-      <footer className="mt-4 flex items-center justify-between border-t border-iron/5 pt-3 text-xs text-iron/55">
+      <footer className="mt-4 flex items-center justify-between border-t border-iron/5 pt-3 text-xs text-iron/70">
         <span>
           {commentCount ?? 0} comment{commentCount === 1 ? "" : "s"}
         </span>
@@ -323,7 +323,7 @@ function OpenView({
       />
       {post.show_live_tally && tally && tally.total_votes > 0 && (
         <details className="rounded-lg border border-iron/10 bg-iron/3 p-3 text-sm text-iron/75">
-          <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wider text-iron/55">
+          <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wider text-iron/70">
             See live tally · {tally.total_votes} vote{tally.total_votes === 1 ? "" : "s"}
           </summary>
           <div className="mt-3">
@@ -422,7 +422,7 @@ function ResolvedView({
       )}
       {tally && tally.total_votes > 0 && (
         <details className="rounded-lg border border-iron/10 bg-iron/3 p-3 text-sm text-iron/75">
-          <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wider text-iron/55">
+          <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wider text-iron/70">
             How everyone voted · {tally.total_votes} vote
             {tally.total_votes === 1 ? "" : "s"}
           </summary>

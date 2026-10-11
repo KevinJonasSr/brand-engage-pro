@@ -113,14 +113,14 @@ export default async function AdminLayout({
                 {(ctx.isSuperAdmin || ctx.communities.length > 1) && (
                   <Link
                     href="/admin/communities"
-                    className="text-iron/50 hover:text-iron"
+                    className="text-iron/70 hover:text-iron"
                   >
                     switch
                   </Link>
                 )}
               </span>
             )}
-            <span className="text-iron/60">{ctx.user.email}</span>
+            <span className="text-iron/70">{ctx.user.email}</span>
             {ctx.isSuperAdmin && (
               <span className="rounded-full bg-aurora/20 px-2 py-0.5 text-xs uppercase tracking-wide text-aurora-ink">
                 Super-admin
@@ -129,7 +129,7 @@ export default async function AdminLayout({
           </div>
           <Link
             href="/"
-            className="text-xs text-iron/60 hover:text-iron"
+            className="text-xs text-iron/70 hover:text-iron"
           >
             ← Back to member site
           </Link>
@@ -140,11 +140,11 @@ export default async function AdminLayout({
             <Link
               key={item.href}
               href={item.href}
-              className="relative inline-flex rounded-lg border border-iron/10 px-3 py-2 text-xs font-medium text-iron/60 hover:border-iron/20 hover:text-iron"
+              className="relative inline-flex rounded-lg border border-iron/10 px-3 py-2 text-xs font-medium text-iron/70 hover:border-iron/20 hover:text-iron"
             >
               {item.label}
               {item.href === "/admin/redemptions" && pendingCount > 0 && (
-                <span className="absolute right-0 top-0 inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-linen translate-x-1 -translate-y-1">
+                <span className="absolute right-0 top-0 inline-flex h-5 w-5 items-center justify-center rounded-full bg-ember text-xs font-bold text-linen translate-x-1 -translate-y-1">
                   {pendingCount > 9 ? "9+" : pendingCount}
                 </span>
               )}

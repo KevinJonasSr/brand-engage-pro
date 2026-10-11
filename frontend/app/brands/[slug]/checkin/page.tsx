@@ -97,14 +97,14 @@ export default function CheckinPage() {
       {state.status === "resolving" && (
         <div className="space-y-4">
           <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-iron/10 border-t-aurora" />
-          <p className="text-sm text-iron/50">One moment…</p>
+          <p className="text-sm text-iron/70">One moment…</p>
         </div>
       )}
 
       {state.status === "checking_in" && (
         <div className="space-y-4">
           <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-iron/10 border-t-aurora" />
-          <p className="text-sm text-iron/60">Checking you in at {brandName}…</p>
+          <p className="text-sm text-iron/70">Checking you in at {brandName}…</p>
         </div>
       )}
 
@@ -112,7 +112,7 @@ export default function CheckinPage() {
         <div className="space-y-6">
           <div className="text-5xl">🔑</div>
           <h1 className="text-2xl font-semibold">Sign in to check in</h1>
-          <p className="max-w-sm text-sm text-iron/60">
+          <p className="max-w-sm text-sm text-iron/70">
             Create a free account or sign in to earn visit points at{" "}
             <span className="text-iron/80">{brandName}</span>.
           </p>
@@ -125,7 +125,7 @@ export default function CheckinPage() {
             </Link>
             <Link
               href={`/signup?ref=${encodeURIComponent(brandSlug ?? "")}&next=${encodeURIComponent(checkinPath)}`}
-              className="text-sm text-iron/60 hover:text-iron"
+              className="text-sm text-iron/70 hover:text-iron"
             >
               New here? Create a free account
             </Link>
@@ -140,7 +140,7 @@ export default function CheckinPage() {
           <p className="text-xl font-semibold text-sage-ink">
             +{state.pointsAwarded} points earned
           </p>
-          <p className="max-w-xs text-sm text-iron/60">
+          <p className="max-w-xs text-sm text-iron/70">
             Your visit to {brandName} has been recorded. Come back tomorrow for another{" "}
             {state.pointsAwarded} pts.
           </p>
@@ -157,7 +157,7 @@ export default function CheckinPage() {
         <div className="space-y-6">
           <div className="text-6xl">✅</div>
           <h1 className="text-2xl font-semibold">Already checked in today</h1>
-          <p className="max-w-xs text-sm text-iron/60">
+          <p className="max-w-xs text-sm text-iron/70">
             You&apos;ve already earned your visit points at {brandName} today. See you tomorrow!
           </p>
           <Link
@@ -173,7 +173,7 @@ export default function CheckinPage() {
         <div className="space-y-6">
           <div className="text-5xl">⚠️</div>
           <h1 className="text-2xl font-semibold">Check-in failed</h1>
-          <p className="max-w-xs text-sm text-iron/60">{state.message}</p>
+          <p className="max-w-xs text-sm text-iron/70">{state.message}</p>
           <button
             onClick={() => {
               void runCheckin();

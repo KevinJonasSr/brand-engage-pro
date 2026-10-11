@@ -144,7 +144,7 @@ export default function ApplyForm({ errorCode }: { errorCode?: string }) {
 
       {/* Social */}
       <Section title="Social handles">
-        <p className="text-xs text-iron/55">
+        <p className="text-xs text-iron/70">
           Paste full URLs. Leave blank for platforms you don&apos;t use.
         </p>
         {["Instagram", "Facebook", "TikTok", "YouTube", "X", "LinkedIn"].map(
@@ -197,7 +197,7 @@ export default function ApplyForm({ errorCode }: { errorCode?: string }) {
       )}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs text-iron/55">
+        <p className="text-xs text-iron/70">
           By submitting you agree we may contact the email above. We never
           share your data with third parties.
         </p>
@@ -232,7 +232,7 @@ function Section({
 }) {
   return (
     <fieldset className="glass-card space-y-4 rounded-lg p-6">
-      <legend className="text-xs uppercase tracking-[0.2em] text-iron/60">
+      <legend className="text-xs uppercase tracking-[0.2em] text-iron/70">
         {title}
       </legend>
       <div className="space-y-4">{children}</div>

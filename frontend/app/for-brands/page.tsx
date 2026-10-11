@@ -52,7 +52,7 @@ export default async function ForBrandsPage() {
     <main className="mx-auto max-w-5xl space-y-20 px-6 py-16">
       {/* ─── Hero ──────────────────────────────────────────────────────────── */}
       <section className="space-y-6 text-center">
-        <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
+        <p className="text-xs uppercase tracking-[0.3em] text-iron/70">
           For Brands
         </p>
         <h1
@@ -85,7 +85,7 @@ export default async function ForBrandsPage() {
             See active brands
           </Link>
         </div>
-        <p className="pt-2 text-xs text-iron/50">
+        <p className="pt-2 text-xs text-iron/70">
           No payment or contract required to apply. We respond within 48 hours.
         </p>
         <p className="text-xs text-iron/45">
@@ -102,7 +102,7 @@ export default async function ForBrandsPage() {
       {/* ─── Proof: what's already live ────────────────────────────────────── */}
       <section className="space-y-6">
         <div className="text-center">
-          <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
+          <p className="text-xs uppercase tracking-[0.3em] text-iron/70">
             Already live on Brand Engage Pro
           </p>
           <h2
@@ -131,7 +131,7 @@ export default async function ForBrandsPage() {
       {/* ─── Featured brands (real proof) ─────────────────────────────────── */}
       <section className="space-y-6">
         <div className="text-center">
-          <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
+          <p className="text-xs uppercase tracking-[0.3em] text-iron/70">
             Featured brands
           </p>
           <h2
@@ -158,10 +158,10 @@ export default async function ForBrandsPage() {
                 style={{ backgroundImage: `linear-gradient(90deg, ${b.accentFrom}, ${b.accentTo})` }}
               />
               <p className="mt-2 text-base font-semibold">{b.name}</p>
-              <p className="mt-2 text-xs text-iron/60 line-clamp-3">
+              <p className="mt-2 text-xs text-iron/70 line-clamp-3">
                 {b.tagline}
               </p>
-              <p className="mt-4 text-xs text-iron/55 transition group-hover:text-iron/85">
+              <p className="mt-4 text-xs text-iron/70 transition group-hover:text-iron/85">
                 See their member club →
               </p>
             </Link>
@@ -176,7 +176,7 @@ export default async function ForBrandsPage() {
       {/* ─── What brands can launch ────────────────────────────────────────── */}
       <section className="space-y-6">
         <div className="text-center">
-          <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
+          <p className="text-xs uppercase tracking-[0.3em] text-iron/70">
             What you can launch
           </p>
           <h2
@@ -223,7 +223,7 @@ export default async function ForBrandsPage() {
 
       {/* ─── Data ownership ────────────────────────────────────────────────── */}
       <section className="rounded-lg border border-iron/10 bg-gradient-to-br from-aurora/15 via-parchment to-ember/15 p-10">
-        <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
+        <p className="text-xs uppercase tracking-[0.3em] text-iron/70">
           Your audience, your relationship
         </p>
         <h2
@@ -239,7 +239,7 @@ export default async function ForBrandsPage() {
           they share with you doesn&apos;t live behind someone else&apos;s
           ranking algorithm.
         </p>
-        <p className="mt-4 max-w-3xl text-xs text-iron/55">
+        <p className="mt-4 max-w-3xl text-xs text-iron/70">
           Final data access, export, and permission terms are confirmed during
           onboarding and reflected in the brand agreement. We&apos;ll walk
           through what you can pull, what members control, and how email and
@@ -249,7 +249,7 @@ export default async function ForBrandsPage() {
 
       {/* ─── How launch works ──────────────────────────────────────────────── */}
       <section className="rounded-lg border border-iron/10 bg-gradient-to-br from-amber-500/10 via-parchment to-aurora/10 p-10 text-center">
-        <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
+        <p className="text-xs uppercase tracking-[0.3em] text-iron/70">
           How launch works
         </p>
         <h2
@@ -290,7 +290,7 @@ export default async function ForBrandsPage() {
       {/* ─── FAQ ───────────────────────────────────────────────────────────── */}
       <section className="space-y-6">
         <div className="text-center">
-          <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
+          <p className="text-xs uppercase tracking-[0.3em] text-iron/70">
             FAQ
           </p>
           <h2
@@ -349,7 +349,7 @@ export default async function ForBrandsPage() {
 
       {/* ─── Closing CTA ───────────────────────────────────────────────────── */}
       <section className="rounded-lg border border-iron/10 bg-gradient-to-br from-aurora/25 via-parchment to-ember/25 p-10 text-center md:p-16">
-        <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
+        <p className="text-xs uppercase tracking-[0.3em] text-iron/70">
           Ready when you are
         </p>
         <h2

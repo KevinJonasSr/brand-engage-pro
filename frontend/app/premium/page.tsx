@@ -133,7 +133,7 @@ export default async function PremiumPage({
         )}
 
         {/* Header */}
-        <p className="text-xs uppercase tracking-widest text-iron/50">
+        <p className="text-xs uppercase tracking-widest text-iron/70">
           Premium Member Club
         </p>
         <h1
@@ -169,7 +169,7 @@ export default async function PremiumPage({
           </div>
         )}
         {founder.isFull && (
-          <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-iron/10 bg-iron/5 px-4 py-2 text-xs text-iron/55">
+          <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-iron/10 bg-iron/5 px-4 py-2 text-xs text-iron/70">
             Founding 100 is full. Premium is still available as a separate
             paid club — {fmtPrice(community.monthly_price_cents)}/mo or{" "}
             {fmtPrice(community.annual_price_cents)}/yr.
@@ -181,7 +181,7 @@ export default async function PremiumPage({
           <div className="mt-3">
             <Link
               href={`/brands/${communityId}/founders`}
-              className="text-xs text-iron/60 hover:text-iron/80 transition"
+              className="text-xs text-iron/70 hover:text-iron/80 transition"
             >
               See who&apos;s already a Founding Member →
             </Link>
@@ -236,7 +236,7 @@ export default async function PremiumPage({
                 disabled={Boolean(user) && !community.stripe_product_id}
                 className="group flex flex-col items-start rounded-lg border border-iron/10 bg-parchment/40 p-6 text-left transition hover:border-iron/25 hover:bg-iron/5 disabled:opacity-50"
               >
-                <p className="text-xs uppercase tracking-widest text-iron/50">
+                <p className="text-xs uppercase tracking-widest text-iron/70">
                   Monthly
                 </p>
                 <p
@@ -244,11 +244,11 @@ export default async function PremiumPage({
                   style={{ fontFamily: "var(--font-display)" }}
                 >
                   {fmtPrice(monthly)}
-                  <span className="ml-1 text-base font-normal text-iron/50">
+                  <span className="ml-1 text-base font-normal text-iron/70">
                     /mo
                   </span>
                 </p>
-                <p className="mt-2 text-xs text-iron/55">
+                <p className="mt-2 text-xs text-iron/70">
                   Cancel anytime. No long-term commitment.
                 </p>
                 <span
@@ -274,7 +274,7 @@ export default async function PremiumPage({
                 <span className="absolute right-4 top-4 rounded-full bg-iron/15 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-iron">
                   Save {annualSavingsPct}%
                 </span>
-                <p className="text-xs uppercase tracking-widest text-iron/50">
+                <p className="text-xs uppercase tracking-widest text-iron/70">
                   Annual
                 </p>
                 <p
@@ -282,11 +282,11 @@ export default async function PremiumPage({
                   style={{ fontFamily: "var(--font-display)" }}
                 >
                   {fmtPrice(annual)}
-                  <span className="ml-1 text-base font-normal text-iron/50">
+                  <span className="ml-1 text-base font-normal text-iron/70">
                     /yr
                   </span>
                 </p>
-                <p className="mt-2 text-xs text-iron/55">
+                <p className="mt-2 text-xs text-iron/70">
                   Works out to {fmtPrice(annualMonthlyEquiv)}/mo. Two months free.
                 </p>
                 <span
@@ -304,7 +304,7 @@ export default async function PremiumPage({
 
         {/* Signed-out prompt */}
         {!user && (
-          <p className="mt-4 text-sm text-iron/60">
+          <p className="mt-4 text-sm text-iron/70">
             You&apos;ll need to{" "}
             <Link href={signupHref} className="underline hover:text-iron">
               create a free member profile
@@ -319,7 +319,7 @@ export default async function PremiumPage({
 
         {/* Perks */}
         <section className="mt-16">
-          <p className="text-xs uppercase tracking-widest text-iron/50">
+          <p className="text-xs uppercase tracking-widest text-iron/70">
             What you get
           </p>
           <h2
@@ -336,13 +336,13 @@ export default async function PremiumPage({
               >
                 <p className="text-2xl">{p.icon}</p>
                 <p className="mt-2 font-semibold">{p.title}</p>
-                <p className="mt-1 text-sm text-iron/60">{p.body}</p>
+                <p className="mt-1 text-sm text-iron/70">{p.body}</p>
               </div>
             ))}
           </div>
         </section>
 
-        <p className="mt-12 text-xs text-iron/40">
+        <p className="mt-12 text-xs text-iron/70">
           Secure checkout via Stripe. Cancel anytime from{" "}
           <Link href="/me/billing" className="underline hover:text-iron/70">
             Account, Billing

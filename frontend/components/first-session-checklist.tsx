@@ -65,7 +65,7 @@ export default function FirstSessionChecklist({
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-wide text-iron/60">
+          <p className="text-xs uppercase tracking-wide text-iron/70">
             {FIRST_SESSION_EYEBROW}
           </p>
           <h2
@@ -81,7 +81,7 @@ export default function FirstSessionChecklist({
           <button
             type="button"
             onClick={dismiss}
-            className="rounded-full p-1 text-iron/50 transition hover:bg-iron/10 hover:text-iron"
+            className="rounded-full p-1 text-iron/70 transition hover:bg-iron/10 hover:text-iron"
             aria-label="Dismiss first-session checklist"
           >
             <X size={16} />
@@ -89,7 +89,7 @@ export default function FirstSessionChecklist({
         )}
       </div>
 
-      <p className="mt-3 text-xs text-iron/50">
+      <p className="mt-3 text-xs text-iron/70">
         {done} of {steps.length} done
       </p>
       <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-iron/10">
@@ -119,7 +119,7 @@ export default function FirstSessionChecklist({
               ) : (
                 <Circle
                   size={18}
-                  className="mt-0.5 shrink-0 text-iron/40"
+                  className="mt-0.5 shrink-0 text-iron/70"
                   aria-hidden
                 />
               )}
@@ -127,12 +127,12 @@ export default function FirstSessionChecklist({
                 <span className="block text-sm font-semibold text-iron">
                   {step.label}
                 </span>
-                <span className="mt-0.5 block text-xs text-iron/60">
+                <span className="mt-0.5 block text-xs text-iron/70">
                   {step.detail}
                 </span>
               </span>
               {!step.done && (
-                <span className="ml-auto shrink-0 self-center text-xs text-iron/50">
+                <span className="ml-auto shrink-0 self-center text-xs text-iron/70">
                   Go →
                 </span>
               )}

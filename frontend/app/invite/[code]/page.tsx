@@ -50,7 +50,7 @@ export default async function InvitePage({
     <main className="mx-auto flex min-h-[80vh] max-w-xl flex-col justify-center gap-6 px-6 py-12">
       <SetRefCookie code={code} />
       <section className="rounded-lg border border-iron/10 bg-gradient-to-br from-aurora/30 via-parchment to-ember/20 p-8 shadow-glass">
-        <p className="text-xs uppercase tracking-[0.3em] text-iron/60">You&apos;re invited</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-iron/70">You&apos;re invited</p>
         <h1 className="mt-3 text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
           {inviterName} invited you to Brand Engage Pro
         </h1>
@@ -72,7 +72,7 @@ export default async function InvitePage({
             I already have an account
           </Link>
         </div>
-        <p className="mt-6 text-xs text-iron/50">
+        <p className="mt-6 text-xs text-iron/70">
           Invite code: <code className="font-mono">{code}</code>
         </p>
       </section>

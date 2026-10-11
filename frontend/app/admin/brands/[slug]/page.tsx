@@ -72,13 +72,13 @@ export default async function AdminBrandEditPage({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <Link href="/admin/brands" className="text-xs text-iron/60 hover:text-iron">
+          <Link href="/admin/brands" className="text-xs text-iron/70 hover:text-iron">
             ← Back to brands
           </Link>
           <h1 className="mt-2 text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
             Edit {brand.name as string}
           </h1>
-          <p className="mt-1 text-xs text-iron/60">/{brand.slug as string}</p>
+          <p className="mt-1 text-xs text-iron/70">/{brand.slug as string}</p>
         </div>
         <Link
           href={`/brands/${brand.slug as string}`}
@@ -100,7 +100,7 @@ export default async function AdminBrandEditPage({
           heroFocalX: (brand.hero_focal_x as number | null) ?? 50,
           heroFocalY: (brand.hero_focal_y as number | null) ?? 50,
           accentFrom: (brand.accent_from as string) ?? "#D4A017",
-          accentTo: (brand.accent_to as string) ?? "#f97316",
+          accentTo: (brand.accent_to as string) ?? "#9B2335",
           genresText,
           socialText,
           active: (brand.active as boolean) ?? true,
@@ -111,12 +111,12 @@ export default async function AdminBrandEditPage({
       {/* Events CRUD */}
       <section className="glass-card p-5">
         <p className="text-sm font-semibold">Upcoming events</p>
-        <p className="mt-1 text-xs text-iron/60">
+        <p className="mt-1 text-xs text-iron/70">
           Shown on the brand page. Set <span className="text-iron/80">active = false</span> to hide without deleting,
           or click ✏️ Edit on a row to change date, location, capacity, etc.
         </p>
         <div className="mt-3 space-y-3">
-          {events.length === 0 && <p className="text-xs text-iron/50">No events yet.</p>}
+          {events.length === 0 && <p className="text-xs text-iron/70">No events yet.</p>}
           {events.map((e, i) => {
             const rsvps = rsvpListsByEvent[i] ?? [];
             const atCap = e.capacity != null && e.capacity > 0 && rsvps.length >= e.capacity;
@@ -147,7 +147,7 @@ export default async function AdminBrandEditPage({
                     <p className="text-sm font-semibold">
                       {e.title}
                       {!e.active && (
-                        <span className="ml-2 rounded-full bg-iron/10 px-2 py-0.5 text-xs uppercase text-iron/50">
+                        <span className="ml-2 rounded-full bg-iron/10 px-2 py-0.5 text-xs uppercase text-iron/70">
                           Inactive
                         </span>
                       )}
@@ -157,11 +157,11 @@ export default async function AdminBrandEditPage({
                         </span>
                       )}
                     </p>
-                    <p className="text-xs text-iron/60">
+                    <p className="text-xs text-iron/70">
                       {e.detail ?? "—"} · {e.event_date ?? "—"}
                       {e.location ? ` · 📍 ${e.location}` : ""}
                     </p>
-                    <p className="mt-1 text-xs text-iron/50">
+                    <p className="mt-1 text-xs text-iron/70">
                       {rsvps.length}
                       {e.capacity ? ` / ${e.capacity}` : ""} RSVPed
                     </p>
@@ -172,7 +172,7 @@ export default async function AdminBrandEditPage({
                         <ReminderChip label="1h" row={rem1h} scheduled={remindersScheduled} />
                       </div>
                     )}
-                    {e.url && <p className="mt-1 text-xs text-iron/50 truncate">{e.url}</p>}
+                    {e.url && <p className="mt-1 text-xs text-iron/70 truncate">{e.url}</p>}
                   </div>
                   <div className="flex flex-col items-end gap-1">
                     <form action={sendReminderNowAction}>
@@ -193,7 +193,7 @@ export default async function AdminBrandEditPage({
                 </div>
                 {rsvps.length > 0 && (
                   <details className="mt-2">
-                    <summary className="cursor-pointer text-xs text-iron/60 hover:text-iron">
+                    <summary className="cursor-pointer text-xs text-iron/70 hover:text-iron">
                       View RSVPs ({rsvps.length})
                     </summary>
                     <div className="mt-2 flex flex-wrap gap-2">
@@ -269,7 +269,7 @@ function ReminderChip({
   }
   if (!scheduled) return null;
   return (
-    <span className="rounded-full bg-iron/10 px-2 py-0.5 text-xs text-iron/60">
+    <span className="rounded-full bg-iron/10 px-2 py-0.5 text-xs text-iron/70">
       {label}: scheduled
     </span>
   );

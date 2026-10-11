@@ -53,7 +53,7 @@ function StatusPill({ tier }: { tier: string }) {
     premium: { label: "Active", cls: "bg-emerald-500/20 text-sage-ink" },
     comped: { label: "Comped", cls: "bg-sky-500/20 text-sky-800" },
     past_due: { label: "Past due", cls: "bg-yellow-500/20 text-aurora-ink" },
-    cancelled: { label: "Cancelled", cls: "bg-iron/10 text-iron/60" },
+    cancelled: { label: "Cancelled", cls: "bg-iron/10 text-iron/70" },
   };
   const s = styles[tier] ?? styles.cancelled;
   return (
@@ -102,7 +102,7 @@ export default async function BillingPage({
       <header className="mb-8">
         <Link
           href="/me"
-          className="text-xs uppercase tracking-widest text-iron/60 hover:text-iron"
+          className="text-xs uppercase tracking-widest text-iron/70 hover:text-iron"
         >
           ← Account
         </Link>
@@ -123,7 +123,7 @@ export default async function BillingPage({
 
       {memberships.length > 0 && (
         <section className="mb-8 space-y-3">
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-iron/50">
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-iron/70">
             Memberships
           </h2>
           <ul className="space-y-3">
@@ -139,7 +139,7 @@ export default async function BillingPage({
                       {m.community_id.replace(/-/g, " ")}
                     </div>
                     {line && (
-                      <div className="mt-0.5 text-sm capitalize text-iron/60">
+                      <div className="mt-0.5 text-sm capitalize text-iron/70">
                         {line}
                       </div>
                     )}
@@ -174,7 +174,7 @@ export default async function BillingPage({
               Manage billing or cancel
             </button>
           </form>
-          <p className="text-xs text-iron/50">
+          <p className="text-xs text-iron/70">
             Opens Stripe&apos;s secure billing portal, where you can update
             your card, switch plans, see invoices, or cancel. You&apos;ll come
             back here when you&apos;re done.

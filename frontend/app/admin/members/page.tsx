@@ -64,7 +64,7 @@ export default async function AdminMembersPage() {
         <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
           Members
         </h1>
-        <p className="mt-2 text-sm text-iron/60">
+        <p className="mt-2 text-sm text-iron/70">
           Top {members.length} members by total points. Read-only for now — edits happen via Supabase
           directly.
         </p>
@@ -72,7 +72,7 @@ export default async function AdminMembersPage() {
 
       <div className="overflow-hidden rounded-lg border border-iron/10">
         <table className="w-full text-sm">
-          <thead className="bg-parchment/40 text-left text-xs uppercase tracking-wide text-iron/50">
+          <thead className="bg-parchment/40 text-left text-xs uppercase tracking-wide text-iron/70">
             <tr>
               <th className="px-4 py-3">Name</th>
               <th className="px-4 py-3">Email</th>
@@ -84,7 +84,7 @@ export default async function AdminMembersPage() {
           <tbody>
             {members.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-iron/50">
+                <td colSpan={5} className="px-4 py-6 text-center text-iron/70">
                   No members yet.
                 </td>
               </tr>
@@ -97,7 +97,7 @@ export default async function AdminMembersPage() {
                 <td className="px-4 py-3 text-right">
                   {new Intl.NumberFormat("en-US").format(f.total_points)}
                 </td>
-                <td className="px-4 py-3 text-iron/60">
+                <td className="px-4 py-3 text-iron/70">
                   {new Date(f.created_at).toLocaleDateString()}
                 </td>
               </tr>

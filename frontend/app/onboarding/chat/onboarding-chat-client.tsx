@@ -95,7 +95,7 @@ export default function OnboardingChatClient({
         ))}
         {busy && !done && (
           <div className="flex justify-start">
-            <div className="rounded-lg bg-iron/10 px-4 py-2 text-sm text-iron/60">
+            <div className="rounded-lg bg-iron/10 px-4 py-2 text-sm text-iron/70">
               <span className="inline-block animate-pulse">…</span>
             </div>
           </div>
@@ -136,7 +136,7 @@ export default function OnboardingChatClient({
 
       <Link
         href="/"
-        className="text-center text-xs text-iron/50 hover:text-iron/80"
+        className="text-center text-xs text-iron/70 hover:text-iron/80"
       >
         Skip for now
       </Link>

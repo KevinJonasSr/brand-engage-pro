@@ -71,7 +71,7 @@ export async function LatestStrip({ slug }: { slug: string }) {
       className="mt-6"
     >
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-xs uppercase tracking-widest text-iron/60">
+        <h2 className="text-xs uppercase tracking-widest text-iron/70">
           Latest
         </h2>
       </div>
@@ -91,13 +91,13 @@ export async function LatestStrip({ slug }: { slug: string }) {
               >
                 {KIND_LABEL[c.kind]}
               </span>
-              <span className="text-xs text-iron/40">{c.when}</span>
+              <span className="text-xs text-iron/70">{c.when}</span>
             </div>
             <div className="font-medium leading-snug group-hover:text-iron">
               {c.title}
             </div>
             {c.body && (
-              <p className="mt-1 line-clamp-2 text-sm text-iron/60">
+              <p className="mt-1 line-clamp-2 text-sm text-iron/70">
                 {c.body}
               </p>
             )}

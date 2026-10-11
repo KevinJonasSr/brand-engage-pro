@@ -57,9 +57,9 @@ export default function BroadcastPage() {
   return (
     <div className="space-y-8 max-w-2xl">
       <header>
-        <p className="text-xs uppercase tracking-wide text-iron/60">Admin · Broadcast</p>
+        <p className="text-xs uppercase tracking-wide text-iron/70">Admin · Broadcast</p>
         <h1 className="mt-1 text-2xl font-semibold">Send a broadcast</h1>
-        <p className="mt-2 text-sm text-iron/60">
+        <p className="mt-2 text-sm text-iron/70">
           Message your members by text, email or both, and target by tier.
           Only members who follow this brand and said yes to that channel get
           it. Every send is logged to Campaigns for your records.
@@ -148,7 +148,7 @@ export default function BroadcastPage() {
             </label>
             {sendsSms && (
               <span
-                className={`text-xs ${charsLeft < 20 ? "text-ember" : "text-iron/40"}`}
+                className={`text-xs ${charsLeft < 20 ? "text-ember" : "text-iron/70"}`}
               >
                 {charsLeft} chars left (SMS)
               </span>
@@ -169,9 +169,9 @@ export default function BroadcastPage() {
             className="w-full resize-none rounded-xl border border-iron/15 bg-parchment/30 p-4 text-sm text-iron placeholder:text-iron/30 focus:border-aurora/60 focus:outline-none"
           />
           {sendsSms && message.length > 0 && (
-            <p className="text-xs text-iron/40">
+            <p className="text-xs text-iron/70">
               Text recipients will see:{" "}
-              <span className="text-iron/60">
+              <span className="text-iron/70">
                 {message} Reply STOP to opt out.
               </span>
             </p>
@@ -236,8 +236,8 @@ export default function BroadcastPage() {
         </div>
       )}
 
-      <div className="rounded-lg border border-iron/10 bg-parchment/20 p-5 text-xs text-iron/50 space-y-1">
-        <p className="font-medium text-iron/60">Good to know</p>
+      <div className="rounded-lg border border-iron/10 bg-parchment/20 p-5 text-xs text-iron/70 space-y-1">
+        <p className="font-medium text-iron/70">Good to know</p>
         <p>• Text recipients must have opted in and have a verified phone number.</p>
         <p>• Email recipients must have said yes to email. Each email names your brand and has its own unsubscribe link.</p>
         <p>• Text sends are throttled (250 ms/msg) to stay within carrier rate limits.</p>

@@ -151,7 +151,7 @@ export default function EditRewardForm({ reward }: { reward: RewardRow }) {
         <button
           type="submit"
           disabled={submitting}
-          className="flex-1 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 px-4 py-2 font-medium text-iron hover:opacity-90 disabled:opacity-50"
+          className="flex-1 rounded-lg bg-ember px-4 py-2 font-medium text-linen hover:bg-ember/90 disabled:opacity-50"
         >
           {submitting ? "Saving…" : "Save Changes"}
         </button>

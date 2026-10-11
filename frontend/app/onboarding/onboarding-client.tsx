@@ -372,7 +372,7 @@ export default function OnboardingWizard({
     <div className="min-h-screen bg-gradient-to-b from-linen via-parchment to-parchment text-iron">
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-12 lg:flex-row">
         <section className="w-full max-w-3xl rounded-lg border border-iron/10 bg-parchment/40 p-8">
-          <div className="flex items-center justify-between text-sm uppercase tracking-[0.3em] text-iron/60">
+          <div className="flex items-center justify-between text-sm uppercase tracking-[0.3em] text-iron/70">
             <span>Set up your profile</span>
             <span>{Math.round(progress)}% complete</span>
           </div>
@@ -382,7 +382,7 @@ export default function OnboardingWizard({
 
           <div className="mt-8 space-y-6">
             <div>
-              <p className="text-sm uppercase tracking-wide text-iron/60">Step {stepIndex + 1}</p>
+              <p className="text-sm uppercase tracking-wide text-iron/70">Step {stepIndex + 1}</p>
               <h1 className="mt-2 text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
                 {currentStep.title}
               </h1>
@@ -452,7 +452,7 @@ export default function OnboardingWizard({
                         })}
                       </select>
                       {field.hint && (
-                        <span className="mt-1 block text-xs text-iron/50">{field.hint}</span>
+                        <span className="mt-1 block text-xs text-iron/70">{field.hint}</span>
                       )}
                     </label>
                   );
@@ -482,13 +482,13 @@ export default function OnboardingWizard({
                             (field.name === "email" && !emailAutoFilled)
                           }
                           className={`mt-2 w-full rounded-lg border border-iron/10 bg-iron/5 px-4 py-3 text-iron placeholder-iron/40 focus:border-iron/40 focus:outline-none ${
-                            fieldReadOnly ? "cursor-not-allowed text-iron/60" : ""
+                            fieldReadOnly ? "cursor-not-allowed text-iron/70" : ""
                           }`}
                         />
                       );
                     })()}
                     {field.hint && (
-                      <span className="mt-1 block text-xs text-iron/50">
+                      <span className="mt-1 block text-xs text-iron/70">
                         {field.name === "email" && !emailAutoFilled
                           ? "We'll use this to send your weekly digest and confirmations."
                           : field.hint}
@@ -567,7 +567,7 @@ export default function OnboardingWizard({
             <div className="flex flex-col gap-2 pt-4">
               <div className="flex items-center justify-between gap-4">
                 <button
-                  className="text-sm text-iron/60 disabled:opacity-30"
+                  className="text-sm text-iron/70 disabled:opacity-30"
                   disabled={stepIndex === 0}
                   onClick={prevStep}
                 >
@@ -594,7 +594,7 @@ export default function OnboardingWizard({
                 )}
               </div>
               {!isLastStep && !stepValid && (
-                <p className="text-right text-xs text-iron/50">
+                <p className="text-right text-xs text-iron/70">
                   Fill in the required fields (
                   <span className="text-ember">*</span>) to continue.
                 </p>

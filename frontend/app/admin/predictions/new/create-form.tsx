@@ -202,7 +202,7 @@ export function CreatePredictionForm({ brands }: Props) {
             <h2 className="text-sm font-semibold text-iron">
               ✨ Suggest predictions with AI
             </h2>
-            <p className="text-xs text-iron/55">
+            <p className="text-xs text-iron/70">
               Uses the brand&rsquo;s recent posts + upcoming events to ground
               suggestions. ~3¢ per click.
             </p>
@@ -239,7 +239,7 @@ export function CreatePredictionForm({ brands }: Props) {
                     {s.body && (
                       <p className="mt-0.5 text-xs text-iron/65">{s.body}</p>
                     )}
-                    <p className="mt-1 text-xs uppercase tracking-wider text-iron/40">
+                    <p className="mt-1 text-xs uppercase tracking-wider text-iron/70">
                       {s.prediction_type} ·{" "}
                       {s.suggested_close_in_hours ?? 72}h ·{" "}
                       {s.suggested_points ?? 50}pts
@@ -335,7 +335,7 @@ export function CreatePredictionForm({ brands }: Props) {
                     <button
                       type="button"
                       onClick={() => removeOption(i)}
-                      className="rounded-lg border border-iron/15 px-3 text-sm text-iron/60 hover:bg-iron/5"
+                      className="rounded-lg border border-iron/15 px-3 text-sm text-iron/70 hover:bg-iron/5"
                       aria-label="Remove option"
                     >
                       ×
@@ -485,11 +485,11 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-iron/55">
+      <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-iron/70">
         {label}
       </span>
       {children}
-      {hint && <span className="mt-1 block text-xs text-iron/40">{hint}</span>}
+      {hint && <span className="mt-1 block text-xs text-iron/70">{hint}</span>}
     </label>
   );
 }
