@@ -92,7 +92,7 @@ export default async function RewardsPage({
         </div>
 
         {!isSignedIn && (
-          <div className="mb-6 rounded-lg border border-aurora/40 bg-gradient-to-r from-aurora/20 via-slate-900 to-ember/20 px-5 py-4">
+          <div className="mb-6 rounded-lg border border-aurora/40 bg-gradient-to-r from-aurora/20 via-parchment to-ember/20 px-5 py-4">
             <p className="text-sm font-semibold">Browse rewards — redeem after you join</p>
             <p className="mt-1 text-xs text-iron/70">
               Finish your profile for +100 welcome points, then earn from visits and check-ins.

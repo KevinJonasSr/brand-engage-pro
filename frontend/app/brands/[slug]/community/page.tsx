@@ -109,7 +109,7 @@ export default async function BrandCommunityPage({
       {isSignedIn ? (
         <NewPostForm brandSlug={slug} isAdmin={isAdmin} />
       ) : (
-        <section className="rounded-lg border border-aurora/40 bg-gradient-to-r from-aurora/20 via-slate-900 to-ember/20 p-5">
+        <section className="rounded-lg border border-aurora/40 bg-gradient-to-r from-aurora/20 via-parchment to-ember/20 p-5">
           <p className="text-sm">
             Sign in to post in the {brand.name} community.
           </p>

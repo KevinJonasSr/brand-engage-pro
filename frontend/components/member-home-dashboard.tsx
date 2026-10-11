@@ -156,11 +156,11 @@ function FollowedBrandsStrip({
 
               {/* Name + tagline overlay */}
               <div className="absolute inset-x-0 bottom-0 p-3">
-                <p className="text-sm font-semibold text-iron drop-shadow-[0_1px_8px_rgba(0,0,0,0.7)]">
+                <p className="text-sm font-semibold text-linen drop-shadow-[0_1px_8px_rgba(0,0,0,0.7)]">
                   {a.name}
                 </p>
                 {a.tagline && (
-                  <p className="mt-0.5 line-clamp-1 text-xs text-iron/80 drop-shadow-[0_1px_6px_rgba(0,0,0,0.6)]">
+                  <p className="mt-0.5 line-clamp-1 text-xs text-linen/80 drop-shadow-[0_1px_6px_rgba(0,0,0,0.6)]">
                     {a.tagline}
                   </p>
                 )}

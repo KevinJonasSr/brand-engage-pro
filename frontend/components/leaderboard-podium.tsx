@@ -14,7 +14,7 @@ interface PodiumProps {
 }
 
 const TIER_COLOR: Record<string, string> = {
-  bronze:   "from-amber-700/40 to-amber-900/30",
+  bronze:   "from-amber-700/40 to-aurora/20",
   silver:   "from-slate-300/30 to-slate-500/20",
   gold:     "from-yellow-400/40 to-amber-600/30",
   platinum: "from-violet-300/40 to-fuchsia-500/30",
@@ -38,7 +38,7 @@ const RANK_THEME: Record<number, { ring: string; halo: string; medal: string; he
   },
   3: {
     ring:   "ring-amber-700/60",
-    halo:   "from-amber-700/40 via-amber-800/20 to-amber-900/30",
+    halo:   "from-amber-700/40 via-aurora/15 to-aurora/20",
     medal:  "🥉",
     height: "h-32",
     label:  "3rd",
@@ -133,7 +133,7 @@ export default function LeaderboardPodium({
                   ? "from-amber-500/20 to-amber-700/30"
                   : rank === 2
                     ? "from-slate-300/15 to-slate-500/25"
-                    : "from-amber-700/20 to-amber-900/30"
+                    : "from-amber-700/20 to-aurora/20"
               } px-2 py-3 ring-1 ring-iron/10`}
               style={{
                 height:

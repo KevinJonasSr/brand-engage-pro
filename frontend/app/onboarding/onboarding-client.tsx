@@ -369,7 +369,7 @@ export default function OnboardingWizard({
   const stepValid = canAdvanceCurrentStep();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-parchment text-iron">
+    <div className="min-h-screen bg-gradient-to-b from-linen via-parchment to-parchment text-iron">
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-12 lg:flex-row">
         <section className="w-full max-w-3xl rounded-lg border border-iron/10 bg-parchment/40 p-8">
           <div className="flex items-center justify-between text-sm uppercase tracking-[0.3em] text-iron/60">

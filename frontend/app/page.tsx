@@ -138,7 +138,7 @@ export default async function Home({
         <div className="flex-1 space-y-6">
           {firstSession && <FirstSessionChecklist facts={firstSession} />}
           {needsProfile && !firstSession && (
-            <section className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-aurora/40 bg-gradient-to-r from-aurora/20 via-slate-900 to-ember/20 px-5 py-4">
+            <section className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-aurora/40 bg-gradient-to-r from-aurora/20 via-parchment to-ember/20 px-5 py-4">
               <div>
                 <p className="text-sm font-semibold">Finish setting up your profile</p>
                 <p className="text-xs text-iron/70">

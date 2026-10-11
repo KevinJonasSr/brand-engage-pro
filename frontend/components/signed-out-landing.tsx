@@ -146,7 +146,7 @@ export default function SignedOutLanding({
           </div>
 
           {/* Honest start state — no fake points / Gold theater */}
-          <div className="lg:hidden mt-8 rounded-lg border border-iron/10 bg-gradient-to-br from-aurora/40 via-slate-900 to-parchment p-6 shadow-glass">
+          <div className="lg:hidden mt-8 rounded-lg border border-iron/10 bg-linen bg-gradient-to-br from-aurora/40 via-parchment to-parchment p-6 shadow-glass">
             <p className="text-xs uppercase tracking-widest text-iron/60">Your member start</p>
             <p className="mt-4 text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>0</p>
             <p className="text-xs text-iron/50">points until you join</p>
@@ -160,7 +160,7 @@ export default function SignedOutLanding({
           <div className="relative hidden lg:block">
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="relative h-[440px] w-[360px]">
-                <div className="absolute left-8 top-12 h-[380px] w-[320px] rotate-3 rounded-lg border border-iron/10 bg-gradient-to-br from-ember/25 via-slate-900 to-aurora/25 shadow-glass">
+                <div className="absolute left-8 top-12 h-[380px] w-[320px] rotate-3 rounded-lg border border-iron/10 bg-linen bg-gradient-to-br from-ember/25 via-parchment to-aurora/25 shadow-glass">
                   <div className="p-6 text-iron/70">
                     <p className="text-xs uppercase tracking-widest">How members earn</p>
                     <p className="mt-2 text-sm font-semibold text-iron">Visits · check-ins · community</p>
@@ -169,7 +169,7 @@ export default function SignedOutLanding({
                     </p>
                   </div>
                 </div>
-                <div className="absolute left-0 top-0 h-[380px] w-[320px] -rotate-2 rounded-lg border border-iron/10 bg-gradient-to-br from-aurora/40 via-slate-900 to-parchment p-6 shadow-glass">
+                <div className="absolute left-0 top-0 h-[380px] w-[320px] -rotate-2 rounded-lg border border-iron/10 bg-linen bg-gradient-to-br from-aurora/40 via-parchment to-parchment p-6 shadow-glass">
                   <p className="text-xs uppercase tracking-widest text-iron/60">
                     Sign up to start at 0
                   </p>
@@ -379,7 +379,7 @@ export default function SignedOutLanding({
 
       {/* ─── Closing CTA ──────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-6 py-24">
-        <div className="relative overflow-hidden rounded-lg border border-iron/10 bg-gradient-to-br from-aurora/25 via-slate-900 to-ember/25 p-10 text-center shadow-glass md:p-16">
+        <div className="relative overflow-hidden rounded-lg border border-iron/10 bg-gradient-to-br from-aurora/25 via-parchment to-ember/25 p-10 text-center shadow-glass md:p-16">
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0 bg-[radial-gradient(600px_circle_at_50%_-20%,rgba(212,160,23,0.35),transparent)]"

@@ -135,14 +135,14 @@ export default async function BrandsIndexPage({ searchParams }: { searchParams?:
 
               {/* Top-left genre chip */}
               {a.genres.length > 0 && (
-                <p className="absolute left-5 top-5 rounded-full border border-iron/15 bg-parchment/45 px-3 py-1 text-xs uppercase tracking-[0.3em] text-iron/85 backdrop-blur">
+                <p className="absolute left-5 top-5 max-w-[calc(100%-9.5rem)] truncate rounded-full border border-linen/15 bg-iron/45 px-3 py-1 text-xs uppercase tracking-[0.3em] text-linen/85 backdrop-blur">
                   {a.genres.slice(0, 2).join(" · ")}{a.genres.length > 2 ? " +" + (a.genres.length - 2) : ""}
                 </p>
               )}
 
               {/* Top-right member count chip (M-14) */}
               {(memberCounts[a.slug] ?? 0) > 0 && (
-                <p className="absolute right-5 top-5 rounded-full border border-iron/15 bg-parchment/45 px-3 py-1 text-xs uppercase tracking-[0.3em] text-iron/85 backdrop-blur">
+                <p className="absolute right-5 top-5 whitespace-nowrap rounded-full border border-linen/15 bg-iron/45 px-3 py-1 text-xs uppercase tracking-[0.3em] text-linen/85 backdrop-blur">
                   {memberCounts[a.slug].toLocaleString()} {memberCounts[a.slug] === 1 ? "member" : "members"}
                 </p>
               )}
@@ -150,17 +150,17 @@ export default async function BrandsIndexPage({ searchParams }: { searchParams?:
               {/* Bottom-left content: name + tagline + CTA arrow */}
               <div className="absolute inset-x-0 bottom-0 p-5">
                 <h2
-                  className="truncate text-2xl font-semibold text-iron drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]"
+                  className="truncate text-2xl font-semibold text-linen drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]"
                   style={{ fontFamily: "var(--font-display)" }}
                 >
                   {a.name}
                 </h2>
                 {a.tagline && (
-                  <p className="mt-1 line-clamp-2 text-sm text-iron/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.5)]">
+                  <p className="mt-1 line-clamp-2 text-sm text-linen/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.5)]">
                     {a.tagline}
                   </p>
                 )}
-                <span className="mt-3 inline-flex text-sm text-iron/90 transition group-hover:text-iron">
+                <span className="mt-3 inline-flex text-sm text-linen/90 transition group-hover:text-linen">
                   Enter member club →
                 </span>
               </div>

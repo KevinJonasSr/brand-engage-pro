@@ -24,8 +24,8 @@ export interface ShareButtonProps {
   url: string;
   /** Button label. Defaults to "Share". */
   label?: string;
-  /** Visual style. "primary" = brand gradient pill, "ghost" = outline. */
-  variant?: "primary" | "ghost";
+  /** Visual style. "primary" = ember pill, "ghost" = outline, "photo" = outline on a dark photo. */
+  variant?: "primary" | "ghost" | "photo";
   /** Optional analytics hook called when share is invoked. */
   onShare?: () => void;
 }
@@ -69,7 +69,9 @@ export default function ShareButton({
   const styleClass =
     variant === "primary"
       ? "bg-ember text-linen shadow-glass hover:brightness-110"
-      : "border border-iron/25 text-iron/85 hover:bg-iron/10";
+      : variant === "photo"
+        ? "border border-linen/30 bg-iron/30 text-linen/90 backdrop-blur hover:bg-linen/10"
+        : "border border-iron/25 text-iron/85 hover:bg-iron/10";
 
   const feedbackLabel =
     state === "copied" ? "Copied" : state === "error" ? "Error" : label;
