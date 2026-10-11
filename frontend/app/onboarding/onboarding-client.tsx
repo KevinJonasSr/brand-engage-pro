@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import FirstSessionChecklist from "@/components/first-session-checklist";
 import { SMS_CONSENT_TEXT } from "@/lib/sms-compliance";
+import { safeRelativePath } from "@/lib/safe-redirect";
+import { onboardingDoneHref } from "@/lib/onboarding-next";
 import {
   EMPTY_FIRST_SESSION_FACTS,
   type FirstSessionFacts,
@@ -155,7 +157,7 @@ export default function OnboardingWizard({
       } | null) => {
         if (cancelled || !body) return;
         if (body.complete || isOnboardingComplete(body.member ?? null)) {
-          window.location.replace("/");
+          window.location.replace(doneHrefFromUrl());
           return;
         }
         const nextForm =
@@ -356,7 +358,7 @@ export default function OnboardingWizard({
         }).catch((err) => console.warn("Welcome text did not send:", err));
       }
 
-      window.location.assign("/");
+      window.location.assign(doneHrefFromUrl());
     } catch (error) {
       console.error(error);
       setFinishStatus("error");
@@ -625,4 +627,10 @@ export default function OnboardingWizard({
       </div>
     </div>
   );
+}
+
+/** Where to go after onboarding: the safe `next` from the URL, else home. */
+function doneHrefFromUrl(): string {
+  const raw = new URLSearchParams(window.location.search).get("next");
+  return onboardingDoneHref(safeRelativePath(raw, ""));
 }

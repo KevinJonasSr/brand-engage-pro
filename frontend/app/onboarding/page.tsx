@@ -2,7 +2,8 @@
  * Server-component wrapper around the onboarding client.
  *
  * Auth is gated here so anonymous visitors never see a wizard flash.
- * Finished profiles (name + consent) redirect home — reopening
+ * Finished profiles (name + consent) redirect home (or to a safe `next`
+ * path, such as the QR check-in page they came from) — reopening
  * /onboarding must not reset to a blank 33% form.
  * Drafts rehydrate Preferred name, lane, and favorite brand.
  */
@@ -13,6 +14,8 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ONBOARDED_COOKIE, ONBOARDED_MAX_AGE } from "@/lib/auth-cookies";
+import { safeRelativePath } from "@/lib/safe-redirect";
+import { onboardingDoneHref, onboardingNextTarget } from "@/lib/onboarding-next";
 import { getFirstSessionFacts } from "@/lib/data/first-session";
 import { EMPTY_FIRST_SESSION_FACTS } from "@/lib/first-session";
 import {
@@ -29,17 +32,20 @@ export const dynamic = "force-dynamic";
 export default async function OnboardingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ ref?: string }>;
+  searchParams: Promise<{ ref?: string; next?: string }>;
 }) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const sp = (await searchParams) ?? {};
+  const nextTarget = onboardingNextTarget(safeRelativePath(sp.next, ""));
+
   if (!user) {
-    const sp = (await searchParams) ?? {};
     const params = new URLSearchParams();
-    params.set("next", "/onboarding");
+    // Signup always routes through onboarding and carries `next` along.
+    params.set("next", nextTarget ?? "/onboarding");
     if (sp.ref) params.set("ref", sp.ref);
     redirect(`/signup?${params.toString()}`);
   }
@@ -79,7 +85,7 @@ export default async function OnboardingPage({
       maxAge: ONBOARDED_MAX_AGE,
       sameSite: "lax",
     });
-    redirect("/");
+    redirect(onboardingDoneHref(nextTarget));
   }
 
   const initialForm = wizardFormFromMember(member, user.email);

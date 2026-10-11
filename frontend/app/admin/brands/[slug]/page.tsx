@@ -8,6 +8,7 @@ import BrandEditForm from "./edit-form";
 import CreateEventForm from "./create-event-form";
 import EditableEventRow from "./editable-event-row";
 import CheckinQrCard from "@/components/checkin-qr-card";
+import { checkinPath, checkinSecretFromEnv, signCheckinToken } from "@/lib/checkin-token";
 import {
   deleteEventAction,
   sendReminderNowAction,
@@ -230,11 +231,17 @@ export default async function AdminBrandEditPage({
 
       {/* Check-in QR — print or display at the register / entrance */}
       <CheckinQrCard
-        brandSlug={brand.slug as string}
         brandName={brand.name as string}
+        checkinPath={signedCheckinPath(brand.slug as string)}
       />
     </div>
   );
+}
+
+/** Check-in path for the printed QR, signed when CHECKIN_SIGNING_SECRET is set. */
+function signedCheckinPath(brandSlug: string): string {
+  const secret = checkinSecretFromEnv();
+  return checkinPath(brandSlug, secret ? signCheckinToken(brandSlug, secret) : null);
 }
 
 function ReminderChip({

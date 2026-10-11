@@ -23,7 +23,13 @@ type State =
 export default function CheckinPage() {
   const params = useParams<{ slug: string }>();
   const brandSlug = params.slug;
-  const checkinPath = brandSlug ? `/brands/${brandSlug}/checkin` : "/";
+  // Proof-of-presence token from the printed QR code (?t=...). The sign-in
+  // links only render after the first client effect, so reading
+  // window.location here cannot cause a hydration mismatch.
+  const token = readCheckinToken();
+  const checkinPath = brandSlug
+    ? `/brands/${brandSlug}/checkin${token ? `?t=${encodeURIComponent(token)}` : ""}`
+    : "/";
 
   const brandName = useMemo(() => {
     if (!brandSlug) return "this brand";
@@ -58,7 +64,7 @@ export default function CheckinPage() {
       const res = await fetch("/api/checkin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ brand_slug: brandSlug }),
+        body: JSON.stringify({ brand_slug: brandSlug, token: readCheckinToken() }),
       });
 
       if (res.status === 401) {
@@ -180,4 +186,10 @@ export default function CheckinPage() {
       )}
     </main>
   );
+}
+
+/** The `t` token from the scanned QR URL, or null (server render or none). */
+function readCheckinToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return new URLSearchParams(window.location.search).get("t");
 }
