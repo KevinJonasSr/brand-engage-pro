@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { Brand } from "@/lib/brands";
 import { featuredBrandsForGuestHome } from "@/lib/guest-home-featured-brands";
 import type { ReactNode } from "react";
+import GuestResultsSection from "@/components/guest-results-section";
+import type { GuestResults } from "@/lib/guest-results";
 
 /* ── Icon set (Lucide-style, 24×24, 1.5px stroke) ─────────────────────── */
 function IconUsers() {
@@ -78,7 +80,13 @@ function IconBadge({ icon }: { icon: ReactNode }) {
  * brands → closing CTA). Signed-in members never see this — they hit the
  * personalized Member Home dashboard from Phase 3e instead.
  */
-export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
+export default function SignedOutLanding({
+  brands,
+  results = null,
+}: {
+  brands: Brand[];
+  results?: GuestResults | null;
+}) {
   const featured = featuredBrandsForGuestHome(brands);
 
   return (
@@ -346,6 +354,9 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
           </div>
         </section>
       )}
+
+      {/* ─── Results (hidden until Nellie's has real numbers) ──────────── */}
+      <GuestResultsSection results={results} />
 
       {/* ─── Closing CTA ──────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-6 py-24">
