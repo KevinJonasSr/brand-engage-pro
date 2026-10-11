@@ -22,6 +22,7 @@ type InitialValues = {
   active: boolean;
   sortOrder: number;
   founderEarlyRsvpHours: number;
+  requireRotatingCheckin: boolean;
 };
 
 export default function BrandEditForm({
@@ -199,6 +200,21 @@ export default function BrandEditForm({
           still works.
         </p>
       </Field>
+      <label className="flex items-start gap-2 text-xs text-iron/70">
+        <input
+          type="checkbox"
+          name="require_rotating_checkin"
+          value="true"
+          defaultChecked={initial.requireRotatingCheckin}
+          className="mt-0.5 h-4 w-4 accent-aurora"
+        />
+        <span>
+          Require a rotating host-stand code for visit points. Leave this off
+          until a tablet is showing the host-stand screen. Printed posters
+          keep working for sign-up either way, and keep awarding points while
+          this is off.
+        </span>
+      </label>
       <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
         <label className="flex items-center gap-2 text-xs text-iron/70">
           <input

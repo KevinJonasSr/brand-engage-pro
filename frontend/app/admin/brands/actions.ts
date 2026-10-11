@@ -15,6 +15,11 @@ import { parseSocialLines } from "@/lib/socials/parse";
 const EARLY_RSVP_HOURS_ERROR =
   "Founder early RSVP hours must be a whole number from 0 to 168. Use 0 to turn the early window off.";
 
+/** True when this database does not have brands.require_rotating_checkin yet. */
+function missingRotatingColumn(error: { message?: string }): boolean {
+  return (error.message ?? "").includes("require_rotating_checkin");
+}
+
 /** Throws unless the caller is an admin with access to `brandSlug`. */
 async function requireBrandAdmin(brandSlug: string) {
   const ctx = await requireAdminContext();
@@ -72,6 +77,7 @@ export async function updateBrandAction(formData: FormData) {
   const genresRaw = String(formData.get("genres") ?? "").trim();
   const socialRaw = String(formData.get("social") ?? "").trim();
   const active = String(formData.get("active") ?? "true") === "true";
+  const requireRotatingCheckin = formData.get("require_rotating_checkin") === "true";
   const sortOrder = parseInt(String(formData.get("sort_order") ?? "99"), 10);
   const earlyHours = parseEarlyRsvpHours(String(formData.get("founder_early_rsvp_hours") ?? ""));
   if (earlyHours === "invalid" || earlyHours === null) {
@@ -88,24 +94,33 @@ export async function updateBrandAction(formData: FormData) {
   // domain). See lib/socials/parse.ts for the full format spec.
   const social = parseSocialLines(socialRaw);
   const supa = createAdminClient();
-  const { error } = await supa
+  const fields = {
+    name,
+    tagline: tagline || null,
+    bio: bio || null,
+    hero_image: heroImage || null,
+    hero_focal_x: clampFocal(heroFocalX),
+    hero_focal_y: clampFocal(heroFocalY),
+    accent_from: accentFrom,
+    accent_to: accentTo,
+    genres,
+    social,
+    active,
+    sort_order: Number.isFinite(sortOrder) ? sortOrder : 99,
+    founder_early_rsvp_hours: earlyHours,
+  };
+  let { error } = await supa
     .from("brands")
-    .update({
-      name,
-      tagline: tagline || null,
-      bio: bio || null,
-      hero_image: heroImage || null,
-      hero_focal_x: clampFocal(heroFocalX),
-      hero_focal_y: clampFocal(heroFocalY),
-      accent_from: accentFrom,
-      accent_to: accentTo,
-      genres,
-      social,
-      active,
-      sort_order: Number.isFinite(sortOrder) ? sortOrder : 99,
-      founder_early_rsvp_hours: earlyHours,
-    })
+    .update({ ...fields, require_rotating_checkin: requireRotatingCheckin })
     .eq("slug", slug);
+  if (error && missingRotatingColumn(error)) {
+    if (requireRotatingCheckin) {
+      return {
+        error: "Rotating check-in isn't available until the database update is applied.",
+      };
+    }
+    ({ error } = await supa.from("brands").update(fields).eq("slug", slug));
+  }
   if (error) return { error: error.message };
   revalidatePath("/admin/brands");
   revalidatePath(`/admin/brands/${slug}`);
