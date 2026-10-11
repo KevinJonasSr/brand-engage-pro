@@ -21,3 +21,12 @@ export function prefersReducedMotion(): boolean {
 export function scrollBehavior(): ScrollBehavior {
   return prefersReducedMotion() ? "auto" : "smooth";
 }
+
+/** Front Porch Supper stagger: 120ms per item, capped so a long list never waits. */
+export const REVEAL_STAGGER_MS = 120;
+export const REVEAL_MAX_STEPS = 4;
+
+export function revealDelayMs(index: number): number {
+  if (!Number.isFinite(index) || index <= 0) return 0;
+  return Math.min(Math.floor(index), REVEAL_MAX_STEPS) * REVEAL_STAGGER_MS;
+}

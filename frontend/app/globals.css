@@ -42,6 +42,56 @@ body {
 }
 
 /*
+ * Front Porch Supper motion (art direction report, 2026-10-11). Unhurried:
+ * one ease-out-quart curve, no overshoot.
+ *
+ * .bep-reveal       sections rise 24px and fade in as they scroll into
+ *                   view. Stagger comes from --reveal-delay, set by
+ *                   components/reveal.tsx. Only hidden when scripting is
+ *                   on, so a page without JS never stays blank.
+ * .bep-photo-zoom   photo inside a .group slowly grows to 104% on hover
+ *                   (mouse and trackpad only, not touch).
+ * .bep-press        buttons settle to 98% while pressed.
+ */
+:root {
+  --ease-porch: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@media (scripting: enabled) {
+  .bep-reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 560ms var(--ease-porch),
+      transform 560ms var(--ease-porch);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .bep-reveal[data-revealed="true"] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.bep-photo-zoom {
+  transition: transform 900ms var(--ease-porch);
+}
+
+@media (hover: hover) {
+  .group:hover .bep-photo-zoom {
+    transform: scale(1.04);
+  }
+}
+
+.bep-press {
+  transition: transform 160ms ease-out;
+}
+
+.bep-press:active {
+  transform: scale(0.98);
+}
+
+/*
  * Reduce Motion (iPhone Settings > Accessibility > Motion, and the desktop
  * equivalents). Looping animations stop after one near-instant pass,
  * Tailwind animate-* utilities (spin, pulse) are switched off so spinners
@@ -61,5 +111,15 @@ body {
 
   *[class*="animate-"] {
     animation: none !important;
+  }
+
+  /* Front Porch Supper: fades only. No rise, no zoom, no press scale. */
+  .bep-reveal,
+  .bep-reveal[data-revealed="true"],
+  .bep-photo-zoom,
+  .group:hover .bep-photo-zoom,
+  .bep-press:active {
+    transform: none !important;
+    transition-delay: 0ms !important;
   }
 }
