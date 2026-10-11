@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { withStopFooter } from "@/lib/sms-compliance";
 
 /**
  * Send a single SMS to a member via Twilio. Tier-gated by default — only
@@ -66,9 +67,7 @@ export async function sendSmsToFan(opts: {
   }
 
   // 10DLC compliance: include STOP unless body already mentions it
-  const body =
-    opts.body +
-    (opts.body.toUpperCase().includes("STOP") ? "" : " Reply STOP to opt out.");
+  const body = withStopFooter(opts.body);
 
   try {
     const { default: twilio } = await import("twilio");

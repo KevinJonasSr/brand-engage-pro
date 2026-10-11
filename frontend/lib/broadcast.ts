@@ -8,6 +8,9 @@ import {
   unsubscribeUrl,
   validateEmailCampaign,
 } from "@/lib/email-campaign";
+import { isInQuietHours } from "@/lib/notifications/preferences";
+import type { NotificationPreferences } from "@/lib/notifications/types";
+import { isSmsQuietTime, withStopFooter } from "@/lib/sms-compliance";
 
 const MANDRILL_SEND_URL = "https://mandrillapp.com/api/1.0/messages/send";
 const DEFAULT_APP_URL = "https://www.brandengagepro.com";
@@ -25,6 +28,8 @@ export type BroadcastResult = {
   sent: number;
   failed: number;
   recipients: number; // how many members matched before any send
+  /** SMS only: members held back because it is quiet hours for them. */
+  skippedQuietHours?: number;
   error?: string;
 };
 
@@ -101,7 +106,36 @@ async function loadRecipients(opts: {
   }>;
 }
 
-/** Send an SMS to every opted-in member via Twilio. */
+type QuietPrefs = Pick<NotificationPreferences, "timezone" | "quiet_start" | "quiet_end">;
+
+/**
+ * Members it is quiet hours for right now: 9pm to 8am in their time zone,
+ * or inside the quiet window they set. Members with no preferences row are
+ * checked against the default time zone.
+ */
+async function quietHoursMemberIds(memberIds: string[], now: Date = new Date()): Promise<Set<string>> {
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("notification_preferences")
+    .select("member_id, timezone, quiet_start, quiet_end")
+    .in("member_id", memberIds);
+  if (error) throw error;
+  const prefsById = new Map(
+    (data ?? []).map((p) => [p.member_id as string, p as unknown as QuietPrefs]),
+  );
+  const quiet = new Set<string>();
+  for (const id of memberIds) {
+    const prefs = prefsById.get(id);
+    const inOwnWindow = prefs ? isInQuietHours(prefs as NotificationPreferences, now) : false;
+    if (inOwnWindow || isSmsQuietTime(prefs?.timezone, now)) quiet.add(id);
+  }
+  return quiet;
+}
+
+/**
+ * Send an SMS to every opted-in member via Twilio. Members it is quiet
+ * hours for are skipped and counted in `skippedQuietHours`.
+ */
 export async function broadcastSms(params: {
   body: string;
   brandSlug?: string | null;
@@ -127,17 +161,19 @@ export async function broadcastSms(params: {
   result.recipients = recipients.length;
   if (recipients.length === 0) return result;
 
+  const quiet = await quietHoursMemberIds(recipients.map((r) => r.id));
+  result.skippedQuietHours = quiet.size;
+
   const { default: twilio } = await import("twilio");
   const client = twilio(accountSid, authToken);
 
   // Append the carrier-required STOP footer once per message. Twilio also
   // handles STOP automatically, but the explicit footer keeps us in good
   // standing with US carriers (10DLC compliance).
-  const smsBody =
-    params.body + (params.body.toUpperCase().includes("STOP") ? "" : " Reply STOP to opt out.");
+  const smsBody = withStopFooter(params.body);
 
   for (const member of recipients) {
-    if (!member.phone) continue;
+    if (!member.phone || quiet.has(member.id)) continue;
     result.attempted += 1;
     try {
       await client.messages.create({

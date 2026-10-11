@@ -31,6 +31,13 @@ export async function confirmUnsubscribe(formData: FormData) {
         .update(update)
         .eq("id", member.id);
       if (updateError) throw updateError;
+      if (ch === "sms") {
+        // Keep the notification settings in step so texts stop everywhere.
+        const { error: prefsError } = await admin
+          .from("notification_preferences")
+          .upsert({ member_id: member.id, sms_enabled: false }, { onConflict: "member_id" });
+        if (prefsError) throw prefsError;
+      }
     }
   } catch (err) {
     console.error("[unsubscribe] failed", err);
