@@ -1,10 +1,12 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentCommunityId, normalizeCommunitySlug } from "@/lib/community";
 import { getFoundingClaims } from "@/lib/founding";
 import { fmtPrice } from "@/lib/stripe-helpers";
 import { createCheckoutSessionAction } from "./actions";
+import { PREMIUM_SALES_OPEN, premiumClosedRedirect } from "@/lib/premium-sales";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +34,13 @@ export default async function PremiumPage({
   }>;
 }) {
   const params = (await searchParams) ?? {};
+  if (!PREMIUM_SALES_OPEN) {
+    redirect(
+      premiumClosedRedirect(
+        normalizeCommunitySlug(params.c) ?? normalizeCommunitySlug(params.ref),
+      ),
+    );
+  }
 
   // Who's the viewer + what's the community?
   const supabase = await createClient();

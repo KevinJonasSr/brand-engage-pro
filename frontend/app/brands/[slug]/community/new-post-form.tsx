@@ -93,7 +93,7 @@ export default function NewPostForm({
         ? "Publish announcement"
         : kind === "challenge"
           ? "Publish challenge"
-          : "Post · +5 pts";
+          : "Post";
 
   return (
     <form

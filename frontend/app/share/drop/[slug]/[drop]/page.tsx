@@ -19,7 +19,7 @@ export async function generateMetadata({
     .replace(/-/g, " ")
     .replace(/\b\w/g, (c) => c.toUpperCase());
   const title = `Exclusive Drop: ${dropLabel} — ${brandName}`;
-  const description = `Premium members got first access to ${dropLabel} from ${brandName} on Brand Engage Pro.`;
+  const description = `Members got first access to ${dropLabel} from ${brandName} on Brand Engage Pro.`;
   return {
     title,
     description,
@@ -52,7 +52,7 @@ export default async function DropSharePage({
       ? `${process.env.NEXT_PUBLIC_APP_URL}/share/drop/${slug}/${drop}`
       : `https://brand-engage-pro.vercel.app/share/drop/${slug}/${drop}`;
   const shareTitle = `I got early access to ${dropLabel} from ${brand.name}`;
-  const shareText = `Premium members on Brand Engage Pro got first access. Don't miss the next one: ${shareUrl}`;
+  const shareText = `Members on Brand Engage Pro got first access. Don't miss the next one: ${shareUrl}`;
 
   return (
     <main className="min-h-screen bg-[#050b1f] text-white flex flex-col items-center justify-center px-6 py-16">
@@ -83,7 +83,7 @@ export default async function DropSharePage({
           <p className="text-white/60 text-sm">from {brand.name}</p>
         </div>
         <p className="text-white/60 text-sm max-w-xs">
-          Premium members on Brand Engage Pro get first access to new offers. Don&apos;t miss the next one.
+          Members on Brand Engage Pro get first access to new offers. Don&apos;t miss the next one.
         </p>
         <ShareButton
           title={shareTitle}

@@ -163,7 +163,7 @@ export default async function FounderWallPage({
           Founding Members of {brand.name}
         </h1>
         <p className="mt-3 max-w-2xl text-lg text-white/80">
-          The free first 100 who join — a Founding badge. Premium is a separate paid club.
+          The free first 100 who join — a Founding badge. Brands pay, guests join free.
         </p>
       </section>
 
@@ -270,19 +270,19 @@ export default async function FounderWallPage({
       <section className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-8 text-center">
         <p className="text-lg font-semibold">
           {isFull
-            ? "Standard Premium available"
+            ? "All Founding spots are claimed"
             : "Want to be a Founding Member?"}
         </p>
         <p className="mt-2 text-sm text-white/70">
           {isFull
-            ? "All founder slots are claimed. Join as a Standard Premium member to access the same perks."
-            : "Join free to claim a Founding badge. Premium ($10/mo or $99/yr) is separate paid."}
+            ? "You can still join free and earn points toward every reward."
+            : "Join free to claim a Founding badge. Brands pay, guests join free."}
         </p>
         <Link
-          href={`/premium?c=${encodeURIComponent(slug)}`}
+          href={`/signup?ref=${encodeURIComponent(slug)}`}
           className="mt-6 inline-block rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-3 text-sm font-semibold text-white shadow-lg hover:brightness-110"
         >
-          {isFull ? "Standard Premium →" : "Become a Founding Member →"}
+          {isFull ? "Join free →" : "Become a Founding Member →"}
         </Link>
       </section>
 

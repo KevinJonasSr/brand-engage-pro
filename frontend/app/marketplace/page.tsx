@@ -33,7 +33,7 @@ export default async function MarketplacePage() {
             body="Earn points after you join, then use them on each brand’s rewards page. At Nellie's: free dessert with an entrée when you join, 1,500 bonus points after 3 visits, and a birthday entrée up to $30. Bourbon & Cigar Night is September 23 at 7:00 PM ET in the Private Dining Room."
             bullets={[
               "Move up from Bronze to Platinum as you earn points",
-              "The first 100 members of each brand join as Founders for free. Premium is a separate paid membership.",
+              "The first 100 members of each brand join as Founders for free. Brands pay, guests join free.",
               "Each brand page shows its current offers. This page lists rewards you can use points on.",
             ]}
             primaryCta="Sign up free →"

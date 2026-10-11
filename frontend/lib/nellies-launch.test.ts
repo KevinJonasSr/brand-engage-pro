@@ -366,7 +366,7 @@ describe("guest surfaces", () => {
     assert.match(brandPage, /NELLIES_BRAND_SLUG/);
     assert.match(brandPage, /Sign in to RSVP/);
     assert.match(brandPage, /Join to RSVP/);
-    assert.match(brandPage, /\/premium\?c=/);
+    assert.doesNotMatch(brandPage, /\/premium\?c=/);
     assert.match(brandPage, /founders/);
   });
 

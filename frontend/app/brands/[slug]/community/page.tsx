@@ -92,8 +92,7 @@ export default async function BrandCommunityPage({
               {brand.name} community
             </h1>
             <p className="mt-3 text-sm text-white/75">
-              Posts +5 pts · comments +2 pts · poll votes +1 pt · challenge
-              entries +3 pts.
+              Posts, polls, and challenges from the brand and its members.
             </p>
           </div>
           <Link
@@ -136,7 +135,7 @@ export default async function BrandCommunityPage({
           <p className="text-sm font-semibold">Nothing posted yet</p>
           <p className="mt-2 text-xs text-white/60">
             {isSignedIn
-              ? "Be the first to post — earn 5 pts and kick off the conversation."
+              ? "Be the first to post and kick off the conversation."
               : "Be the first in when the community fills up — sign in to post."}
           </p>
         </section>
@@ -154,8 +153,8 @@ export default async function BrandCommunityPage({
                   feature="This post"
                   description={
                     post.title
-                      ? `"${post.title}" — Premium members see every behind-the-scenes post, voice note, and work-in-progress.`
-                      : "Premium members see every behind-the-scenes post, voice note, and work-in-progress."
+                      ? `"${post.title}" is a members-only post.`
+                      : "This is a members-only post."
                   }
                   communityId={slug}
                   accentFrom={brand.accentFrom}

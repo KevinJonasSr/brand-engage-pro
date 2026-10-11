@@ -263,7 +263,7 @@ export default function SignedOutLanding({ brands }: { brands: Brand[] }) {
               {[
                 {
                   title: "Tier Journey",
-                  body: "Move up from Bronze to Platinum as you earn points. The first 100 members of each brand join as Founders for free. Premium is a separate paid membership.",
+                  body: "Move up from Bronze to Platinum as you earn points. The first 100 members of each brand join as Founders for free. Brands pay, guests join free.",
                   icon: <IconTrophy />,
                 },
                 {
