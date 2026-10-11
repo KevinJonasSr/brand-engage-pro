@@ -30,7 +30,7 @@ export async function generateMetadata({
   ]);
   const brandName = brand?.name ?? "Brand Engage Pro";
   const badgeName = badgeRow?.name ?? "Badge";
-  const title = `${badgeName} — ${brandName}`;
+  const title = `${badgeName} · ${brandName}`;
   const description =
     badgeRow?.description ??
     `Earned the ${badgeName} badge for ${brandName} on Brand Engage Pro.`;
@@ -69,7 +69,7 @@ export default async function BadgeSharePage({
       ? `${process.env.NEXT_PUBLIC_APP_URL}/share/badge/${slug}/${badgeSlug}`
       : `https://brand-engage-pro.vercel.app/share/badge/${slug}/${badgeSlug}`;
   const shareTitle = `I earned the ${badgeName} badge for ${brand.name}`;
-  const shareText = `${badgeDesc} — ${shareUrl}`;
+  const shareText = `${badgeDesc} ${shareUrl}`;
 
   return (
     <main className="min-h-screen bg-linen text-iron flex flex-col items-center justify-center px-6 py-16">
