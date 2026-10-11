@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { afterEach, describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
-import { prefersReducedMotion, scrollBehavior } from "./motion.ts";
+import { prefersReducedMotion, revealDelayMs, scrollBehavior } from "./motion.ts";
 
 const g = globalThis as { window?: unknown };
 
@@ -46,6 +46,25 @@ describe("motion helpers", () => {
   });
 });
 
+describe("revealDelayMs", () => {
+  it("staggers 120ms per item", () => {
+    assert.equal(revealDelayMs(0), 0);
+    assert.equal(revealDelayMs(1), 120);
+    assert.equal(revealDelayMs(3), 360);
+  });
+
+  it("caps the wait so a long list never lags", () => {
+    assert.equal(revealDelayMs(4), 480);
+    assert.equal(revealDelayMs(40), 480);
+  });
+
+  it("treats bad input as no delay", () => {
+    assert.equal(revealDelayMs(-2), 0);
+    assert.equal(revealDelayMs(Number.NaN), 0);
+    assert.equal(revealDelayMs(Number.POSITIVE_INFINITY), 0);
+  });
+});
+
 describe("globals.css reduced-motion block", () => {
   const css = readFileSync(
     fileURLToPath(new URL("../app/globals.css", import.meta.url)),
@@ -61,5 +80,19 @@ describe("globals.css reduced-motion block", () => {
     assert.match(block, /animation-iteration-count: 1 !important/);
     assert.match(block, /scroll-behavior: auto !important/);
     assert.match(block, /\[class\*="animate-"\]/);
+  });
+
+  it("has the Front Porch Supper reveal, zoom and press", () => {
+    assert.match(css, /@media \(scripting: enabled\)/);
+    assert.match(css, /\.bep-reveal \{[^}]*translateY\(24px\)[^}]*560ms/);
+    assert.match(css, /\.bep-photo-zoom \{[^}]*900ms/);
+    assert.match(css, /scale\(1\.04\)/);
+    assert.match(css, /\.bep-press \{[^}]*160ms/);
+    assert.match(css, /scale\(0\.98\)/);
+  });
+
+  it("turns Front Porch Supper into fades only under reduce motion", () => {
+    const block = css.slice(css.indexOf("@media (prefers-reduced-motion"));
+    assert.match(block, /\.bep-reveal,[\s\S]*\.bep-press:active \{[^}]*transform: none !important/);
   });
 });

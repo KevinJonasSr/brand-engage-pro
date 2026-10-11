@@ -30,6 +30,7 @@ import { resolveBrandSlug } from "@/lib/brand-aliases";
 import { getFoundingClaims } from "@/lib/founding";
 import { JGE_BRAND_SLUG } from "@/lib/jge-launch";
 import { NELLIES_BRAND_SLUG } from "@/lib/nellies-launch";
+import Reveal from "@/components/reveal";
 export const dynamic = "force-dynamic";
 
 // Per-brand hero focal-point now comes from brands.hero_focal_x /
@@ -85,6 +86,9 @@ export default async function BrandPage({
   const isNellies = slug.toLowerCase() === NELLIES_BRAND_SLUG;
   // Nellie's: listSpecialsForBrand already puts Jackie's three first.
   const guestSpecials = specials;
+  // Front Porch Supper motion (globals.css): Nellie's only for now.
+  const motion = isNellies;
+  const press = motion ? " bep-press" : "";
 
   // Fetch activity pulse + stamp card in parallel (non-blocking — both fail gracefully)
   const [pulse, stampCardData, eventIds, goals] = await Promise.all([
@@ -132,7 +136,7 @@ export default async function BrandPage({
     <main className="mx-auto max-w-6xl space-y-10 px-6 py-12">
       {/* Hero */}
       <section
-        className="relative flex flex-col justify-end overflow-hidden rounded-3xl border border-white/10 min-h-[420px] md:min-h-[520px]"
+        className="group relative flex flex-col justify-end overflow-hidden rounded-3xl border border-white/10 min-h-[420px] md:min-h-[520px]"
         style={!brand.heroImage ? { backgroundImage: heroGradient } : undefined}
       >
         {brand.heroImage && (
@@ -145,7 +149,7 @@ export default async function BrandPage({
               // Default 50/50 (centered) when not set. Tweak via Supabase
               // SQL editor or (Phase 2) the admin focal-point picker.
               style={focalPointStyle(brand)}
-              className="absolute inset-0 h-full w-full object-cover"
+              className={`absolute inset-0 h-full w-full object-cover${motion ? " bep-photo-zoom" : ""}`}
               aria-hidden
             />
             {/* Dark gradient overlay so the title/CTAs stay legible regardless of the photo */}
@@ -177,14 +181,14 @@ export default async function BrandPage({
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link
               href={primaryCta.href}
-              className="rounded-full px-6 py-3 text-sm font-semibold text-white transition hover:brightness-110"
+              className={`rounded-full px-6 py-3 text-sm font-semibold text-white transition hover:brightness-110${press}`}
               style={{ backgroundImage: ctaGradient }}
             >
               {primaryCta.label}
             </Link>
             <Link
               href={`/brands/${slug}/community`}
-              className="rounded-full border border-white/30 bg-black/30 px-6 py-3 text-sm font-medium text-white/90 backdrop-blur hover:bg-white/10"
+              className={`rounded-full border border-white/30 bg-black/30 px-6 py-3 text-sm font-medium text-white/90 backdrop-blur hover:bg-white/10${press}`}
             >
               Community →
             </Link>
@@ -212,6 +216,7 @@ export default async function BrandPage({
       </section>
 
       {/* Founder wall link */}
+      <Reveal enabled={motion}>
       <section className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-4">
         <p className="text-xs uppercase tracking-wide text-white/50">
           Optional upgrades
@@ -236,12 +241,14 @@ export default async function BrandPage({
           )}
         </div>
       </section>
+      </Reveal>
 
       {/* Activity pulse — anonymized social proof */}
       {pulse && <ActivityPulseStrip pulse={pulse} />}
 
       {/* Community goals — shared targets with live progress */}
       {goals.length > 0 && (
+        <Reveal enabled={motion}>
         <section className="glass-card p-8">
           <p className="text-sm uppercase tracking-wide text-white/60">
             Community goals
@@ -283,11 +290,15 @@ export default async function BrandPage({
             ))}
           </div>
         </section>
+        </Reveal>
       )}
 
       {/* About */}
-      <LatestStrip slug={slug} />
+      <Reveal enabled={motion}>
+        <LatestStrip slug={slug} />
+      </Reveal>
 
+      <Reveal enabled={motion}>
       <section className="grid gap-6 lg:grid-cols-[2fr_1fr]">
 
         <div className="glass-card p-8">
@@ -307,9 +318,12 @@ export default async function BrandPage({
           </div>
         </div>
       </section>
+      </Reveal>
 
       {/* Top members leaderboard preview */}
-      <LeaderboardMiniCard brandSlug={slug} />
+      <Reveal enabled={motion}>
+        <LeaderboardMiniCard brandSlug={slug} />
+      </Reveal>
 
       {/* Stamp card — only shown when config exists and member is signed in */}
       {isSignedIn && stampCardData && (
@@ -330,16 +344,18 @@ export default async function BrandPage({
           come first, then active specials from the specials table. */}
       {guestSpecials.length > 0 && (
         <section id="offers" className="glass-card p-8 scroll-mt-24">
-          <p className="text-sm uppercase tracking-wide text-white/60">
-            {isNellies ? "Member offers & specials" : "Specials"}
-          </p>
+          <Reveal enabled={motion}>
+            <p className="text-sm uppercase tracking-wide text-white/60">
+              {isNellies ? "Member offers & specials" : "Specials"}
+            </p>
+          </Reveal>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
-            {guestSpecials.map((s) => {
+            {guestSpecials.map((s, i) => {
               const access = canAccess(s.tier, entitlement);
               if (!access.allowed) {
                 return (
+                  <Reveal key={s.id} enabled={motion} index={i + 1} className="grid">
                   <PremiumPaywall
-                    key={s.id}
                     feature={s.title}
                     description={premiumDescriptionForBrand.specials}
                     communityId={slug}
@@ -354,11 +370,13 @@ export default async function BrandPage({
                     }
                     compact
                   />
+                  </Reveal>
                 );
               }
               const cadence = formatRecurrence(s);
               return (
-                <div key={s.id} className="rounded-2xl bg-black/30 p-5">
+                <Reveal key={s.id} enabled={motion} index={i + 1} className="grid">
+                <div className="rounded-2xl bg-black/30 p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-semibold">{s.title}</p>
@@ -410,6 +428,7 @@ export default async function BrandPage({
                     </div>
                   </div>
                 </div>
+                </Reveal>
               );
             })}
           </div>
@@ -418,17 +437,19 @@ export default async function BrandPage({
 
       {/* Upcoming */}
       <section id="upcoming" className="glass-card p-8 scroll-mt-24">
-        <p className="text-sm uppercase tracking-wide text-white/60">Upcoming</p>
+        <Reveal enabled={motion}>
+          <p className="text-sm uppercase tracking-wide text-white/60">Upcoming</p>
+        </Reveal>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
-          {brand.upcoming.map((e) => {
+          {brand.upcoming.map((e, i) => {
             // Phase 5d: gate premium-tier events. Fallback events (no id)
             // have no DB tier; treat as public.
             const eventTier = e.tier ?? "public";
             const access = canAccess(eventTier, entitlement);
             if (!access.allowed) {
               return (
+                <Reveal key={e.id ?? e.title} enabled={motion} index={i + 1} className="grid">
                 <PremiumPaywall
-                  key={e.id ?? e.title}
                   feature={e.title}
                   description={premiumDescriptionForBrand.events}
                   communityId={slug}
@@ -443,6 +464,7 @@ export default async function BrandPage({
                   }
                   compact
                 />
+                </Reveal>
               );
             }
             const eventId = e.id ?? null;
@@ -451,10 +473,8 @@ export default async function BrandPage({
               e.capacity != null && e.capacity > 0 && count >= e.capacity;
             const rsvped = eventId ? myRsvps.has(eventId) : false;
             return (
-              <div
-                key={eventId ?? e.title}
-                className="rounded-2xl bg-black/30 p-5"
-              >
+              <Reveal key={eventId ?? e.title} enabled={motion} index={i + 1} className="grid">
+              <div className="rounded-2xl bg-black/30 p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-sm font-semibold">{e.title}</p>
@@ -491,7 +511,7 @@ export default async function BrandPage({
                     <div className="flex shrink-0 flex-col items-end gap-1.5">
                       <Link
                         href={`/login?next=${encodeURIComponent(`/brands/${brand.slug}#upcoming`)}`}
-                        className="rounded-full bg-gradient-to-r from-aurora to-ember px-3 py-1 text-xs font-semibold text-white"
+                        className={`rounded-full bg-gradient-to-r from-aurora to-ember px-3 py-1 text-xs font-semibold text-white${press}`}
                       >
                         Sign in to RSVP
                       </Link>
@@ -525,6 +545,7 @@ export default async function BrandPage({
                   </div>
                 )}
               </div>
+              </Reveal>
             );
           })}
         </div>
@@ -548,9 +569,9 @@ export default async function BrandPage({
             </Link>
           </div>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
-            {brand.merch.map((m) => (
+            {brand.merch.map((m, i) => (
+              <Reveal key={m.title} enabled={motion} index={i} className="grid">
               <Link
-                key={m.title}
                 href={`/brands/${brand.slug}/rewards`}
                 className="rounded-2xl bg-black/30 p-5 transition hover:bg-black/40"
               >
@@ -558,6 +579,7 @@ export default async function BrandPage({
                 <p className="mt-1 text-sm font-semibold">{m.title}</p>
                 <p className="mt-3 text-sm font-semibold text-emerald-300">{m.points}</p>
               </Link>
+              </Reveal>
             ))}
           </div>
         </section>
