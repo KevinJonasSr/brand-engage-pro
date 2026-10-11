@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { resolveBrandAccent } from "@/lib/brand-accent";
 
 interface PremiumBadgeProps {
   /** True if the viewer has Premium-level access (premium/comped/past_due). */
@@ -33,8 +34,7 @@ export default function PremiumBadge({
 }: PremiumBadgeProps) {
   if (!show || !isPremium) return null;
 
-  const from = accentFrom ?? "#D4A017";
-  const to = accentTo ?? "#9B2335";
+  const palette = resolveBrandAccent(accentFrom, accentTo);
 
   const label = isFounder ? "Founder" : "Premium";
   const icon = isFounder ? "👑" : "⭐";
@@ -47,8 +47,8 @@ export default function PremiumBadge({
       href="/account/billing"
       aria-label={tooltip}
       title={tooltip}
-      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-iron shadow-glass transition hover:brightness-110"
-      style={{ backgroundImage: `linear-gradient(90deg, ${from}, ${to})` }}
+      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wide shadow-glass transition hover:brightness-110"
+      style={{ backgroundColor: palette.accent, color: palette.onAccent }}
     >
       <span aria-hidden>{icon}</span>
       <span>{label}</span>
