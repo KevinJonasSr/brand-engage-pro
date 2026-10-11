@@ -50,7 +50,7 @@ export default function NativeShareButton({ url, text, title }: Props) {
     <button
       type="button"
       onClick={handleShare}
-      className="rounded-full bg-gradient-to-r from-aurora to-ember px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+      className="rounded-full bg-ember px-4 py-2 text-sm font-medium text-linen transition hover:opacity-90"
     >
       {shared ? "Shared!" : "Share"}
     </button>

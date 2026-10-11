@@ -31,7 +31,7 @@ export default async function OnboardingChatPage() {
   return (
     <main className="mx-auto max-w-2xl space-y-6 px-6 py-10">
       <header className="space-y-2">
-        <p className="text-xs uppercase tracking-[0.3em] text-white/60">
+        <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
           Welcome
         </p>
         <h1
@@ -40,7 +40,7 @@ export default async function OnboardingChatPage() {
         >
           A few quick things
         </h1>
-        <p className="max-w-xl text-sm text-white/70">
+        <p className="max-w-xl text-sm text-iron/70">
           Chat with Claude for a minute so we know who you are — city,
           favorite brand, why you're here. You can skip and finish later
           from your profile.

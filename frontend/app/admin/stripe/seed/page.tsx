@@ -30,7 +30,7 @@ export default async function StripeSeedPage() {
   if (!ctx.isSuperAdmin) {
     return (
       <main className="mx-auto max-w-2xl px-6 py-10">
-        <p className="text-white/70">
+        <p className="text-iron/70">
           This page is super-admin only. Your admin context is scoped to
           specific communities — contact a super-admin to seed Stripe
           products.
@@ -53,7 +53,7 @@ export default async function StripeSeedPage() {
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">
       <div className="mb-8">
-        <p className="text-xs uppercase tracking-widest text-white/50">
+        <p className="text-xs uppercase tracking-widest text-iron/50">
           Admin · Stripe
         </p>
         <h1
@@ -62,7 +62,7 @@ export default async function StripeSeedPage() {
         >
           Seed Stripe products
         </h1>
-        <p className="mt-2 max-w-2xl text-sm text-white/60">
+        <p className="mt-2 max-w-2xl text-sm text-iron/60">
           Creates one Stripe Product per community + four Prices per Product
           (monthly / annual × standard / founder). Runs once per community,
           idempotent — re-running on an already-seeded community is a no-op.
@@ -72,9 +72,9 @@ export default async function StripeSeedPage() {
       </div>
 
       {!stripeReady && (
-        <div className="mb-8 rounded-2xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-200">
+        <div className="mb-8 rounded-lg border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-aurora-ink">
           <p className="font-semibold">STRIPE_SECRET_KEY not available.</p>
-          <p className="mt-1 text-amber-200/80">
+          <p className="mt-1 text-aurora-ink/80">
             Set it in Vercel env vars (Production + Preview) and redeploy.
             This page can read rows from the DB but can&apos;t call Stripe until
             the key is live in the running app.
@@ -82,9 +82,9 @@ export default async function StripeSeedPage() {
         </div>
       )}
 
-      <div className="overflow-hidden rounded-2xl border border-white/10">
+      <div className="overflow-hidden rounded-lg border border-iron/10">
         <table className="w-full text-sm">
-          <thead className="bg-black/40 text-xs uppercase tracking-wide text-white/60">
+          <thead className="bg-parchment/40 text-xs uppercase tracking-wide text-iron/60">
             <tr>
               <th className="px-4 py-3 text-left">Community</th>
               <th className="px-4 py-3 text-left">Type</th>
@@ -93,33 +93,33 @@ export default async function StripeSeedPage() {
               <th className="px-4 py-3"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/10">
+          <tbody className="divide-y divide-iron/10">
             {communities.map((c) => {
               const seeded = !!c.stripe_product_id;
               return (
-                <tr key={c.slug} className="bg-black/20">
+                <tr key={c.slug} className="bg-parchment/20">
                   <td className="px-4 py-4">
                     <div className="font-semibold">{c.display_name}</div>
-                    <div className="text-xs text-white/50">{c.slug}</div>
+                    <div className="text-xs text-iron/50">{c.slug}</div>
                   </td>
                   <td className="px-4 py-4">
-                    <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs uppercase tracking-wide">
+                    <span className="rounded-full bg-iron/10 px-2 py-0.5 text-xs uppercase tracking-wide">
                       {c.type.replace("_", " ")}
                     </span>
                     {!c.active && (
-                      <span className="ml-2 rounded-full bg-white/5 px-2 py-0.5 text-xs text-white/50">
+                      <span className="ml-2 rounded-full bg-iron/5 px-2 py-0.5 text-xs text-iron/50">
                         inactive
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-4 text-white/80">
+                  <td className="px-4 py-4 text-iron/80">
                     {fmtUSD(c.monthly_price_cents)}/mo ·{" "}
                     {fmtUSD(c.annual_price_cents)}/yr
                   </td>
                   <td className="px-4 py-4 font-mono text-xs leading-5">
                     {seeded ? (
-                      <div className="space-y-0.5 text-white/70">
-                        <div className="text-white">
+                      <div className="space-y-0.5 text-iron/70">
+                        <div className="text-iron">
                           {c.stripe_product_id}
                         </div>
                         <div>
@@ -140,12 +140,12 @@ export default async function StripeSeedPage() {
                         </div>
                       </div>
                     ) : (
-                      <span className="text-white/40">— not seeded</span>
+                      <span className="text-iron/40">— not seeded</span>
                     )}
                   </td>
                   <td className="px-4 py-4 text-right">
                     {seeded ? (
-                      <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-xs text-emerald-300">
+                      <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-xs text-sage-ink">
                         ✓ Seeded
                       </span>
                     ) : (
@@ -158,7 +158,7 @@ export default async function StripeSeedPage() {
                         <button
                           type="submit"
                           disabled={!stripeReady}
-                          className="rounded-full bg-gradient-to-r from-aurora to-ember px-4 py-2 text-xs font-semibold text-white shadow-glass transition hover:brightness-110 disabled:opacity-40"
+                          className="rounded-full bg-ember px-4 py-2 text-xs font-semibold text-linen shadow-glass transition hover:brightness-110 disabled:opacity-40"
                         >
                           Seed Stripe
                         </button>
@@ -172,15 +172,15 @@ export default async function StripeSeedPage() {
         </table>
       </div>
 
-      <p className="mt-8 text-xs text-white/40">
+      <p className="mt-8 text-xs text-iron/40">
         Products land in Stripe test mode (the key currently starts with{" "}
-        <code className="rounded bg-white/10 px-1.5 py-0.5">sk_test_</code>).
+        <code className="rounded bg-iron/10 px-1.5 py-0.5">sk_test_</code>).
         Review in the{" "}
         <a
           href="https://dashboard.stripe.com/test/products"
           target="_blank"
           rel="noopener"
-          className="underline hover:text-white"
+          className="underline hover:text-iron"
         >
           Stripe dashboard
         </a>{" "}

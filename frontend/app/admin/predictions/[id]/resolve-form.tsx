@@ -78,18 +78,18 @@ export function ResolvePredictionForm({
     <form onSubmit={onSubmit} className="space-y-4">
       {predictionType === "multi" && (
         <fieldset className="space-y-2">
-          <legend className="mb-1 block text-xs font-semibold uppercase tracking-wider text-white/55">
+          <legend className="mb-1 block text-xs font-semibold uppercase tracking-wider text-iron/55">
             Correct option
           </legend>
           {options.length === 0 && (
-            <p className="text-xs text-amber-300">
+            <p className="text-xs text-aurora-ink">
               No options found for this prediction.
             </p>
           )}
           {options.map((o) => (
             <label
               key={o.id}
-              className="flex cursor-pointer items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm hover:bg-white/10"
+              className="flex cursor-pointer items-center gap-2 rounded-lg border border-iron/10 bg-iron/5 px-3 py-2 text-sm hover:bg-iron/10"
             >
               <input
                 type="radio"
@@ -99,7 +99,7 @@ export function ResolvePredictionForm({
                 onChange={() => setCorrectOptionId(o.id)}
                 className="h-4 w-4"
               />
-              <span className="text-white/90">{o.label}</span>
+              <span className="text-iron/90">{o.label}</span>
             </label>
           ))}
         </fieldset>
@@ -107,7 +107,7 @@ export function ResolvePredictionForm({
 
       {predictionType === "numeric" && (
         <label className="block">
-          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-white/55">
+          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-iron/55">
             Correct number{numericUnit ? ` (${numericUnit})` : ""}
           </span>
           <input
@@ -115,27 +115,27 @@ export function ResolvePredictionForm({
             step="any"
             value={correctNumeric}
             onChange={(e) => setCorrectNumeric(e.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+            className="w-full rounded-lg border border-iron/10 bg-iron/5 px-3 py-2 text-sm text-iron"
           />
         </label>
       )}
 
       {predictionType === "date" && (
         <label className="block">
-          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-white/55">
+          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-iron/55">
             Correct date
           </span>
           <input
             type="date"
             value={correctDate}
             onChange={(e) => setCorrectDate(e.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+            className="w-full rounded-lg border border-iron/10 bg-iron/5 px-3 py-2 text-sm text-iron"
           />
         </label>
       )}
 
       <label className="block">
-        <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-white/55">
+        <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-iron/55">
           Resolution note (optional)
         </span>
         <textarea
@@ -143,17 +143,17 @@ export function ResolvePredictionForm({
           onChange={(e) => setResolutionNote(e.target.value)}
           rows={2}
           placeholder="A short reveal members will see — e.g. 'We sold 412 by 8pm thanks to the brunch rush.'"
-          className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40"
+          className="w-full rounded-lg border border-iron/10 bg-iron/5 px-3 py-2 text-sm text-iron placeholder:text-iron/40"
         />
       </label>
 
       {error && (
-        <p className="rounded-lg border border-rose-400/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">
+        <p className="rounded-lg border border-rose-400/30 bg-rose-500/10 px-3 py-2 text-sm text-ember">
           {error}
         </p>
       )}
       {success && (
-        <p className="rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">
+        <p className="rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-sm text-sage-ink">
           {success}
         </p>
       )}
@@ -162,7 +162,7 @@ export function ResolvePredictionForm({
         <button
           type="submit"
           disabled={pending}
-          className="rounded-lg bg-aurora px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-50"
+          className="rounded-lg bg-aurora px-4 py-2 text-sm font-medium text-iron shadow-sm hover:opacity-90 disabled:opacity-50"
         >
           {pending ? "Resolving…" : "Resolve & award points"}
         </button>

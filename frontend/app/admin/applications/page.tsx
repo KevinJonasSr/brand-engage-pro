@@ -7,11 +7,11 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Applications · Admin" };
 
 const STATUS_BADGE: Record<string, string> = {
-  pending: "bg-amber-500/20 text-amber-300",
-  in_review: "bg-aurora/30 text-white",
-  approved: "bg-emerald-500/20 text-emerald-300",
-  rejected: "bg-rose-500/20 text-rose-300",
-  waitlisted: "bg-white/10 text-white/70",
+  pending: "bg-amber-500/20 text-aurora-ink",
+  in_review: "bg-aurora/30 text-iron",
+  approved: "bg-emerald-500/20 text-sage-ink",
+  rejected: "bg-rose-500/20 text-ember",
+  waitlisted: "bg-iron/10 text-iron/70",
 };
 
 export default async function AdminApplicationsPage() {
@@ -33,7 +33,7 @@ export default async function AdminApplicationsPage() {
         >
           Brand applications
         </h1>
-        <p className="mt-2 text-sm text-white/60">
+        <p className="mt-2 text-sm text-iron/60">
           Submissions from /for-brands/apply. Approve / reject actions land in
           Phase F.1.B — for now this is read-only intake.
         </p>
@@ -53,7 +53,7 @@ export default async function AdminApplicationsPage() {
       </div>
 
       {apps.length === 0 ? (
-        <div className="glass-card rounded-2xl p-8 text-center text-sm text-white/55">
+        <div className="glass-card rounded-lg p-8 text-center text-sm text-iron/55">
           No applications yet. Submissions land here as soon as someone hits
           the form at /for-brands/apply.
         </div>
@@ -62,19 +62,19 @@ export default async function AdminApplicationsPage() {
           {apps.map((a) => (
             <li
               key={a.id}
-              className="glass-card rounded-2xl p-5"
+              className="glass-card rounded-lg p-5"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-base font-semibold">{a.display_name}</p>
                   {a.tagline && (
-                    <p className="mt-1 text-sm text-white/70">{a.tagline}</p>
+                    <p className="mt-1 text-sm text-iron/70">{a.tagline}</p>
                   )}
-                  <p className="mt-2 text-xs text-white/50">
+                  <p className="mt-2 text-xs text-iron/50">
                     {a.contact_name} · {a.contact_email}
                     {a.contact_phone ? ` · ${a.contact_phone}` : ""}
                   </p>
-                  <p className="mt-1 text-xs text-white/40">
+                  <p className="mt-1 text-xs text-iron/40">
                     {new Date(a.created_at).toLocaleString()}
                     {a.category ? ` · ${a.category}` : ""}
                     {a.primary_city ? ` · ${a.primary_city}` : ""}
@@ -87,12 +87,12 @@ export default async function AdminApplicationsPage() {
                 </span>
               </div>
               {a.community_pitch && (
-                <p className="mt-3 rounded-xl bg-black/30 p-3 text-xs text-white/65 whitespace-pre-line">
+                <p className="mt-3 rounded-xl bg-parchment/30 p-3 text-xs text-iron/65 whitespace-pre-line">
                   {a.community_pitch}
                 </p>
               )}
               {a.social.length > 0 && (
-                <p className="mt-3 text-xs text-white/55">
+                <p className="mt-3 text-xs text-iron/55">
                   Social:{" "}
                   {a.social
                     .map((s) => `${s.label} (${s.href})`)

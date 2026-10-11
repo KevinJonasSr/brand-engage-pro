@@ -57,13 +57,13 @@ export default function RedemptionAction({
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="How was it fulfilled?"
-            className="rounded-lg border border-white/10 bg-black/50 px-2 py-1 text-xs text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+            className="rounded-lg border border-iron/10 bg-parchment/50 px-2 py-1 text-xs text-iron placeholder-iron/40 focus:border-iron/30 focus:outline-none"
           />
           <button
             type="button"
             onClick={handleFulfill}
             disabled={submitting}
-            className="rounded-lg bg-green-500/20 px-3 py-1 text-xs font-medium text-green-300 hover:bg-green-500/30 disabled:opacity-50"
+            className="rounded-lg bg-green-500/20 px-3 py-1 text-xs font-medium text-sage-ink hover:bg-green-500/30 disabled:opacity-50"
           >
             {submitting ? "…" : "Done"}
           </button>
@@ -74,7 +74,7 @@ export default function RedemptionAction({
               setBusinessError(null);
             }}
             disabled={submitting}
-            className="rounded-lg border border-white/10 px-3 py-1 text-xs text-white/60 hover:bg-white/5 disabled:opacity-50"
+            className="rounded-lg border border-iron/10 px-3 py-1 text-xs text-iron/60 hover:bg-iron/5 disabled:opacity-50"
           >
             Cancel
           </button>
@@ -85,7 +85,7 @@ export default function RedemptionAction({
             type="button"
             onClick={() => setShowNote(true)}
             disabled={submitting}
-            className="rounded-lg bg-green-500/20 px-3 py-1 text-xs font-medium text-green-300 hover:bg-green-500/30 disabled:opacity-50"
+            className="rounded-lg bg-green-500/20 px-3 py-1 text-xs font-medium text-sage-ink hover:bg-green-500/30 disabled:opacity-50"
           >
             Fulfill
           </button>
@@ -93,7 +93,7 @@ export default function RedemptionAction({
             type="button"
             onClick={handleCancel}
             disabled={submitting}
-            className="rounded-lg bg-red-500/20 px-3 py-1 text-xs font-medium text-red-300 hover:bg-red-500/30 disabled:opacity-50"
+            className="rounded-lg bg-red-500/20 px-3 py-1 text-xs font-medium text-ember hover:bg-red-500/30 disabled:opacity-50"
           >
             {submitting ? "…" : "Refund"}
           </button>
@@ -102,7 +102,7 @@ export default function RedemptionAction({
       <SaveStatusIndicator status={status} className="text-xs" />
       {businessError && (
         <span
-          className="text-xs text-rose-300"
+          className="text-xs text-ember"
           title={businessError}
         >
           ✗ {businessError}

@@ -68,8 +68,8 @@ export default function ShareButton({
     : "inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition disabled:opacity-60";
   const styleClass =
     variant === "primary"
-      ? "bg-gradient-to-r from-aurora to-ember text-white shadow-glass hover:brightness-110"
-      : "border border-white/25 text-white/85 hover:bg-white/10";
+      ? "bg-ember text-linen shadow-glass hover:brightness-110"
+      : "border border-iron/25 text-iron/85 hover:bg-iron/10";
 
   const feedbackLabel =
     state === "copied" ? "Copied" : state === "error" ? "Error" : label;

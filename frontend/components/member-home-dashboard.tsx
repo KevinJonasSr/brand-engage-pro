@@ -29,7 +29,7 @@ export default function MemberHomeDashboard({ data, streak, recap }: { data: Mem
       {/* Greeting + quick stats */}
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-white/60">
+          <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
             Welcome back{member.first_name ? `, ${member.first_name.split(" ")[0]}` : ""}
           </p>
           <h1
@@ -89,13 +89,13 @@ function FollowedBrandsStrip({
     return (
       <div className="glass-card p-5">
         <p className="text-sm font-semibold">Follow your favorite brands</p>
-        <p className="mt-2 text-xs text-white/60">
-          Tap a brand, hit <span className="text-white">+ Follow</span>, and you&apos;ll see
+        <p className="mt-2 text-xs text-iron/60">
+          Tap a brand, hit <span className="text-iron">+ Follow</span>, and you&apos;ll see
           their posts, events, and offers here.
         </p>
         <Link
           href="/brands"
-          className="mt-3 inline-flex rounded-full border border-white/20 px-3 py-1 text-xs text-white/80 hover:bg-white/10"
+          className="mt-3 inline-flex rounded-full border border-iron/20 px-3 py-1 text-xs text-iron/80 hover:bg-iron/10"
         >
           Browse brands →
         </Link>
@@ -105,10 +105,10 @@ function FollowedBrandsStrip({
   return (
     <div className="glass-card p-4">
       <div className="mb-3 flex items-center justify-between">
-        <p className="text-xs uppercase tracking-wide text-white/60">
+        <p className="text-xs uppercase tracking-wide text-iron/60">
           Following · {brands.length}
         </p>
-        <Link href="/brands" className="text-xs text-white/60 hover:text-white">
+        <Link href="/brands" className="text-xs text-iron/60 hover:text-iron">
           Add more →
         </Link>
       </div>
@@ -117,10 +117,10 @@ function FollowedBrandsStrip({
           <Link
             key={a.slug}
             href={`/brands/${a.slug}`}
-            className="group relative flex w-44 shrink-0 flex-col overflow-hidden rounded-2xl border border-white/10 transition hover:border-white/30 hover:-translate-y-0.5"
+            className="group relative flex w-44 shrink-0 flex-col overflow-hidden rounded-lg border border-iron/10 transition hover:border-iron/30 hover:-translate-y-0.5"
           >
             {/* Photo area: 3:4 portrait so the brand reads cleanly at this width. */}
-            <div className="relative aspect-[3/4] w-full overflow-hidden bg-black/40">
+            <div className="relative aspect-[3/4] w-full overflow-hidden bg-parchment/40">
               {a.hero_image ? (
                 <>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -156,11 +156,11 @@ function FollowedBrandsStrip({
 
               {/* Name + tagline overlay */}
               <div className="absolute inset-x-0 bottom-0 p-3">
-                <p className="text-sm font-semibold text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.7)]">
+                <p className="text-sm font-semibold text-iron drop-shadow-[0_1px_8px_rgba(0,0,0,0.7)]">
                   {a.name}
                 </p>
                 {a.tagline && (
-                  <p className="mt-0.5 line-clamp-1 text-xs text-white/80 drop-shadow-[0_1px_6px_rgba(0,0,0,0.6)]">
+                  <p className="mt-0.5 line-clamp-1 text-xs text-iron/80 drop-shadow-[0_1px_6px_rgba(0,0,0,0.6)]">
                     {a.tagline}
                   </p>
                 )}
@@ -191,9 +191,9 @@ function UpcomingEventsList({
   //   - member follows brands but none have upcoming public events → say so
   if (events.length === 0) {
     return (
-      <div className="glass-card rounded-2xl p-5">
-        <p className="text-xs uppercase tracking-wide text-white/60">Upcoming</p>
-        <p className="mt-3 text-sm text-white/70">
+      <div className="glass-card rounded-lg p-5">
+        <p className="text-xs uppercase tracking-wide text-iron/60">Upcoming</p>
+        <p className="mt-3 text-sm text-iron/70">
           {hasFollows
             ? "No upcoming shows from your brands yet — check back soon."
             : "Follow an brand to see their upcoming shows here."}
@@ -203,9 +203,9 @@ function UpcomingEventsList({
   }
 
   return (
-    <div className="glass-card rounded-2xl p-5">
+    <div className="glass-card rounded-lg p-5">
       <div className="flex items-center justify-between">
-        <p className="text-xs uppercase tracking-wide text-white/60">
+        <p className="text-xs uppercase tracking-wide text-iron/60">
           Upcoming · {events.length}
         </p>
       </div>
@@ -214,27 +214,27 @@ function UpcomingEventsList({
           <li key={e.id}>
             <Link
               href={`/brands/${e.brand_slug}`}
-              className="group flex items-start justify-between gap-3 rounded-xl bg-black/20 p-3 transition hover:bg-black/30"
+              className="group flex items-start justify-between gap-3 rounded-xl bg-parchment/20 p-3 transition hover:bg-parchment/30"
             >
               <div className="min-w-0 flex-1">
-                <p className="text-xs uppercase tracking-wide text-white/50">
+                <p className="text-xs uppercase tracking-wide text-iron/50">
                   {e.event_date ?? "Date TBD"}
                 </p>
-                <p className="mt-1 line-clamp-2 text-sm font-semibold text-white">
+                <p className="mt-1 line-clamp-2 text-sm font-semibold text-iron">
                   {e.title}
                 </p>
-                <p className="mt-1 text-xs text-white/60">
+                <p className="mt-1 text-xs text-iron/60">
                   {e.brand_name ? `${e.brand_name} · ` : ""}
                   {e.location ? `📍 ${e.location}` : "Location TBA"}
                 </p>
               </div>
               <div className="shrink-0 text-right">
                 {e.rsvped ? (
-                  <span className="inline-flex rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-medium text-emerald-300">
+                  <span className="inline-flex rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-medium text-sage-ink">
                     ✓ Going
                   </span>
                 ) : (
-                  <span className="inline-flex text-xs text-white/50 group-hover:text-white/80">
+                  <span className="inline-flex text-xs text-iron/50 group-hover:text-iron/80">
                     RSVP →
                   </span>
                 )}
@@ -255,12 +255,12 @@ function ActiveCtasBlock({ ctas }: { ctas: MemberHomeData["ctas"] }) {
         <Link
           key={cta.id}
           href={cta.url || "#"}
-          className="glass-card group flex items-center gap-3 rounded-2xl p-4 transition hover:border-white/20"
+          className="glass-card group flex items-center gap-3 rounded-lg p-4 transition hover:border-iron/20"
         >
           <div className="text-xl">{cta.kind === "share" ? "📣" : "✨"}</div>
           <div>
             <p className="text-xs font-semibold">{cta.title}</p>
-            <p className="text-xs text-white/60">{cta.description}</p>
+            <p className="text-xs text-iron/60">{cta.description}</p>
           </div>
         </Link>
       ))}
@@ -292,9 +292,9 @@ function RecentActivityFeed({
 }) {
   if (posts.length === 0) {
     return (
-      <div className="glass-card rounded-2xl p-5">
-        <p className="text-xs uppercase tracking-wide text-white/60">Recent activity</p>
-        <p className="mt-3 text-sm text-white/70">
+      <div className="glass-card rounded-lg p-5">
+        <p className="text-xs uppercase tracking-wide text-iron/60">Recent activity</p>
+        <p className="mt-3 text-sm text-iron/70">
           {hasFollows
             ? "Nothing new from your brands yet."
             : "Follow an brand to see their community posts here."}
@@ -304,8 +304,8 @@ function RecentActivityFeed({
   }
 
   return (
-    <div className="glass-card rounded-2xl p-5">
-      <p className="text-xs uppercase tracking-wide text-white/60">Recent activity</p>
+    <div className="glass-card rounded-lg p-5">
+      <p className="text-xs uppercase tracking-wide text-iron/60">Recent activity</p>
       <ul className="mt-4 space-y-3">
         {posts.slice(0, 3).map((post) => {
           const badge = postKindBadge(post.kind);
@@ -330,23 +330,23 @@ function RecentActivityFeed({
                 ? "Founders-only post"
                 : "New premium post";
           return (
-            <li key={post.id} className="border-b border-white/5 pb-3 last:border-0">
+            <li key={post.id} className="border-b border-iron/5 pb-3 last:border-0">
               <Link
                 href={`/brands/${post.brand_slug}/community`}
                 className="group block"
               >
-                <p className="text-xs uppercase tracking-wide text-white/50">
+                <p className="text-xs uppercase tracking-wide text-iron/50">
                   {badge.icon} {badge.label}
                   {post.pinned && (
-                    <span className="ml-2 rounded-full bg-white/10 px-1.5 py-0.5 text-[9px] text-white/60">
+                    <span className="ml-2 rounded-full bg-iron/10 px-1.5 py-0.5 text-[9px] text-iron/60">
                       📌 Pinned
                     </span>
                   )}
                 </p>
-                <p className="mt-1 line-clamp-2 text-xs font-semibold text-white group-hover:text-white">
+                <p className="mt-1 line-clamp-2 text-xs font-semibold text-iron group-hover:text-iron">
                   {display}
                 </p>
-                <p className="mt-1 text-xs text-white/40">
+                <p className="mt-1 text-xs text-iron/40">
                   {post.brand_name ?? post.brand_slug}
                   {post.author_first_name ? ` · ${post.author_first_name}` : ""}
                   {" · "}
@@ -412,8 +412,8 @@ function timeAgo(iso: string): string {
 
 function BadgesInProgressPanel({ items }: { items: MemberHomeData["badgesInProgress"] }) {
   return (
-    <div className="glass-card rounded-2xl p-5">
-      <p className="text-xs uppercase tracking-wide text-white/60">Badges in progress</p>
+    <div className="glass-card rounded-lg p-5">
+      <p className="text-xs uppercase tracking-wide text-iron/60">Badges in progress</p>
       {items.length > 0 ? (
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {items.slice(0, 6).map((badge) => {
@@ -427,7 +427,7 @@ function BadgesInProgressPanel({ items }: { items: MemberHomeData["badgesInProgr
             return (
               <div
                 key={badge.slug}
-                className="flex flex-col items-center gap-2 rounded-2xl border border-white/10 bg-white/5 p-4 text-center transition hover:border-white/25 hover:bg-white/10"
+                className="flex flex-col items-center gap-2 rounded-lg border border-iron/10 bg-iron/5 p-4 text-center transition hover:border-iron/25 hover:bg-iron/10"
               >
                 <span className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-aurora/30 to-ember/30 text-3xl">
                   {badge.icon ?? "🏅"}
@@ -437,13 +437,13 @@ function BadgesInProgressPanel({ items }: { items: MemberHomeData["badgesInProgr
                 </span>
                 {badge.threshold > 0 && (
                   <>
-                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-iron/10">
                       <div
-                        className="h-full rounded-full bg-gradient-to-r from-aurora to-ember"
+                        className="h-full rounded-full bg-ember"
                         style={{ width: `${pct}%` }}
                       />
                     </div>
-                    <span className="text-xs uppercase tracking-wide text-white/50">
+                    <span className="text-xs uppercase tracking-wide text-iron/50">
                       {badge.progress}/{badge.threshold}
                     </span>
                   </>
@@ -453,7 +453,7 @@ function BadgesInProgressPanel({ items }: { items: MemberHomeData["badgesInProgr
           })}
         </div>
       ) : (
-        <p className="mt-3 text-xs text-white/50">
+        <p className="mt-3 text-xs text-iron/50">
           Keep engaging — new badges will appear here as you make progress.
         </p>
       )}
@@ -470,15 +470,15 @@ function SpendPointsCard({
 }) {
   const rewardsHref = primaryCommunity ? `/brands/${primaryCommunity}/rewards` : "/rewards";
   return (
-    <div className="glass-card rounded-2xl p-5 border border-gradient-to-r from-purple-500/30 to-blue-500/30">
+    <div className="glass-card rounded-lg p-5 border border-gradient-to-r from-purple-500/30 to-blue-500/30">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs uppercase tracking-wide text-white/60">Spend your points</p>
+          <p className="text-xs uppercase tracking-wide text-iron/60">Spend your points</p>
           <p className="mt-1 text-sm font-semibold">{points.toLocaleString()} available</p>
         </div>
         <Link
           href={rewardsHref}
-          className="inline-flex rounded-lg bg-gradient-to-r from-aurora to-ember px-4 py-2 text-xs font-medium text-white hover:opacity-90"
+          className="inline-flex rounded-lg bg-ember px-4 py-2 text-xs font-medium text-linen hover:opacity-90"
         >
           Browse rewards →
         </Link>

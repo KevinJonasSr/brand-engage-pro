@@ -44,8 +44,8 @@ export default function PreviewSignupBanner({
     : "/login";
 
   return (
-    <section className="rounded-3xl border border-aurora/30 bg-gradient-to-br from-aurora/15 via-slate-900/80 to-ember/15 p-6 shadow-glass">
-      <p className="text-xs uppercase tracking-[0.3em] text-aurora">
+    <section className="rounded-lg border border-aurora/30 bg-gradient-to-br from-aurora/15 via-slate-900/80 to-ember/15 p-6 shadow-glass">
+      <p className="text-xs uppercase tracking-[0.3em] text-aurora-ink">
         {eyebrow}
       </p>
       <h2
@@ -54,9 +54,9 @@ export default function PreviewSignupBanner({
       >
         {headline}
       </h2>
-      <p className="mt-3 text-sm text-white/80">{body}</p>
+      <p className="mt-3 text-sm text-iron/80">{body}</p>
       {bullets && bullets.length > 0 && (
-        <ul className="mt-4 space-y-1.5 text-sm text-white/75">
+        <ul className="mt-4 space-y-1.5 text-sm text-iron/75">
           {bullets.map((b) => (
             <li key={b} className="flex items-start gap-2">
               <span className="mt-1 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-300" />
@@ -68,19 +68,19 @@ export default function PreviewSignupBanner({
       <div className="mt-5 flex flex-wrap items-center gap-3">
         <Link
           href={signupHref}
-          className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-aurora to-ember px-5 py-2.5 text-sm font-semibold text-white shadow-glass transition hover:brightness-110"
+          className="inline-flex items-center gap-2 rounded-full bg-ember px-5 py-2.5 text-sm font-semibold text-linen shadow-glass transition hover:brightness-110"
         >
           {primaryCta}
         </Link>
         <Link
           href={loginHref}
-          className="text-sm text-white/70 underline-offset-2 hover:text-white hover:underline"
+          className="text-sm text-iron/70 underline-offset-2 hover:text-iron hover:underline"
         >
           Already a member? Sign in
         </Link>
       </div>
       {firstRewardLine && (
-        <p className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-aurora/30 bg-aurora/10 px-3 py-1 text-xs font-medium text-aurora">
+        <p className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-aurora/30 bg-aurora/10 px-3 py-1 text-xs font-medium text-aurora-ink">
           {firstRewardLine}
         </p>
       )}

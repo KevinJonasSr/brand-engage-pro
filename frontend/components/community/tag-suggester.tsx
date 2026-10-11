@@ -70,7 +70,7 @@ export default function TagSuggester({
   }
 
   return (
-    <div className="space-y-2 rounded-2xl border border-white/10 bg-black/30 p-3">
+    <div className="space-y-2 rounded-lg border border-iron/10 bg-parchment/30 p-3">
       <input type="hidden" name={name} value={hiddenValue} />
 
       {!suggestions && (
@@ -78,17 +78,17 @@ export default function TagSuggester({
           type="button"
           onClick={handleSuggest}
           disabled={!ready || loading}
-          className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs text-white hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 rounded-full border border-iron/15 bg-iron/10 px-3 py-1.5 text-xs text-iron hover:bg-iron/15 disabled:cursor-not-allowed disabled:opacity-50"
           title={!ready ? "Type at least 12 characters first" : undefined}
         >
           {loading ? "Thinking…" : "✨ Suggest tags"}
         </button>
       )}
 
-      {error && <p className="text-xs text-rose-300/80">{error}</p>}
+      {error && <p className="text-xs text-ember/80">{error}</p>}
 
       {suggestions && suggestions.length === 0 && (
-        <p className="text-xs text-white/60">
+        <p className="text-xs text-iron/60">
           No tag ideas — your post might be a bit short or off-topic for the
           existing taxonomy. You can submit without tags.
         </p>
@@ -96,7 +96,7 @@ export default function TagSuggester({
 
       {suggestions && suggestions.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-wide text-white/50">
+          <p className="text-xs uppercase tracking-wide text-iron/50">
             Tap to toggle:
           </p>
           <div className="flex flex-wrap gap-1.5">
@@ -109,8 +109,8 @@ export default function TagSuggester({
                   onClick={() => toggle(tag)}
                   className={`rounded-full border px-3 py-1 text-xs transition ${
                     on
-                      ? "border-aurora/40 bg-aurora/15 text-aurora"
-                      : "border-white/15 bg-white/5 text-white/60 hover:bg-white/10"
+                      ? "border-aurora/40 bg-aurora/15 text-aurora-ink"
+                      : "border-iron/15 bg-iron/5 text-iron/60 hover:bg-iron/10"
                   }`}
                 >
                   {on ? "✓ " : "+ "}
@@ -123,7 +123,7 @@ export default function TagSuggester({
             type="button"
             onClick={handleSuggest}
             disabled={loading}
-            className="text-xs text-white/50 hover:text-white"
+            className="text-xs text-iron/50 hover:text-iron"
           >
             {loading ? "Refreshing…" : "↻ Refresh suggestions"}
           </button>

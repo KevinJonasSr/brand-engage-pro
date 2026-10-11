@@ -33,7 +33,7 @@ export default async function AdminSegmentsPage() {
 
   if (error) {
     return (
-      <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-sm text-red-200">
+      <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-6 text-sm text-ember">
         Failed to load segments: {error.message}
       </div>
     );
@@ -44,7 +44,7 @@ export default async function AdminSegmentsPage() {
   return (
     <main className="space-y-8">
       <header className="space-y-2">
-        <p className="text-sm uppercase tracking-wide text-white/60">
+        <p className="text-sm uppercase tracking-wide text-iron/60">
           Admin · Segments
         </p>
         <h1
@@ -53,7 +53,7 @@ export default async function AdminSegmentsPage() {
         >
           Audience segments
         </h1>
-        <p className="max-w-2xl text-sm text-white/70">
+        <p className="max-w-2xl text-sm text-iron/70">
           Describe a member group in plain English. Claude translates it into
           a structured filter and the system saves a named segment with the
           matching members cached. Use these for targeted notifications,
@@ -65,7 +65,7 @@ export default async function AdminSegmentsPage() {
         <h2 className="text-lg font-semibold">Create a new segment</h2>
         <form action={createSegmentAction} className="space-y-4">
           <div>
-            <label className="mb-1 block text-xs uppercase tracking-wide text-white/60">
+            <label className="mb-1 block text-xs uppercase tracking-wide text-iron/60">
               Segment name
             </label>
             <input
@@ -74,11 +74,11 @@ export default async function AdminSegmentsPage() {
               required
               maxLength={80}
               placeholder="Tennessee regulars"
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm placeholder-white/40 outline-none focus:border-aurora/40"
+              className="w-full rounded-xl border border-iron/10 bg-parchment/40 px-3 py-2 text-sm placeholder-iron/40 outline-none focus:border-aurora/40"
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs uppercase tracking-wide text-white/60">
+            <label className="mb-1 block text-xs uppercase tracking-wide text-iron/60">
               Describe your audience
             </label>
             <textarea
@@ -87,9 +87,9 @@ export default async function AdminSegmentsPage() {
               rows={3}
               maxLength={400}
               placeholder="super-engaged gold/platinum members in Tennessee who've posted in the last month"
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm placeholder-white/40 outline-none focus:border-aurora/40"
+              className="w-full rounded-xl border border-iron/10 bg-parchment/40 px-3 py-2 text-sm placeholder-iron/40 outline-none focus:border-aurora/40"
             />
-            <p className="mt-1 text-xs text-white/40">
+            <p className="mt-1 text-xs text-iron/40">
               Examples: &quot;new bronze members this month&quot;, &quot;loyal
               members willing to receive SMS&quot;, &quot;high-points members
               in California&quot;.
@@ -97,7 +97,7 @@ export default async function AdminSegmentsPage() {
           </div>
           <button
             type="submit"
-            className="rounded-full bg-gradient-to-r from-aurora to-ember px-5 py-2 text-sm font-semibold text-white shadow-glass"
+            className="rounded-full bg-ember px-5 py-2 text-sm font-semibold text-linen shadow-glass"
           >
             Generate segment
           </button>
@@ -107,7 +107,7 @@ export default async function AdminSegmentsPage() {
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">Saved segments</h2>
         {segments.length === 0 ? (
-          <p className="rounded-2xl border border-white/10 bg-black/30 p-6 text-sm text-white/60">
+          <p className="rounded-lg border border-iron/10 bg-parchment/30 p-6 text-sm text-iron/60">
             No segments yet. Use the form above to create one.
           </p>
         ) : (
@@ -136,14 +136,14 @@ function SegmentCard({ segment }: { segment: SegmentRow }) {
     <li className="glass-card p-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0 flex-1 space-y-2">
-          <p className="text-base font-semibold text-white">{segment.name}</p>
+          <p className="text-base font-semibold text-iron">{segment.name}</p>
           {segment.description_input && (
-            <p className="text-xs italic text-white/60">
+            <p className="text-xs italic text-iron/60">
               &ldquo;{segment.description_input}&rdquo;
             </p>
           )}
-          <p className="text-xs text-white/50">
-            <span className="font-semibold text-aurora">
+          <p className="text-xs text-iron/50">
+            <span className="font-semibold text-aurora-ink">
               {segment.member_count}
             </span>{" "}
             {segment.member_count === 1 ? "member" : "members"} · refreshed{" "}
@@ -151,10 +151,10 @@ function SegmentCard({ segment }: { segment: SegmentRow }) {
           </p>
           <FilterChips filter={segment.filter_json} />
           <details>
-            <summary className="cursor-pointer text-xs uppercase tracking-wide text-white/40">
+            <summary className="cursor-pointer text-xs uppercase tracking-wide text-iron/40">
               Filter JSON
             </summary>
-            <pre className="mt-2 overflow-x-auto rounded-xl bg-black/50 p-3 text-xs text-white/70">
+            <pre className="mt-2 overflow-x-auto rounded-xl bg-parchment/50 p-3 text-xs text-iron/70">
               {JSON.stringify(segment.filter_json, null, 2)}
             </pre>
           </details>
@@ -164,7 +164,7 @@ function SegmentCard({ segment }: { segment: SegmentRow }) {
             <input type="hidden" name="segment_id" value={segment.id} />
             <button
               type="submit"
-              className="w-full rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-medium text-white/80 hover:bg-white/10"
+              className="w-full rounded-full border border-iron/15 bg-iron/5 px-4 py-2 text-xs font-medium text-iron/80 hover:bg-iron/10"
             >
               Refresh
             </button>
@@ -173,7 +173,7 @@ function SegmentCard({ segment }: { segment: SegmentRow }) {
             <input type="hidden" name="segment_id" value={segment.id} />
             <button
               type="submit"
-              className="w-full rounded-full border border-red-400/30 bg-red-400/10 px-4 py-2 text-xs font-medium text-red-200 hover:bg-red-400/15"
+              className="w-full rounded-full border border-red-400/30 bg-red-400/10 px-4 py-2 text-xs font-medium text-ember hover:bg-red-400/15"
             >
               Delete
             </button>
@@ -206,7 +206,7 @@ function FilterChips({ filter }: { filter: SegmentFilter }) {
 
   if (chips.length === 0) {
     return (
-      <p className="text-xs text-white/40">(no filters — matches all members)</p>
+      <p className="text-xs text-iron/40">(no filters — matches all members)</p>
     );
   }
 
@@ -215,7 +215,7 @@ function FilterChips({ filter }: { filter: SegmentFilter }) {
       {chips.map((c) => (
         <span
           key={c}
-          className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-xs text-white/70"
+          className="rounded-full border border-iron/15 bg-iron/5 px-2 py-0.5 text-xs text-iron/70"
         >
           {c}
         </span>

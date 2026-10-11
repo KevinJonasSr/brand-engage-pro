@@ -49,30 +49,30 @@ export default async function InvitePage({
   return (
     <main className="mx-auto flex min-h-[80vh] max-w-xl flex-col justify-center gap-6 px-6 py-12">
       <SetRefCookie code={code} />
-      <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-aurora/30 via-slate-900 to-ember/20 p-8 shadow-glass">
-        <p className="text-xs uppercase tracking-[0.3em] text-white/60">You&apos;re invited</p>
+      <section className="rounded-lg border border-iron/10 bg-gradient-to-br from-aurora/30 via-slate-900 to-ember/20 p-8 shadow-glass">
+        <p className="text-xs uppercase tracking-[0.3em] text-iron/60">You&apos;re invited</p>
         <h1 className="mt-3 text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
           {inviterName} invited you to Brand Engage Pro
         </h1>
-        <p className="mt-4 text-sm text-white/75">
+        <p className="mt-4 text-sm text-iron/75">
           Join in under a minute to earn points, get member rewards, and hear about new offers
           first. When you finish signing up, {inviterName} gets 150 bonus points for inviting you.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
             href={links.signup}
-            className="rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white shadow-glass transition hover:brightness-110"
+            className="rounded-full bg-ember px-6 py-3 text-sm font-semibold text-linen shadow-glass transition hover:brightness-110"
           >
             Create your account
           </Link>
           <Link
             href={links.login}
-            className="rounded-full border border-white/20 px-6 py-3 text-sm font-medium text-white/80 hover:bg-white/10"
+            className="rounded-full border border-iron/20 px-6 py-3 text-sm font-medium text-iron/80 hover:bg-iron/10"
           >
             I already have an account
           </Link>
         </div>
-        <p className="mt-6 text-xs text-white/50">
+        <p className="mt-6 text-xs text-iron/50">
           Invite code: <code className="font-mono">{code}</code>
         </p>
       </section>

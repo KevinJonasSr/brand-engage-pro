@@ -24,7 +24,7 @@ export function PredictionTallyView({
   highlightOptionId,
 }: Props) {
   if (tally.total_votes === 0) {
-    return <p className="text-xs text-white/55">No votes yet.</p>;
+    return <p className="text-xs text-iron/55">No votes yet.</p>;
   }
 
   if (type === "multi") {
@@ -35,19 +35,19 @@ export function PredictionTallyView({
           return (
             <li key={row.option_id}>
               <div className="mb-1 flex items-center justify-between text-sm">
-                <span className={isHighlight ? "font-semibold text-white" : "text-white/85"}>
+                <span className={isHighlight ? "font-semibold text-iron" : "text-iron/85"}>
                   {row.label}
                   {isHighlight && (
-                    <span className="ml-2 rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-medium uppercase tracking-wider text-emerald-200">
+                    <span className="ml-2 rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-medium uppercase tracking-wider text-sage-ink">
                       ✓
                     </span>
                   )}
                 </span>
-                <span className="text-white/60">
+                <span className="text-iron/60">
                   {row.count} · {row.pct}%
                 </span>
               </div>
-              <div className="h-2 overflow-hidden rounded-full bg-white/5">
+              <div className="h-2 overflow-hidden rounded-full bg-iron/5">
                 <div
                   className={`h-full ${isHighlight ? "bg-emerald-400" : "bg-aurora"}`}
                   style={{ width: `${row.pct}%` }}
@@ -80,10 +80,10 @@ export function PredictionTallyView({
           return (
             <li key={b.date}>
               <div className="mb-0.5 flex items-center justify-between text-xs">
-                <span className="text-white/80">{b.date}</span>
-                <span className="text-white/55">×{b.count}</span>
+                <span className="text-iron/80">{b.date}</span>
+                <span className="text-iron/55">×{b.count}</span>
               </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-white/5">
+              <div className="h-1.5 overflow-hidden rounded-full bg-iron/5">
                 <div
                   className="h-full bg-aurora"
                   style={{ width: `${pct}%` }}
@@ -102,10 +102,10 @@ export function PredictionTallyView({
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-xs uppercase tracking-wider text-white/45">
+      <dt className="text-xs uppercase tracking-wider text-iron/45">
         {label}
       </dt>
-      <dd className="text-base font-semibold text-white">{value}</dd>
+      <dd className="text-base font-semibold text-iron">{value}</dd>
     </div>
   );
 }

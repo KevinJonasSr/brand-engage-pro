@@ -10,7 +10,7 @@ import { getAdminContext } from "@/lib/admin";
  */
 export default async function BrandField({
   name = "community_id",
-  className = "rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm",
+  className = "rounded-xl border border-iron/10 bg-parchment/40 px-3 py-2 text-sm",
 }: {
   name?: string;
   className?: string;

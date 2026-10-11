@@ -276,12 +276,12 @@ function KpiCard({
   sub?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-      <p className="text-xs uppercase tracking-wide text-white/60">{label}</p>
+    <div className="rounded-lg border border-iron/10 bg-parchment/30 p-4">
+      <p className="text-xs uppercase tracking-wide text-iron/60">{label}</p>
       <p className="mt-1 font-mono text-2xl font-semibold tabular-nums">
         {typeof value === "number" ? value.toLocaleString() : value}
       </p>
-      {sub && <p className="mt-1 text-xs text-white/50">{sub}</p>}
+      {sub && <p className="mt-1 text-xs text-iron/50">{sub}</p>}
     </div>
   );
 }
@@ -313,14 +313,14 @@ export default async function AdminCommunityAnalyticsPage({
         <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
           Analytics
         </h1>
-        <p className="mt-1 text-sm text-white/60">
+        <p className="mt-1 text-sm text-iron/60">
           {data.community.display_name} — community health dashboard
         </p>
       </div>
 
       {/* KPI Row */}
       <section>
-        <p className="mb-2 text-xs uppercase tracking-wide text-white/50">
+        <p className="mb-2 text-xs uppercase tracking-wide text-iron/50">
           Key Metrics
         </p>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -353,10 +353,10 @@ export default async function AdminCommunityAnalyticsPage({
       </section>
 
       {/* Founder Progress Bar */}
-      <section className="rounded-2xl border border-white/10 bg-black/30 p-4">
+      <section className="rounded-lg border border-iron/10 bg-parchment/30 p-4">
         <p className="mb-3 text-sm font-semibold">Founder Slot Progress</p>
         <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm text-white/70">
+          <div className="flex items-center justify-between text-sm text-iron/70">
             <span>
               {data.kpi.foundersClaimed} of {data.kpi.founderCap} claimed
             </span>
@@ -364,7 +364,7 @@ export default async function AdminCommunityAnalyticsPage({
               {Math.round((data.kpi.foundersClaimed / data.kpi.founderCap) * 100)}%
             </span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-white/5">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-iron/5">
             <div
               className="h-full transition-all"
               style={{
@@ -377,12 +377,12 @@ export default async function AdminCommunityAnalyticsPage({
       </section>
 
       {/* Recent Activity Trend */}
-      <section className="rounded-2xl border border-white/10 bg-black/30 p-4">
+      <section className="rounded-lg border border-iron/10 bg-parchment/30 p-4">
         <p className="mb-3 text-sm font-semibold">Activity · Last 7 Days</p>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/5 text-left text-xs uppercase tracking-wide text-white/50">
+              <tr className="border-b border-iron/5 text-left text-xs uppercase tracking-wide text-iron/50">
                 <th className="px-2 py-2">Date</th>
                 <th className="px-2 py-2 text-right">New Members</th>
                 <th className="px-2 py-2 text-right">New Posts</th>
@@ -392,8 +392,8 @@ export default async function AdminCommunityAnalyticsPage({
             </thead>
             <tbody>
               {data.daily.map((row) => (
-                <tr key={row.date} className="border-b border-white/5">
-                  <td className="px-2 py-2 font-mono text-white/70">{row.date}</td>
+                <tr key={row.date} className="border-b border-iron/5">
+                  <td className="px-2 py-2 font-mono text-iron/70">{row.date}</td>
                   <td className="px-2 py-2 text-right font-mono tabular-nums">{row.newMembers}</td>
                   <td className="px-2 py-2 text-right font-mono tabular-nums">{row.newPosts}</td>
                   <td className="px-2 py-2 text-right font-mono tabular-nums">{row.newRsvps}</td>
@@ -409,12 +409,12 @@ export default async function AdminCommunityAnalyticsPage({
 
       {/* Top Members & Recent Subscriptions */}
       <section className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+        <div className="rounded-lg border border-iron/10 bg-parchment/30 p-4">
           <p className="mb-3 text-sm font-semibold">Top Members by Points</p>
           {data.topMembers.length === 0 ? (
-            <p className="text-xs text-white/50">No members yet.</p>
+            <p className="text-xs text-iron/50">No members yet.</p>
           ) : (
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-iron/5">
               {data.topMembers.map((member) => (
                 <div key={member.member_id} className="flex items-center gap-3 py-3">
                   {member.avatar_url && (
@@ -427,10 +427,10 @@ export default async function AdminCommunityAnalyticsPage({
                     />
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">
+                    <p className="text-sm font-medium text-iron truncate">
                       {member.first_name} {member.last_name}
                     </p>
-                    <p className="text-xs text-white/50">{member.subscription_tier}</p>
+                    <p className="text-xs text-iron/50">{member.subscription_tier}</p>
                   </div>
                   <p className="font-mono text-sm font-semibold tabular-nums text-right">
                     {member.total_points.toLocaleString()}
@@ -441,30 +441,30 @@ export default async function AdminCommunityAnalyticsPage({
           )}
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+        <div className="rounded-lg border border-iron/10 bg-parchment/30 p-4">
           <p className="mb-3 text-sm font-semibold">Recent Subscriptions</p>
           {data.subscriptions.length === 0 ? (
-            <p className="text-xs text-white/50">No recent activity.</p>
+            <p className="text-xs text-iron/50">No recent activity.</p>
           ) : (
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-iron/5">
               {data.subscriptions.map((sub) => (
                 <div key={sub.member_id} className="py-2.5 text-sm">
                   <div className="flex items-center justify-between">
                     <div className="min-w-0">
-                      <p className="font-medium text-white truncate">
+                      <p className="font-medium text-iron truncate">
                         {sub.first_name} {sub.last_name}
                       </p>
-                      <p className="text-xs text-white/50 mt-0.5">
+                      <p className="text-xs text-iron/50 mt-0.5">
                         {sub.subscription_tier}
                         {sub.is_founder && (
-                          <span className="ml-1 inline-block rounded bg-amber-500/20 px-1.5 py-0.5 text-xs font-semibold text-amber-300">
+                          <span className="ml-1 inline-block rounded bg-amber-500/20 px-1.5 py-0.5 text-xs font-semibold text-aurora-ink">
                             Founder #{sub.founder_number}
                           </span>
                         )}
                       </p>
                     </div>
                   </div>
-                  <p className="text-xs text-white/40 mt-1">
+                  <p className="text-xs text-iron/40 mt-1">
                     Joined {formatDate(sub.joined_at)}
                     {sub.current_period_end && (
                       <> • Renews {formatDate(sub.current_period_end)}</>

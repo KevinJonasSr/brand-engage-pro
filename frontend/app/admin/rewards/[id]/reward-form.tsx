@@ -42,7 +42,7 @@ export default function EditRewardForm({ reward }: { reward: RewardRow }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="glass-card space-y-4 rounded-2xl p-6"
+      className="glass-card space-y-4 rounded-lg p-6"
     >
       <input type="hidden" name="id" value={reward.id} />
 
@@ -53,7 +53,7 @@ export default function EditRewardForm({ reward }: { reward: RewardRow }) {
           name="title"
           required
           defaultValue={reward.title}
-          className="mt-2 w-full rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-white focus:border-white/30 focus:outline-none"
+          className="mt-2 w-full rounded-lg border border-iron/10 bg-parchment/50 px-3 py-2 text-iron focus:border-iron/30 focus:outline-none"
         />
       </div>
 
@@ -62,7 +62,7 @@ export default function EditRewardForm({ reward }: { reward: RewardRow }) {
         <textarea
           name="description"
           defaultValue={reward.description || ""}
-          className="mt-2 w-full rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-white focus:border-white/30 focus:outline-none"
+          className="mt-2 w-full rounded-lg border border-iron/10 bg-parchment/50 px-3 py-2 text-iron focus:border-iron/30 focus:outline-none"
           rows={3}
         />
       </div>
@@ -73,7 +73,7 @@ export default function EditRewardForm({ reward }: { reward: RewardRow }) {
           type="url"
           name="image_url"
           defaultValue={reward.image_url || ""}
-          className="mt-2 w-full rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-white focus:border-white/30 focus:outline-none"
+          className="mt-2 w-full rounded-lg border border-iron/10 bg-parchment/50 px-3 py-2 text-iron focus:border-iron/30 focus:outline-none"
         />
       </div>
 
@@ -86,7 +86,7 @@ export default function EditRewardForm({ reward }: { reward: RewardRow }) {
             required
             min="1"
             defaultValue={reward.point_cost}
-            className="mt-2 w-full rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-white focus:border-white/30 focus:outline-none"
+            className="mt-2 w-full rounded-lg border border-iron/10 bg-parchment/50 px-3 py-2 text-iron focus:border-iron/30 focus:outline-none"
           />
         </div>
 
@@ -96,7 +96,7 @@ export default function EditRewardForm({ reward }: { reward: RewardRow }) {
             name="kind"
             required
             defaultValue={reward.kind}
-            className="mt-2 w-full rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-white focus:border-white/30 focus:outline-none"
+            className="mt-2 w-full rounded-lg border border-iron/10 bg-parchment/50 px-3 py-2 text-iron focus:border-iron/30 focus:outline-none"
           >
             <option value="voice_note">Voice Note</option>
             <option value="video_shoutout">Video Shoutout</option>
@@ -116,7 +116,7 @@ export default function EditRewardForm({ reward }: { reward: RewardRow }) {
             name="stock"
             min="0"
             defaultValue={reward.stock || ""}
-            className="mt-2 w-full rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-white focus:border-white/30 focus:outline-none"
+            className="mt-2 w-full rounded-lg border border-iron/10 bg-parchment/50 px-3 py-2 text-iron focus:border-iron/30 focus:outline-none"
           />
         </div>
 
@@ -125,7 +125,7 @@ export default function EditRewardForm({ reward }: { reward: RewardRow }) {
           <select
             name="requires_tier"
             defaultValue={reward.requires_tier || ""}
-            className="mt-2 w-full rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-white focus:border-white/30 focus:outline-none"
+            className="mt-2 w-full rounded-lg border border-iron/10 bg-parchment/50 px-3 py-2 text-iron focus:border-iron/30 focus:outline-none"
           >
             <option value="">None</option>
             <option value="premium">Premium</option>
@@ -140,7 +140,7 @@ export default function EditRewardForm({ reward }: { reward: RewardRow }) {
           name="active"
           id="active"
           defaultChecked={reward.active}
-          className="rounded border border-white/30"
+          className="rounded border border-iron/30"
         />
         <label htmlFor="active" className="text-sm font-medium">
           Active
@@ -151,13 +151,13 @@ export default function EditRewardForm({ reward }: { reward: RewardRow }) {
         <button
           type="submit"
           disabled={submitting}
-          className="flex-1 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 px-4 py-2 font-medium text-white hover:opacity-90 disabled:opacity-50"
+          className="flex-1 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 px-4 py-2 font-medium text-iron hover:opacity-90 disabled:opacity-50"
         >
           {submitting ? "Saving…" : "Save Changes"}
         </button>
         <SaveStatusIndicator status={status} />
         {businessError && (
-          <span className="text-xs text-rose-300" title={businessError}>
+          <span className="text-xs text-ember" title={businessError}>
             ✗ {businessError}
           </span>
         )}

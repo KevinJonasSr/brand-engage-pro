@@ -35,7 +35,7 @@ export default function FocalPointPicker({
 
   if (!imageUrl) {
     return (
-      <div className="rounded-2xl border border-dashed border-white/15 bg-black/20 p-4 text-xs text-white/50">
+      <div className="rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-4 text-xs text-iron/50">
         Upload a hero image first to set the focal point.
       </div>
     );
@@ -68,15 +68,15 @@ export default function FocalPointPicker({
 
   return (
     <div className="space-y-3">
-      <div className="rounded-2xl border border-white/10 bg-black/20 p-3">
-        <p className="mb-2 text-xs text-white/60">
+      <div className="rounded-lg border border-iron/10 bg-parchment/20 p-3">
+        <p className="mb-2 text-xs text-iron/60">
           Click or drag anywhere on the photo to set the focal point. The
           dot marks the spot that stays in view when the image is cropped
           to different aspect ratios on the public pages.
         </p>
         <div
           ref={wrapRef}
-          className="relative cursor-crosshair overflow-hidden rounded-2xl bg-black/40 select-none"
+          className="relative cursor-crosshair overflow-hidden rounded-lg bg-parchment/40 select-none"
           onMouseDown={onMouseDown}
           onMouseMove={onMouseMove}
           onMouseUp={endDrag}
@@ -96,14 +96,14 @@ export default function FocalPointPicker({
               className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 transition-[left,top] duration-100"
               style={{ left: `${focalX}%`, top: `${focalY}%` }}
             >
-              <span className="block h-6 w-6 rounded-full border-2 border-white bg-aurora/70 shadow-[0_0_0_2px_rgba(0,0,0,0.55)]" />
+              <span className="block h-6 w-6 rounded-full border-2 border-iron bg-aurora/70 shadow-[0_0_0_2px_rgba(0,0,0,0.55)]" />
             </span>
           )}
         </div>
 
         <div className="mt-3 flex flex-wrap items-end gap-3">
           <label className="block">
-            <span className="text-xs uppercase tracking-wide text-white/50">x %</span>
+            <span className="text-xs uppercase tracking-wide text-iron/50">x %</span>
             <input
               type="number"
               min={0}
@@ -112,11 +112,11 @@ export default function FocalPointPicker({
               onChange={(e) =>
                 onChange(clamp(parseFloat(e.target.value) || 0), focalY)
               }
-              className="mt-1 w-20 rounded-2xl border border-white/10 bg-black/40 px-2 py-1 text-sm"
+              className="mt-1 w-20 rounded-lg border border-iron/10 bg-parchment/40 px-2 py-1 text-sm"
             />
           </label>
           <label className="block">
-            <span className="text-xs uppercase tracking-wide text-white/50">y %</span>
+            <span className="text-xs uppercase tracking-wide text-iron/50">y %</span>
             <input
               type="number"
               min={0}
@@ -125,24 +125,24 @@ export default function FocalPointPicker({
               onChange={(e) =>
                 onChange(focalX, clamp(parseFloat(e.target.value) || 0))
               }
-              className="mt-1 w-20 rounded-2xl border border-white/10 bg-black/40 px-2 py-1 text-sm"
+              className="mt-1 w-20 rounded-lg border border-iron/10 bg-parchment/40 px-2 py-1 text-sm"
             />
           </label>
           <button
             type="button"
             onClick={() => onChange(50, 50)}
-            className="rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs text-white/70 hover:bg-white/10"
+            className="rounded-full border border-iron/15 bg-iron/5 px-3 py-1.5 text-xs text-iron/70 hover:bg-iron/10"
           >
             Reset to center
           </button>
-          <p className="ml-auto text-xs text-white/40">
+          <p className="ml-auto text-xs text-iron/40">
             Saves with the rest of the form.
           </p>
         </div>
       </div>
 
       <div>
-        <p className="mb-2 text-xs uppercase tracking-wide text-white/60">
+        <p className="mb-2 text-xs uppercase tracking-wide text-iron/60">
           Live preview · {focalX}% {focalY}%
         </p>
         <div className="grid grid-cols-3 gap-2">
@@ -168,7 +168,7 @@ function PreviewTile({
 }) {
   return (
     <div className="space-y-1">
-      <div className={`relative ${aspect} overflow-hidden rounded-xl border border-white/10 bg-black/40`}>
+      <div className={`relative ${aspect} overflow-hidden rounded-xl border border-iron/10 bg-parchment/40`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={imageUrl}
@@ -178,7 +178,7 @@ function PreviewTile({
           aria-hidden
         />
       </div>
-      <p className="text-center text-xs uppercase tracking-wide text-white/50">
+      <p className="text-center text-xs uppercase tracking-wide text-iron/50">
         {label}
       </p>
     </div>

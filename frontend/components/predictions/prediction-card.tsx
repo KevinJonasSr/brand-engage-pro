@@ -153,49 +153,49 @@ export async function PredictionCard({
   return (
     <article
       id={`prediction-${postId}`}
-      className="glass-card rounded-2xl p-5"
+      className="glass-card rounded-lg p-5"
     >
       {/* Header */}
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2 text-xs">
             <span
-              className="rounded-full bg-aurora/30 px-2 py-1 font-medium text-white"
+              className="rounded-full bg-aurora/30 px-2 py-1 font-medium text-iron"
               style={{ fontFamily: "var(--font-display)" }}
             >
               Prediction
             </span>
-            <span className="rounded-full bg-white/5 px-2 py-1 text-white/65">
+            <span className="rounded-full bg-iron/5 px-2 py-1 text-iron/65">
               {labelType(post.prediction_type)}
             </span>
             {phase === "open" && secsLeft !== null && (
-              <span className="rounded-full bg-emerald-500/15 px-2 py-1 text-emerald-300">
+              <span className="rounded-full bg-emerald-500/15 px-2 py-1 text-sage-ink">
                 Closes in {formatPredictionCountdown(secsLeft)}
               </span>
             )}
             {phase === "closed" && (
-              <span className="rounded-full bg-amber-500/15 px-2 py-1 text-amber-300">
+              <span className="rounded-full bg-amber-500/15 px-2 py-1 text-aurora-ink">
                 Voting closed
               </span>
             )}
             {phase === "resolved" && (
-              <span className="rounded-full bg-white/10 px-2 py-1 text-white/65">
+              <span className="rounded-full bg-iron/10 px-2 py-1 text-iron/65">
                 Resolved
               </span>
             )}
             {phase === "resolved" && isWinner && (
-              <span className="rounded-full bg-emerald-500/25 px-2 py-1 font-semibold text-emerald-200">
+              <span className="rounded-full bg-emerald-500/25 px-2 py-1 font-semibold text-sage-ink">
                 🎉 You called it!
               </span>
             )}
             {(post.points_for_correct ?? 0) > 0 && (
-              <span className="rounded-full bg-white/5 px-2 py-1 text-white/65">
+              <span className="rounded-full bg-iron/5 px-2 py-1 text-iron/65">
                 {post.points_for_correct} pts
               </span>
             )}
           </div>
           <h3
-            className="mt-2 text-lg font-semibold leading-snug text-white"
+            className="mt-2 text-lg font-semibold leading-snug text-iron"
             style={{ fontFamily: "var(--font-display)" }}
           >
             {adminLink ? (
@@ -210,7 +210,7 @@ export async function PredictionCard({
             )}
           </h3>
           {post.body && (
-            <p className="mt-1 text-sm text-white/75">{post.body}</p>
+            <p className="mt-1 text-sm text-iron/75">{post.body}</p>
           )}
         </div>
       </header>
@@ -240,13 +240,13 @@ export async function PredictionCard({
       </div>
 
       {/* Footer */}
-      <footer className="mt-4 flex items-center justify-between border-t border-white/5 pt-3 text-xs text-white/55">
+      <footer className="mt-4 flex items-center justify-between border-t border-iron/5 pt-3 text-xs text-iron/55">
         <span>
           {commentCount ?? 0} comment{commentCount === 1 ? "" : "s"}
         </span>
         <a
           href={`/brands/${post.brand_slug}/community#post-${post.id}`}
-          className="text-white/65 hover:text-white"
+          className="text-iron/65 hover:text-iron"
         >
           Discuss →
         </a>
@@ -279,10 +279,10 @@ function OpenView({
 }) {
   if (!viewerMemberId) {
     return (
-      <p className="text-sm text-white/65">
+      <p className="text-sm text-iron/65">
         <a
           href={`/login?redirect=/brands/${post.brand_slug}#prediction-${post.id}`}
-          className="font-medium text-white underline"
+          className="font-medium text-iron underline"
         >
           Sign in
         </a>{" "}
@@ -296,7 +296,7 @@ function OpenView({
   if (viewerVote && !post.allow_vote_changes) {
     return (
       <div className="space-y-3">
-        <p className="text-sm text-emerald-300">
+        <p className="text-sm text-sage-ink">
           ✓ You voted — locked until results.
         </p>
         {post.show_live_tally && tally && (
@@ -322,8 +322,8 @@ function OpenView({
         currentVote={viewerVote}
       />
       {post.show_live_tally && tally && tally.total_votes > 0 && (
-        <details className="rounded-lg border border-white/10 bg-white/3 p-3 text-sm text-white/75">
-          <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wider text-white/55">
+        <details className="rounded-lg border border-iron/10 bg-iron/3 p-3 text-sm text-iron/75">
+          <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wider text-iron/55">
             See live tally · {tally.total_votes} vote{tally.total_votes === 1 ? "" : "s"}
           </summary>
           <div className="mt-3">
@@ -355,7 +355,7 @@ function ClosedView({
 }) {
   return (
     <div className="space-y-3">
-      <p className="text-sm text-white/75">
+      <p className="text-sm text-iron/75">
         Voting closed. Awaiting the official answer.
       </p>
       {tally && tally.total_votes > 0 && (
@@ -404,25 +404,25 @@ function ResolvedView({
   return (
     <div className="space-y-3">
       {viewerVoted && isWinner && (
-        <div className="rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">
+        <div className="rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-sm text-sage-ink">
           🎉 You called it — points are in your wallet.
         </div>
       )}
       {viewerVoted && !isWinner && (
-        <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/75">
+        <div className="rounded-lg border border-iron/10 bg-iron/5 px-3 py-2 text-sm text-iron/75">
           Better luck next time.
         </div>
       )}
-      <p className="text-sm text-white/85">
-        <span className="font-semibold text-white">Correct answer:</span>{" "}
+      <p className="text-sm text-iron/85">
+        <span className="font-semibold text-iron">Correct answer:</span>{" "}
         {correctLabel}
       </p>
       {post.resolution_note && (
-        <p className="text-sm text-white/65">{post.resolution_note}</p>
+        <p className="text-sm text-iron/65">{post.resolution_note}</p>
       )}
       {tally && tally.total_votes > 0 && (
-        <details className="rounded-lg border border-white/10 bg-white/3 p-3 text-sm text-white/75">
-          <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wider text-white/55">
+        <details className="rounded-lg border border-iron/10 bg-iron/3 p-3 text-sm text-iron/75">
+          <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wider text-iron/55">
             How everyone voted · {tally.total_votes} vote
             {tally.total_votes === 1 ? "" : "s"}
           </summary>

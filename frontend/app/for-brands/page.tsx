@@ -52,7 +52,7 @@ export default async function ForBrandsPage() {
     <main className="mx-auto max-w-5xl space-y-20 px-6 py-16">
       {/* ─── Hero ──────────────────────────────────────────────────────────── */}
       <section className="space-y-6 text-center">
-        <p className="text-xs uppercase tracking-[0.3em] text-white/60">
+        <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
           For Brands
         </p>
         <h1
@@ -65,7 +65,7 @@ export default async function ForBrandsPage() {
           </span>
           .
         </h1>
-        <p className="mx-auto max-w-2xl text-base text-white/75 md:text-lg">
+        <p className="mx-auto max-w-2xl text-base text-iron/75 md:text-lg">
           Brand Engage Pro helps restaurants, retailers, and entertainment
           companies build direct member relationships, reward real engagement,
           and turn customer activity into specials, RSVPs, referrals, and
@@ -74,25 +74,25 @@ export default async function ForBrandsPage() {
         <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
           <Link
             href="/for-brands/apply"
-            className="rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white shadow-glass transition hover:brightness-110"
+            className="rounded-full bg-ember px-6 py-3 text-sm font-semibold text-linen shadow-glass transition hover:brightness-110"
           >
             Apply to launch your member club →
           </Link>
           <Link
             href="/brands"
-            className="rounded-full border border-white/30 px-6 py-3 text-sm font-medium text-white/80 hover:bg-white/10"
+            className="rounded-full border border-iron/30 px-6 py-3 text-sm font-medium text-iron/80 hover:bg-iron/10"
           >
             See active brands
           </Link>
         </div>
-        <p className="pt-2 text-xs text-white/50">
+        <p className="pt-2 text-xs text-iron/50">
           No payment or contract required to apply. We respond within 48 hours.
         </p>
-        <p className="text-xs text-white/45">
+        <p className="text-xs text-iron/45">
           Already approved?{" "}
           <Link
             href="/login"
-            className="text-white/80 underline-offset-4 hover:underline"
+            className="text-iron/80 underline-offset-4 hover:underline"
           >
             Sign in to your admin →
           </Link>
@@ -102,7 +102,7 @@ export default async function ForBrandsPage() {
       {/* ─── Proof: what's already live ────────────────────────────────────── */}
       <section className="space-y-6">
         <div className="text-center">
-          <p className="text-xs uppercase tracking-[0.3em] text-white/60">
+          <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
             Already live on Brand Engage Pro
           </p>
           <h2
@@ -111,7 +111,7 @@ export default async function ForBrandsPage() {
           >
             Built for real brand communities.
           </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-sm text-white/70">
+          <p className="mx-auto mt-3 max-w-2xl text-sm text-iron/70">
             Each brand gets a member club where regulars follow, earn perks,
             unlock specials, RSVP to events, and stay close to what&apos;s
             happening next. Browse the active clubs to see what your hub could
@@ -121,7 +121,7 @@ export default async function ForBrandsPage() {
         <div className="flex justify-center pt-4">
           <Link
             href="/brands"
-            className="rounded-full border border-white/25 px-5 py-2.5 text-sm font-medium text-white/85 hover:bg-white/10"
+            className="rounded-full border border-iron/25 px-5 py-2.5 text-sm font-medium text-iron/85 hover:bg-iron/10"
           >
             Browse all member clubs →
           </Link>
@@ -131,7 +131,7 @@ export default async function ForBrandsPage() {
       {/* ─── Featured brands (real proof) ─────────────────────────────────── */}
       <section className="space-y-6">
         <div className="text-center">
-          <p className="text-xs uppercase tracking-[0.3em] text-white/60">
+          <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
             Featured brands
           </p>
           <h2
@@ -140,7 +140,7 @@ export default async function ForBrandsPage() {
           >
             Real member clubs, real brands.
           </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-sm text-white/70">
+          <p className="mx-auto mt-3 max-w-2xl text-sm text-iron/70">
             A handful of the brands who built their member club on Brand Engage
             Pro. Click through to see what their hub actually looks like.
           </p>
@@ -150,7 +150,7 @@ export default async function ForBrandsPage() {
             <Link
               key={b.slug}
               href={`/brands/${b.slug}`}
-              className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/30 p-5 transition hover:border-white/25 hover:bg-white/5"
+              className="group relative overflow-hidden rounded-lg border border-iron/10 bg-parchment/30 p-5 transition hover:border-iron/25 hover:bg-iron/5"
             >
               <div
                 aria-hidden
@@ -158,10 +158,10 @@ export default async function ForBrandsPage() {
                 style={{ backgroundImage: `linear-gradient(90deg, ${b.accentFrom}, ${b.accentTo})` }}
               />
               <p className="mt-2 text-base font-semibold">{b.name}</p>
-              <p className="mt-2 text-xs text-white/60 line-clamp-3">
+              <p className="mt-2 text-xs text-iron/60 line-clamp-3">
                 {b.tagline}
               </p>
-              <p className="mt-4 text-xs text-white/55 transition group-hover:text-white/85">
+              <p className="mt-4 text-xs text-iron/55 transition group-hover:text-iron/85">
                 See their member club →
               </p>
             </Link>
@@ -176,7 +176,7 @@ export default async function ForBrandsPage() {
       {/* ─── What brands can launch ────────────────────────────────────────── */}
       <section className="space-y-6">
         <div className="text-center">
-          <p className="text-xs uppercase tracking-[0.3em] text-white/60">
+          <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
             What you can launch
           </p>
           <h2
@@ -213,17 +213,17 @@ export default async function ForBrandsPage() {
               body: "Every Monday morning: top members, redemption velocity, anomaly flags. Lands in Slack and at /admin/briefs.",
             },
           ].map((card) => (
-            <div key={card.title} className="glass-card rounded-2xl p-6">
+            <div key={card.title} className="glass-card rounded-lg p-6">
               <p className="text-sm font-semibold">{card.title}</p>
-              <p className="mt-2 text-xs text-white/65">{card.body}</p>
+              <p className="mt-2 text-xs text-iron/65">{card.body}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* ─── Data ownership ────────────────────────────────────────────────── */}
-      <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-aurora/15 via-black to-ember/15 p-10">
-        <p className="text-xs uppercase tracking-[0.3em] text-white/60">
+      <section className="rounded-lg border border-iron/10 bg-gradient-to-br from-aurora/15 via-parchment to-ember/15 p-10">
+        <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
           Your audience, your relationship
         </p>
         <h2
@@ -232,14 +232,14 @@ export default async function ForBrandsPage() {
         >
           The members you build here stay yours.
         </h2>
-        <p className="mt-5 max-w-3xl text-sm text-white/75">
+        <p className="mt-5 max-w-3xl text-sm text-iron/75">
           Brand Engage Pro is built so brands strengthen direct member
           relationships instead of renting attention from social platforms. You
           can see your regulars, you can talk to them, and the contact data
           they share with you doesn&apos;t live behind someone else&apos;s
           ranking algorithm.
         </p>
-        <p className="mt-4 max-w-3xl text-xs text-white/55">
+        <p className="mt-4 max-w-3xl text-xs text-iron/55">
           Final data access, export, and permission terms are confirmed during
           onboarding and reflected in the brand agreement. We&apos;ll walk
           through what you can pull, what members control, and how email and
@@ -248,8 +248,8 @@ export default async function ForBrandsPage() {
       </section>
 
       {/* ─── How launch works ──────────────────────────────────────────────── */}
-      <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-amber-500/10 via-black to-aurora/10 p-10 text-center">
-        <p className="text-xs uppercase tracking-[0.3em] text-white/60">
+      <section className="rounded-lg border border-iron/10 bg-gradient-to-br from-amber-500/10 via-parchment to-aurora/10 p-10 text-center">
+        <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
           How launch works
         </p>
         <h2
@@ -258,7 +258,7 @@ export default async function ForBrandsPage() {
         >
           Four steps from application to live.
         </h2>
-        <ol className="mx-auto mt-8 grid max-w-4xl gap-4 text-left text-sm text-white/80 md:grid-cols-4">
+        <ol className="mx-auto mt-8 grid max-w-4xl gap-4 text-left text-sm text-iron/80 md:grid-cols-4">
           {[
             {
               n: "1. Apply",
@@ -277,8 +277,8 @@ export default async function ForBrandsPage() {
               body: "Flip your hub live, invite your first founders, and watch the perks start flowing.",
             },
           ].map((step) => (
-            <li key={step.n} className="rounded-2xl bg-white/5 p-5">
-              <span className="text-xs uppercase tracking-wide text-aurora">
+            <li key={step.n} className="rounded-lg bg-iron/5 p-5">
+              <span className="text-xs uppercase tracking-wide text-aurora-ink">
                 {step.n}
               </span>
               <p className="mt-2 font-medium">{step.body}</p>
@@ -290,7 +290,7 @@ export default async function ForBrandsPage() {
       {/* ─── FAQ ───────────────────────────────────────────────────────────── */}
       <section className="space-y-6">
         <div className="text-center">
-          <p className="text-xs uppercase tracking-[0.3em] text-white/60">
+          <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
             FAQ
           </p>
           <h2
@@ -333,23 +333,23 @@ export default async function ForBrandsPage() {
           ].map((item) => (
             <details
               key={item.q}
-              className="group rounded-2xl border border-white/10 bg-black/30 p-5 transition hover:border-white/25"
+              className="group rounded-lg border border-iron/10 bg-parchment/30 p-5 transition hover:border-iron/25"
             >
-              <summary className="flex cursor-pointer items-center justify-between gap-4 text-sm font-medium text-white/90 marker:hidden">
+              <summary className="flex cursor-pointer items-center justify-between gap-4 text-sm font-medium text-iron/90 marker:hidden">
                 <span>{item.q}</span>
-                <span className="text-aurora transition group-open:rotate-45">
+                <span className="text-aurora-ink transition group-open:rotate-45">
                   +
                 </span>
               </summary>
-              <p className="mt-3 text-sm text-white/70">{item.a}</p>
+              <p className="mt-3 text-sm text-iron/70">{item.a}</p>
             </details>
           ))}
         </div>
       </section>
 
       {/* ─── Closing CTA ───────────────────────────────────────────────────── */}
-      <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-aurora/25 via-slate-900 to-ember/25 p-10 text-center md:p-16">
-        <p className="text-xs uppercase tracking-[0.3em] text-white/60">
+      <section className="rounded-lg border border-iron/10 bg-gradient-to-br from-aurora/25 via-slate-900 to-ember/25 p-10 text-center md:p-16">
+        <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
           Ready when you are
         </p>
         <h2
@@ -358,20 +358,20 @@ export default async function ForBrandsPage() {
         >
           Let&apos;s build your member club.
         </h2>
-        <p className="mx-auto mt-4 max-w-2xl text-sm text-white/75">
+        <p className="mx-auto mt-4 max-w-2xl text-sm text-iron/75">
           Apply free in under five minutes. We respond within 48 hours and walk
           you through a launch plan that fits your team.
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Link
             href="/for-brands/apply"
-            className="rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white shadow-glass transition hover:brightness-110"
+            className="rounded-full bg-ember px-6 py-3 text-sm font-semibold text-linen shadow-glass transition hover:brightness-110"
           >
             Apply to launch your member club →
           </Link>
           <Link
             href="/brands"
-            className="rounded-full border border-white/25 px-5 py-3 text-sm font-medium text-white/80 hover:bg-white/10"
+            className="rounded-full border border-iron/25 px-5 py-3 text-sm font-medium text-iron/80 hover:bg-iron/10"
           >
             See active brands
           </Link>

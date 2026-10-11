@@ -103,46 +103,46 @@ export default async function AdminLaunchPage() {
   return (
     <main className="mx-auto max-w-5xl px-6 py-10 space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-white">Brand launch</h1>
-        <p className="mt-2 text-sm text-white/60">
+        <h1 className="text-2xl font-bold text-iron">Brand launch</h1>
+        <p className="mt-2 text-sm text-iron/60">
           Guided checklist for taking a brand community live. Super-admin
           only. A brand goes live when it has a brand page, at least one
           reward, a welcome post, and an owner.
         </p>
       </div>
 
-      <section className="rounded-2xl border border-white/10 bg-black/30 p-6">
-        <h2 className="text-lg font-semibold text-white">Start a new brand</h2>
+      <section className="rounded-lg border border-iron/10 bg-parchment/30 p-6">
+        <h2 className="text-lg font-semibold text-iron">Start a new brand</h2>
         <form
           action={initializeCommunityAction}
           className="mt-4 flex flex-wrap items-end gap-3"
         >
-          <label className="flex flex-col gap-1 text-xs text-white/50">
+          <label className="flex flex-col gap-1 text-xs text-iron/50">
             Slug
             <input
               name="slug"
               required
               placeholder="nellies"
-              className="w-48 rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
+              className="w-48 rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm text-iron"
             />
           </label>
-          <label className="flex flex-col gap-1 text-xs text-white/50">
+          <label className="flex flex-col gap-1 text-xs text-iron/50">
             Display name
             <input
               name="display_name"
               required
               placeholder="Nellie's Southern Kitchen"
-              className="w-64 rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
+              className="w-64 rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm text-iron"
             />
           </label>
           <button
             type="submit"
-            className="rounded-lg bg-gradient-to-r from-aurora to-ember px-4 py-2 text-sm font-semibold text-white"
+            className="rounded-lg bg-ember px-4 py-2 text-sm font-semibold text-linen"
           >
             Create (hidden)
           </button>
         </form>
-        <p className="mt-3 text-xs text-white/40">
+        <p className="mt-3 text-xs text-iron/40">
           Creates the community row inactive. Add the brand page, rewards, and
           a welcome announcement, then flip it live below.
         </p>
@@ -158,17 +158,17 @@ export default async function AdminLaunchPage() {
           return (
             <section
               key={s.slug}
-              className="rounded-2xl border border-white/10 bg-black/30 p-6"
+              className="rounded-lg border border-iron/10 bg-parchment/30 p-6"
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <h3 className="text-lg font-semibold text-white">
+                  <h3 className="text-lg font-semibold text-iron">
                     {s.displayName}
-                    <span className="ml-2 text-xs text-white/40">
+                    <span className="ml-2 text-xs text-iron/40">
                       /{s.slug}
                     </span>
                   </h3>
-                  <p className="mt-1 text-xs text-white/50">
+                  <p className="mt-1 text-xs text-iron/50">
                     {s.memberCount.toLocaleString()} member
                     {s.memberCount === 1 ? "" : "s"}
                     {s.owners.length > 0 &&
@@ -178,8 +178,8 @@ export default async function AdminLaunchPage() {
                 <span
                   className={`rounded-full px-3 py-1 text-xs font-semibold ${
                     s.active
-                      ? "bg-emerald-500/20 text-emerald-300"
-                      : "bg-white/10 text-white/50"
+                      ? "bg-emerald-500/20 text-sage-ink"
+                      : "bg-iron/10 text-iron/50"
                   }`}
                 >
                   {s.active ? "LIVE" : "HIDDEN"}
@@ -207,18 +207,18 @@ export default async function AdminLaunchPage() {
                   className="flex items-end gap-2"
                 >
                   <input type="hidden" name="community_id" value={s.slug} />
-                  <label className="flex flex-col gap-1 text-xs text-white/50">
+                  <label className="flex flex-col gap-1 text-xs text-iron/50">
                     Assign owner by email
                     <input
                       type="email"
                       name="email"
                       placeholder="owner@brand.com"
-                      className="w-56 rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
+                      className="w-56 rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm text-iron"
                     />
                   </label>
                   <button
                     type="submit"
-                    className="rounded-lg border border-white/15 px-3 py-2 text-xs font-semibold text-white/80 hover:text-white"
+                    className="rounded-lg border border-iron/15 px-3 py-2 text-xs font-semibold text-iron/80 hover:text-iron"
                   >
                     Assign
                   </button>
@@ -236,10 +236,10 @@ export default async function AdminLaunchPage() {
                     disabled={!s.active && !readyToLaunch}
                     className={`rounded-lg px-4 py-2 text-xs font-semibold ${
                       s.active
-                        ? "border border-white/15 text-white/70 hover:text-white"
+                        ? "border border-iron/15 text-iron/70 hover:text-iron"
                         : readyToLaunch
-                          ? "bg-gradient-to-r from-aurora to-ember text-white"
-                          : "cursor-not-allowed bg-white/5 text-white/30"
+                          ? "bg-ember text-linen"
+                          : "cursor-not-allowed bg-iron/5 text-iron/30"
                     }`}
                   >
                     {s.active
@@ -260,7 +260,7 @@ export default async function AdminLaunchPage() {
 
 function Check({ ok, label }: { ok: boolean; label: string }) {
   return (
-    <p className={ok ? "text-emerald-300/90" : "text-white/40"}>
+    <p className={ok ? "text-sage-ink/90" : "text-iron/40"}>
       <span className="mr-2">{ok ? "✓" : "○"}</span>
       {label}
     </p>

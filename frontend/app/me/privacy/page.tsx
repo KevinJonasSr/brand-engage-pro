@@ -31,12 +31,12 @@ export default async function PrivacyPage() {
       <header className="mb-8">
         <Link
           href="/me"
-          className="text-xs uppercase tracking-widest text-white/60 hover:text-white"
+          className="text-xs uppercase tracking-widest text-iron/60 hover:text-iron"
         >
           ← Account
         </Link>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight">Privacy</h1>
-        <p className="mt-3 text-white/70">
+        <p className="mt-3 text-iron/70">
           Choose what other members can see about you. Personal info like
           email, phone, and address are always private — see below.
         </p>

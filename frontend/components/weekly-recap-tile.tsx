@@ -96,7 +96,7 @@ export default function WeeklyRecapTile({
   }
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-violet-500/15 via-fuchsia-500/10 to-rose-500/10 p-5 shadow-lg shadow-fuchsia-500/5">
+    <div className="relative overflow-hidden rounded-lg border border-iron/10 bg-gradient-to-br from-violet-500/15 via-fuchsia-500/10 to-rose-500/10 p-5 shadow-lg shadow-fuchsia-500/5">
       {/* Subtle decorative glow */}
       <div
         aria-hidden
@@ -109,17 +109,17 @@ export default function WeeklyRecapTile({
 
       <header className="relative flex flex-wrap items-baseline justify-between gap-2">
         <div>
-          <p className="text-xs uppercase tracking-[0.25em] text-white/55">
+          <p className="text-xs uppercase tracking-[0.25em] text-iron/55">
             Your week
           </p>
-          <p className="mt-1 text-base font-semibold text-white">
+          <p className="mt-1 text-base font-semibold text-iron">
             {dateRange(recap.windowStart, recap.windowEnd) || "This week"}
           </p>
         </div>
         <button
           type="button"
           onClick={onShare}
-          className="rounded-lg border border-white/15 bg-black/30 px-3 py-1.5 text-xs font-semibold text-white/85 transition hover:border-white/30 hover:text-white"
+          className="rounded-lg border border-iron/15 bg-parchment/30 px-3 py-1.5 text-xs font-semibold text-iron/85 transition hover:border-iron/30 hover:text-iron"
         >
           {shareState === "copied"
             ? "Copied!"
@@ -133,14 +133,14 @@ export default function WeeklyRecapTile({
         {stats.map((s) => (
           <div
             key={s.label}
-            className="rounded-xl border border-white/10 bg-black/30 px-3 py-3 text-center"
+            className="rounded-xl border border-iron/10 bg-parchment/30 px-3 py-3 text-center"
           >
-            <p className="text-2xl font-semibold leading-none text-white">
+            <p className="text-2xl font-semibold leading-none text-iron">
               {s.value > 0 && s.label === "points earned"
                 ? `+${s.value.toLocaleString()}`
                 : s.value.toLocaleString()}
             </p>
-            <p className="mt-1 text-xs uppercase tracking-wide text-white/55">
+            <p className="mt-1 text-xs uppercase tracking-wide text-iron/55">
               {s.label}
             </p>
           </div>
@@ -148,11 +148,11 @@ export default function WeeklyRecapTile({
       </div>
 
       {(recap.topBrandName || recap.currentStreakDays > 0) && (
-        <div className="relative mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-3 text-xs text-white/70">
+        <div className="relative mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-iron/10 pt-3 text-xs text-iron/70">
           {recap.topBrandName ? (
             <span>
               Most active in{" "}
-              <span className="font-semibold text-white">
+              <span className="font-semibold text-iron">
                 {recap.topBrandName}
               </span>
             </span>
@@ -160,7 +160,7 @@ export default function WeeklyRecapTile({
             <span />
           )}
           {recap.currentStreakDays > 0 && (
-            <span className="text-white/55">
+            <span className="text-iron/55">
               🔥 {recap.currentStreakDays}-day streak
             </span>
           )}

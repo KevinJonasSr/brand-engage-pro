@@ -196,13 +196,13 @@ export function CreatePredictionForm({ brands }: Props) {
     <form onSubmit={onSubmit} className="space-y-6">
       {/* AI Suggest panel */}
       {isAiFeatureOn("predictionIdeas") && (
-      <section className="glass-card rounded-2xl p-5">
+      <section className="glass-card rounded-lg p-5">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-sm font-semibold text-white">
+            <h2 className="text-sm font-semibold text-iron">
               ✨ Suggest predictions with AI
             </h2>
-            <p className="text-xs text-white/55">
+            <p className="text-xs text-iron/55">
               Uses the brand&rsquo;s recent posts + upcoming events to ground
               suggestions. ~3¢ per click.
             </p>
@@ -211,7 +211,7 @@ export function CreatePredictionForm({ brands }: Props) {
             type="button"
             onClick={fetchSuggestions}
             disabled={suggesting || !brandSlug}
-            className="rounded-lg bg-aurora px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-50"
+            className="rounded-lg bg-aurora px-3 py-1.5 text-sm font-medium text-iron shadow-sm hover:opacity-90 disabled:opacity-50"
           >
             {suggesting ? "Thinking…" : `Suggest 5 ${TYPE_LABELS[predictionType]}`}
           </button>
@@ -221,25 +221,25 @@ export function CreatePredictionForm({ brands }: Props) {
           value={topicSeed}
           onChange={(e) => setTopicSeed(e.target.value)}
           placeholder="Optional topic seed — e.g. 'Friday biscuit specials'"
-          className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40"
+          className="w-full rounded-lg border border-iron/10 bg-iron/5 px-3 py-2 text-sm text-iron placeholder:text-iron/40"
         />
         {suggestError && (
-          <p className="mt-2 text-xs text-amber-300">{suggestError}</p>
+          <p className="mt-2 text-xs text-aurora-ink">{suggestError}</p>
         )}
         {suggestions.length > 0 && (
           <ul className="mt-3 space-y-2">
             {suggestions.map((s, i) => (
               <li
                 key={i}
-                className="rounded-lg border border-white/10 bg-white/5 p-3"
+                className="rounded-lg border border-iron/10 bg-iron/5 p-3"
               >
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-white">{s.title}</p>
+                    <p className="text-sm font-semibold text-iron">{s.title}</p>
                     {s.body && (
-                      <p className="mt-0.5 text-xs text-white/65">{s.body}</p>
+                      <p className="mt-0.5 text-xs text-iron/65">{s.body}</p>
                     )}
-                    <p className="mt-1 text-xs uppercase tracking-wider text-white/40">
+                    <p className="mt-1 text-xs uppercase tracking-wider text-iron/40">
                       {s.prediction_type} ·{" "}
                       {s.suggested_close_in_hours ?? 72}h ·{" "}
                       {s.suggested_points ?? 50}pts
@@ -249,7 +249,7 @@ export function CreatePredictionForm({ brands }: Props) {
                   <button
                     type="button"
                     onClick={() => applySuggestion(s)}
-                    className="rounded-md bg-emerald-500/20 px-3 py-1 text-xs font-medium text-emerald-200 hover:bg-emerald-500/30"
+                    className="rounded-md bg-emerald-500/20 px-3 py-1 text-xs font-medium text-sage-ink hover:bg-emerald-500/30"
                   >
                     Use this
                   </button>
@@ -262,15 +262,15 @@ export function CreatePredictionForm({ brands }: Props) {
       )}
 
       {/* Main form */}
-      <section className="glass-card space-y-4 rounded-2xl p-5">
+      <section className="glass-card space-y-4 rounded-lg p-5">
         <Field label="Brand">
           <select
             value={brandSlug}
             onChange={(e) => setBrandSlug(e.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+            className="w-full rounded-lg border border-iron/10 bg-iron/5 px-3 py-2 text-sm text-iron"
           >
             {brands.map((b) => (
-              <option key={b.slug} value={b.slug} className="bg-neutral-900">
+              <option key={b.slug} value={b.slug} className="bg-linen">
                 {b.name}
               </option>
             ))}
@@ -286,8 +286,8 @@ export function CreatePredictionForm({ brands }: Props) {
                 onClick={() => setPredictionType(t)}
                 className={`rounded-full px-3 py-1.5 text-xs font-medium ${
                   predictionType === t
-                    ? "bg-aurora text-white"
-                    : "border border-white/15 text-white/70 hover:bg-white/5"
+                    ? "bg-aurora text-iron"
+                    : "border border-iron/15 text-iron/70 hover:bg-iron/5"
                 }`}
               >
                 {TYPE_LABELS[t]}
@@ -302,7 +302,7 @@ export function CreatePredictionForm({ brands }: Props) {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="How many biscuits will Nellie's sell this Friday?"
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40"
+            className="w-full rounded-lg border border-iron/10 bg-iron/5 px-3 py-2 text-sm text-iron placeholder:text-iron/40"
           />
         </Field>
 
@@ -315,7 +315,7 @@ export function CreatePredictionForm({ brands }: Props) {
             onChange={(e) => setBody(e.target.value)}
             rows={3}
             placeholder="Friday brunch is our biggest biscuit day. Take a guess."
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40"
+            className="w-full rounded-lg border border-iron/10 bg-iron/5 px-3 py-2 text-sm text-iron placeholder:text-iron/40"
           />
         </Field>
 
@@ -329,13 +329,13 @@ export function CreatePredictionForm({ brands }: Props) {
                     value={opt}
                     onChange={(e) => updateOption(i, e.target.value)}
                     placeholder={`Option ${i + 1}`}
-                    className="flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40"
+                    className="flex-1 rounded-lg border border-iron/10 bg-iron/5 px-3 py-2 text-sm text-iron placeholder:text-iron/40"
                   />
                   {options.length > 2 && (
                     <button
                       type="button"
                       onClick={() => removeOption(i)}
-                      className="rounded-lg border border-white/15 px-3 text-sm text-white/60 hover:bg-white/5"
+                      className="rounded-lg border border-iron/15 px-3 text-sm text-iron/60 hover:bg-iron/5"
                       aria-label="Remove option"
                     >
                       ×
@@ -347,7 +347,7 @@ export function CreatePredictionForm({ brands }: Props) {
                 <button
                   type="button"
                   onClick={addOption}
-                  className="rounded-lg border border-dashed border-white/15 px-3 py-1.5 text-xs text-white/65 hover:bg-white/5"
+                  className="rounded-lg border border-dashed border-iron/15 px-3 py-1.5 text-xs text-iron/65 hover:bg-iron/5"
                 >
                   + Add option
                 </button>
@@ -364,7 +364,7 @@ export function CreatePredictionForm({ brands }: Props) {
                 value={numericUnit}
                 onChange={(e) => setNumericUnit(e.target.value)}
                 placeholder="biscuits"
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40"
+                className="w-full rounded-lg border border-iron/10 bg-iron/5 px-3 py-2 text-sm text-iron placeholder:text-iron/40"
               />
             </Field>
             <Field
@@ -376,7 +376,7 @@ export function CreatePredictionForm({ brands }: Props) {
                 min={0}
                 value={numericTolerance}
                 onChange={(e) => setNumericTolerance(Number(e.target.value))}
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+                className="w-full rounded-lg border border-iron/10 bg-iron/5 px-3 py-2 text-sm text-iron"
               />
             </Field>
           </div>
@@ -388,7 +388,7 @@ export function CreatePredictionForm({ brands }: Props) {
               type="datetime-local"
               value={closesAt}
               onChange={(e) => setClosesAt(e.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+              className="w-full rounded-lg border border-iron/10 bg-iron/5 px-3 py-2 text-sm text-iron"
             />
           </Field>
           <Field
@@ -400,7 +400,7 @@ export function CreatePredictionForm({ brands }: Props) {
               min={0}
               value={points}
               onChange={(e) => setPoints(Number(e.target.value))}
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+              className="w-full rounded-lg border border-iron/10 bg-iron/5 px-3 py-2 text-sm text-iron"
             />
           </Field>
         </div>
@@ -409,10 +409,10 @@ export function CreatePredictionForm({ brands }: Props) {
           <select
             value={visibility}
             onChange={(e) => setVisibility(e.target.value as PredictionVisibility)}
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+            className="w-full rounded-lg border border-iron/10 bg-iron/5 px-3 py-2 text-sm text-iron"
           >
             {(Object.keys(VISIBILITY_LABELS) as PredictionVisibility[]).map((v) => (
-              <option key={v} value={v} className="bg-neutral-900">
+              <option key={v} value={v} className="bg-linen">
                 {VISIBILITY_LABELS[v]}
               </option>
             ))}
@@ -424,10 +424,10 @@ export function CreatePredictionForm({ brands }: Props) {
             <select
               value={awardStrategy}
               onChange={(e) => setAwardStrategy(e.target.value as AwardStrategy)}
-              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+              className="w-full rounded-lg border border-iron/10 bg-iron/5 px-3 py-2 text-sm text-iron"
             >
               {(Object.keys(STRATEGY_LABELS) as AwardStrategy[]).map((s) => (
-                <option key={s} value={s} className="bg-neutral-900">
+                <option key={s} value={s} className="bg-linen">
                   {STRATEGY_LABELS[s]}
                 </option>
               ))}
@@ -450,7 +450,7 @@ export function CreatePredictionForm({ brands }: Props) {
       </section>
 
       {error && (
-        <p className="rounded-lg border border-rose-400/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">
+        <p className="rounded-lg border border-rose-400/30 bg-rose-500/10 px-3 py-2 text-sm text-ember">
           {error}
         </p>
       )}
@@ -458,14 +458,14 @@ export function CreatePredictionForm({ brands }: Props) {
       <div className="flex flex-wrap items-center justify-end gap-2">
         <a
           href="/admin/predictions"
-          className="rounded-lg border border-white/15 px-4 py-2 text-sm text-white/75 hover:bg-white/5"
+          className="rounded-lg border border-iron/15 px-4 py-2 text-sm text-iron/75 hover:bg-iron/5"
         >
           Cancel
         </a>
         <button
           type="submit"
           disabled={pending}
-          className="rounded-lg bg-aurora px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-50"
+          className="rounded-lg bg-aurora px-4 py-2 text-sm font-medium text-iron shadow-sm hover:opacity-90 disabled:opacity-50"
         >
           {pending ? "Saving…" : "Save prediction"}
         </button>
@@ -485,11 +485,11 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-white/55">
+      <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-iron/55">
         {label}
       </span>
       {children}
-      {hint && <span className="mt-1 block text-xs text-white/40">{hint}</span>}
+      {hint && <span className="mt-1 block text-xs text-iron/40">{hint}</span>}
     </label>
   );
 }
@@ -509,9 +509,9 @@ function Toggle({
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="h-4 w-4 rounded border border-white/20 bg-white/10"
+        className="h-4 w-4 rounded border border-iron/20 bg-iron/10"
       />
-      <span className="text-sm text-white/85">{label}</span>
+      <span className="text-sm text-iron/85">{label}</span>
     </label>
   );
 }

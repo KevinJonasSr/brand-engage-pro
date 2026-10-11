@@ -182,8 +182,8 @@ export function PreferencesForm({
       </Section>
 
       <Section title="Quiet hours">
-        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
-          <p className="text-sm text-white/60">
+        <div className="rounded-xl border border-iron/10 bg-iron/[0.02] p-4">
+          <p className="text-sm text-iron/60">
             We hold non-urgent alerts during this window. RSVP and redemption
             confirmations always come through.
           </p>
@@ -204,12 +204,12 @@ export function PreferencesForm({
 
       <div className="flex items-center justify-between pt-2">
         <div className="text-sm">
-          {error && <span className="text-rose-300">{error}</span>}
+          {error && <span className="text-ember">{error}</span>}
           {savedAt && !error && (
-            <span className="text-emerald-300">Saved.</span>
+            <span className="text-sage-ink">Saved.</span>
           )}
           {!savedAt && !error && !hadRow && dirty && (
-            <span className="text-white/50">
+            <span className="text-iron/50">
               First save creates your preferences row.
             </span>
           )}
@@ -221,8 +221,8 @@ export function PreferencesForm({
           className={
             "inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-medium transition " +
             (!dirty || pending
-              ? "bg-white/10 text-white/50 cursor-not-allowed"
-              : "bg-white text-black hover:bg-white/90")
+              ? "bg-iron/10 text-iron/50 cursor-not-allowed"
+              : "bg-iron text-linen hover:bg-iron/90")
           }
         >
           {pending ? "Saving…" : "Save changes"}
@@ -241,7 +241,7 @@ function Section({
 }) {
   return (
     <div>
-      <h3 className="mb-2 text-xs uppercase tracking-widest text-white/50">
+      <h3 className="mb-2 text-xs uppercase tracking-widest text-iron/50">
         {title}
       </h3>
       <div className="space-y-3">{children}</div>
@@ -259,13 +259,13 @@ function TimeField({
   onChange: (v: string | null) => void;
 }) {
   return (
-    <label className="flex flex-col gap-1 text-xs text-white/70">
+    <label className="flex flex-col gap-1 text-xs text-iron/70">
       {label}
       <input
         type="time"
         value={value ?? ""}
         onChange={(e) => onChange(e.target.value || null)}
-        className="rounded-lg border border-white/15 bg-black/30 px-3 py-2 text-sm text-white"
+        className="rounded-lg border border-iron/15 bg-parchment/30 px-3 py-2 text-sm text-iron"
       />
     </label>
   );
@@ -285,8 +285,8 @@ function PrefRow({
   return (
     <label
       className={
-        "flex items-start gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-4 transition " +
-        (disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:border-white/20")
+        "flex items-start gap-4 rounded-xl border border-iron/10 bg-iron/[0.02] p-4 transition " +
+        (disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:border-iron/20")
       }
     >
       <span aria-hidden className="mt-0.5 text-xl">
@@ -294,7 +294,7 @@ function PrefRow({
       </span>
       <div className="flex-1">
         <div className="font-medium">{row.title}</div>
-        <p className="mt-0.5 text-sm text-white/60">{row.body}</p>
+        <p className="mt-0.5 text-sm text-iron/60">{row.body}</p>
       </div>
       <span className="mt-1 shrink-0">
         <input
@@ -308,12 +308,12 @@ function PrefRow({
         <span
           className={
             "block h-6 w-11 rounded-full transition " +
-            (on ? "bg-emerald-500" : "bg-white/15")
+            (on ? "bg-emerald-500" : "bg-iron/15")
           }
         >
           <span
             className={
-              "block h-5 w-5 translate-y-0.5 rounded-full bg-white transition " +
+              "block h-5 w-5 translate-y-0.5 rounded-full bg-iron transition " +
               (on ? "translate-x-[22px]" : "translate-x-0.5")
             }
           />

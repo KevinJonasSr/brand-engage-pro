@@ -22,17 +22,17 @@ export default async function MemberRecapPage() {
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-12">
-      <p className="text-xs uppercase tracking-widest text-white/50">
+      <p className="text-xs uppercase tracking-widest text-iron/50">
         Your last 7 days
         {recap.topBrandName ? ` · ${recap.topBrandName}` : ""}
       </p>
       <h1
-        className="mt-2 text-3xl font-bold text-white"
+        className="mt-2 text-3xl font-bold text-iron"
         style={{ fontFamily: "var(--font-display)" }}
       >
         Your weekly recap
       </h1>
-      <p className="mt-3 text-lg text-white/80">{hype}</p>
+      <p className="mt-3 text-lg text-iron/80">{hype}</p>
 
       <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Big label="Points earned" value={recap.pointsEarned} />
@@ -42,14 +42,14 @@ export default async function MemberRecapPage() {
       </div>
 
       {recap.rsvpsAdded > 0 && (
-        <p className="mt-6 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/70">
+        <p className="mt-6 rounded-xl border border-iron/10 bg-parchment/30 px-4 py-3 text-sm text-iron/70">
           You RSVPed to {recap.rsvpsAdded} event
           {recap.rsvpsAdded === 1 ? "" : "s"} this week — see you there. 🎟️
         </p>
       )}
 
       {!recap.hasActivity && (
-        <p className="mt-6 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/60">
+        <p className="mt-6 rounded-xl border border-iron/10 bg-parchment/30 px-4 py-3 text-sm text-iron/60">
           Nothing logged this week yet — a visit, a comment, or a check-in
           gets your streak moving again.
         </p>
@@ -60,14 +60,14 @@ export default async function MemberRecapPage() {
           href={
             recap.topBrandSlug ? `/brands/${recap.topBrandSlug}` : "/brands"
           }
-          className="rounded-xl bg-gradient-to-r from-aurora to-ember px-5 py-2.5 text-sm font-semibold text-white"
+          className="rounded-xl bg-ember px-5 py-2.5 text-sm font-semibold text-linen"
         >
           Keep the streak going →
         </Link>
-        <Link href="/rewards" className="text-sm text-white/60 hover:text-white">
+        <Link href="/rewards" className="text-sm text-iron/60 hover:text-iron">
           Spend your points
         </Link>
-        <Link href="/me" className="text-sm text-white/60 hover:text-white">
+        <Link href="/me" className="text-sm text-iron/60 hover:text-iron">
           Back to my profile
         </Link>
       </div>
@@ -85,9 +85,9 @@ function Big({
   suffix?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/40 px-4 py-4">
-      <p className="text-xs uppercase tracking-wide text-white/40">{label}</p>
-      <p className="mt-1 text-2xl font-bold text-white">
+    <div className="rounded-lg border border-iron/10 bg-parchment/40 px-4 py-4">
+      <p className="text-xs uppercase tracking-wide text-iron/40">{label}</p>
+      <p className="mt-1 text-2xl font-bold text-iron">
         {value.toLocaleString()}
         {suffix}
       </p>

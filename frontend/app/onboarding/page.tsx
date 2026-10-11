@@ -100,9 +100,9 @@ export default async function OnboardingPage({
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black text-white">
+        <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-parchment text-iron">
           <div className="mx-auto flex max-w-6xl items-center justify-center px-6 py-24">
-            <p className="text-white/60">Loading onboarding…</p>
+            <p className="text-iron/60">Loading onboarding…</p>
           </div>
         </div>
       }

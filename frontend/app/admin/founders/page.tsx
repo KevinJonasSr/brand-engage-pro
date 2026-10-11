@@ -125,15 +125,15 @@ function getTierBadgeColor(
 ): { bg: string; text: string } {
   switch (tier) {
     case "premium":
-      return { bg: "bg-emerald-500/20", text: "text-emerald-300" };
+      return { bg: "bg-emerald-500/20", text: "text-sage-ink" };
     case "comped":
-      return { bg: "bg-aurora/20", text: "text-aurora" };
+      return { bg: "bg-aurora/20", text: "text-aurora-ink" };
     case "past_due":
-      return { bg: "bg-amber-500/20", text: "text-amber-300" };
+      return { bg: "bg-amber-500/20", text: "text-aurora-ink" };
     case "cancelled":
-      return { bg: "bg-rose-500/20", text: "text-rose-300" };
+      return { bg: "bg-rose-500/20", text: "text-ember" };
     default:
-      return { bg: "bg-white/10", text: "text-white/50" };
+      return { bg: "bg-iron/10", text: "text-iron/50" };
   }
 }
 
@@ -153,12 +153,12 @@ export default async function AdminFoundersPage() {
           >
             Founder rosters
           </h1>
-          <p className="mt-2 text-sm text-white/60">
+          <p className="mt-2 text-sm text-iron/60">
             View founding members per community.
           </p>
         </div>
-        <div className="rounded-2xl border border-white/10 bg-black/30 p-8 text-center">
-          <p className="text-white/50">No communities found or no access.</p>
+        <div className="rounded-lg border border-iron/10 bg-parchment/30 p-8 text-center">
+          <p className="text-iron/50">No communities found or no access.</p>
         </div>
       </div>
     );
@@ -173,7 +173,7 @@ export default async function AdminFoundersPage() {
         >
           Founder rosters
         </h1>
-        <p className="mt-2 text-sm text-white/60">
+        <p className="mt-2 text-sm text-iron/60">
           Founding members per community. Sorted by founder number within each community.
         </p>
       </div>
@@ -193,21 +193,21 @@ export default async function AdminFoundersPage() {
             >
               {community.display_name}
             </h2>
-            <span className="ml-auto text-xs text-white/60">
+            <span className="ml-auto text-xs text-iron/60">
               {community.founders.length} / {community.founder_cap} slots
             </span>
           </div>
 
           {community.founders.length === 0 ? (
-            <div className="rounded-2xl border border-white/10 bg-black/30 p-6 text-center">
-              <p className="text-sm text-white/50">
+            <div className="rounded-lg border border-iron/10 bg-parchment/30 p-6 text-center">
+              <p className="text-sm text-iron/50">
                 No founders yet in this community.
               </p>
             </div>
           ) : (
-            <div className="overflow-hidden rounded-2xl border border-white/10">
+            <div className="overflow-hidden rounded-lg border border-iron/10">
               <table className="w-full text-sm">
-                <thead className="bg-black/40 text-left text-xs uppercase tracking-wide text-white/50">
+                <thead className="bg-parchment/40 text-left text-xs uppercase tracking-wide text-iron/50">
                   <tr>
                     <th className="px-4 py-3 w-12">#</th>
                     <th className="px-4 py-3">Member</th>
@@ -220,8 +220,8 @@ export default async function AdminFoundersPage() {
                 </thead>
                 <tbody>
                   {community.founders.map((founder) => (
-                    <tr key={`${community.slug}-${founder.member_id}`} className="border-t border-white/5">
-                      <td className="px-4 py-3 font-semibold text-white/70">
+                    <tr key={`${community.slug}-${founder.member_id}`} className="border-t border-iron/5">
+                      <td className="px-4 py-3 font-semibold text-iron/70">
                         {founder.founder_number}
                       </td>
                       <td className="px-4 py-3">
@@ -235,14 +235,14 @@ export default async function AdminFoundersPage() {
                               className="rounded-full"
                             />
                           )}
-                          <span className="text-white">
+                          <span className="text-iron">
                             {[founder.first_name, founder.last_name]
                               .filter(Boolean)
                               .join(" ") || "—"}
                           </span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-white/70">
+                      <td className="px-4 py-3 text-iron/70">
                         {founder.email || "—"}
                       </td>
                       <td className="px-4 py-3">
@@ -254,16 +254,16 @@ export default async function AdminFoundersPage() {
                           {founder.subscription_tier}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-white/70">
+                      <td className="px-4 py-3 text-iron/70">
                         {formatDate(founder.joined_at)}
                       </td>
-                      <td className="px-4 py-3 text-white/70">
+                      <td className="px-4 py-3 text-iron/70">
                         {founder.billing_period
                           ? founder.billing_period.charAt(0).toUpperCase() +
                             founder.billing_period.slice(1)
                           : "—"}
                       </td>
-                      <td className="px-4 py-3 text-right text-white/70">
+                      <td className="px-4 py-3 text-right text-iron/70">
                         ${(founder.monthly_credit_cents / 100).toFixed(2)}
                       </td>
                     </tr>

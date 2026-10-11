@@ -147,7 +147,7 @@ export default async function BrandPage({
     <main className="mx-auto max-w-6xl space-y-10 px-6 py-12">
       {/* Hero */}
       <section
-        className="group relative flex flex-col justify-end overflow-hidden rounded-3xl border border-white/10 min-h-[420px] md:min-h-[520px]"
+        className="group relative flex flex-col justify-end overflow-hidden rounded-lg border border-iron/10 min-h-[420px] md:min-h-[520px]"
         style={!brand.heroImage ? { backgroundImage: heroGradient } : undefined}
       >
         {brand.heroImage && (
@@ -177,7 +177,7 @@ export default async function BrandPage({
 
         {/* Content layer — sits above image + overlay */}
         <div className="relative p-10">
-          <p className="text-xs uppercase tracking-[0.3em] text-white/70">
+          <p className="text-xs uppercase tracking-[0.3em] text-iron/70">
             {brand.genres.slice(0, 2).join(" · ")}{brand.genres.length > 2 ? " +" + (brand.genres.length - 2) : ""}
           </p>
           <h1
@@ -186,20 +186,20 @@ export default async function BrandPage({
           >
             {brand.name}
           </h1>
-          <p className="mt-3 max-w-xl text-lg text-white/85 drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)]">
+          <p className="mt-3 max-w-xl text-lg text-iron/85 drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)]">
             {brand.tagline}
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link
               href={primaryCta.href}
-              className="rounded-full px-6 py-3 text-sm font-semibold text-white transition hover:brightness-110 bep-press"
+              className="rounded-full px-6 py-3 text-sm font-semibold text-iron transition hover:brightness-110 bep-press"
               style={{ backgroundImage: ctaGradient }}
             >
               {primaryCta.label}
             </Link>
             <Link
               href={`/brands/${slug}/community`}
-              className="rounded-full border border-white/30 bg-black/30 px-6 py-3 text-sm font-medium text-white/90 backdrop-blur hover:bg-white/10 bep-press"
+              className="rounded-full border border-iron/30 bg-parchment/30 px-6 py-3 text-sm font-medium text-iron/90 backdrop-blur hover:bg-iron/10 bep-press"
             >
               Community →
             </Link>
@@ -219,7 +219,7 @@ export default async function BrandPage({
             />
           </div>
           {!isSignedIn && (
-            <p className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-aurora/30 bg-aurora/10 px-3 py-1 text-xs font-medium text-aurora">
+            <p className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-aurora/30 bg-aurora/10 px-3 py-1 text-xs font-medium text-aurora-ink">
               🎁 Join free — finish your profile for +100 welcome points.
             </p>
           )}
@@ -228,15 +228,15 @@ export default async function BrandPage({
 
       {/* Founder wall link */}
       <Reveal>
-      <section className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-4">
-        <p className="text-xs uppercase tracking-wide text-white/50">
+      <section className="rounded-lg border border-iron/10 bg-iron/5 backdrop-blur p-4">
+        <p className="text-xs uppercase tracking-wide text-iron/50">
           Optional upgrades
         </p>
         <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
           {showFounderLink ? (
             <Link
               href={`/brands/${brand.slug}/founders`}
-              className="inline-flex items-center gap-2 font-medium text-white/80 transition hover:text-white"
+              className="inline-flex items-center gap-2 font-medium text-iron/80 transition hover:text-iron"
             >
               👑 {(founderData?.count ?? 0) === 0
                 ? "Be one of the first 100 Founding Members"
@@ -245,7 +245,7 @@ export default async function BrandPage({
           ) : (
             <Link
               href={`/brands/${brand.slug}/founders`}
-              className="inline-flex items-center gap-2 font-medium text-white/80 transition hover:text-white"
+              className="inline-flex items-center gap-2 font-medium text-iron/80 transition hover:text-iron"
             >
               Founding Members →
             </Link>
@@ -261,26 +261,26 @@ export default async function BrandPage({
       {goals.length > 0 && (
         <Reveal>
         <section className="glass-card p-8">
-          <p className="text-sm uppercase tracking-wide text-white/60">
+          <p className="text-sm uppercase tracking-wide text-iron/60">
             Community goals
           </p>
           <div className="mt-4 space-y-5">
             {goals.map((g) => (
               <div key={g.id}>
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="font-semibold text-white">
+                  <p className="font-semibold text-iron">
                     {g.title}
                     {g.completed && <span className="ml-2">🏆</span>}
                   </p>
-                  <p className="text-sm text-white/60">
+                  <p className="text-sm text-iron/60">
                     {g.current.toLocaleString()} / {g.target.toLocaleString()}{" "}
                     · {g.pct}%
                   </p>
                 </div>
                 {g.description && (
-                  <p className="mt-1 text-sm text-white/60">{g.description}</p>
+                  <p className="mt-1 text-sm text-iron/60">{g.description}</p>
                 )}
-                <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/10">
+                <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-iron/10">
                   <div
                     className="h-full rounded-full"
                     style={{
@@ -292,7 +292,7 @@ export default async function BrandPage({
                 <div className="mt-2">
                   <Link
                     href={`/share/goal/${brand.slug}/${g.id}`}
-                    className="text-xs text-white/50 hover:text-white"
+                    className="text-xs text-iron/50 hover:text-iron"
                   >
                     Share this goal →
                   </Link>
@@ -313,14 +313,14 @@ export default async function BrandPage({
       <section className="grid gap-6 lg:grid-cols-[2fr_1fr]">
 
         <div className="glass-card p-8">
-          <p className="text-sm uppercase tracking-wide text-white/60">About</p>
-          <p className="mt-4 text-base leading-relaxed text-white/80 whitespace-pre-line">{brand.bio}</p>
+          <p className="text-sm uppercase tracking-wide text-iron/60">About</p>
+          <p className="mt-4 text-base leading-relaxed text-iron/80 whitespace-pre-line">{brand.bio}</p>
         </div>
         <div className="glass-card p-8">
-          <p className="text-sm uppercase tracking-wide text-white/60">Follow</p>
+          <p className="text-sm uppercase tracking-wide text-iron/60">Follow</p>
           <div className="mt-4 flex flex-wrap gap-3">
             {brand.social.length === 0 ? (
-              <p className="text-xs text-white/40">Social links pending.</p>
+              <p className="text-xs text-iron/40">Social links pending.</p>
             ) : (
               brand.social.map((s) => (
                 <SocialIcon key={s.label} label={s.label} href={s.href} />
@@ -336,7 +336,7 @@ export default async function BrandPage({
         <section className="grid gap-6 sm:grid-cols-2">
           {NELLIES_PHOTOS.map((photo, i) => (
             <Reveal key={photo.src} index={i}>
-              <figure className="group overflow-hidden rounded-lg border border-white/10">
+              <figure className="group overflow-hidden rounded-lg border border-iron/10">
                 <div className="relative aspect-[4/3]">
                   <Image
                     src={photo.src}
@@ -346,7 +346,7 @@ export default async function BrandPage({
                     className="bep-photo-zoom object-cover"
                   />
                 </div>
-                <figcaption className="bg-black/30 px-5 py-3 text-sm text-white/70">
+                <figcaption className="bg-parchment/30 px-5 py-3 text-sm text-iron/70">
                   {photo.caption}
                 </figcaption>
               </figure>
@@ -380,7 +380,7 @@ export default async function BrandPage({
       {guestSpecials.length > 0 && (
         <section id="offers" className="glass-card p-8 scroll-mt-24">
           <Reveal>
-            <p className="text-sm uppercase tracking-wide text-white/60">
+            <p className="text-sm uppercase tracking-wide text-iron/60">
               {isNellies ? "Member offers & specials" : "Specials"}
             </p>
           </Reveal>
@@ -411,48 +411,48 @@ export default async function BrandPage({
               const cadence = formatRecurrence(s);
               return (
                 <Reveal key={s.id} index={i + 1} className="grid">
-                <div className="rounded-2xl bg-black/30 p-5">
+                <div className="rounded-lg bg-parchment/30 p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-semibold">{s.title}</p>
                       {s.description && (
-                        <p className="mt-1 text-xs leading-relaxed text-white/70">
+                        <p className="mt-1 text-xs leading-relaxed text-iron/70">
                           {s.description}
                         </p>
                       )}
                       <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
                         <DropCountdown reward={s} />
                         {cadence && (
-                          <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 uppercase tracking-wide text-white/70">
+                          <span className="rounded-full border border-iron/15 bg-iron/5 px-2 py-0.5 uppercase tracking-wide text-iron/70">
                             {cadence}
                           </span>
                         )}
                         {s.tier !== "public" && (
-                          <span className="rounded-full border border-amber-300/30 bg-amber-300/10 px-2 py-0.5 uppercase tracking-wide text-amber-200">
+                          <span className="rounded-full border border-amber-300/30 bg-amber-300/10 px-2 py-0.5 uppercase tracking-wide text-aurora-ink">
                             {s.tier === "founder-only" ? "Founders" : "Premium"}
                           </span>
                         )}
                         {s.points_required && s.points_required > 0 ? (
-                          <span className="rounded-full border border-emerald-300/30 bg-emerald-300/10 px-2 py-0.5 uppercase tracking-wide text-emerald-200">
+                          <span className="rounded-full border border-emerald-300/30 bg-emerald-300/10 px-2 py-0.5 uppercase tracking-wide text-sage-ink">
                             {s.points_required.toLocaleString()} pts
                           </span>
                         ) : null}
                       </div>
                       {s.redemption_code && (
                         isSignedIn ? (
-                          <p className="mt-3 text-xs text-white/50">
+                          <p className="mt-3 text-xs text-iron/50">
                             Show code{" "}
-                            <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-white/90">
+                            <code className="rounded bg-iron/10 px-1.5 py-0.5 font-mono text-iron/90">
                               {s.redemption_code}
                             </code>{" "}
                             at the register.
                           </p>
                         ) : (
-                          <p className="mt-3 text-xs text-white/50">
+                          <p className="mt-3 text-xs text-iron/50">
                             Member code unlocked after{" "}
                             <Link
                               href={`/signup?ref=${brand.slug}`}
-                              className="text-aurora underline underline-offset-2 hover:text-white"
+                              className="text-aurora-ink underline underline-offset-2 hover:text-iron"
                             >
                               sign-in
                             </Link>
@@ -473,7 +473,7 @@ export default async function BrandPage({
       {/* Upcoming */}
       <section id="upcoming" className="glass-card p-8 scroll-mt-24">
         <Reveal>
-          <p className="text-sm uppercase tracking-wide text-white/60">Upcoming</p>
+          <p className="text-sm uppercase tracking-wide text-iron/60">Upcoming</p>
         </Reveal>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           {brand.upcoming.map((e, i) => {
@@ -509,25 +509,25 @@ export default async function BrandPage({
             const rsvped = eventId ? myRsvps.has(eventId) : false;
             return (
               <Reveal key={eventId ?? e.title} index={i + 1} className="grid">
-              <div className="rounded-2xl bg-black/30 p-5">
+              <div className="rounded-lg bg-parchment/30 p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-sm font-semibold">{e.title}</p>
-                    <p className="text-xs text-white/60">{e.detail}</p>
+                    <p className="text-xs text-iron/60">{e.detail}</p>
                     {e.location && (
-                      <p className="mt-1 text-xs text-white/60">📍 {e.location}</p>
+                      <p className="mt-1 text-xs text-iron/60">📍 {e.location}</p>
                     )}
-                    <p className="mt-3 text-xs uppercase tracking-wide text-white/40">
+                    <p className="mt-3 text-xs uppercase tracking-wide text-iron/40">
                       {e.date}
                     </p>
                     {eventId && count > 0 && (
-                      <p className="mt-1 text-xs text-white/50">
+                      <p className="mt-1 text-xs text-iron/50">
                         {count}
                         {e.capacity ? ` / ${e.capacity}` : ""} RSVPed
                       </p>
                     )}
                     {eventId && count === 0 && isSignedIn && (
-                      <p className="mt-1 text-xs text-white/50">
+                      <p className="mt-1 text-xs text-iron/50">
                         Be the first to RSVP
                       </p>
                     )}
@@ -546,13 +546,13 @@ export default async function BrandPage({
                     <div className="flex shrink-0 flex-col items-end gap-1.5">
                       <Link
                         href={`/login?next=${encodeURIComponent(`/brands/${brand.slug}#upcoming`)}`}
-                        className="rounded-full bg-gradient-to-r from-aurora to-ember px-3 py-1 text-xs font-semibold text-white bep-press"
+                        className="rounded-full bg-ember px-3 py-1 text-xs font-semibold text-linen bep-press"
                       >
                         Sign in to RSVP
                       </Link>
                       <Link
                         href={`/signup?ref=${encodeURIComponent(brand.slug)}&next=${encodeURIComponent(`/brands/${brand.slug}#upcoming`)}`}
-                        className="text-xs text-white/70 underline-offset-2 hover:text-white hover:underline"
+                        className="text-xs text-iron/70 underline-offset-2 hover:text-iron hover:underline"
                       >
                         Join to RSVP
                       </Link>
@@ -563,7 +563,7 @@ export default async function BrandPage({
                   <div className="mt-3 flex items-center gap-3 text-xs">
                     <a
                       href={`/api/events/${eventId}/ics`}
-                      className="text-white/60 hover:text-white"
+                      className="text-iron/60 hover:text-iron"
                     >
                       📅 Add to calendar
                     </a>
@@ -572,7 +572,7 @@ export default async function BrandPage({
                         href={e.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-white/60 hover:text-white"
+                        className="text-iron/60 hover:text-iron"
                       >
                         Details ↗
                       </a>
@@ -590,15 +590,15 @@ export default async function BrandPage({
         <section className="glass-card p-8">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <p className="text-sm uppercase tracking-wide text-white/60">Member club rewards</p>
-              <p className="mt-1 text-xs text-white/50">
+              <p className="text-sm uppercase tracking-wide text-iron/60">Member club rewards</p>
+              <p className="mt-1 text-xs text-iron/50">
                 Live redeemables on the brand rewards page (points you earn after joining — new
                 accounts start at 0).
               </p>
             </div>
             <Link
               href={`/brands/${brand.slug}/rewards`}
-              className="text-sm font-medium text-aurora underline underline-offset-2 hover:text-white"
+              className="text-sm font-medium text-aurora-ink underline underline-offset-2 hover:text-iron"
             >
               Open brand rewards →
             </Link>
@@ -608,11 +608,11 @@ export default async function BrandPage({
               <Reveal key={m.title} index={i} className="grid">
               <Link
                 href={`/brands/${brand.slug}/rewards`}
-                className="rounded-2xl bg-black/30 p-5 transition hover:bg-black/40"
+                className="rounded-lg bg-parchment/30 p-5 transition hover:bg-parchment/40"
               >
-                <p className="text-xs uppercase tracking-wide text-white/50">{m.tier}</p>
+                <p className="text-xs uppercase tracking-wide text-iron/50">{m.tier}</p>
                 <p className="mt-1 text-sm font-semibold">{m.title}</p>
-                <p className="mt-3 text-sm font-semibold text-emerald-300">{m.points}</p>
+                <p className="mt-3 text-sm font-semibold text-sage-ink">{m.points}</p>
               </Link>
               </Reveal>
             ))}

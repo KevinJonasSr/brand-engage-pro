@@ -54,7 +54,7 @@ export function MobileNav({
         aria-expanded={open}
         aria-controls="mobile-nav-panel"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/30 text-white/80 hover:bg-white/10 md:hidden"
+        className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-iron/15 bg-parchment/30 text-iron/80 hover:bg-iron/10 md:hidden"
       >
         <span aria-hidden className="text-base leading-none">
           {open ? "✕" : "☰"}
@@ -65,12 +65,12 @@ export function MobileNav({
           <div
             aria-hidden
             onClick={() => setOpen(false)}
-            className="fixed inset-0 top-[var(--mobile-nav-top,64px)] z-30 bg-black/60 backdrop-blur md:hidden"
+            className="fixed inset-0 top-[var(--mobile-nav-top,64px)] z-30 bg-parchment/60 backdrop-blur md:hidden"
           />
           <nav
             id="mobile-nav-panel"
             aria-label="Mobile menu"
-            className="absolute inset-x-0 top-full z-40 border-b border-white/10 bg-midnight/95 shadow-2xl md:hidden"
+            className="absolute inset-x-0 top-full z-40 border-b border-iron/10 bg-linen/95 shadow-2xl md:hidden"
           >
             <ul className="mx-auto flex max-w-6xl flex-col px-4 py-2">
               {navItems.map((item) => {
@@ -81,10 +81,10 @@ export function MobileNav({
                       href={item.href}
                       onClick={() => setOpen(false)}
                       className={
-                        "block rounded-2xl px-4 py-3 text-base transition " +
+                        "block rounded-lg px-4 py-3 text-base transition " +
                         (active
-                          ? "bg-white/10 text-white"
-                          : "text-white/80 hover:bg-white/10 hover:text-white")
+                          ? "bg-iron/10 text-iron"
+                          : "text-iron/80 hover:bg-iron/10 hover:text-iron")
                       }
                       aria-current={active ? "page" : undefined}
                     >

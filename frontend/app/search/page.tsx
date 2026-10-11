@@ -50,7 +50,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
   return (
     <Shell query={query}>
       {errorMsg ? (
-        <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-sm text-red-200">
+        <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-6 text-sm text-ember">
           {errorMsg}
         </div>
       ) : results && results.totalHits === 0 ? (
@@ -64,10 +64,10 @@ export default async function SearchPage({ searchParams }: PageProps) {
 
 function Shell({ query, children }: { query: string; children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-midnight">
+    <div className="min-h-screen bg-linen">
       <main className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-12">
         <header className="space-y-3">
-          <p className="text-xs uppercase tracking-wide text-white/60">Search</p>
+          <p className="text-xs uppercase tracking-wide text-iron/60">Search</p>
           <h1
             className="text-3xl font-semibold"
             style={{ fontFamily: "var(--font-display)" }}
@@ -84,7 +84,7 @@ function Shell({ query, children }: { query: string; children: React.ReactNode }
 
 function EmptyPrompt() {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-8 text-sm text-white/70">
+    <div className="rounded-lg border border-iron/10 bg-iron/5 p-8 text-sm text-iron/70">
       <p>
         Search across communities, posts, comments, events, and rewards. Try a
         topic, post, event, or member question — semantic search figures out
@@ -96,9 +96,9 @@ function EmptyPrompt() {
 
 function NoResults({ query }: { query: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-8 text-sm text-white/70">
+    <div className="rounded-lg border border-iron/10 bg-iron/5 p-8 text-sm text-iron/70">
       <p>
-        No matches for <span className="text-white">“{query}”</span>. Try a
+        No matches for <span className="text-iron">“{query}”</span>. Try a
         different phrasing — semantic search works best with full thoughts
         rather than single keywords.
       </p>
@@ -126,7 +126,7 @@ function ResultsGrouped({ results }: { results: SearchResults }) {
 
   return (
     <>
-      <p className="text-xs text-white/50">
+      <p className="text-xs text-iron/50">
         {results.totalHits} {results.totalHits === 1 ? "result" : "results"}
         {" · "}
         {results.durationMs}ms
@@ -135,14 +135,14 @@ function ResultsGrouped({ results }: { results: SearchResults }) {
         {sections.map((s) =>
           s.hits.length === 0 ? null : (
             <section key={s.title} className="space-y-3">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-white/70">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-iron/70">
                 {s.title}
               </h2>
               <ul className="space-y-2">
                 {s.hits.map((h) => (
                   <li
                     key={`${h.source_table}:${h.source_id}`}
-                    className="rounded-xl border border-white/10 bg-black/30 p-4 transition hover:border-white/30 hover:bg-black/50"
+                    className="rounded-xl border border-iron/10 bg-parchment/30 p-4 transition hover:border-iron/30 hover:bg-parchment/50"
                   >
                     {s.render(h)}
                   </li>
@@ -160,15 +160,15 @@ function renderCommunity(h: SearchHit) {
   if (h.data.kind !== "community") return null;
   return (
     <Link href={`/brands/${h.data.slug}/community`} className="block">
-      <p className="text-sm font-semibold text-white">
+      <p className="text-sm font-semibold text-iron">
         {h.data.display_name}
       </p>
       {h.data.tagline ? (
-        <p className="mt-1 line-clamp-2 text-xs text-white/70">
+        <p className="mt-1 line-clamp-2 text-xs text-iron/70">
           {h.data.tagline}
         </p>
       ) : h.data.bio ? (
-        <p className="mt-1 line-clamp-2 text-xs text-white/70">{h.data.bio}</p>
+        <p className="mt-1 line-clamp-2 text-xs text-iron/70">{h.data.bio}</p>
       ) : null}
     </Link>
   );
@@ -182,10 +182,10 @@ function renderPost(h: SearchHit) {
       className="block"
     >
       {h.data.title ? (
-        <p className="text-sm font-semibold text-white">{h.data.title}</p>
+        <p className="text-sm font-semibold text-iron">{h.data.title}</p>
       ) : null}
-      <p className="mt-1 line-clamp-3 text-xs text-white/70">{h.data.body}</p>
-      <p className="mt-2 text-xs uppercase tracking-wide text-white/40">
+      <p className="mt-1 line-clamp-3 text-xs text-iron/70">{h.data.body}</p>
+      <p className="mt-2 text-xs uppercase tracking-wide text-iron/40">
         in {h.data.brand_slug} · {absoluteDate(h.data.created_at)}
       </p>
     </Link>
@@ -199,8 +199,8 @@ function renderComment(h: SearchHit) {
       href={`/brands/${h.data.brand_slug}/community#comment-${h.data.id}`}
       className="block"
     >
-      <p className="line-clamp-3 text-xs text-white/80">{h.data.body}</p>
-      <p className="mt-2 text-xs uppercase tracking-wide text-white/40">
+      <p className="line-clamp-3 text-xs text-iron/80">{h.data.body}</p>
+      <p className="mt-2 text-xs uppercase tracking-wide text-iron/40">
         comment in {h.data.brand_slug} · {absoluteDate(h.data.created_at)}
       </p>
     </Link>
@@ -211,11 +211,11 @@ function renderEvent(h: SearchHit) {
   if (h.data.kind !== "event") return null;
   return (
     <Link href={`/brands/${h.data.brand_slug}`} className="block">
-      <p className="text-sm font-semibold text-white">{h.data.title}</p>
+      <p className="text-sm font-semibold text-iron">{h.data.title}</p>
       {h.data.detail ? (
-        <p className="mt-1 line-clamp-2 text-xs text-white/70">{h.data.detail}</p>
+        <p className="mt-1 line-clamp-2 text-xs text-iron/70">{h.data.detail}</p>
       ) : null}
-      <p className="mt-2 text-xs uppercase tracking-wide text-white/40">
+      <p className="mt-2 text-xs uppercase tracking-wide text-iron/40">
         {h.data.brand_slug}
         {(() => { const f = absoluteDate(h.data.event_date); return f ? ` · ${f}` : ""; })()}
       </p>
@@ -227,13 +227,13 @@ function renderReward(h: SearchHit) {
   if (h.data.kind !== "reward") return null;
   return (
     <Link href={`/rewards`} className="block">
-      <p className="text-sm font-semibold text-white">{h.data.title}</p>
+      <p className="text-sm font-semibold text-iron">{h.data.title}</p>
       {h.data.description ? (
-        <p className="mt-1 line-clamp-2 text-xs text-white/70">
+        <p className="mt-1 line-clamp-2 text-xs text-iron/70">
           {h.data.description}
         </p>
       ) : null}
-      <p className="mt-2 text-xs uppercase tracking-wide text-white/40">
+      <p className="mt-2 text-xs uppercase tracking-wide text-iron/40">
         {h.data.point_cost.toLocaleString()} pts
       </p>
     </Link>
@@ -245,13 +245,13 @@ function renderSpecial(h: SearchHit) {
   if (h.data.kind !== "special") return null;
   return (
     <Link href={`/brands/${h.data.community_id}`} className="block">
-      <p className="text-sm font-semibold text-white">{h.data.title}</p>
+      <p className="text-sm font-semibold text-iron">{h.data.title}</p>
       {h.data.description ? (
-        <p className="mt-1 line-clamp-2 text-xs text-white/70">
+        <p className="mt-1 line-clamp-2 text-xs text-iron/70">
           {h.data.description}
         </p>
       ) : null}
-      <p className="mt-2 text-xs uppercase tracking-wide text-white/40">
+      <p className="mt-2 text-xs uppercase tracking-wide text-iron/40">
         {h.data.community_id} · {h.data.tier === "public" ? "Members" : h.data.tier}
       </p>
     </Link>

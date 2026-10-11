@@ -61,7 +61,7 @@ export default async function AdminPostDraftsPage() {
   return (
     <main className="space-y-8">
       <header className="space-y-2">
-        <p className="text-sm uppercase tracking-wide text-white/60">
+        <p className="text-sm uppercase tracking-wide text-iron/60">
           Admin · Post drafts
         </p>
         <h1
@@ -70,7 +70,7 @@ export default async function AdminPostDraftsPage() {
         >
           Auto-generated post drafts
         </h1>
-        <p className="max-w-2xl text-sm text-white/70">
+        <p className="max-w-2xl text-sm text-iron/70">
           Click <span className="font-semibold">Generate draft</span> and
           AI will write a candidate community post using only real data
           (your upcoming events, recent admin posts, member comments).
@@ -82,7 +82,7 @@ export default async function AdminPostDraftsPage() {
         <form action={generateAction}>
           <button
             type="submit"
-            className="rounded-full bg-gradient-to-r from-aurora to-ember px-5 py-2.5 text-sm font-semibold text-white shadow-glass hover:brightness-110"
+            className="rounded-full bg-ember px-5 py-2.5 text-sm font-semibold text-linen shadow-glass hover:brightness-110"
           >
             ✨ Generate a new draft
           </button>
@@ -94,7 +94,7 @@ export default async function AdminPostDraftsPage() {
           Pending review ({pendingDrafts.length})
         </h2>
         {pendingDrafts.length === 0 ? (
-          <p className="rounded-2xl border border-white/10 bg-black/30 p-6 text-sm text-white/60">
+          <p className="rounded-lg border border-iron/10 bg-parchment/30 p-6 text-sm text-iron/60">
             No pending drafts. Click &ldquo;Generate a new draft&rdquo;
             above to create one.
           </p>
@@ -109,37 +109,37 @@ export default async function AdminPostDraftsPage() {
 
       {pastDrafts.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-lg font-semibold text-white/80">
+          <h2 className="text-lg font-semibold text-iron/80">
             Recent history
           </h2>
           <ul className="space-y-2">
             {pastDrafts.map((d) => (
               <li
                 key={d.id}
-                className="rounded-2xl border border-white/10 bg-black/30 p-4 text-xs"
+                className="rounded-lg border border-iron/10 bg-parchment/30 p-4 text-xs"
               >
                 <div className="flex items-center justify-between gap-2">
                   <span
                     className={`rounded-full border px-2 py-0.5 uppercase tracking-wide ${
                       d.status === "published"
-                        ? "border-emerald-300/30 bg-emerald-300/10 text-emerald-200"
-                        : "border-white/15 bg-white/5 text-white/60"
+                        ? "border-emerald-300/30 bg-emerald-300/10 text-sage-ink"
+                        : "border-iron/15 bg-iron/5 text-iron/60"
                     }`}
                   >
                     {d.status}
                   </span>
-                  <span className="text-white/40">
+                  <span className="text-iron/40">
                     {d.reviewed_at
                       ? new Date(d.reviewed_at).toLocaleString()
                       : new Date(d.created_at).toLocaleString()}
                   </span>
                 </div>
                 {d.suggested_title && (
-                  <p className="mt-2 text-sm font-semibold text-white/80">
+                  <p className="mt-2 text-sm font-semibold text-iron/80">
                     {d.suggested_title}
                   </p>
                 )}
-                <p className="mt-1 text-white/60 line-clamp-2">
+                <p className="mt-1 text-iron/60 line-clamp-2">
                   {d.suggested_body.length > 200
                     ? d.suggested_body.slice(0, 200) + "…"
                     : d.suggested_body}
@@ -158,17 +158,17 @@ function PendingDraftCard({ draft }: { draft: DraftRow }) {
     <li className="glass-card p-5">
       <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-2 text-xs">
-          <span className="rounded-full border border-aurora/30 bg-aurora/10 px-2 py-0.5 uppercase tracking-wide text-aurora">
+          <span className="rounded-full border border-aurora/30 bg-aurora/10 px-2 py-0.5 uppercase tracking-wide text-aurora-ink">
             {draft.kind === "announcement" ? "📢 Announcement" : "Post"}
           </span>
-          <span className="text-white/40">
+          <span className="text-iron/40">
             Drafted {new Date(draft.created_at).toLocaleString()}
           </span>
         </div>
 
         {draft.context_summary && (
-          <p className="rounded-xl border border-white/10 bg-black/30 p-3 text-xs text-white/70">
-            <span className="text-white/50">Based on: </span>
+          <p className="rounded-xl border border-iron/10 bg-parchment/30 p-3 text-xs text-iron/70">
+            <span className="text-iron/50">Based on: </span>
             {draft.context_summary}
           </p>
         )}
@@ -177,7 +177,7 @@ function PendingDraftCard({ draft }: { draft: DraftRow }) {
           <input type="hidden" name="draft_id" value={draft.id} />
 
           <div>
-            <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
+            <label className="mb-1 block text-xs uppercase tracking-wide text-iron/50">
               Title (optional)
             </label>
             <input
@@ -186,12 +186,12 @@ function PendingDraftCard({ draft }: { draft: DraftRow }) {
               defaultValue={draft.suggested_title ?? ""}
               maxLength={200}
               placeholder="(no title)"
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm placeholder-white/40 focus:border-aurora/40 outline-none"
+              className="w-full rounded-xl border border-iron/10 bg-parchment/40 px-3 py-2 text-sm placeholder-iron/40 focus:border-aurora/40 outline-none"
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-xs uppercase tracking-wide text-white/50">
+            <label className="mb-1 block text-xs uppercase tracking-wide text-iron/50">
               Body
             </label>
             <textarea
@@ -199,14 +199,14 @@ function PendingDraftCard({ draft }: { draft: DraftRow }) {
               defaultValue={draft.suggested_body}
               rows={6}
               maxLength={2000}
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm focus:border-aurora/40 outline-none"
+              className="w-full rounded-xl border border-iron/10 bg-parchment/40 px-3 py-2 text-sm focus:border-aurora/40 outline-none"
             />
           </div>
 
           <div className="flex flex-wrap gap-2">
             <button
               type="submit"
-              className="rounded-full bg-gradient-to-r from-aurora to-ember px-5 py-2 text-xs font-semibold text-white shadow-glass hover:brightness-110"
+              className="rounded-full bg-ember px-5 py-2 text-xs font-semibold text-linen shadow-glass hover:brightness-110"
             >
               Publish to community
             </button>
@@ -217,7 +217,7 @@ function PendingDraftCard({ draft }: { draft: DraftRow }) {
           <input type="hidden" name="draft_id" value={draft.id} />
           <button
             type="submit"
-            className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs text-white/60 hover:bg-white/10"
+            className="rounded-full border border-iron/15 bg-iron/5 px-4 py-1.5 text-xs text-iron/60 hover:bg-iron/10"
           >
             Discard
           </button>

@@ -37,18 +37,18 @@ export default async function LeaderboardMiniCard({
   return (
     <Link
       href={`/brands/${brandSlug}/leaderboard`}
-      className="group block rounded-2xl border border-white/10 bg-gradient-to-br from-amber-500/10 via-violet-500/5 to-rose-500/10 p-5 transition hover:border-white/20"
+      className="group block rounded-lg border border-iron/10 bg-gradient-to-br from-amber-500/10 via-violet-500/5 to-rose-500/10 p-5 transition hover:border-iron/20"
     >
       <header className="flex items-center justify-between">
         <div>
-          <p className="text-xs uppercase tracking-[0.25em] text-white/55">
+          <p className="text-xs uppercase tracking-[0.25em] text-iron/55">
             Top members · {board.monthLabel}
           </p>
-          <p className="mt-1 text-base font-semibold text-white">
+          <p className="mt-1 text-base font-semibold text-iron">
             This month&apos;s leaderboard
           </p>
         </div>
-        <span className="text-xs font-medium text-white/55 transition group-hover:text-white">
+        <span className="text-xs font-medium text-iron/55 transition group-hover:text-iron">
           See all →
         </span>
       </header>
@@ -57,13 +57,13 @@ export default async function LeaderboardMiniCard({
         {board.top.map((entry) => (
           <li
             key={entry.member_id}
-            className="flex items-center gap-3 rounded-lg bg-black/20 px-3 py-2"
+            className="flex items-center gap-3 rounded-lg bg-parchment/20 px-3 py-2"
           >
-            <span className="w-5 text-center text-xs font-semibold tabular-nums text-white/65">
+            <span className="w-5 text-center text-xs font-semibold tabular-nums text-iron/65">
               {entry.rank}
             </span>
             {entry.avatar_url ? (
-              <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full ring-1 ring-white/10">
+              <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full ring-1 ring-iron/10">
                 <Image
                   src={entry.avatar_url}
                   alt={entry.display_name}
@@ -73,28 +73,28 @@ export default async function LeaderboardMiniCard({
                 />
               </div>
             ) : (
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-semibold text-white">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-iron/10 text-xs font-semibold text-iron">
                 {entry.display_name.charAt(0).toUpperCase()}
               </div>
             )}
-            <p className="flex-1 truncate text-sm text-white">
+            <p className="flex-1 truncate text-sm text-iron">
               {entry.display_name}
               {user?.id === entry.member_id && (
-                <span className="ml-1.5 rounded-full bg-aurora/25 px-1.5 py-0.5 text-[9px] uppercase tracking-wide text-aurora">
+                <span className="ml-1.5 rounded-full bg-aurora/25 px-1.5 py-0.5 text-[9px] uppercase tracking-wide text-aurora-ink">
                   You
                 </span>
               )}
             </p>
-            <p className="text-xs font-semibold tabular-nums text-white/85">
+            <p className="text-xs font-semibold tabular-nums text-iron/85">
               {entry.score.toLocaleString()}{" "}
-              <span className="text-white/45">pts</span>
+              <span className="text-iron/45">pts</span>
             </p>
           </li>
         ))}
       </ul>
 
       {board.viewerEntry && board.viewerEntry.rank > 3 && (
-        <p className="mt-3 rounded-lg border border-aurora/20 bg-aurora/10 px-3 py-2 text-center text-xs text-white">
+        <p className="mt-3 rounded-lg border border-aurora/20 bg-aurora/10 px-3 py-2 text-center text-xs text-iron">
           You&apos;re{" "}
           <span className="font-semibold">#{board.viewerEntry.rank}</span> of{" "}
           {board.totalMembers} this month ·{" "}

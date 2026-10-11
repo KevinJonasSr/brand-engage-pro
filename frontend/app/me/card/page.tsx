@@ -42,16 +42,16 @@ export default async function MemberCardPage() {
   return (
     <main className="mx-auto max-w-lg px-4 py-10 sm:py-16 space-y-6">
       <header>
-        <p className="text-xs uppercase tracking-widest text-white/60">Your card</p>
+        <p className="text-xs uppercase tracking-widest text-iron/60">Your card</p>
         <h1 className="mt-1 text-3xl font-semibold tracking-tight">Member Card</h1>
-        <p className="mt-2 text-sm text-white/60">
+        <p className="mt-2 text-sm text-iron/60">
           Share this to flex your tier and invite friends.
         </p>
       </header>
 
       {/* The card itself */}
       <div
-        className="relative overflow-hidden rounded-3xl border border-white/10 p-8 shadow-glass"
+        className="relative overflow-hidden rounded-lg border border-iron/10 p-8 shadow-glass"
         style={{
           background: "linear-gradient(135deg, rgba(212,160,23,0.3) 0%, #0f172a 50%, rgba(245,101,40,0.2) 100%)",
         }}
@@ -66,13 +66,13 @@ export default async function MemberCardPage() {
           {/* Header row */}
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-white/50">
+              <p className="text-xs uppercase tracking-[0.3em] text-iron/50">
                 Brand Engage Pro
               </p>
               <p className="mt-2 text-2xl font-semibold">{displayName}</p>
             </div>
             <div className="text-right">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-sm font-semibold">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-iron/10 px-3 py-1 text-sm font-semibold">
                 <span className="text-base">{tierIcon(currentTier)}</span>
                 {currentTierData?.display_name ?? "Bronze"}
               </span>
@@ -87,19 +87,19 @@ export default async function MemberCardPage() {
             >
               {totalPoints.toLocaleString()}
             </p>
-            <p className="mt-1 text-sm text-white/50">total points</p>
+            <p className="mt-1 text-sm text-iron/50">total points</p>
           </div>
 
           {/* Progress to next tier */}
           {nextTierData && kpis?.points_to_next_tier != null && (
             <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs text-white/50">
+              <div className="flex items-center justify-between text-xs text-iron/50">
                 <span>{currentTierData?.display_name}</span>
                 <span>{nextTierData.display_name}</span>
               </div>
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-iron/10">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-aurora to-ember transition-all"
+                  className="h-full rounded-full bg-ember transition-all"
                   style={{
                     width: `${Math.min(
                       100,
@@ -113,7 +113,7 @@ export default async function MemberCardPage() {
                   }}
                 />
               </div>
-              <p className="text-xs text-white/40">
+              <p className="text-xs text-iron/40">
                 {kpis.points_to_next_tier.toLocaleString()} pts to{" "}
                 {nextTierData.display_name}
               </p>
@@ -121,20 +121,20 @@ export default async function MemberCardPage() {
           )}
 
           {/* Badges / stats row */}
-          <div className="flex gap-4 border-t border-white/10 pt-4 text-center">
+          <div className="flex gap-4 border-t border-iron/10 pt-4 text-center">
             <div className="flex-1">
               <p className="text-lg font-semibold">{kpis?.badge_count ?? 0}</p>
-              <p className="text-xs text-white/50">Badges</p>
+              <p className="text-xs text-iron/50">Badges</p>
             </div>
             <div className="flex-1">
               <p className="text-lg font-semibold">{kpis?.referral_count ?? 0}</p>
-              <p className="text-xs text-white/50">Referrals</p>
+              <p className="text-xs text-iron/50">Referrals</p>
             </div>
             <div className="flex-1">
               <p className="text-lg font-semibold">
                 {currentTierData?.min_points?.toLocaleString() ?? "—"}
               </p>
-              <p className="text-xs text-white/50">Tier min pts</p>
+              <p className="text-xs text-iron/50">Tier min pts</p>
             </div>
           </div>
         </div>
@@ -151,15 +151,15 @@ export default async function MemberCardPage() {
         />
         <a
           href="/"
-          className="block w-full rounded-full border border-white/15 py-3 text-center text-sm font-medium text-white/70 hover:bg-white/5 transition"
+          className="block w-full rounded-full border border-iron/15 py-3 text-center text-sm font-medium text-iron/70 hover:bg-iron/5 transition"
         >
           Back to dashboard
         </a>
       </div>
 
-      <p className="text-center text-xs text-white/35">
+      <p className="text-center text-xs text-iron/35">
         Members can view your public profile at{" "}
-        <span className="text-white/55">/members/{member.id}</span>
+        <span className="text-iron/55">/members/{member.id}</span>
       </p>
     </main>
   );

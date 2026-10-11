@@ -113,8 +113,8 @@ export default function NewPostForm({
               onClick={() => setKind(k)}
               className={`rounded-full border px-3 py-1 text-xs capitalize transition ${
                 kind === k
-                  ? "border-aurora/60 bg-aurora/20 text-white"
-                  : "border-white/10 bg-black/30 text-white/70 hover:bg-black/50"
+                  ? "border-aurora/60 bg-aurora/20 text-iron"
+                  : "border-iron/10 bg-parchment/30 text-iron/70 hover:bg-parchment/50"
               }`}
             >
               {k === "post"
@@ -127,7 +127,7 @@ export default function NewPostForm({
             </button>
           ))}
           {kind !== "post" && (
-            <div className="ml-auto flex items-center gap-1 rounded-full border border-white/15 bg-black/30 p-0.5">
+            <div className="ml-auto flex items-center gap-1 rounded-full border border-iron/15 bg-parchment/30 p-0.5">
               {(["public", "premium", "founder-only"] as Visibility[]).map((v) => {
                 const isActive = visibility === v;
                 const labels: Record<Visibility, string> = {
@@ -150,11 +150,11 @@ export default function NewPostForm({
                     className={`rounded-full px-2.5 py-1 text-xs font-semibold transition ${
                       isActive
                         ? v === "premium"
-                          ? "border border-amber-300/70 bg-gradient-to-r from-aurora/30 to-ember/30 text-white"
+                          ? "border border-amber-300/70 bg-gradient-to-r from-aurora/30 to-ember/30 text-iron"
                           : v === "founder-only"
-                            ? "border border-amber-300/70 bg-gradient-to-r from-amber-500/30 to-yellow-500/30 text-white"
-                            : "border border-cyan-300/70 bg-gradient-to-r from-aurora/30 to-cyan-500/30 text-white"
-                        : "text-white/60 hover:text-white/80"
+                            ? "border border-amber-300/70 bg-gradient-to-r from-amber-500/30 to-yellow-500/30 text-iron"
+                            : "border border-cyan-300/70 bg-gradient-to-r from-aurora/30 to-cyan-500/30 text-iron"
+                        : "text-iron/60 hover:text-iron/80"
                     }`}
                   >
                     {labels[v]}
@@ -176,7 +176,7 @@ export default function NewPostForm({
               ? "Announcement headline (optional)"
               : "Challenge title (optional)"
           }
-          className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-2 text-sm text-white placeholder:text-white/40 focus:border-white/40 focus:outline-none"
+          className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-4 py-2 text-sm text-iron placeholder:text-iron/40 focus:border-iron/40 focus:outline-none"
         />
       )}
 
@@ -196,7 +196,7 @@ export default function NewPostForm({
                 : "What's on your mind? Share with the community…"
         }
         rows={3}
-        className="w-full resize-none rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-white/40 focus:outline-none"
+        className="w-full resize-none rounded-lg border border-iron/10 bg-parchment/40 px-4 py-3 text-sm text-iron placeholder:text-iron/40 focus:border-iron/40 focus:outline-none"
       />
 
       {/* AI #5 — TagSuggester (lights M-2 filter chips on submit) */}
@@ -206,7 +206,7 @@ export default function NewPostForm({
 
       {kind === "poll" && (
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-wide text-white/50">Options</p>
+          <p className="text-xs uppercase tracking-wide text-iron/50">Options</p>
           {pollOptions.map((opt, i) => (
             <div key={i} className="flex items-center gap-2">
               <input
@@ -219,7 +219,7 @@ export default function NewPostForm({
                 }}
                 maxLength={120}
                 placeholder={`Option ${i + 1}`}
-                className="flex-1 rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-white/40 focus:outline-none"
+                className="flex-1 rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm text-iron placeholder:text-iron/40 focus:border-iron/40 focus:outline-none"
               />
               {pollOptions.length > 2 && (
                 <button
@@ -227,7 +227,7 @@ export default function NewPostForm({
                   onClick={() =>
                     setPollOptions(pollOptions.filter((_, idx) => idx !== i))
                   }
-                  className="text-xs text-rose-300/80 hover:text-rose-300"
+                  className="text-xs text-ember/80 hover:text-ember"
                 >
                   Remove
                 </button>
@@ -238,7 +238,7 @@ export default function NewPostForm({
             <button
               type="button"
               onClick={() => setPollOptions([...pollOptions, ""])}
-              className="text-xs text-white/60 hover:text-white"
+              className="text-xs text-iron/60 hover:text-iron"
             >
               + Add option
             </button>
@@ -271,7 +271,7 @@ export default function NewPostForm({
 
       <div className="flex items-center justify-between gap-3">
         {kind === "poll" ? (
-          <span className="text-xs text-white/50">
+          <span className="text-xs text-iron/50">
             {pollOptions.filter((o) => o.trim()).length} of 6 options
           </span>
         ) : (
@@ -285,7 +285,7 @@ export default function NewPostForm({
               submitting ||
               (kind === "poll" && pollOptions.filter((o) => o.trim()).length < 2)
             }
-            className="rounded-full bg-gradient-to-r from-aurora to-ember px-5 py-2 text-sm font-semibold text-white shadow-glass transition hover:brightness-110 disabled:opacity-50"
+            className="rounded-full bg-ember px-5 py-2 text-sm font-semibold text-linen shadow-glass transition hover:brightness-110 disabled:opacity-50"
           >
             {submitting ? "Posting…" : submitLabel}
           </button>

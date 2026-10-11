@@ -344,11 +344,11 @@ export function TurnstileWidget({
           className="space-y-2 outline-none"
         >
           <div className="space-y-2 rounded-xl border border-rose-400/30 bg-rose-500/10 px-3 py-2">
-            <p className="text-xs text-rose-200">{TURNSTILE_WIDGET_ERROR_COPY}</p>
+            <p className="text-xs text-ember">{TURNSTILE_WIDGET_ERROR_COPY}</p>
             <button
               type="button"
               onClick={handleRetry}
-              className="rounded-full border border-white/20 px-3 py-1 text-xs font-medium text-white/80 hover:bg-white/10"
+              className="rounded-full border border-iron/20 px-3 py-1 text-xs font-medium text-iron/80 hover:bg-iron/10"
             >
               Retry security check
             </button>
@@ -383,13 +383,13 @@ export function TurnstileWidget({
       >
         {loadState === "loading" && (
           <div
-            className="absolute inset-0 z-10 flex flex-col justify-center gap-2 rounded-lg border border-white/15 bg-black/70 px-3 py-2"
+            className="absolute inset-0 z-10 flex flex-col justify-center gap-2 rounded-lg border border-iron/15 bg-parchment/70 px-3 py-2"
             role="status"
             aria-live="polite"
           >
-            <div className="h-3 w-2/3 animate-pulse rounded bg-white/20" />
-            <div className="h-3 w-1/2 animate-pulse rounded bg-white/10" />
-            <p className="text-xs text-white/70">{turnstileSlowLoadHint(slowLoad)}</p>
+            <div className="h-3 w-2/3 animate-pulse rounded bg-iron/20" />
+            <div className="h-3 w-1/2 animate-pulse rounded bg-iron/10" />
+            <p className="text-xs text-iron/70">{turnstileSlowLoadHint(slowLoad)}</p>
           </div>
         )}
         <div
@@ -400,11 +400,11 @@ export function TurnstileWidget({
       </div>
       {loadState === "error" && (
         <div className="space-y-2 rounded-xl border border-rose-400/30 bg-rose-500/10 px-3 py-2">
-          <p className="text-xs text-rose-200">{TURNSTILE_WIDGET_ERROR_COPY}</p>
+          <p className="text-xs text-ember">{TURNSTILE_WIDGET_ERROR_COPY}</p>
           <button
             type="button"
             onClick={handleRetry}
-            className="rounded-full border border-white/20 px-3 py-1 text-xs font-medium text-white/80 hover:bg-white/10"
+            className="rounded-full border border-iron/20 px-3 py-1 text-xs font-medium text-iron/80 hover:bg-iron/10"
           >
             Retry security check
           </button>

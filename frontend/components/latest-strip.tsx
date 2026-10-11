@@ -26,10 +26,10 @@ const KIND_LABEL: Record<CardKind, string> = {
 };
 
 const KIND_COLOR: Record<CardKind, string> = {
-  post: "text-fuchsia-300 border-fuchsia-300/30",
-  event: "text-emerald-300 border-emerald-300/30",
-  drop: "text-amber-300 border-amber-300/30",
-  prediction: "text-sky-300 border-sky-300/30",
+  post: "text-fuchsia-800 border-fuchsia-300/30",
+  event: "text-sage-ink border-emerald-300/30",
+  drop: "text-aurora-ink border-amber-300/30",
+  prediction: "text-sky-800 border-sky-300/30",
 };
 
 /**
@@ -71,7 +71,7 @@ export async function LatestStrip({ slug }: { slug: string }) {
       className="mt-6"
     >
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-xs uppercase tracking-widest text-white/60">
+        <h2 className="text-xs uppercase tracking-widest text-iron/60">
           Latest
         </h2>
       </div>
@@ -80,7 +80,7 @@ export async function LatestStrip({ slug }: { slug: string }) {
           <Link
             key={c.kind + ":" + i + ":" + c.ts}
             href={c.href}
-            className="group flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.02] p-4 transition hover:border-white/25 hover:bg-white/[0.04]"
+            className="group flex h-full flex-col rounded-lg border border-iron/10 bg-iron/[0.02] p-4 transition hover:border-iron/25 hover:bg-iron/[0.04]"
           >
             <div className="mb-2 flex items-center justify-between">
               <span
@@ -91,13 +91,13 @@ export async function LatestStrip({ slug }: { slug: string }) {
               >
                 {KIND_LABEL[c.kind]}
               </span>
-              <span className="text-xs text-white/40">{c.when}</span>
+              <span className="text-xs text-iron/40">{c.when}</span>
             </div>
-            <div className="font-medium leading-snug group-hover:text-white">
+            <div className="font-medium leading-snug group-hover:text-iron">
               {c.title}
             </div>
             {c.body && (
-              <p className="mt-1 line-clamp-2 text-sm text-white/60">
+              <p className="mt-1 line-clamp-2 text-sm text-iron/60">
                 {c.body}
               </p>
             )}

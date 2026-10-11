@@ -50,10 +50,10 @@ function statusLine(m: MembershipRow): string {
 
 function StatusPill({ tier }: { tier: string }) {
   const styles: Record<string, { label: string; cls: string }> = {
-    premium: { label: "Active", cls: "bg-emerald-500/20 text-emerald-300" },
-    comped: { label: "Comped", cls: "bg-sky-500/20 text-sky-300" },
-    past_due: { label: "Past due", cls: "bg-yellow-500/20 text-yellow-300" },
-    cancelled: { label: "Cancelled", cls: "bg-white/10 text-white/60" },
+    premium: { label: "Active", cls: "bg-emerald-500/20 text-sage-ink" },
+    comped: { label: "Comped", cls: "bg-sky-500/20 text-sky-800" },
+    past_due: { label: "Past due", cls: "bg-yellow-500/20 text-aurora-ink" },
+    cancelled: { label: "Cancelled", cls: "bg-iron/10 text-iron/60" },
   };
   const s = styles[tier] ?? styles.cancelled;
   return (
@@ -102,12 +102,12 @@ export default async function BillingPage({
       <header className="mb-8">
         <Link
           href="/me"
-          className="text-xs uppercase tracking-widest text-white/60 hover:text-white"
+          className="text-xs uppercase tracking-widest text-iron/60 hover:text-iron"
         >
           ← Account
         </Link>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight">Billing</h1>
-        <p className="mt-3 text-white/70">
+        <p className="mt-3 text-iron/70">
           See your Premium memberships, update your card, or cancel.
         </p>
       </header>
@@ -115,7 +115,7 @@ export default async function BillingPage({
       {errorMessage && (
         <div
           role="alert"
-          className="mb-6 rounded-2xl border border-yellow-500/30 bg-yellow-500/10 p-4 text-sm text-yellow-200"
+          className="mb-6 rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-4 text-sm text-aurora-ink"
         >
           {errorMessage}
         </div>
@@ -123,7 +123,7 @@ export default async function BillingPage({
 
       {memberships.length > 0 && (
         <section className="mb-8 space-y-3">
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-white/50">
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-iron/50">
             Memberships
           </h2>
           <ul className="space-y-3">
@@ -132,14 +132,14 @@ export default async function BillingPage({
               return (
                 <li
                   key={m.community_id}
-                  className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.02] p-4"
+                  className="flex items-center justify-between rounded-xl border border-iron/10 bg-iron/[0.02] p-4"
                 >
                   <div>
                     <div className="font-medium capitalize">
                       {m.community_id.replace(/-/g, " ")}
                     </div>
                     {line && (
-                      <div className="mt-0.5 text-sm capitalize text-white/60">
+                      <div className="mt-0.5 text-sm capitalize text-iron/60">
                         {line}
                       </div>
                     )}
@@ -153,13 +153,13 @@ export default async function BillingPage({
       )}
 
       {!hasStripe && (
-        <div className="rounded-2xl border border-yellow-500/30 bg-yellow-500/10 p-5 text-sm text-yellow-200">
+        <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-5 text-sm text-aurora-ink">
           Billing is not set up in this environment yet.
         </div>
       )}
 
       {hasStripe && !hasCustomer && (
-        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 text-sm text-white/70">
+        <div className="rounded-lg border border-iron/10 bg-iron/[0.02] p-5 text-sm text-iron/70">
           You don&apos;t have a paid subscription. Membership is free for guests.
         </div>
       )}
@@ -169,12 +169,12 @@ export default async function BillingPage({
           <form action={openBillingPortalAction}>
             <button
               type="submit"
-              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white transition hover:brightness-110"
+              className="inline-flex items-center gap-2 rounded-full bg-ember px-6 py-3 text-sm font-semibold text-linen transition hover:brightness-110"
             >
               Manage billing or cancel
             </button>
           </form>
-          <p className="text-xs text-white/50">
+          <p className="text-xs text-iron/50">
             Opens Stripe&apos;s secure billing portal, where you can update
             your card, switch plans, see invoices, or cancel. You&apos;ll come
             back here when you&apos;re done.

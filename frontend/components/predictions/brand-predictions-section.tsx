@@ -103,7 +103,7 @@ export async function BrandPredictionsSection({
     <section className="space-y-3">
       <header className="flex items-center justify-between">
         <h2
-          className="text-sm font-semibold uppercase tracking-[0.18em] text-white/65"
+          className="text-sm font-semibold uppercase tracking-[0.18em] text-iron/65"
           style={{ fontFamily: "var(--font-display)" }}
         >
           Predictions

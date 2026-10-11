@@ -120,21 +120,21 @@ export default function ImageUploader({
           <img
             src={url}
             alt=""
-            className="max-h-64 w-full rounded-2xl border border-white/10 object-cover"
+            className="max-h-64 w-full rounded-lg border border-iron/10 object-cover"
           />
           <div className="flex gap-2">
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
               disabled={uploading}
-              className="rounded-full border border-white/20 px-3 py-1 text-xs text-white/70 hover:bg-white/10 disabled:opacity-50"
+              className="rounded-full border border-iron/20 px-3 py-1 text-xs text-iron/70 hover:bg-iron/10 disabled:opacity-50"
             >
               {uploading ? status ?? "Uploading…" : "Replace"}
             </button>
             <button
               type="button"
               onClick={() => setUrl(null)}
-              className="rounded-full border border-white/20 px-3 py-1 text-xs text-rose-300/80 hover:text-rose-300"
+              className="rounded-full border border-iron/20 px-3 py-1 text-xs text-ember/80 hover:text-ember"
             >
               Remove
             </button>
@@ -145,12 +145,12 @@ export default function ImageUploader({
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
-          className="rounded-full border border-dashed border-white/20 bg-black/30 px-4 py-2 text-xs text-white/70 hover:bg-black/50 disabled:opacity-50"
+          className="rounded-full border border-dashed border-iron/20 bg-parchment/30 px-4 py-2 text-xs text-iron/70 hover:bg-parchment/50 disabled:opacity-50"
         >
           {uploading ? status ?? "Uploading…" : `📷 ${label}`}
         </button>
       )}
-      {error && <p className="text-xs text-rose-300">{error}</p>}
+      {error && <p className="text-xs text-ember">{error}</p>}
     </div>
   );
 }

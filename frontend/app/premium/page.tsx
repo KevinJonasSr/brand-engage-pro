@@ -65,8 +65,8 @@ export default async function PremiumPage({
   const community = row as CommunityWithPricing | null;
   if (!community) {
     return (
-      <main className="mx-auto max-w-2xl px-6 py-16 text-white/70">
-        <h1 className="text-2xl font-semibold text-white">Not found</h1>
+      <main className="mx-auto max-w-2xl px-6 py-16 text-iron/70">
+        <h1 className="text-2xl font-semibold text-iron">Not found</h1>
         <p className="mt-2">This community isn&apos;t available yet.</p>
       </main>
     );
@@ -120,20 +120,20 @@ export default async function PremiumPage({
       <div className="relative mx-auto max-w-5xl px-6 py-16">
         {/* Alerts */}
         {params.canceled && (
-          <div className="mb-8 rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/75">
+          <div className="mb-8 rounded-xl border border-iron/15 bg-iron/5 px-4 py-3 text-sm text-iron/75">
             Checkout canceled. You can pick up where you left off whenever
             you&apos;re ready.
           </div>
         )}
         {params.already_active && (
-          <div className="mb-8 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+          <div className="mb-8 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-sage-ink">
             You&apos;re already a Premium member of {community.display_name} —
             welcome back.
           </div>
         )}
 
         {/* Header */}
-        <p className="text-xs uppercase tracking-widest text-white/50">
+        <p className="text-xs uppercase tracking-widest text-iron/50">
           Premium Member Club
         </p>
         <h1
@@ -150,7 +150,7 @@ export default async function PremiumPage({
             Premium
           </span>
         </h1>
-        <p className="mt-3 max-w-2xl text-lg text-white/70">
+        <p className="mt-3 max-w-2xl text-lg text-iron/70">
           {community.tagline ?? `The inner circle of the ${community.display_name} community.`}{" "}
           {fmtPrice(monthly)}/month or {fmtPrice(annual)}/year — everything
           below, no ads, no gimmicks.
@@ -159,7 +159,7 @@ export default async function PremiumPage({
         {/* Founder banner */}
         {!founder.isFull && (
           <div
-            className="mt-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-gradient-to-r from-aurora/20 to-ember/20 px-4 py-2 text-xs font-medium text-white"
+            className="mt-6 inline-flex items-center gap-2 rounded-full border border-iron/15 bg-gradient-to-r from-aurora/20 to-ember/20 px-4 py-2 text-xs font-medium text-iron"
             style={{
               borderColor: `${community.accent_from}66`,
             }}
@@ -169,7 +169,7 @@ export default async function PremiumPage({
           </div>
         )}
         {founder.isFull && (
-          <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-white/55">
+          <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-iron/10 bg-iron/5 px-4 py-2 text-xs text-iron/55">
             Founding 100 is full. Premium is still available as a separate
             paid club — {fmtPrice(community.monthly_price_cents)}/mo or{" "}
             {fmtPrice(community.annual_price_cents)}/yr.
@@ -181,7 +181,7 @@ export default async function PremiumPage({
           <div className="mt-3">
             <Link
               href={`/brands/${communityId}/founders`}
-              className="text-xs text-white/60 hover:text-white/80 transition"
+              className="text-xs text-iron/60 hover:text-iron/80 transition"
             >
               See who&apos;s already a Founding Member →
             </Link>
@@ -190,15 +190,15 @@ export default async function PremiumPage({
 
         {/* Already-Premium state */}
         {isPremium && (
-          <section className="mt-10 rounded-3xl border border-emerald-500/40 bg-emerald-500/10 p-6">
-            <p className="text-xs uppercase tracking-widest text-emerald-300">
+          <section className="mt-10 rounded-lg border border-emerald-500/40 bg-emerald-500/10 p-6">
+            <p className="text-xs uppercase tracking-widest text-sage-ink">
               You&apos;re in
             </p>
             <h2 className="mt-1 text-2xl font-semibold">
               Premium is active{tier === "comped" && " (comped access)"}
               {tier === "past_due" && " — card needs attention"}
             </h2>
-            <p className="mt-2 text-sm text-white/70">
+            <p className="mt-2 text-sm text-iron/70">
               {tier === "past_due"
                 ? "Your most recent payment failed and Stripe is retrying. Update your card to keep access when the grace period ends."
                 : tier === "comped"
@@ -208,14 +208,14 @@ export default async function PremiumPage({
             <div className="mt-4 flex gap-3">
             <Link
               href={`/brands/${communityId}`}
-              className="rounded-full bg-white/10 px-4 py-2 text-sm text-white hover:bg-white/15"
+              className="rounded-full bg-iron/10 px-4 py-2 text-sm text-iron hover:bg-iron/15"
             >
                 Back to community
               </Link>
               {tier !== "comped" && (
                 <Link
                   href="/account/billing"
-                  className="rounded-full border border-white/20 px-4 py-2 text-sm text-white/80 hover:bg-white/5"
+                  className="rounded-full border border-iron/20 px-4 py-2 text-sm text-iron/80 hover:bg-iron/5"
                 >
                   Manage billing →
                 </Link>
@@ -234,9 +234,9 @@ export default async function PremiumPage({
               <button
                 type="submit"
                 disabled={Boolean(user) && !community.stripe_product_id}
-                className="group flex flex-col items-start rounded-3xl border border-white/10 bg-black/40 p-6 text-left transition hover:border-white/25 hover:bg-white/5 disabled:opacity-50"
+                className="group flex flex-col items-start rounded-lg border border-iron/10 bg-parchment/40 p-6 text-left transition hover:border-iron/25 hover:bg-iron/5 disabled:opacity-50"
               >
-                <p className="text-xs uppercase tracking-widest text-white/50">
+                <p className="text-xs uppercase tracking-widest text-iron/50">
                   Monthly
                 </p>
                 <p
@@ -244,15 +244,15 @@ export default async function PremiumPage({
                   style={{ fontFamily: "var(--font-display)" }}
                 >
                   {fmtPrice(monthly)}
-                  <span className="ml-1 text-base font-normal text-white/50">
+                  <span className="ml-1 text-base font-normal text-iron/50">
                     /mo
                   </span>
                 </p>
-                <p className="mt-2 text-xs text-white/55">
+                <p className="mt-2 text-xs text-iron/55">
                   Cancel anytime. No long-term commitment.
                 </p>
                 <span
-                  className="mt-6 inline-flex rounded-full px-4 py-2 text-sm font-semibold text-white transition group-hover:brightness-110"
+                  className="mt-6 inline-flex rounded-full px-4 py-2 text-sm font-semibold text-iron transition group-hover:brightness-110"
                   style={{
                     backgroundImage: `linear-gradient(90deg, ${community.accent_from}, ${community.accent_to})`,
                   }}
@@ -269,12 +269,12 @@ export default async function PremiumPage({
               <button
                 type="submit"
                 disabled={Boolean(user) && !community.stripe_product_id}
-                className="group relative flex flex-col items-start rounded-3xl border-2 border-white/20 bg-gradient-to-br from-white/8 to-black/40 p-6 text-left transition hover:border-white/35 disabled:opacity-50"
+                className="group relative flex flex-col items-start rounded-lg border-2 border-iron/20 bg-gradient-to-br from-iron/8 to-parchment/40 p-6 text-left transition hover:border-iron/35 disabled:opacity-50"
               >
-                <span className="absolute right-4 top-4 rounded-full bg-white/15 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-white">
+                <span className="absolute right-4 top-4 rounded-full bg-iron/15 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-iron">
                   Save {annualSavingsPct}%
                 </span>
-                <p className="text-xs uppercase tracking-widest text-white/50">
+                <p className="text-xs uppercase tracking-widest text-iron/50">
                   Annual
                 </p>
                 <p
@@ -282,15 +282,15 @@ export default async function PremiumPage({
                   style={{ fontFamily: "var(--font-display)" }}
                 >
                   {fmtPrice(annual)}
-                  <span className="ml-1 text-base font-normal text-white/50">
+                  <span className="ml-1 text-base font-normal text-iron/50">
                     /yr
                   </span>
                 </p>
-                <p className="mt-2 text-xs text-white/55">
+                <p className="mt-2 text-xs text-iron/55">
                   Works out to {fmtPrice(annualMonthlyEquiv)}/mo. Two months free.
                 </p>
                 <span
-                  className="mt-6 inline-flex rounded-full px-4 py-2 text-sm font-semibold text-white transition group-hover:brightness-110"
+                  className="mt-6 inline-flex rounded-full px-4 py-2 text-sm font-semibold text-iron transition group-hover:brightness-110"
                   style={{
                     backgroundImage: `linear-gradient(90deg, ${community.accent_from}, ${community.accent_to})`,
                   }}
@@ -304,13 +304,13 @@ export default async function PremiumPage({
 
         {/* Signed-out prompt */}
         {!user && (
-          <p className="mt-4 text-sm text-white/60">
+          <p className="mt-4 text-sm text-iron/60">
             You&apos;ll need to{" "}
-            <Link href={signupHref} className="underline hover:text-white">
+            <Link href={signupHref} className="underline hover:text-iron">
               create a free member profile
             </Link>{" "}
             or{" "}
-            <Link href={loginHref} className="underline hover:text-white">
+            <Link href={loginHref} className="underline hover:text-iron">
               sign in
             </Link>{" "}
             before you can subscribe. It takes 60 seconds.
@@ -319,7 +319,7 @@ export default async function PremiumPage({
 
         {/* Perks */}
         <section className="mt-16">
-          <p className="text-xs uppercase tracking-widest text-white/50">
+          <p className="text-xs uppercase tracking-widest text-iron/50">
             What you get
           </p>
           <h2
@@ -332,25 +332,25 @@ export default async function PremiumPage({
             {perks.map((p) => (
               <div
                 key={p.title}
-                className="rounded-2xl border border-white/10 bg-black/30 p-5"
+                className="rounded-lg border border-iron/10 bg-parchment/30 p-5"
               >
                 <p className="text-2xl">{p.icon}</p>
                 <p className="mt-2 font-semibold">{p.title}</p>
-                <p className="mt-1 text-sm text-white/60">{p.body}</p>
+                <p className="mt-1 text-sm text-iron/60">{p.body}</p>
               </div>
             ))}
           </div>
         </section>
 
-        <p className="mt-12 text-xs text-white/40">
+        <p className="mt-12 text-xs text-iron/40">
           Secure checkout via Stripe. Cancel anytime from{" "}
-          <Link href="/me/billing" className="underline hover:text-white/70">
+          <Link href="/me/billing" className="underline hover:text-iron/70">
             Account, Billing
           </Link>
           . See our{" "}
           <Link
             href="/cancellation-refund"
-            className="underline hover:text-white/70"
+            className="underline hover:text-iron/70"
           >
             Cancellation &amp; Refund Policy
           </Link>

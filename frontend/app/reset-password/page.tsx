@@ -12,7 +12,7 @@ export default function ResetPasswordPage() {
     <Suspense
       fallback={
         <main className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center px-6 py-12">
-          <div className="glass-card p-8 text-center text-sm text-white/60">Loading…</div>
+          <div className="glass-card p-8 text-center text-sm text-iron/60">Loading…</div>
         </main>
       }
     >
@@ -87,18 +87,18 @@ function ResetPasswordForm() {
     <main className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center gap-6 px-6 py-12">
       <div className="glass-card space-y-6 p-8">
         <div className="space-y-2">
-          <p className="text-sm uppercase tracking-wide text-white/60">Brand Engage Pro</p>
+          <p className="text-sm uppercase tracking-wide text-iron/60">Brand Engage Pro</p>
           <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
             Choose a new password
           </h1>
-          <p className="text-sm text-white/70">
+          <p className="text-sm text-iron/70">
             Enter a new password for your member account.
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-wide text-white/60">New password</span>
+            <span className="text-xs uppercase tracking-wide text-iron/60">New password</span>
             <input
               type="password"
               required
@@ -106,12 +106,12 @@ function ResetPasswordForm() {
               minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-white/40 focus:outline-none"
+              className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-4 py-3 text-sm text-iron placeholder:text-iron/40 focus:border-iron/40 focus:outline-none"
               placeholder="••••••••"
             />
           </label>
           <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-wide text-white/60">Confirm password</span>
+            <span className="text-xs uppercase tracking-wide text-iron/60">Confirm password</span>
             <input
               type="password"
               required
@@ -119,22 +119,22 @@ function ResetPasswordForm() {
               minLength={8}
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
-              className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-white/40 focus:outline-none"
+              className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-4 py-3 text-sm text-iron placeholder:text-iron/40 focus:border-iron/40 focus:outline-none"
               placeholder="••••••••"
             />
           </label>
           <button
             type="submit"
             disabled={status === "loading"}
-            className="w-full rounded-full bg-gradient-to-r from-aurora to-ember px-4 py-3 text-sm font-semibold text-white shadow-glass disabled:opacity-60"
+            className="w-full rounded-full bg-ember px-4 py-3 text-sm font-semibold text-linen shadow-glass disabled:opacity-60"
           >
             {status === "loading" ? "Saving…" : "Update password"}
           </button>
           {status === "error" && message && (
-            <p className="text-sm text-red-300">{message}</p>
+            <p className="text-sm text-ember">{message}</p>
           )}
-          <p className="text-center text-sm text-white/60">
-            <Link href="/login" className="text-white underline-offset-4 hover:underline">
+          <p className="text-center text-sm text-iron/60">
+            <Link href="/login" className="text-iron underline-offset-4 hover:underline">
               Back to sign in
             </Link>
           </p>

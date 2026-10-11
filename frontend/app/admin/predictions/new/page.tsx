@@ -41,14 +41,14 @@ export default async function NewPredictionPage() {
           >
             New prediction
           </h1>
-          <p className="mt-1 text-sm text-white/65">
+          <p className="mt-1 text-sm text-iron/65">
             Pose a question with a verifiable answer. Members vote — you reveal
             the result later and points get awarded automatically.
           </p>
         </div>
         <Link
           href="/admin/predictions"
-          className="rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/75 hover:bg-white/5"
+          className="rounded-lg border border-iron/15 px-3 py-1.5 text-xs text-iron/75 hover:bg-iron/5"
         >
           ← Back to queue
         </Link>

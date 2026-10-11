@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 /*
@@ -18,27 +18,41 @@ html {
 }
 
 @theme inline {
-  --color-midnight: #050b1f;
+  /* Front Porch Supper, linen daylight world (Art Direction item 3) */
+  --color-linen: #F5EFE4;
+  --color-parchment: #EADFCB;
+  --color-iron: #1E1B17;
   --color-aurora: #D4A017;
+  --color-aurora-ink: #7A5A06;
   --color-ember: #9B2335;
-  --color-glass: rgba(15, 23, 42, 0.45);
-  --font-display: var(--font-display, "Space Grotesk", "Inter", sans-serif);
+  --color-sage: #7E8B6A;
+  --color-sage-ink: #4F5A3F;
+  --color-glass: rgba(245, 239, 228, 0.9);
+  --font-display: var(--font-display, "Young Serif", Georgia, serif);
   --font-body: var(--font-body, "Inter", sans-serif);
-  --shadow-glass: 0 25px 50px -12px rgba(15, 23, 42, 0.45);
+  --font-mono: var(--font-mono, "IBM Plex Mono", ui-monospace, monospace);
+  --shadow-glass: 0 1px 0 rgba(30, 27, 23, 0.04);
 }
 
 body {
-  background-color: var(--color-midnight);
-  color: white;
+  background-color: var(--color-linen);
+  color: var(--color-iron);
   font-family: var(--font-body);
 }
 
+/* Young Serif ships one weight; keep headlines at 400 so nothing fakes bold. */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+}
+
+/* Paper card: flat linen, one iron hairline, 8px corners. No glass. */
 .glass-card {
-  background-color: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
-  box-shadow: var(--shadow-glass);
-  backdrop-filter: blur(24px);
+  background-color: var(--color-linen);
+  border: 1px solid rgba(30, 27, 23, 0.14);
+  border-radius: 8px;
 }
 
 /*

@@ -70,7 +70,7 @@ export default function EditEventForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="mt-3 grid gap-2 rounded-2xl border border-white/10 bg-black/30 p-3 md:grid-cols-2"
+      className="mt-3 grid gap-2 rounded-lg border border-iron/10 bg-parchment/30 p-3 md:grid-cols-2"
     >
       <input type="hidden" name="event_id" value={event.id} />
       <input type="hidden" name="brand_slug" value={brandSlug} />
@@ -80,53 +80,53 @@ export default function EditEventForm({
         required
         defaultValue={event.title}
         placeholder="Event title"
-        className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm md:col-span-2"
+        className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm md:col-span-2"
       />
       <input
         name="starts_at"
         type="datetime-local"
         defaultValue={startsAtLocal}
-        className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+        className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
       />
       <input
         name="event_date"
         defaultValue={event.event_date ?? ""}
         placeholder="Display date (Mar 14 · 7 PM)"
-        className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+        className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
       />
       <input
         name="location"
         defaultValue={event.location ?? ""}
         placeholder="Location (Nashville, TN)"
-        className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+        className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
       />
       <input
         name="detail"
         defaultValue={event.detail ?? ""}
         placeholder="Detail (Brand Engage Pro members only)"
-        className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+        className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
       />
       <input
         name="url"
         defaultValue={event.url ?? ""}
         placeholder="URL (ticket link / livestream)"
-        className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+        className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
       />
       <input
         name="capacity"
         type="number"
         defaultValue={event.capacity ?? ""}
         placeholder="Capacity (blank = unlimited)"
-        className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+        className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
       />
       <input
         name="sort_order"
         type="number"
         defaultValue={event.sort_order}
         placeholder="Sort order"
-        className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+        className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
       />
-      <label className="flex items-center gap-2 text-xs text-white/80 md:col-span-2">
+      <label className="flex items-center gap-2 text-xs text-iron/80 md:col-span-2">
         <input
           type="checkbox"
           name="active"
@@ -140,20 +140,20 @@ export default function EditEventForm({
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-full bg-gradient-to-r from-aurora to-ember px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          className="rounded-full bg-ember px-4 py-2 text-sm font-semibold text-linen disabled:opacity-50"
         >
           {submitting ? "Saving…" : "Save changes"}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="text-xs text-white/60 hover:text-white"
+          className="text-xs text-iron/60 hover:text-iron"
         >
           Cancel
         </button>
         <SaveStatusIndicator status={status} />
         {businessError && (
-          <span className="text-xs text-rose-300" title={businessError}>
+          <span className="text-xs text-ember" title={businessError}>
             ✗ {businessError}
           </span>
         )}

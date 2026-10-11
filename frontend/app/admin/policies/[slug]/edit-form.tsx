@@ -43,26 +43,26 @@ export default function PolicyEditForm({
     <form action={handleSubmit} className="space-y-4">
       <div className="grid gap-3 md:grid-cols-2">
         <label className="block">
-          <span className="text-xs uppercase tracking-wide text-white/60">Title</span>
+          <span className="text-xs uppercase tracking-wide text-iron/60">Title</span>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
-            className="mt-1 w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+            className="mt-1 w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
           />
         </label>
         <label className="block">
-          <span className="text-xs uppercase tracking-wide text-white/60">Effective date</span>
+          <span className="text-xs uppercase tracking-wide text-iron/60">Effective date</span>
           <input
             type="date"
             value={effectiveDate}
             onChange={(e) => setEffectiveDate(e.target.value)}
-            className="mt-1 w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+            className="mt-1 w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
           />
         </label>
       </div>
 
-      <label className="flex items-center gap-2 text-xs text-white/70">
+      <label className="flex items-center gap-2 text-xs text-iron/70">
         <input
           type="checkbox"
           checked={isDraft}
@@ -74,21 +74,21 @@ export default function PolicyEditForm({
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div>
-          <p className="mb-1 text-xs uppercase tracking-wide text-white/60">Markdown</p>
+          <p className="mb-1 text-xs uppercase tracking-wide text-iron/60">Markdown</p>
           <textarea
             value={contentMd}
             onChange={(e) => setContentMd(e.target.value)}
             rows={26}
             spellCheck={false}
-            className="w-full rounded-2xl border border-white/10 bg-black/60 px-3 py-2 font-mono text-xs text-white/90"
+            className="w-full rounded-lg border border-iron/10 bg-parchment/60 px-3 py-2 font-mono text-xs text-iron/90"
           />
-          <p className="mt-1 text-xs text-white/40">
+          <p className="mt-1 text-xs text-iron/40">
             Supports # headings, **bold**, *italic*, [links](url), -/1. lists, &gt; blockquotes, --- rules.
           </p>
         </div>
         <div>
-          <p className="mb-1 text-xs uppercase tracking-wide text-white/60">Live preview</p>
-          <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+          <p className="mb-1 text-xs uppercase tracking-wide text-iron/60">Live preview</p>
+          <div className="rounded-lg border border-iron/10 bg-parchment/30 p-4">
             <SimpleMarkdown source={contentMd} />
           </div>
         </div>
@@ -98,7 +98,7 @@ export default function PolicyEditForm({
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          className="rounded-full bg-ember px-6 py-2 text-sm font-semibold text-linen disabled:opacity-50"
         >
           {submitting ? "Saving…" : "Save policy"}
         </button>

@@ -104,44 +104,44 @@ export default async function AdminChallengesPage() {
         <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
           Challenges review
         </h1>
-        <p className="mt-1 text-sm text-white/60">
+        <p className="mt-1 text-sm text-iron/60">
           Every active challenge and its entries. Pick a winner to grant a bonus badge + points.
         </p>
       </div>
 
       {challenges.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-white/15 bg-black/20 p-8 text-center">
+        <div className="rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-8 text-center">
           <p className="text-sm font-semibold">No challenges yet.</p>
         </div>
       ) : (
         <div className="space-y-6">
           {challenges.map((c) => (
-            <section key={c.id} className="rounded-2xl border border-white/10 bg-black/20 p-4">
+            <section key={c.id} className="rounded-lg border border-iron/10 bg-parchment/20 p-4">
               <header className="flex flex-wrap items-start justify-between gap-2">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs uppercase tracking-wide text-white/70">
+                    <span className="rounded-full bg-iron/10 px-2 py-0.5 text-xs uppercase tracking-wide text-iron/70">
                       /{c.brand_slug}
                     </span>
                     {c.winner_id && (
-                      <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs uppercase tracking-wide text-emerald-200">
+                      <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs uppercase tracking-wide text-sage-ink">
                         Winner picked
                       </span>
                     )}
                   </div>
                   {c.title && <h2 className="mt-1 text-lg font-semibold">{c.title}</h2>}
-                  <p className="mt-1 text-sm text-white/70 line-clamp-2">{c.body}</p>
+                  <p className="mt-1 text-sm text-iron/70 line-clamp-2">{c.body}</p>
                 </div>
                 <Link
                   href={`/brands/${c.brand_slug}/community`}
-                  className="text-xs text-white/60 hover:text-white"
+                  className="text-xs text-iron/60 hover:text-iron"
                 >
                   View live →
                 </Link>
               </header>
 
               {c.entries.length === 0 ? (
-                <p className="mt-3 text-xs text-white/50">No entries yet.</p>
+                <p className="mt-3 text-xs text-iron/50">No entries yet.</p>
               ) : (
                 <div className="mt-3 grid gap-3 md:grid-cols-2">
                   {c.entries.map((e) => {
@@ -152,23 +152,23 @@ export default async function AdminChallengesPage() {
                         className={`rounded-xl border p-3 ${
                           isWinner
                             ? "border-emerald-500/50 bg-emerald-500/10"
-                            : "border-white/10 bg-black/30"
+                            : "border-iron/10 bg-parchment/30"
                         }`}
                       >
                         <div className="flex items-center justify-between">
                           <Link
                             href={`/admin/members/${e.member_id}`}
-                            className="text-xs font-semibold hover:text-white"
+                            className="text-xs font-semibold hover:text-iron"
                           >
                             {e.member_first_name ?? "Anonymous"}
                             {isWinner && " 🏆"}
                           </Link>
-                          <span className="text-xs text-white/40">
+                          <span className="text-xs text-iron/40">
                             {new Date(e.created_at).toLocaleString()}
                           </span>
                         </div>
                         {e.body && (
-                          <p className="mt-2 text-sm text-white/80 line-clamp-3">{e.body}</p>
+                          <p className="mt-2 text-sm text-iron/80 line-clamp-3">{e.body}</p>
                         )}
                         {e.image_url && (
                           // eslint-disable-next-line @next/next/no-img-element
@@ -184,7 +184,7 @@ export default async function AdminChallengesPage() {
                               <input type="hidden" name="post_id" value={c.id} />
                               <input type="hidden" name="entry_id" value={e.id} />
                               <input type="hidden" name="member_id" value={e.member_id} />
-                              <button className="rounded-full bg-gradient-to-r from-aurora to-ember px-3 py-1 text-xs font-semibold text-white">
+                              <button className="rounded-full bg-ember px-3 py-1 text-xs font-semibold text-linen">
                                 Pick winner · +200 pts
                               </button>
                             </form>
@@ -193,7 +193,7 @@ export default async function AdminChallengesPage() {
                           )}
                           <form action={adminDeleteEntryAction}>
                             <input type="hidden" name="entry_id" value={e.id} />
-                            <button className="text-xs text-rose-300/80 hover:text-rose-300">
+                            <button className="text-xs text-ember/80 hover:text-ember">
                               Delete
                             </button>
                           </form>

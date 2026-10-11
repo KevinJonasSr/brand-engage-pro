@@ -28,14 +28,14 @@ function renderInline(md: string): string {
     const safeHref = /^(https?:|mailto:|tel:|\/)/i.test(href) ? href : "#";
     // Encode quotes to prevent attribute injection
     const encodedHref = safeHref.replace(/"/g, "%22").replace(/'/g, "%27");
-    return `<a href="${encodedHref}" class="text-aurora underline underline-offset-2 hover:text-white">${text}</a>`;
+    return `<a href="${encodedHref}" class="text-aurora-ink underline underline-offset-2 hover:text-iron">${text}</a>`;
   });
   // Bold (before italic so it takes precedence)
   out = out.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
   // Italic
   out = out.replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>");
   // Inline code
-  out = out.replace(/`([^`]+)`/g, '<code class="rounded bg-black/40 px-1 py-0.5 text-[12px]">$1</code>');
+  out = out.replace(/`([^`]+)`/g, '<code class="rounded bg-parchment/40 px-1 py-0.5 text-[12px]">$1</code>');
   return out;
 }
 
@@ -44,13 +44,13 @@ export function SimpleMarkdown({ source }: { source: string }) {
   const blocks = source.replace(/\r\n/g, "\n").split(/\n{2,}/);
 
   return (
-    <div className="space-y-4 text-sm leading-relaxed text-white/80">
+    <div className="space-y-4 text-sm leading-relaxed text-iron/80">
       {blocks.map((raw, i) => {
         const block = raw.trim();
         if (!block) return null;
 
         // Horizontal rule
-        if (/^-{3,}$/.test(block)) return <hr key={i} className="border-white/10" />;
+        if (/^-{3,}$/.test(block)) return <hr key={i} className="border-iron/10" />;
 
         // Headings
         const h = /^(#{1,3})\s+(.*)$/.exec(block);
@@ -60,7 +60,7 @@ export function SimpleMarkdown({ source }: { source: string }) {
             return (
               <h1
                 key={i}
-                className="mt-4 text-3xl font-semibold text-white"
+                className="mt-4 text-3xl font-semibold text-iron"
                 style={{ fontFamily: "var(--font-display)" }}
                 dangerouslySetInnerHTML={{ __html: text }}
               />
@@ -69,7 +69,7 @@ export function SimpleMarkdown({ source }: { source: string }) {
             return (
               <h2
                 key={i}
-                className="mt-6 text-xl font-semibold text-white"
+                className="mt-6 text-xl font-semibold text-iron"
                 style={{ fontFamily: "var(--font-display)" }}
                 dangerouslySetInnerHTML={{ __html: text }}
               />
@@ -77,7 +77,7 @@ export function SimpleMarkdown({ source }: { source: string }) {
           return (
             <h3
               key={i}
-              className="mt-4 text-base font-semibold text-white"
+              className="mt-4 text-base font-semibold text-iron"
               dangerouslySetInnerHTML={{ __html: text }}
             />
           );
@@ -94,7 +94,7 @@ export function SimpleMarkdown({ source }: { source: string }) {
           return (
             <blockquote
               key={i}
-              className="border-l-2 border-white/20 pl-4 italic text-white/70"
+              className="border-l-2 border-iron/20 pl-4 italic text-iron/70"
               dangerouslySetInnerHTML={{ __html: text }}
             />
           );

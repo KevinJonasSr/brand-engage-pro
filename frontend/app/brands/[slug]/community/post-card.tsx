@@ -37,21 +37,21 @@ function authorLabel(
 function KindBadge({ kind }: { kind: CommunityPost["kind"] }) {
   if (kind === "announcement") {
     return (
-      <span className="rounded-full bg-sky-500/20 px-2 py-0.5 text-xs uppercase tracking-wide text-sky-200">
+      <span className="rounded-full bg-sky-500/20 px-2 py-0.5 text-xs uppercase tracking-wide text-sky-800">
         📢 Announcement
       </span>
     );
   }
   if (kind === "poll") {
     return (
-      <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs uppercase tracking-wide text-amber-200">
+      <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs uppercase tracking-wide text-aurora-ink">
         📊 Poll
       </span>
     );
   }
   if (kind === "challenge") {
     return (
-      <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs uppercase tracking-wide text-amber-200">
+      <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs uppercase tracking-wide text-aurora-ink">
         🏆 Challenge
       </span>
     );
@@ -103,11 +103,11 @@ export default function PostCard({
             </p>
             <KindBadge kind={post.kind} />
           </div>
-          <p className="text-xs text-white/50">{relativeTime(post.created_at)}</p>
+          <p className="text-xs text-iron/50">{relativeTime(post.created_at)}</p>
         </div>
         <div className="flex items-center gap-2">
           {post.pinned && (
-            <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs uppercase tracking-wide text-amber-200">
+            <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs uppercase tracking-wide text-aurora-ink">
               Pinned
             </span>
           )}
@@ -116,7 +116,7 @@ export default function PostCard({
               <input type="hidden" name="post_id" value={post.id} />
               <input type="hidden" name="brand_slug" value={post.brand_slug} />
               <input type="hidden" name="currently_pinned" value={String(post.pinned)} />
-              <button className="text-xs text-white/60 hover:text-white">
+              <button className="text-xs text-iron/60 hover:text-iron">
                 {post.pinned ? "Unpin" : "Pin"}
               </button>
             </form>
@@ -125,7 +125,7 @@ export default function PostCard({
             <form action={deletePostAction}>
               <input type="hidden" name="post_id" value={post.id} />
               <input type="hidden" name="brand_slug" value={post.brand_slug} />
-              <button className="text-xs text-rose-300/80 hover:text-rose-300">
+              <button className="text-xs text-ember/80 hover:text-ember">
                 Delete
               </button>
             </form>
@@ -142,7 +142,7 @@ export default function PostCard({
         </h2>
       )}
 
-      <p className="whitespace-pre-wrap text-sm text-white/90">{post.body}</p>
+      <p className="whitespace-pre-wrap text-sm text-iron/90">{post.body}</p>
 
       {post.video_url ? (
         <video
@@ -150,7 +150,7 @@ export default function PostCard({
           poster={post.video_poster_url ?? undefined}
           preload="metadata"
           playsInline
-          className="mt-3 w-full rounded-2xl border border-white/10"
+          className="mt-3 w-full rounded-lg border border-iron/10"
         >
           <source src={post.video_url} />
         </video>
@@ -160,7 +160,7 @@ export default function PostCard({
           <img
             src={post.image_url}
             alt={post.image_alt ?? ""}
-            className="max-h-96 w-full rounded-2xl object-cover"
+            className="max-h-96 w-full rounded-lg object-cover"
           />
         )
       )}
@@ -185,16 +185,16 @@ export default function PostCard({
 
       {/* AI #14: thread summary for posts with active discussion */}
       {post.thread_summary && post.comment_count >= 8 && (
-        <div className="rounded-2xl border border-aurora/30 bg-aurora/5 p-3">
-          <p className="mb-1 flex items-center gap-1 text-xs uppercase tracking-[0.18em] text-aurora">
+        <div className="rounded-lg border border-aurora/30 bg-aurora/5 p-3">
+          <p className="mb-1 flex items-center gap-1 text-xs uppercase tracking-[0.18em] text-aurora-ink">
             <span aria-hidden>✨</span> What people are saying
           </p>
-          <p className="text-sm text-white/85">{post.thread_summary}</p>
+          <p className="text-sm text-iron/85">{post.thread_summary}</p>
         </div>
       )}
 
       {/* Reactions */}
-      <div className="flex flex-wrap items-center gap-2 border-t border-white/5 pt-3">
+      <div className="flex flex-wrap items-center gap-2 border-t border-iron/5 pt-3">
         {currentUserId ? (
           REACTION_SET.map((emoji) => {
             const count = post.reaction_counts[emoji] ?? 0;
@@ -208,8 +208,8 @@ export default function PostCard({
                   type="submit"
                   className={`flex items-center gap-1 rounded-full border px-3 py-1 text-sm transition ${
                     mine
-                      ? "border-aurora/60 bg-aurora/20 text-white"
-                      : "border-white/10 bg-black/30 text-white/70 hover:bg-black/50"
+                      ? "border-aurora/60 bg-aurora/20 text-iron"
+                      : "border-iron/10 bg-parchment/30 text-iron/70 hover:bg-parchment/50"
                   }`}
                 >
                   <span>{emoji}</span>
@@ -221,37 +221,37 @@ export default function PostCard({
         ) : (
           <Link
             href={`/login?next=${encodeURIComponent(communityPath)}`}
-            className="rounded-full border border-white/15 bg-black/30 px-3 py-1 text-xs font-medium text-white/80 hover:bg-white/10"
+            className="rounded-full border border-iron/15 bg-parchment/30 px-3 py-1 text-xs font-medium text-iron/80 hover:bg-iron/10"
           >
             Sign in to react
           </Link>
         )}
         <button
           onClick={() => setShowComments((v) => !v)}
-          className="ml-auto rounded-full border border-white/10 bg-black/30 px-3 py-1 text-xs text-white/70 hover:bg-black/50"
+          className="ml-auto rounded-full border border-iron/10 bg-parchment/30 px-3 py-1 text-xs text-iron/70 hover:bg-parchment/50"
         >
           💬 {post.comment_count} {post.comment_count === 1 ? "comment" : "comments"}
         </button>
       </div>
 
       {showComments && (
-        <div className="space-y-3 border-t border-white/5 pt-3">
+        <div className="space-y-3 border-t border-iron/5 pt-3">
           {initialComments.length === 0 && (
-            <p className="text-xs text-white/50">
+            <p className="text-xs text-iron/50">
               No comments yet — be the first.
             </p>
           )}
           {initialComments.map((c) => (
-            <div key={c.id} className="rounded-2xl bg-black/30 p-3">
+            <div key={c.id} className="rounded-lg bg-parchment/30 p-3">
               <div className="flex items-center justify-between">
                 <p className="text-xs font-semibold">
                   {c.author_first_name?.trim() || "Member"}
                 </p>
-                <p className="text-xs uppercase tracking-wide text-white/40">
+                <p className="text-xs uppercase tracking-wide text-iron/40">
                   {relativeTime(c.created_at)}
                 </p>
               </div>
-              <p className="mt-1 whitespace-pre-wrap text-sm text-white/80">
+              <p className="mt-1 whitespace-pre-wrap text-sm text-iron/80">
                 {c.body}
               </p>
             </div>
@@ -266,11 +266,11 @@ export default function PostCard({
                 maxLength={1000}
                 rows={2}
                 placeholder="Add a comment… (+2 pts)"
-                className="flex-1 resize-none rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-white/40 focus:outline-none"
+                className="flex-1 resize-none rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm text-iron placeholder:text-iron/40 focus:border-iron/40 focus:outline-none"
               />
               <button
                 type="submit"
-                className="rounded-full bg-white/10 px-4 py-2 text-sm text-white/90 hover:bg-white/15"
+                className="rounded-full bg-iron/10 px-4 py-2 text-sm text-iron/90 hover:bg-iron/15"
               >
                 Post
               </button>

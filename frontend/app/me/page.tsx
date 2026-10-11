@@ -17,11 +17,11 @@ export default async function MeIndexPage() {
   return (
     <main className="mx-auto max-w-2xl px-4 py-10 sm:py-14">
       <header className="mb-8">
-        <p className="text-xs uppercase tracking-widest text-white/60">
+        <p className="text-xs uppercase tracking-widest text-iron/60">
           Your account
         </p>
         <h1 className="mt-1 text-3xl font-semibold tracking-tight">Me</h1>
-        <p className="mt-3 text-white/70">
+        <p className="mt-3 text-iron/70">
           Manage your profile, notifications, and history.
         </p>
       </header>
@@ -90,13 +90,13 @@ function Row({
     <li>
       <Link
         href={href}
-        className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.02] p-4 transition hover:border-white/20 hover:bg-white/[0.04]"
+        className="flex items-center justify-between rounded-xl border border-iron/10 bg-iron/[0.02] p-4 transition hover:border-iron/20 hover:bg-iron/[0.04]"
       >
         <div>
           <div className="font-medium">{title}</div>
-          <div className="mt-0.5 text-sm text-white/60">{body}</div>
+          <div className="mt-0.5 text-sm text-iron/60">{body}</div>
         </div>
-        <span aria-hidden className="text-white/30">
+        <span aria-hidden className="text-iron/30">
           →
         </span>
       </Link>

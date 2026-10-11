@@ -35,12 +35,12 @@ const SEVERITY_LABEL: Record<number, string> = {
 };
 
 const SEVERITY_TONE: Record<number, string> = {
-  0: "border-emerald-300/30 bg-emerald-300/10 text-emerald-200",
-  1: "border-emerald-300/30 bg-emerald-300/10 text-emerald-200",
-  2: "border-amber-300/30 bg-amber-300/10 text-amber-200",
-  3: "border-amber-400/40 bg-amber-400/15 text-amber-100",
-  4: "border-red-400/40 bg-red-400/15 text-red-200",
-  5: "border-red-500/50 bg-red-500/20 text-red-100",
+  0: "border-emerald-300/30 bg-emerald-300/10 text-sage-ink",
+  1: "border-emerald-300/30 bg-emerald-300/10 text-sage-ink",
+  2: "border-amber-300/30 bg-amber-300/10 text-aurora-ink",
+  3: "border-amber-400/40 bg-amber-400/15 text-aurora-ink",
+  4: "border-red-400/40 bg-red-400/15 text-ember",
+  5: "border-red-500/50 bg-red-500/20 text-ember",
 };
 
 export default async function AdminModerationPage() {
@@ -128,7 +128,7 @@ export default async function AdminModerationPage() {
   return (
     <main className="mx-auto max-w-5xl space-y-8 px-6 py-12">
       <header className="space-y-2">
-        <p className="text-sm uppercase tracking-wide text-white/60">
+        <p className="text-sm uppercase tracking-wide text-iron/60">
           Admin · Moderation
         </p>
         <h1
@@ -137,7 +137,7 @@ export default async function AdminModerationPage() {
         >
           Moderation queue
         </h1>
-        <p className="max-w-2xl text-sm text-white/70">
+        <p className="max-w-2xl text-sm text-iron/70">
           Posts and comments the AI classifier flagged for human review.
           Self-harm signals stay visible by design — surface crisis
           resources to the author and check in. Approve clears the flag;
@@ -146,17 +146,17 @@ export default async function AdminModerationPage() {
         </p>
 
         <div className="mt-4 flex flex-wrap gap-3 text-xs">
-          <span className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-white/80">
+          <span className="rounded-full border border-iron/15 bg-iron/5 px-3 py-1 text-iron/80">
             Total: {counts.total}
           </span>
-          <span className="rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1 text-amber-200">
+          <span className="rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1 text-aurora-ink">
             Flag review: {counts.flag_review}
           </span>
-          <span className="rounded-full border border-red-400/40 bg-red-400/10 px-3 py-1 text-red-200">
+          <span className="rounded-full border border-red-400/40 bg-red-400/10 px-3 py-1 text-ember">
             Auto-hidden: {counts.auto_hide}
           </span>
           {counts.self_harm > 0 && (
-            <span className="rounded-full border border-violet-400/40 bg-violet-400/15 px-3 py-1 text-violet-200">
+            <span className="rounded-full border border-violet-400/40 bg-violet-400/15 px-3 py-1 text-violet-800">
               💜 Self-harm signal: {counts.self_harm}
             </span>
           )}
@@ -164,7 +164,7 @@ export default async function AdminModerationPage() {
       </header>
 
       {queue.length === 0 ? (
-        <div className="glass-card p-8 text-center text-sm text-white/60">
+        <div className="glass-card p-8 text-center text-sm text-iron/60">
           No items pending review. The classifier is doing its job.
         </div>
       ) : (
@@ -191,10 +191,10 @@ function QueueCard({ row }: { row: QueueRow }) {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 space-y-2">
           <div className="flex flex-wrap items-center gap-2 text-xs">
-            <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 uppercase tracking-wide text-white/70">
+            <span className="rounded-full border border-iron/15 bg-iron/5 px-2 py-0.5 uppercase tracking-wide text-iron/70">
               {row.source_table === "community_posts" ? "Post" : "Comment"}
             </span>
-            <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 uppercase tracking-wide text-white/70">
+            <span className="rounded-full border border-iron/15 bg-iron/5 px-2 py-0.5 uppercase tracking-wide text-iron/70">
               {row.community_id}
             </span>
             {row.duplicate_of ? <DuplicateChip targetId={row.duplicate_of} /> : null}
@@ -206,21 +206,21 @@ function QueueCard({ row }: { row: QueueRow }) {
             <span
               className={`rounded-full border px-2 py-0.5 uppercase tracking-wide ${
                 row.status === "auto_hide"
-                  ? "border-red-400/40 bg-red-400/10 text-red-200"
-                  : "border-amber-400/30 bg-amber-400/10 text-amber-200"
+                  ? "border-red-400/40 bg-red-400/10 text-ember"
+                  : "border-amber-400/30 bg-amber-400/10 text-aurora-ink"
               }`}
             >
               {row.status.replace("_", " ")}
             </span>
             {row.self_harm && (
-              <span className="rounded-full border border-violet-400/40 bg-violet-400/15 px-2 py-0.5 uppercase tracking-wide text-violet-200">
+              <span className="rounded-full border border-violet-400/40 bg-violet-400/15 px-2 py-0.5 uppercase tracking-wide text-violet-800">
                 💜 Self-harm signal
               </span>
             )}
             {row.categories?.map((c) => (
               <span
                 key={c}
-                className="rounded-full border border-white/10 bg-black/30 px-2 py-0.5 uppercase tracking-wide text-white/60"
+                className="rounded-full border border-iron/10 bg-parchment/30 px-2 py-0.5 uppercase tracking-wide text-iron/60"
               >
                 {c}
               </span>
@@ -228,21 +228,21 @@ function QueueCard({ row }: { row: QueueRow }) {
           </div>
 
           {row.title && (
-            <p className="text-sm font-semibold text-white">{row.title}</p>
+            <p className="text-sm font-semibold text-iron">{row.title}</p>
           )}
-          <p className="whitespace-pre-line text-sm text-white/80">
+          <p className="whitespace-pre-line text-sm text-iron/80">
             {previewBody}
           </p>
 
           {row.reason && (
-            <p className="rounded-2xl border border-white/10 bg-black/30 p-3 text-xs text-white/70">
-              <span className="text-white/50">AI reason: </span>
+            <p className="rounded-lg border border-iron/10 bg-parchment/30 p-3 text-xs text-iron/70">
+              <span className="text-iron/50">AI reason: </span>
               {row.reason}
             </p>
           )}
 
           {row.self_harm && (
-            <p className="rounded-2xl border border-violet-400/30 bg-violet-400/10 p-3 text-xs text-violet-100">
+            <p className="rounded-lg border border-violet-400/30 bg-violet-400/10 p-3 text-xs text-violet-800">
               The classifier detected self-harm signals in this content.
               Per platform policy this stays visible — please check in
               with the author and surface crisis resources rather than
@@ -250,7 +250,7 @@ function QueueCard({ row }: { row: QueueRow }) {
             </p>
           )}
 
-          <p className="text-xs text-white/40">
+          <p className="text-xs text-iron/40">
             Classified{" "}
             {row.classified_at
               ? new Date(row.classified_at).toLocaleString()
@@ -265,7 +265,7 @@ function QueueCard({ row }: { row: QueueRow }) {
             <input type="hidden" name="row_id" value={row.id} />
             <button
               type="submit"
-              className="w-full rounded-full border border-emerald-300/30 bg-emerald-300/10 px-4 py-2 text-xs font-medium text-emerald-200 hover:bg-emerald-300/15"
+              className="w-full rounded-full border border-emerald-300/30 bg-emerald-300/10 px-4 py-2 text-xs font-medium text-sage-ink hover:bg-emerald-300/15"
             >
               Approve
             </button>
@@ -275,7 +275,7 @@ function QueueCard({ row }: { row: QueueRow }) {
             <input type="hidden" name="row_id" value={row.id} />
             <button
               type="submit"
-              className="w-full rounded-full border border-red-400/40 bg-red-400/10 px-4 py-2 text-xs font-medium text-red-200 hover:bg-red-400/15"
+              className="w-full rounded-full border border-red-400/40 bg-red-400/10 px-4 py-2 text-xs font-medium text-ember hover:bg-red-400/15"
             >
               Hide
             </button>
@@ -285,7 +285,7 @@ function QueueCard({ row }: { row: QueueRow }) {
             <input type="hidden" name="row_id" value={row.id} />
             <button
               type="submit"
-              className="w-full rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-medium text-white/70 hover:bg-white/10"
+              className="w-full rounded-full border border-iron/15 bg-iron/5 px-4 py-2 text-xs font-medium text-iron/70 hover:bg-iron/10"
             >
               Re-queue
             </button>

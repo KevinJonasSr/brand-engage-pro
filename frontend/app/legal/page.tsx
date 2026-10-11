@@ -78,7 +78,7 @@ export default async function LegalPage() {
       {/* Header */}
       <div className="space-y-2">
         <h1 className="text-4xl font-bold">Legal & Privacy</h1>
-        <p className="text-white/60">
+        <p className="text-iron/60">
           Brand Engage Pro is committed to transparent policies. Review the documents below.
         </p>
       </div>
@@ -90,12 +90,12 @@ export default async function LegalPage() {
           return (
             <div
               key={card.title}
-              className="group relative rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur transition-all hover:border-white/20 hover:bg-white/10"
+              className="group relative rounded-lg border border-iron/10 bg-iron/5 p-6 backdrop-blur transition-all hover:border-iron/20 hover:bg-iron/10"
             >
               {/* Draft Badge */}
               {card.isDraft && (
                 <div className="absolute right-4 top-4">
-                  <span className="inline-block rounded-full bg-amber-500/20 px-2 py-1 text-xs font-medium text-amber-200 border border-amber-500/40">
+                  <span className="inline-block rounded-full bg-amber-500/20 px-2 py-1 text-xs font-medium text-aurora-ink border border-amber-500/40">
                     DRAFT
                   </span>
                 </div>
@@ -110,18 +110,18 @@ export default async function LegalPage() {
               </div>
 
               {/* Description */}
-              <p className="mt-3 text-sm text-white/60">{card.description}</p>
+              <p className="mt-3 text-sm text-iron/60">{card.description}</p>
 
               {/* Link / Coming Soon */}
               <div className="mt-4">
                 {isComingSoon ? (
-                  <span className="inline-block rounded-lg bg-white/5 px-3 py-1.5 text-xs font-medium text-white/40">
+                  <span className="inline-block rounded-lg bg-iron/5 px-3 py-1.5 text-xs font-medium text-iron/40">
                     Coming soon
                   </span>
                 ) : (
                   <Link
                     href={card.href}
-                    className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 text-xs font-medium text-white/80 transition-all hover:bg-white/20 hover:text-white"
+                    className="inline-flex items-center gap-2 rounded-lg bg-iron/10 px-3 py-1.5 text-xs font-medium text-iron/80 transition-all hover:bg-iron/20 hover:text-iron"
                   >
                     Review →
                   </Link>

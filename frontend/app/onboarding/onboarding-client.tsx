@@ -369,24 +369,24 @@ export default function OnboardingWizard({
   const stepValid = canAdvanceCurrentStep();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black text-white">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-parchment text-iron">
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-12 lg:flex-row">
-        <section className="w-full max-w-3xl rounded-3xl border border-white/10 bg-black/40 p-8">
-          <div className="flex items-center justify-between text-sm uppercase tracking-[0.3em] text-white/60">
+        <section className="w-full max-w-3xl rounded-lg border border-iron/10 bg-parchment/40 p-8">
+          <div className="flex items-center justify-between text-sm uppercase tracking-[0.3em] text-iron/60">
             <span>Set up your profile</span>
             <span>{Math.round(progress)}% complete</span>
           </div>
-          <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-white/10">
-            <div className="h-full rounded-full bg-white" style={{ width: `${progress}%` }} />
+          <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-iron/10">
+            <div className="h-full rounded-full bg-iron" style={{ width: `${progress}%` }} />
           </div>
 
           <div className="mt-8 space-y-6">
             <div>
-              <p className="text-sm uppercase tracking-wide text-white/60">Step {stepIndex + 1}</p>
+              <p className="text-sm uppercase tracking-wide text-iron/60">Step {stepIndex + 1}</p>
               <h1 className="mt-2 text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
                 {currentStep.title}
               </h1>
-              <p className="mt-2 text-white/70">{currentStep.description}</p>
+              <p className="mt-2 text-iron/70">{currentStep.description}</p>
             </div>
 
             <div className="space-y-4">
@@ -395,16 +395,16 @@ export default function OnboardingWizard({
                   const selected = formState[field.name] ?? "";
                   const isOther = selected === field.otherOptionLabel;
                   return (
-                    <div key={field.name} className="block text-sm text-white/80">
+                    <div key={field.name} className="block text-sm text-iron/80">
                       <p>
                         {field.label}
-                        {field.required && <span className="ml-1 text-rose-300">*</span>}
+                        {field.required && <span className="ml-1 text-ember">*</span>}
                       </p>
                       <div className="mt-2 space-y-2">
                         {field.options.map((opt) => (
                           <label
                             key={opt}
-                            className="flex cursor-pointer items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 hover:bg-white/10"
+                            className="flex cursor-pointer items-center gap-3 rounded-lg border border-iron/10 bg-iron/5 px-4 py-3 hover:bg-iron/10"
                           >
                             <input
                               type="radio"
@@ -414,7 +414,7 @@ export default function OnboardingWizard({
                               onChange={() => handleInput(field.name, opt)}
                               className="h-4 w-4 accent-aurora"
                             />
-                            <span className="text-white/90">{opt}</span>
+                            <span className="text-iron/90">{opt}</span>
                           </label>
                         ))}
                         {isOther && field.otherFieldName && (
@@ -425,7 +425,7 @@ export default function OnboardingWizard({
                               handleInput(field.otherFieldName!, event.target.value)
                             }
                             placeholder={field.otherPlaceholder ?? "Other"}
-                            className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 focus:border-white/40 focus:outline-none"
+                            className="mt-2 w-full rounded-lg border border-iron/10 bg-iron/5 px-4 py-3 text-iron placeholder-iron/40 focus:border-iron/40 focus:outline-none"
                           />
                         )}
                       </div>
@@ -434,12 +434,12 @@ export default function OnboardingWizard({
                 }
                 if (field.type === "select" && field.options) {
                   return (
-                    <label key={field.name} className="block text-sm text-white/80">
+                    <label key={field.name} className="block text-sm text-iron/80">
                       <span>{field.label}</span>
                       <select
                         value={formState[field.name] ?? ""}
                         onChange={(event) => handleInput(field.name, event.target.value)}
-                        className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white focus:border-white/40 focus:outline-none"
+                        className="mt-2 w-full rounded-lg border border-iron/10 bg-iron/5 px-4 py-3 text-iron focus:border-iron/40 focus:outline-none"
                       >
                         <option value="">Select month</option>
                         {field.options.map((opt) => {
@@ -452,16 +452,16 @@ export default function OnboardingWizard({
                         })}
                       </select>
                       {field.hint && (
-                        <span className="mt-1 block text-xs text-white/50">{field.hint}</span>
+                        <span className="mt-1 block text-xs text-iron/50">{field.hint}</span>
                       )}
                     </label>
                   );
                 }
                 return (
-                  <label key={field.name} className="block text-sm text-white/80">
+                  <label key={field.name} className="block text-sm text-iron/80">
                     <span>
                       {field.label}
-                      {field.required && <span className="ml-1 text-rose-300">*</span>}
+                      {field.required && <span className="ml-1 text-ember">*</span>}
                     </span>
                     {(() => {
                       // Email is the only field with a runtime-overridable
@@ -481,14 +481,14 @@ export default function OnboardingWizard({
                             field.required ||
                             (field.name === "email" && !emailAutoFilled)
                           }
-                          className={`mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 focus:border-white/40 focus:outline-none ${
-                            fieldReadOnly ? "cursor-not-allowed text-white/60" : ""
+                          className={`mt-2 w-full rounded-lg border border-iron/10 bg-iron/5 px-4 py-3 text-iron placeholder-iron/40 focus:border-iron/40 focus:outline-none ${
+                            fieldReadOnly ? "cursor-not-allowed text-iron/60" : ""
                           }`}
                         />
                       );
                     })()}
                     {field.hint && (
-                      <span className="mt-1 block text-xs text-white/50">
+                      <span className="mt-1 block text-xs text-iron/50">
                         {field.name === "email" && !emailAutoFilled
                           ? "We'll use this to send your weekly digest and confirmations."
                           : field.hint}
@@ -500,7 +500,7 @@ export default function OnboardingWizard({
             </div>
 
             {isLastStep && (
-              <div className="space-y-2 rounded-2xl bg-black/30 p-4 text-xs text-white/75">
+              <div className="space-y-2 rounded-lg bg-parchment/30 p-4 text-xs text-iron/75">
                 <label className="flex items-start gap-2">
                   <input
                     type="checkbox"
@@ -514,7 +514,7 @@ export default function OnboardingWizard({
                       href="/terms"
                       target="_blank"
                       rel="noreferrer"
-                      className="text-aurora underline"
+                      className="text-aurora-ink underline"
                     >
                       Terms of Service
                     </a>{" "}
@@ -523,7 +523,7 @@ export default function OnboardingWizard({
                       href="/privacy"
                       target="_blank"
                       rel="noreferrer"
-                      className="text-aurora underline"
+                      className="text-aurora-ink underline"
                     >
                       Privacy Policy
                     </a>
@@ -544,7 +544,7 @@ export default function OnboardingWizard({
                         href="/terms"
                         target="_blank"
                         rel="noreferrer"
-                        className="text-aurora underline"
+                        className="text-aurora-ink underline"
                       >
                         Terms
                       </a>{" "}
@@ -553,7 +553,7 @@ export default function OnboardingWizard({
                         href="/privacy"
                         target="_blank"
                         rel="noreferrer"
-                        className="text-aurora underline"
+                        className="text-aurora-ink underline"
                       >
                         Privacy Policy
                       </a>
@@ -567,7 +567,7 @@ export default function OnboardingWizard({
             <div className="flex flex-col gap-2 pt-4">
               <div className="flex items-center justify-between gap-4">
                 <button
-                  className="text-sm text-white/60 disabled:opacity-30"
+                  className="text-sm text-iron/60 disabled:opacity-30"
                   disabled={stepIndex === 0}
                   onClick={prevStep}
                 >
@@ -578,7 +578,7 @@ export default function OnboardingWizard({
                     type="button"
                     onClick={handleFinish}
                     disabled={finishStatus === "saving"}
-                    className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white shadow-glass transition hover:brightness-110 disabled:opacity-50"
+                    className="inline-flex items-center gap-2 rounded-full bg-ember px-6 py-3 text-sm font-semibold text-linen shadow-glass transition hover:brightness-110 disabled:opacity-50"
                   >
                     {finishStatus === "saving" ? "Saving…" : "Finish"}
                     <ArrowRight size={16} />
@@ -587,21 +587,21 @@ export default function OnboardingWizard({
                   <button
                     onClick={nextStep}
                     disabled={!stepValid}
-                    className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="inline-flex items-center gap-2 rounded-full bg-iron px-6 py-3 text-sm font-semibold text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Continue <ArrowRight size={16} />
                   </button>
                 )}
               </div>
               {!isLastStep && !stepValid && (
-                <p className="text-right text-xs text-white/50">
+                <p className="text-right text-xs text-iron/50">
                   Fill in the required fields (
-                  <span className="text-rose-300">*</span>) to continue.
+                  <span className="text-ember">*</span>) to continue.
                 </p>
               )}
             </div>
             {finishStatus === "error" && (
-              <p className="text-sm text-rose-300">
+              <p className="text-sm text-ember">
                 {finishMessage ?? (
                   <>
                     Could not save your profile. Are you still signed in? Try{" "}

@@ -309,12 +309,12 @@ export default function SignupPage({
     <main className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center gap-6 px-6 py-12">
       {showContextualHero && referrerBrand && ctaGradient && (
         <section
-          className="relative overflow-hidden rounded-3xl border border-white/10 p-6"
+          className="relative overflow-hidden rounded-lg border border-iron/10 p-6"
           style={{
             backgroundImage: `linear-gradient(135deg, ${referrerBrand.accentFrom}33, #0f172a 60%, #000000)`,
           }}
         >
-          <p className="text-xs uppercase tracking-[0.3em] text-white/70">
+          <p className="text-xs uppercase tracking-[0.3em] text-iron/70">
             Member club
           </p>
           <h2
@@ -331,9 +331,9 @@ export default function SignupPage({
             </span>
           </h2>
           {referrerBrand.tagline && (
-            <p className="mt-2 text-sm text-white/75">{referrerBrand.tagline}</p>
+            <p className="mt-2 text-sm text-iron/75">{referrerBrand.tagline}</p>
           )}
-          <ul className="mt-4 space-y-1.5 text-sm text-white/80">
+          <ul className="mt-4 space-y-1.5 text-sm text-iron/80">
             <li className="flex items-start gap-2">
               <span aria-hidden>🎁</span>
               <span>Member-only perks, drops, and brand updates</span>
@@ -352,7 +352,7 @@ export default function SignupPage({
 
       <div className="glass-card space-y-6 p-8">
         <div className="space-y-2">
-          <p className="text-sm uppercase tracking-wide text-white/60">Brand Engage Pro</p>
+          <p className="text-sm uppercase tracking-wide text-iron/60">Brand Engage Pro</p>
           <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
             {next === "/onboarding"
               ? "Create your account to continue"
@@ -361,29 +361,29 @@ export default function SignupPage({
                 : "Join the member club"}
           </h1>
           {next === "/onboarding" && (
-            <p className="rounded-2xl border border-aurora/30 bg-aurora/10 px-3 py-2 text-sm text-white/80">
+            <p className="rounded-lg border border-aurora/30 bg-aurora/10 px-3 py-2 text-sm text-iron/80">
               Next up: your member profile — rewards, check-ins, and brand perks.
               Create a free account to continue.
             </p>
           )}
           {!showContextualHero && next !== "/onboarding" && (
-            <p className="text-sm text-white/70">
+            <p className="text-sm text-iron/70">
               Create an account to earn points, unlock rewards, and get member-only updates.
             </p>
           )}
           {!showContextualHero && next !== "/onboarding" && (
-            <p className="inline-flex items-center gap-1.5 rounded-full border border-aurora/30 bg-aurora/10 px-3 py-1 text-xs font-medium text-aurora">
+            <p className="inline-flex items-center gap-1.5 rounded-full border border-aurora/30 bg-aurora/10 px-3 py-1 text-xs font-medium text-aurora-ink">
               🎁 Finish your profile for +100 welcome points.
             </p>
           )}
           {referrerName && (
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/10 px-3 py-1 text-xs text-sage-ink">
               <span aria-hidden>👋</span>
               <span>Invited by {referrerName}</span>
             </div>
           )}
           {community && (
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-aurora/40 bg-aurora/10 px-3 py-1 text-xs text-aurora">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-aurora/40 bg-aurora/10 px-3 py-1 text-xs text-aurora-ink">
               <span aria-hidden>·</span>
               <span>Joining via @{community}</span>
             </div>
@@ -405,7 +405,7 @@ export default function SignupPage({
 
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-wide text-white/60">Email</span>
+            <span className="text-xs uppercase tracking-wide text-iron/60">Email</span>
             <input
               type="email"
               required
@@ -418,19 +418,19 @@ export default function SignupPage({
               onBlur={() => setEmailError(validateEmail(email))}
               aria-invalid={!!emailError}
               className={
-                "w-full rounded-2xl border bg-black/40 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:outline-none " +
+                "w-full rounded-lg border bg-parchment/40 px-4 py-3 text-sm text-iron placeholder:text-iron/40 focus:outline-none " +
                 (emailError
                   ? "border-rose-500/60 focus:border-rose-400"
-                  : "border-white/10 focus:border-white/40")
+                  : "border-iron/10 focus:border-iron/40")
               }
               placeholder="you@email.com"
             />
             {emailError && (
-              <span className="text-xs text-rose-300">{emailError}</span>
+              <span className="text-xs text-ember">{emailError}</span>
             )}
           </label>
           <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-wide text-white/60">Password</span>
+            <span className="text-xs uppercase tracking-wide text-iron/60">Password</span>
             <input
               type="password"
               required
@@ -444,15 +444,15 @@ export default function SignupPage({
               onBlur={() => setPasswordError(validatePassword(password))}
               aria-invalid={!!passwordError}
               className={
-                "w-full rounded-2xl border bg-black/40 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:outline-none " +
+                "w-full rounded-lg border bg-parchment/40 px-4 py-3 text-sm text-iron placeholder:text-iron/40 focus:outline-none " +
                 (passwordError
                   ? "border-rose-500/60 focus:border-rose-400"
-                  : "border-white/10 focus:border-white/40")
+                  : "border-iron/10 focus:border-iron/40")
               }
               placeholder="at least 8 characters"
             />
             {passwordError && (
-              <span className="text-xs text-rose-300">{passwordError}</span>
+              <span className="text-xs text-ember">{passwordError}</span>
             )}
             {password && !passwordError && (() => {
               let score = 0;
@@ -472,10 +472,10 @@ export default function SignupPage({
               const t = tiers[score];
               return (
                 <div className="mt-1 flex items-center gap-2">
-                  <span className="h-1 flex-1 overflow-hidden rounded bg-white/10">
+                  <span className="h-1 flex-1 overflow-hidden rounded bg-iron/10">
                     <span className={"block h-1 " + t.color} style={{ width: t.w }} />
                   </span>
-                  <span className="text-xs text-white/50">{t.label}</span>
+                  <span className="text-xs text-iron/50">{t.label}</span>
                 </div>
               );
             })()}
@@ -483,7 +483,7 @@ export default function SignupPage({
 
           {turnstileRequired && (
             <div className="space-y-2">
-              <p className="text-xs uppercase tracking-wide text-white/45">Security check</p>
+              <p className="text-xs uppercase tracking-wide text-iron/45">Security check</p>
               <TurnstileWidget
                 key={turnstileKey}
                 onSuccess={handleTurnstileSuccess}
@@ -497,7 +497,7 @@ export default function SignupPage({
                 loadState: turnstileLoadState,
                 challengeFailed: turnstileError,
               }) && (
-                <p className="text-xs text-rose-300">
+                <p className="text-xs text-ember">
                   Security check failed. Tap Retry above. Create account stays
                   disabled until the security check succeeds.
                 </p>
@@ -509,7 +509,7 @@ export default function SignupPage({
             <button
               type="submit"
               disabled={status === "loading" || !canSubmitSignup}
-              className="w-full rounded-full bg-gradient-to-r from-aurora to-ember px-4 py-3 text-sm font-semibold text-white shadow-glass disabled:opacity-60"
+              className="w-full rounded-full bg-ember px-4 py-3 text-sm font-semibold text-linen shadow-glass disabled:opacity-60"
             >
               {signupTurnstileButtonLabel({
                 cooldown: 0,
@@ -518,7 +518,7 @@ export default function SignupPage({
               })}
             </button>
             {status !== "loading" && !canSubmitSignup && signupHelper && (
-              <p className="text-center text-xs text-white/50">{signupHelper}</p>
+              <p className="text-center text-xs text-iron/50">{signupHelper}</p>
             )}
           </div>
         </form>
@@ -526,27 +526,27 @@ export default function SignupPage({
         {message && (
           <p
             className={`text-sm ${
-              status === "error" ? "text-red-300" : "text-emerald-300"
+              status === "error" ? "text-ember" : "text-sage-ink"
             }`}
           >
             {message}
           </p>
         )}
 
-        <p className="text-center text-xs text-white/55">
+        <p className="text-center text-xs text-iron/55">
           By creating an account, you agree to our{" "}
-          <Link href="/terms" className="text-white/80 underline underline-offset-4 hover:text-white">
+          <Link href="/terms" className="text-iron/80 underline underline-offset-4 hover:text-iron">
             Terms
           </Link>{" "}
           and{" "}
-          <Link href="/privacy" className="text-white/80 underline underline-offset-4 hover:text-white">
+          <Link href="/privacy" className="text-iron/80 underline underline-offset-4 hover:text-iron">
             Privacy Policy
           </Link>
           .
         </p>
-        <p className="text-center text-sm text-white/60">
+        <p className="text-center text-sm text-iron/60">
           Already have an account?{" "}
-          <Link href={loginHref} className="text-white underline-offset-4 hover:underline">
+          <Link href={loginHref} className="text-iron underline-offset-4 hover:underline">
             Sign in
           </Link>
         </p>

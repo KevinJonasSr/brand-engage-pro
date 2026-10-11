@@ -19,20 +19,20 @@ export default async function AdminBrandsPage() {
         <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
           Brands
         </h1>
-        <p className="mt-1 text-sm text-white/60">
+        <p className="mt-1 text-sm text-iron/60">
           Manage brand pages, hero images, bios, events, and social links — no code deploys required.
         </p>
       </div>
 
       <section className="space-y-3">
         {brands.length === 0 ? (
-          <p className="text-xs text-white/50">No brands yet.</p>
+          <p className="text-xs text-iron/50">No brands yet.</p>
         ) : (
           brands.map((a) => (
             <Link
               key={a.slug}
               href={`/admin/brands/${a.slug}`}
-              className="block rounded-2xl border border-white/10 bg-black/30 p-4 transition hover:border-white/30"
+              className="block rounded-lg border border-iron/10 bg-parchment/30 p-4 transition hover:border-iron/30"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
@@ -41,7 +41,7 @@ export default async function AdminBrandsPage() {
                     <img src={a.hero_image} alt="" className="h-12 w-12 rounded-full object-cover" />
                   ) : (
                     <span
-                      className="flex h-12 w-12 items-center justify-center rounded-full text-sm font-bold text-white"
+                      className="flex h-12 w-12 items-center justify-center rounded-full text-sm font-bold text-iron"
                       style={{
                         backgroundImage: `linear-gradient(to bottom right, ${a.accent_from}, ${a.accent_to})`
                       }}
@@ -51,27 +51,27 @@ export default async function AdminBrandsPage() {
                   )}
                   <div>
                     <p className="text-base font-semibold">{a.name}</p>
-                    <p className="text-xs text-white/60">/{a.slug}</p>
+                    <p className="text-xs text-iron/60">/{a.slug}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 text-xs text-white/70">
+                <div className="flex items-center gap-4 text-xs text-iron/70">
                   <span>{a.event_count} events</span>
                   <span>{a.follower_count} followers</span>
                   {!a.active && (
-                    <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs uppercase tracking-wide">Inactive</span>
+                    <span className="rounded-full bg-iron/10 px-2 py-0.5 text-xs uppercase tracking-wide">Inactive</span>
                   )}
                 </div>
               </div>
-              {a.tagline && <p className="mt-2 text-sm text-white/70">{a.tagline}</p>}
+              {a.tagline && <p className="mt-2 text-sm text-iron/70">{a.tagline}</p>}
             </Link>
           ))
         )}
       </section>
 
       {ctx.isSuperAdmin && (
-      <section className="rounded-2xl border border-dashed border-white/15 bg-black/20 p-4">
+      <section className="rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-4">
         <p className="text-sm font-semibold">Add a new brand</p>
-        <p className="mt-1 text-xs text-white/60">
+        <p className="mt-1 text-xs text-iron/60">
           Slug is the URL segment (lowercase letters, digits, dashes). Can&apos;t be changed later.
         </p>
         <CreateBrandForm />

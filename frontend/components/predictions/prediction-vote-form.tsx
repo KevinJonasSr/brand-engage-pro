@@ -79,7 +79,7 @@ export function PredictionVoteForm({
 
   if (submitted) {
     return (
-      <p className="rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">
+      <p className="rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-sm text-sage-ink">
         ✓ Vote saved.
       </p>
     );
@@ -90,7 +90,7 @@ export function PredictionVoteForm({
       {predictionType === "multi" && (
         <div className="space-y-2">
           {options.length === 0 && (
-            <p className="text-xs text-amber-300">
+            <p className="text-xs text-aurora-ink">
               No options on this prediction.
             </p>
           )}
@@ -101,8 +101,8 @@ export function PredictionVoteForm({
                 key={o.id}
                 className={`flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 text-sm transition ${
                   selected
-                    ? "border-aurora bg-white/10 text-white"
-                    : "border-white/10 bg-white/5 text-white/85 hover:bg-white/10"
+                    ? "border-aurora bg-iron/10 text-iron"
+                    : "border-iron/10 bg-iron/5 text-iron/85 hover:bg-iron/10"
                 }`}
               >
                 <input
@@ -122,7 +122,7 @@ export function PredictionVoteForm({
 
       {predictionType === "numeric" && (
         <label className="block">
-          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-white/55">
+          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-iron/55">
             Your guess{numericUnit ? ` (${numericUnit})` : ""}
           </span>
           <input
@@ -131,27 +131,27 @@ export function PredictionVoteForm({
             value={numericValue}
             onChange={(e) => setNumericValue(e.target.value)}
             placeholder="Enter a number"
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40"
+            className="w-full rounded-lg border border-iron/10 bg-iron/5 px-3 py-2 text-sm text-iron placeholder:text-iron/40"
           />
         </label>
       )}
 
       {predictionType === "date" && (
         <label className="block">
-          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-white/55">
+          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-iron/55">
             Your guess
           </span>
           <input
             type="date"
             value={dateValue}
             onChange={(e) => setDateValue(e.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white"
+            className="w-full rounded-lg border border-iron/10 bg-iron/5 px-3 py-2 text-sm text-iron"
           />
         </label>
       )}
 
       {error && (
-        <p className="rounded-lg border border-rose-400/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">
+        <p className="rounded-lg border border-rose-400/30 bg-rose-500/10 px-3 py-2 text-sm text-ember">
           {error}
         </p>
       )}
@@ -160,7 +160,7 @@ export function PredictionVoteForm({
         <button
           type="submit"
           disabled={pending}
-          className="rounded-lg bg-aurora px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-50"
+          className="rounded-lg bg-aurora px-4 py-2 text-sm font-medium text-iron shadow-sm hover:opacity-90 disabled:opacity-50"
         >
           {pending ? "Saving…" : currentVote ? "Update vote" : "Submit vote"}
         </button>

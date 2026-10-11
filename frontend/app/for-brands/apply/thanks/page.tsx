@@ -5,7 +5,7 @@ export const metadata = { title: "Application received" };
 export default function ThanksPage() {
   return (
     <main className="mx-auto max-w-2xl space-y-6 px-6 py-20 text-center">
-      <p className="text-xs uppercase tracking-[0.3em] text-white/60">
+      <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
         Application received
       </p>
       <h1
@@ -14,7 +14,7 @@ export default function ThanksPage() {
       >
         Thanks — we&apos;ll be in touch within 48 hours.
       </h1>
-      <p className="text-sm text-white/70">
+      <p className="text-sm text-iron/70">
         We review every application by hand. If you&apos;re a fit you&apos;ll
         get a follow-up email with a link to schedule onboarding. If we need
         more information first, we&apos;ll reach out at the email you provided.
@@ -22,7 +22,7 @@ export default function ThanksPage() {
       <div className="pt-4">
         <Link
           href="/brands"
-          className="rounded-full border border-white/30 px-6 py-3 text-sm font-medium text-white/80 hover:bg-white/10"
+          className="rounded-full border border-iron/30 px-6 py-3 text-sm font-medium text-iron/80 hover:bg-iron/10"
         >
           See active brands
         </Link>

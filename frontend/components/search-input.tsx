@@ -48,7 +48,7 @@ export default function SearchInput({
       <div className="relative">
         <span
           aria-hidden
-          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/40"
+          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-iron/40"
         >
           {/* Plain magnifier glyph — no icon dependency. */}
           ⌕
@@ -61,7 +61,7 @@ export default function SearchInput({
           placeholder={placeholder}
           autoComplete="off"
           spellCheck={false}
-          className={`w-full rounded-full border border-white/10 bg-black/40 pl-9 pr-3 text-white placeholder-white/40 outline-none transition focus:border-white/30 focus:bg-black/60 ${sizing}`}
+          className={`w-full rounded-full border border-iron/10 bg-parchment/40 pl-9 pr-3 text-iron placeholder-iron/40 outline-none transition focus:border-iron/30 focus:bg-parchment/60 ${sizing}`}
         />
       </div>
     </form>

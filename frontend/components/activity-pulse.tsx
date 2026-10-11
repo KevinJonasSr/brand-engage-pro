@@ -20,10 +20,10 @@ export default function ActivityPulseStrip({ pulse }: { pulse: ActivityPulse }) 
       {pills.map((p) => (
         <span
           key={p.label}
-          className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-black/30 px-3 py-1 text-xs text-white/70"
+          className="inline-flex items-center gap-1.5 rounded-full border border-iron/10 bg-parchment/30 px-3 py-1 text-xs text-iron/70"
         >
           <span>{p.emoji}</span>
-          <span className="font-semibold text-white">{p.value}</span>
+          <span className="font-semibold text-iron">{p.value}</span>
           <span>{p.label}</span>
         </span>
       ))}
