@@ -222,6 +222,12 @@ export default function BroadcastPage() {
                 </a>
                 .
               </p>
+              {(result.smsSkippedQuietHours ?? 0) > 0 && (
+                <p className="mt-2 text-amber-300">
+                  {result.smsSkippedQuietHours} texts were held back because it is quiet hours
+                  (9pm to 8am) for those members. They were not sent.
+                </p>
+              )}
               {result.error && <p className="mt-2 text-amber-300">⚠ {result.error}</p>}
             </>
           ) : (

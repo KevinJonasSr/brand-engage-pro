@@ -10,6 +10,8 @@ const SMS_LIMIT = 160;
 export type BroadcastFormResult = {
   ok: boolean;
   smsSent?: number;
+  /** Texts held back because it was quiet hours for the member. */
+  smsSkippedQuietHours?: number;
   emailSent?: number;
   recipientCount?: number;
   error?: string;
@@ -133,6 +135,7 @@ export async function sendBroadcast(
           sent: sms.sent,
           failed: sms.failed,
           recipients: sms.recipients,
+          skipped_quiet_hours: sms.skippedQuietHours ?? 0,
           tier_filter: tierFilter,
           error: sms.error ?? null,
         },
@@ -163,6 +166,7 @@ export async function sendBroadcast(
   return {
     ok: true,
     smsSent: sms.sent,
+    smsSkippedQuietHours: sms.skippedQuietHours ?? 0,
     emailSent: email.sent,
     recipientCount: Math.max(sms.recipients, email.recipients),
     error: errors.length > 0 ? errors.join(" ") : undefined,

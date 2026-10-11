@@ -282,6 +282,7 @@ export async function createAndPublishCampaign(formData: FormData) {
       sent: result.sent,
       failed: result.failed,
       recipients: result.recipients,
+      skipped_quiet_hours: result.skippedQuietHours ?? 0,
       targeted_event_id: targetEventRsvpers ? attachedEventId : null,
       error: result.error ?? null,
     });

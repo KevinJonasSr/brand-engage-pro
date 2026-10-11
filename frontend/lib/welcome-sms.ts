@@ -8,7 +8,7 @@
 export const WELCOME_SMS_BODY =
   "Welcome to Brand Engage Pro! You're signed up for texts about rewards, " +
   "specials, and events from the places you join. " +
-  "Reply HELP for help. Reply STOP to opt out. Msg & data rates may apply.";
+  "Msg frequency varies. Msg & data rates may apply. Reply HELP for help. Reply STOP to opt out.";
 
 const E164 = /^\+[1-9]\d{7,14}$/;
 

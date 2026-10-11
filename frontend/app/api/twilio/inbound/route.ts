@@ -1,29 +1,32 @@
 import { NextResponse } from "next/server";
 import twilio from "twilio";
 import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  HELP_REPLY,
+  START_NO_CONSENT_REPLY,
+  START_REPLY,
+  STOP_REPLY,
+  parseSmsKeyword,
+  phoneLookupVariants,
+} from "@/lib/sms-compliance";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+const DEFAULT_APP_URL = "https://www.brandengagepro.com";
+
 /**
- * Twilio inbound SMS webhook — carrier compliance for STOP / HELP keywords.
+ * Twilio inbound SMS webhook — carrier compliance for STOP / HELP / START.
  *
  * Configure in Twilio Console:
  *   Messaging Service → Integration → Incoming Messages
  *   URL: https://<your-domain>/api/twilio/inbound (POST, x-www-form-urlencoded)
  *
  * We respond with TwiML so Twilio sends the correct reply back to the member.
- * STOP / STOPALL / UNSUB / UNSUBSCRIBE / CANCEL / END / QUIT → opt out
- * HELP / INFO                                               → help text
- * START / YES / UNSTOP                                      → opt back in
- * Anything else                                             → silent ack (empty TwiML)
+ * Keywords and reply text live in lib/sms-compliance.ts. STOP and START keep
+ * members.sms_opted_in and notification_preferences.sms_enabled in step.
+ * Anything else gets a silent ack (empty TwiML).
  */
-const STOP_KEYWORDS = new Set([
-  "STOP", "STOPALL", "UNSUB", "UNSUBSCRIBE", "CANCEL", "END", "QUIT",
-]);
-const HELP_KEYWORDS = new Set(["HELP", "INFO"]);
-const START_KEYWORDS = new Set(["START", "YES", "UNSTOP"]);
-
 function twimlResponse(message: string | null): NextResponse {
   const body = message
     ? `<?xml version="1.0" encoding="UTF-8"?><Response><Message>${escapeXml(message)}</Message></Response>`
@@ -43,9 +46,34 @@ function escapeXml(s: string): string {
     .replaceAll("'", "&apos;");
 }
 
-// Normalize a phone number to a loose compare string (strip everything but digits)
-function normalizePhone(p: string | null | undefined): string {
-  return (p ?? "").replace(/\D/g, "");
+type Admin = ReturnType<typeof createAdminClient>;
+
+async function findMembersByPhone(admin: Admin, from: string) {
+  const variants = phoneLookupVariants(from);
+  if (variants.length === 0) return [];
+  const { data, error } = await admin
+    .from("members")
+    .select("id, consent_accepted_at")
+    .in("phone", variants);
+  if (error) throw error;
+  return (data ?? []) as Array<{ id: string; consent_accepted_at: string | null }>;
+}
+
+/** Set the SMS switch on both the member row and their notification prefs. */
+async function setSmsConsent(admin: Admin, memberIds: string[], enabled: boolean) {
+  if (memberIds.length === 0) return;
+  const { error } = await admin
+    .from("members")
+    .update({ sms_opted_in: enabled })
+    .in("id", memberIds);
+  if (error) throw error;
+  const { error: prefsError } = await admin
+    .from("notification_preferences")
+    .upsert(
+      memberIds.map((member_id) => ({ member_id, sms_enabled: enabled })),
+      { onConflict: "member_id" },
+    );
+  if (prefsError) throw prefsError;
 }
 
 export async function POST(request: Request) {
@@ -56,7 +84,7 @@ export async function POST(request: Request) {
     const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
     if (twilioAuthToken) {
       const sig = request.headers.get("x-twilio-signature") ?? "";
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://brand-engage-pro.vercel.app";
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? DEFAULT_APP_URL;
       const webhookUrl = `${appUrl}/api/twilio/inbound`;
       const params: Record<string, string> = {};
       for (const [k, v] of form.entries()) params[k] = String(v);
@@ -66,58 +94,29 @@ export async function POST(request: Request) {
     }
 
     const from = String(form.get("From") ?? "");
-    const bodyRaw = String(form.get("Body") ?? "").trim();
-    const keyword = bodyRaw.toUpperCase().split(/\s+/)[0] ?? "";
+    const keyword = parseSmsKeyword(String(form.get("Body") ?? ""));
 
-    if (!from) return twimlResponse(null);
+    if (!from || !keyword) return twimlResponse(null);
+    if (keyword === "help") return twimlResponse(HELP_REPLY);
 
     const admin = createAdminClient();
+    const members = await findMembersByPhone(admin, from);
 
-    if (STOP_KEYWORDS.has(keyword)) {
-      // Match by normalized phone in case formatting drifts
-      const digits = normalizePhone(from);
-      const { data: members } = await admin
-        .from("members")
-        .select("id, phone, first_name");
-      const target = (members ?? []).find(
-        (f) => normalizePhone(f.phone as string | null) === digits,
-      );
-      if (target) {
-        await admin.from("members").update({ sms_opted_in: false }).eq("id", target.id);
-      }
-      // Twilio also auto-handles STOP at the carrier level, but we reply explicitly
-      // so both systems stay in sync.
-      return twimlResponse(
-        "You're unsubscribed from Brand Engage Pro. Reply START to opt back in. Reply HELP for help.",
-      );
+    if (keyword === "stop") {
+      // Twilio also blocks the number at the carrier level; we reply and
+      // record it so our own sends skip this member too.
+      await setSmsConsent(admin, members.map((m) => m.id), false);
+      return twimlResponse(STOP_REPLY);
     }
 
-    if (START_KEYWORDS.has(keyword)) {
-      const digits = normalizePhone(from);
-      const { data: members } = await admin
-        .from("members")
-        .select("id, phone, first_name");
-      const target = (members ?? []).find(
-        (f) => normalizePhone(f.phone as string | null) === digits,
-      );
-      if (target) {
-        await admin.from("members").update({ sms_opted_in: true }).eq("id", target.id);
-      }
-      return twimlResponse(
-        "You're back in for Brand Engage Pro updates. Reply STOP anytime to opt out.",
-      );
-    }
-
-    if (HELP_KEYWORDS.has(keyword)) {
-      return twimlResponse(
-        "Brand Engage Pro: brand alerts + member rewards. Msg & data rates may apply. Reply STOP to opt out. Support: support@brandengagepro.com",
-      );
-    }
-
-    // Anything else — silent 200
-    return twimlResponse(null);
-  } catch {
+    // START: only members who accepted the terms on the site can opt back in.
+    const consented = members.filter((m) => m.consent_accepted_at);
+    if (consented.length === 0) return twimlResponse(START_NO_CONSENT_REPLY);
+    await setSmsConsent(admin, consented.map((m) => m.id), true);
+    return twimlResponse(START_REPLY);
+  } catch (err) {
     // Never 500 on this endpoint — Twilio will retry and duplicate messages.
+    console.error("twilio inbound failed:", err);
     return twimlResponse(null);
   }
 }

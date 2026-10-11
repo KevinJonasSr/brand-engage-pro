@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import FirstSessionChecklist from "@/components/first-session-checklist";
+import { SMS_CONSENT_TEXT } from "@/lib/sms-compliance";
 import {
   EMPTY_FIRST_SESSION_FACTS,
   type FirstSessionFacts,
@@ -536,8 +537,25 @@ export default function OnboardingWizard({
                       className="mt-0.5 h-4 w-4 accent-aurora"
                     />
                     <span>
-                      Text me about rewards, specials, and events from the places I join. Message
-                      and data rates may apply. Reply STOP to opt out at any time.
+                      {SMS_CONSENT_TEXT} See our{" "}
+                      <a
+                        href="/terms"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-aurora underline"
+                      >
+                        Terms
+                      </a>{" "}
+                      and{" "}
+                      <a
+                        href="/privacy"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-aurora underline"
+                      >
+                        Privacy Policy
+                      </a>
+                      .
                     </span>
                   </label>
                 )}

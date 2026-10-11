@@ -2,6 +2,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { sendPush } from "./push";
 import { sendSmsToFan } from "./sms";
 import { getPreferences, isOptedIn, isInQuietHours } from "./preferences";
+import { isSmsQuietTime } from "@/lib/sms-compliance";
 import type { NotificationType, PushPayload, Channel } from "./types";
 
 /**
@@ -14,9 +15,9 @@ import type { NotificationType, PushPayload, Channel } from "./types";
  * trigger lives at the tail of an existing user-facing action; if push
  * goes sideways we still want the action to succeed.
  *
- * Quiet hours suppress push only — SMS is always urgent enough to
- * override (and Twilio doesn't have a snooze concept). Easy to flip
- * later if behavior should change.
+ * Quiet hours suppress push and SMS. SMS also follows the carrier rule of
+ * no texts from 9pm to 8am in the member's time zone. Pass
+ * `bypassQuietHours` for confirmations the member is waiting on.
  */
 export async function sendNotification(opts: {
   memberId: string;
@@ -90,6 +91,15 @@ export async function sendNotification(opts: {
           body: opts.payload.body,
           status: "suppressed",
           suppression_reason: prefs.sms_enabled ? "type_opted_out" : "channel_opted_out",
+        });
+      } else if (inQuietHours || (!opts.bypassQuietHours && isSmsQuietTime(prefs.timezone))) {
+        logRows.push({
+          member_id: opts.memberId,
+          channel: "sms",
+          notification_type: opts.type,
+          body: opts.payload.body,
+          status: "suppressed",
+          suppression_reason: "quiet_hours",
         });
       } else {
         const smsBody = `${opts.payload.title}: ${opts.payload.body}`.slice(0, 280);
