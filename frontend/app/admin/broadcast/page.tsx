@@ -12,19 +12,25 @@ const TIER_OPTIONS = [
   { value: "platinum", label: "Platinum only" },
 ];
 
-// Email channel removed until Mailchimp brand/tier segments exist
-// (broadcastEmail currently blasts the full audience).
 const CHANNEL_OPTIONS = [
-  { value: "sms", label: "SMS" },
+  { value: "sms", label: "Text (SMS)" },
+  { value: "email", label: "Email" },
+  { value: "both", label: "Both" },
 ];
 
 const SMS_LIMIT = 160;
+const EMAIL_SUBJECT_MAX = 150;
+const EMAIL_BODY_MAX = 10000;
 
 export default function BroadcastPage() {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<BroadcastFormResult | null>(null);
   const [message, setMessage] = useState("");
+  const [subject, setSubject] = useState("");
+  const [channel, setChannel] = useState("sms");
   const [confirmed, setConfirmed] = useState(false);
+  const sendsSms = channel !== "email";
+  const sendsEmail = channel !== "sms";
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -38,12 +44,15 @@ export default function BroadcastPage() {
       setConfirmed(false);
       if (res.ok) {
         setMessage("");
+        setSubject("");
         (form.querySelector("[name=message]") as HTMLTextAreaElement | null)?.focus();
       }
     });
   }
 
   const charsLeft = SMS_LIMIT - message.length;
+  const canSend =
+    message.trim().length > 0 && (!sendsEmail || subject.trim().length > 0);
 
   return (
     <div className="space-y-8 max-w-2xl">
@@ -51,9 +60,9 @@ export default function BroadcastPage() {
         <p className="text-xs uppercase tracking-wide text-white/60">Admin · Broadcast</p>
         <h1 className="mt-1 text-2xl font-semibold">Send a broadcast</h1>
         <p className="mt-2 text-sm text-white/60">
-          Message your members directly via SMS — target by tier. Every send
-          is logged to Campaigns for your records. Email broadcast is temporarily
-          disabled until brand-scoped segments are ready.
+          Message your members by text, email or both, and target by tier.
+          Only members who follow this brand and said yes to that channel get
+          it. Every send is logged to Campaigns for your records.
         </p>
       </header>
 
@@ -83,7 +92,7 @@ export default function BroadcastPage() {
           </div>
         </fieldset>
 
-        {/* Channel — SMS only for soft launch */}
+        {/* Channel */}
         <fieldset className="space-y-2">
           <legend className="text-sm font-medium text-white/80">Channel</legend>
           <div className="flex flex-wrap gap-2">
@@ -96,7 +105,11 @@ export default function BroadcastPage() {
                   type="radio"
                   name="channel"
                   value={opt.value}
-                  defaultChecked
+                  checked={channel === opt.value}
+                  onChange={() => {
+                    setChannel(opt.value);
+                    setConfirmed(false);
+                  }}
                   className="sr-only"
                 />
                 {opt.label}
@@ -105,24 +118,48 @@ export default function BroadcastPage() {
           </div>
         </fieldset>
 
+        {/* Email subject */}
+        {sendsEmail && (
+          <div className="space-y-2">
+            <label htmlFor="subject" className="text-sm font-medium text-white/80">
+              Email subject
+            </label>
+            <input
+              id="subject"
+              name="subject"
+              required
+              maxLength={EMAIL_SUBJECT_MAX}
+              value={subject}
+              onChange={(e) => {
+                setSubject(e.target.value);
+                setConfirmed(false);
+              }}
+              placeholder="Sweet tea on us tonight"
+              className="w-full rounded-xl border border-white/15 bg-black/30 p-3 text-sm text-white placeholder:text-white/30 focus:border-aurora/60 focus:outline-none"
+            />
+          </div>
+        )}
+
         {/* Message */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <label htmlFor="message" className="text-sm font-medium text-white/80">
               Message
             </label>
-            <span
-              className={`text-xs ${charsLeft < 20 ? "text-red-400" : "text-white/40"}`}
-            >
-              {charsLeft} chars left (SMS)
-            </span>
+            {sendsSms && (
+              <span
+                className={`text-xs ${charsLeft < 20 ? "text-red-400" : "text-white/40"}`}
+              >
+                {charsLeft} chars left (SMS)
+              </span>
+            )}
           </div>
           <textarea
             id="message"
             name="message"
-            rows={4}
+            rows={sendsSms ? 4 : 8}
             required
-            maxLength={SMS_LIMIT}
+            maxLength={sendsSms ? SMS_LIMIT : EMAIL_BODY_MAX}
             value={message}
             onChange={(e) => {
               setMessage(e.target.value);
@@ -131,9 +168,9 @@ export default function BroadcastPage() {
             placeholder="Hey Nellie's fam! Tonight only — show this text for a complimentary sweet tea. 🍹"
             className="w-full resize-none rounded-xl border border-white/15 bg-black/30 p-4 text-sm text-white placeholder:text-white/30 focus:border-aurora/60 focus:outline-none"
           />
-          {message.length > 0 && (
+          {sendsSms && message.length > 0 && (
             <p className="text-xs text-white/40">
-              Recipients will see:{" "}
+              Text recipients will see:{" "}
               <span className="text-white/60">
                 {message} Reply STOP to opt out.
               </span>
@@ -159,7 +196,7 @@ export default function BroadcastPage() {
 
         <button
           type="submit"
-          disabled={isPending || !confirmed || !message.trim()}
+          disabled={isPending || !confirmed || !canSend}
           className="w-full rounded-full bg-gradient-to-r from-aurora to-ember py-3 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
         >
           {isPending ? "Sending…" : "Send broadcast"}
@@ -176,13 +213,17 @@ export default function BroadcastPage() {
           }`}
         >
           {result.ok ? (
-            <p>
-              ✓ Sent — {result.smsSent ?? 0} SMS delivered. Logged to{" "}
-              <a href="/admin/campaigns" className="underline underline-offset-2">
-                Campaigns
-              </a>
-              .
-            </p>
+            <>
+              <p>
+                ✓ Sent: {result.smsSent ?? 0} texts and {result.emailSent ?? 0} emails.
+                Logged to{" "}
+                <a href="/admin/campaigns" className="underline underline-offset-2">
+                  Campaigns
+                </a>
+                .
+              </p>
+              {result.error && <p className="mt-2 text-amber-300">⚠ {result.error}</p>}
+            </>
           ) : (
             <p>⚠ {result.error}</p>
           )}
@@ -191,9 +232,9 @@ export default function BroadcastPage() {
 
       <div className="rounded-2xl border border-white/10 bg-black/20 p-5 text-xs text-white/50 space-y-1">
         <p className="font-medium text-white/60">Good to know</p>
-        <p>• SMS recipients must have opted in and have a verified phone number.</p>
-        <p>• Email broadcast is disabled (unscoped Mailchimp audience risk).</p>
-        <p>• All sends are throttled (250 ms/msg) to stay within carrier rate limits.</p>
+        <p>• Text recipients must have opted in and have a verified phone number.</p>
+        <p>• Email recipients must have said yes to email. Each email names your brand and has its own unsubscribe link.</p>
+        <p>• Text sends are throttled (250 ms/msg) to stay within carrier rate limits.</p>
         <p>• Every broadcast is logged under <a href="/admin/campaigns" className="underline underline-offset-2">Campaigns</a> with recipient counts.</p>
       </div>
     </div>

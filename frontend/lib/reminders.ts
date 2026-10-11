@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { broadcastEmail, broadcastSms } from "@/lib/broadcast";
+import { broadcastBrandEmail, broadcastSms } from "@/lib/broadcast";
 import {
   NELLIES_BOURBON_TITLE,
   isBourbonCigarTitle,
@@ -128,7 +128,12 @@ export async function sendEventReminder(
 
   const [smsResult, emailResult] = await Promise.all([
     broadcastSms({ body: smsBody, brandSlug: event.brand_slug, eventId: event.id }),
-    broadcastEmail({ subject: copy.subject, body: copy.email }),
+    broadcastBrandEmail({
+      subject: copy.subject,
+      body: copy.email,
+      brandSlug: event.brand_slug,
+      eventId: event.id,
+    }),
   ]);
 
   const error =

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { confirmUnsubscribe } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -8,35 +9,38 @@ export const metadata = { title: "Unsubscribe" };
 export default async function UnsubscribePage({
   searchParams,
 }: {
-  searchParams: Promise<{ token?: string; channel?: string }>;
+  searchParams: Promise<{ token?: string; channel?: string; status?: string }>;
 }) {
-  const { token, channel } = await searchParams;
+  const { token, channel, status: done } = await searchParams;
   const ch = channel === "sms" ? "sms" : "email";
+  const what = ch === "sms" ? "text messages" : "email";
 
+  // Looking at this page changes nothing. The change happens only when the
+  // member presses the button (a form POST), so link scanners are harmless.
   let status:
+    | "confirm"
     | "ok"
     | "no_token"
     | "not_found"
     | "error" = "no_token";
   let firstName: string | null = null;
 
-  if (token) {
+  if (done === "error") {
+    status = "error";
+  } else if (done === "not_found") {
+    status = "not_found";
+  } else if (token) {
     try {
       const admin = createAdminClient();
       const { data: member } = await admin
         .from("members")
-        .select("id, first_name")
+        .select("first_name")
         .eq("unsubscribe_token", token)
         .maybeSingle();
       if (!member) {
         status = "not_found";
       } else {
-        const update =
-          ch === "sms"
-            ? { sms_opted_in: false }
-            : { email_opted_in: false };
-        await admin.from("members").update(update).eq("id", member.id);
-        status = "ok";
+        status = done === "done" ? "ok" : "confirm";
         firstName = (member.first_name as string | null) ?? null;
       }
     } catch {
@@ -46,13 +50,33 @@ export default async function UnsubscribePage({
 
   return (
     <main className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4 px-6 py-12 text-center">
+      {status === "confirm" && token && (
+        <>
+          <h1 className="text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
+            Stop {what}{firstName ? `, ${firstName}` : ""}?
+          </h1>
+          <p className="text-sm text-white/70">
+            Press the button to stop getting {what} from Brand Engage Pro.
+          </p>
+          <form action={confirmUnsubscribe}>
+            <input type="hidden" name="token" value={token} />
+            <input type="hidden" name="channel" value={ch} />
+            <button
+              type="submit"
+              className="mt-2 rounded-full bg-white px-6 py-2 text-sm font-semibold text-black hover:bg-white/90"
+            >
+              Unsubscribe from {what}
+            </button>
+          </form>
+        </>
+      )}
       {status === "ok" && (
         <>
           <h1 className="text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
             You&apos;re unsubscribed{firstName ? `, ${firstName}` : ""}.
           </h1>
           <p className="text-sm text-white/70">
-            We&apos;ve stopped sending {ch === "sms" ? "text messages" : "email"} from Brand Engage Pro.
+            We&apos;ve stopped sending {what} from Brand Engage Pro.
             You can turn it back on anytime from your profile.
           </p>
         </>

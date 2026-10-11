@@ -496,7 +496,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
           className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
         />
         <p className="text-xs text-white/50">
-          Recorded as a campaign item; final send handled via Mailchimp.
+          Goes to this brand&apos;s followers who said yes to email. Each email has its own unsubscribe link.
         </p>
       </Section>
 

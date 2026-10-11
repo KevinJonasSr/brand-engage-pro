@@ -2,7 +2,10 @@
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import { canAccessBrand, getAdminContext, requireAdminContext, requireBrandAccess } from "@/lib/admin";
-import { broadcastSms } from "@/lib/broadcast";
+import { broadcastBrandEmail, broadcastSms, type BroadcastResult } from "@/lib/broadcast";
+import { validateEmailCampaign } from "@/lib/email-campaign";
+
+const SMS_LIMIT = 160;
 
 export type BroadcastFormResult = {
   ok: boolean;
@@ -12,12 +15,19 @@ export type BroadcastFormResult = {
   error?: string;
 };
 
+const CHANNELS = ["sms", "email", "both"] as const;
+type BroadcastChannel = (typeof CHANNELS)[number];
+
+function parseChannel(raw: string): BroadcastChannel | null {
+  return (CHANNELS as readonly string[]).includes(raw) ? (raw as BroadcastChannel) : null;
+}
+
 /**
- * Send a targeted SMS broadcast to a brand's member segment.
+ * Send a targeted broadcast to a brand's member segment by SMS, email or both.
  * Tier filter: "all" | "bronze" | "silver" | "gold" | "platinum"
  *
- * Soft-launch: SMS only. Email broadcast stays disabled until Mailchimp
- * audiences can be scoped by brand/tier (unscoped blasts are unsafe).
+ * Email goes one message per member through Mailchimp Transactional, so it
+ * only reaches this brand's opted-in followers (see broadcastBrandEmail).
  */
 export async function sendBroadcast(
   formData: FormData,
@@ -31,20 +41,22 @@ export async function sendBroadcast(
     String(formData.get("brand_slug") ?? "").trim() ||
     (ctx.currentCommunityId ?? "").trim();
   const message = String(formData.get("message") ?? "").trim();
+  const subject = String(formData.get("subject") ?? "").trim();
   const tierFilter = String(formData.get("tier_filter") ?? "all");
-  const channelRaw = String(formData.get("channel") ?? "sms");
+  const channel = parseChannel(String(formData.get("channel") ?? "sms"));
 
   if (!brandSlug || !message) {
     return { ok: false, error: "Brand and message are required." };
   }
-
-  // Reject email / both (and any other channel) — do not send email.
-  if (channelRaw !== "sms") {
-    return {
-      ok: false,
-      error:
-        "Email broadcast is disabled until brand/tier scoping is implemented. Use SMS.",
-    };
+  if (!channel) return { ok: false, error: "Pick SMS, email or both." };
+  const sendsSms = channel !== "email";
+  const sendsEmail = channel !== "sms";
+  if (sendsSms && message.length > SMS_LIMIT) {
+    return { ok: false, error: `SMS messages must be ${SMS_LIMIT} characters or fewer.` };
+  }
+  if (sendsEmail) {
+    const invalid = validateEmailCampaign({ subject, body: message });
+    if (invalid) return { ok: false, error: invalid };
   }
 
   // Brand admins may only broadcast to their own brand.
@@ -86,12 +98,15 @@ export async function sendBroadcast(
       : `[${tierFilter[0].toUpperCase() + tierFilter.slice(1)}+ members] `;
 
   // allowedMemberIds is null for "all", so the whole brand audience is used.
-  const result = await broadcastSms({
-    body: tierLabel + message,
-    brandSlug,
-    memberIds: allowedMemberIds,
-  });
-  const smsSent = result.sent;
+  const empty: BroadcastResult = { attempted: 0, sent: 0, failed: 0, recipients: 0 };
+  const [sms, email] = await Promise.all([
+    sendsSms
+      ? broadcastSms({ body: tierLabel + message, brandSlug, memberIds: allowedMemberIds })
+      : Promise.resolve(empty),
+    sendsEmail
+      ? broadcastBrandEmail({ subject, body: message, brandSlug, memberIds: allowedMemberIds })
+      : Promise.resolve(empty),
+  ]);
 
   // Record in campaigns table for audit trail
   const admin = createAdminClient();
@@ -100,8 +115,8 @@ export async function sendBroadcast(
     .insert({
       brand_slug: brandSlug,
       community_id: brandSlug,
-      title: `Broadcast: ${message.slice(0, 60)}${message.length > 60 ? "…" : ""}`,
-      description: `Tier: ${tierFilter} · Channel: sms`,
+      title: `Broadcast: ${(subject || message).slice(0, 60)}${(subject || message).length > 60 ? "…" : ""}`,
+      description: `Tier: ${tierFilter} · Channel: ${channel}`,
       created_by: ctx.user.id,
       published_at: new Date().toISOString(),
     })
@@ -109,26 +124,56 @@ export async function sendBroadcast(
     .single();
 
   if (campaign) {
-    await admin.from("campaign_items").insert({
-      campaign_id: campaign.id,
-      item_kind: "sms",
-      ref_id: null,
-      metadata: { sent: smsSent, tier_filter: tierFilter },
-    });
+    const items = [
+      sendsSms && {
+        campaign_id: campaign.id,
+        item_kind: "sms",
+        ref_id: null,
+        metadata: {
+          sent: sms.sent,
+          failed: sms.failed,
+          recipients: sms.recipients,
+          tier_filter: tierFilter,
+          error: sms.error ?? null,
+        },
+      },
+      sendsEmail && {
+        campaign_id: campaign.id,
+        item_kind: "email",
+        ref_id: null,
+        metadata: {
+          subject,
+          sent: email.sent,
+          failed: email.failed,
+          recipients: email.recipients,
+          tier_filter: tierFilter,
+          error: email.error ?? null,
+        },
+      },
+    ].filter(Boolean);
+    await admin.from("campaign_items").insert(items);
+  }
+
+  const errors = [sms.error, email.error].filter(Boolean);
+  const anySent = sms.sent + email.sent > 0;
+  if (errors.length > 0 && !anySent) {
+    return { ok: false, error: errors.join(" ") };
   }
 
   return {
     ok: true,
-    smsSent,
-    emailSent: 0,
-    recipientCount: allowedMemberIds?.length ?? smsSent,
+    smsSent: sms.sent,
+    emailSent: email.sent,
+    recipientCount: Math.max(sms.recipients, email.recipients),
+    error: errors.length > 0 ? errors.join(" ") : undefined,
   };
 }
 
-/** Preview SMS recipient count for a brand + tier combination without sending. */
+/** Preview recipient count for a brand + tier + channel without sending. */
 export async function previewRecipientCount(
   brandSlug: string,
   tierFilter: string,
+  channel: string = "sms",
 ): Promise<number> {
   // Server actions are public endpoints: check the caller before counting.
   const ctx = await requireAdminContext();
@@ -147,7 +192,7 @@ export async function previewRecipientCount(
   let query = admin
     .from("members")
     .select("id", { count: "exact", head: true })
-    .eq("sms_opted_in", true)
+    .eq(channel === "email" ? "email_opted_in" : "sms_opted_in", true)
     .eq("suspended", false)
     .in("id", followerIds);
 
