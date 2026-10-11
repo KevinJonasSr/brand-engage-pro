@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { StampCardData } from "@/lib/data/stamp-card";
 
 /**
@@ -7,7 +6,6 @@ import type { StampCardData } from "@/lib/data/stamp-card";
  */
 export default function StampCard({
   data,
-  brandSlug,
   accentFrom,
   accentTo,
 }: {
@@ -82,12 +80,11 @@ export default function StampCard({
         </p>
       )}
 
-      <Link
-        href={`/brands/${brandSlug}/checkin`}
-        className="block w-full rounded-full border border-white/20 py-2 text-center text-sm font-medium text-white/80 hover:bg-white/10 transition"
-      >
-        Scan check-in QR →
-      </Link>
+      {/* Check-in needs the signed token in the store QR code, so there is
+          no link here. A plain link would fail once the secret is set. */}
+      <p className="w-full rounded-full border border-white/20 py-2 text-center text-sm font-medium text-white/80">
+        Scan the QR code at the counter to check in
+      </p>
     </div>
   );
 }

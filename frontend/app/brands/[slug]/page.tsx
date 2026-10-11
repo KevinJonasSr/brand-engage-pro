@@ -126,10 +126,6 @@ export default async function BrandPage({
       ? { label: "Complete your profile", href: `/onboarding?ref=${brand.slug}` }
       : { label: "View rewards", href: `/brands/${brand.slug}/rewards` };
 
-  const secondaryCta = isSignedIn
-    ? { label: "Check in", href: `/brands/${brand.slug}/checkin` }
-    : { label: "See rewards", href: `/brands/${brand.slug}/rewards` };
-
   const showFounderLink = founderData && founderData.cap > 0;
 
   return (
