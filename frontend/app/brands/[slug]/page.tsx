@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import LeaderboardMiniCard from "@/components/leaderboard-mini-card";
 import { LatestStrip } from "@/components/latest-strip";
@@ -31,6 +32,19 @@ import { getFoundingClaims } from "@/lib/founding";
 import { JGE_BRAND_SLUG } from "@/lib/jge-launch";
 import { NELLIES_BRAND_SLUG } from "@/lib/nellies-launch";
 import Reveal from "@/components/reveal";
+
+const NELLIES_PHOTOS = [
+  {
+    src: "/brands/nellies/biscuits.jpg",
+    alt: "Biscuits from the Nellie's kitchen",
+    caption: "Biscuits from the Nellie's kitchen.",
+  },
+  {
+    src: "/brands/nellies/interior-bar.jpg",
+    alt: "The bar at Nellie's Southern Kitchen",
+    caption: "The bar at Nellie's.",
+  },
+] as const;
 export const dynamic = "force-dynamic";
 
 // Per-brand hero focal-point now comes from brands.hero_focal_x /
@@ -316,6 +330,30 @@ export default async function BrandPage({
         </div>
       </section>
       </Reveal>
+
+      {/* Nellie's photos: real kitchen and bar shots, never AI food */}
+      {isNellies && (
+        <section className="grid gap-6 sm:grid-cols-2">
+          {NELLIES_PHOTOS.map((photo, i) => (
+            <Reveal key={photo.src} index={i}>
+              <figure className="group overflow-hidden rounded-lg border border-white/10">
+                <div className="relative aspect-[4/3]">
+                  <Image
+                    src={photo.src}
+                    alt={photo.alt}
+                    fill
+                    sizes="(min-width: 640px) 50vw, 100vw"
+                    className="bep-photo-zoom object-cover"
+                  />
+                </div>
+                <figcaption className="bg-black/30 px-5 py-3 text-sm text-white/70">
+                  {photo.caption}
+                </figcaption>
+              </figure>
+            </Reveal>
+          ))}
+        </section>
+      )}
 
       {/* Top members leaderboard preview */}
       <Reveal>

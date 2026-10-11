@@ -161,10 +161,10 @@ export default async function RootLayout({
     >
       <body className="min-h-full bg-midnight text-white">
         <header className="sticky top-0 z-40 border-b border-white/10 bg-midnight/80 backdrop-blur">
-          <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
-            <div className="flex items-center gap-3">
-              <Link href="/" className="flex items-center gap-2">
-                <svg viewBox="0 0 32 32" width="32" height="32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:gap-4 sm:px-6">
+            <div className="flex min-w-0 items-center gap-3">
+              <Link href="/" className="flex shrink-0 items-center gap-2">
+                <svg className="shrink-0" viewBox="0 0 32 32" width="32" height="32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                   <defs>
                     <linearGradient id="bep-logo-grad" x1="0" y1="0" x2="1" y2="1">
                       <stop offset="0%" stopColor="#D4A017" />
@@ -176,7 +176,7 @@ export default async function RootLayout({
                   <rect x="5.5" y="25" width="21" height="2.5" rx="1.25" fill="white" fillOpacity="0.95" />
                 </svg>
                 <span
-                  className="text-lg font-semibold tracking-tight"
+                  className="whitespace-nowrap text-base font-semibold tracking-tight sm:text-lg"
                   style={{ fontFamily: "var(--font-display)" }}
                 >
                   Brand Engage<span className="text-aurora"> Pro</span>
