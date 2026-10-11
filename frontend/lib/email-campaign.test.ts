@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
+import { fileURLToPath } from "node:url";
 import {
   EMAIL_BODY_MAX,
   EMAIL_SUBJECT_MAX,
@@ -9,6 +11,12 @@ import {
   chunk,
   countMandrillResults,
   escapeHtml,
+  isMarketingEmailEnabled,
+  isOneClickUnsubscribeBody,
+  listUnsubscribeHeaders,
+  mailingAddress,
+  marketingEmailBlockReason,
+  oneClickUnsubscribeUrl,
   stripMergeTags,
   unsubscribeUrl,
   validateEmailCampaign,
@@ -65,11 +73,81 @@ describe("unsubscribeUrl", () => {
   });
 });
 
+describe("env example", () => {
+  const envExample = readFileSync(
+    fileURLToPath(new URL("../.env.example", import.meta.url)),
+    "utf8",
+  );
+
+  it("documents the off switch and does not turn marketing email on", () => {
+    assert.match(envExample, /^EMAIL_SENDING_ENABLED=0$/m);
+    assert.doesNotMatch(envExample, /EMAIL_SENDING_ENABLED=1/);
+    assert.doesNotMatch(envExample, /MAILCHIMP_BROADCAST_ENABLED=1/);
+    assert.match(envExample, /BEP_MAILING_ADDRESS/);
+  });
+});
+
+describe("marketing email gate", () => {
+  const env = {
+    EMAIL_SENDING_ENABLED: "1",
+    BEP_MAILING_ADDRESS: "1 Main St, Nashville, TN 37201",
+    MAILCHIMP_TRANSACTIONAL_API_KEY: "md-test",
+  };
+
+  it("stays off unless EMAIL_SENDING_ENABLED is exactly 1", () => {
+    assert.equal(isMarketingEmailEnabled({}), false);
+    assert.equal(isMarketingEmailEnabled({ EMAIL_SENDING_ENABLED: "true" }), false);
+    assert.equal(isMarketingEmailEnabled({ EMAIL_SENDING_ENABLED: "0" }), false);
+    assert.equal(isMarketingEmailEnabled({ EMAIL_SENDING_ENABLED: "1" }), true);
+  });
+
+  it("refuses to send when the key is set but the switch or address is missing", () => {
+    assert.match(
+      marketingEmailBlockReason({ MAILCHIMP_TRANSACTIONAL_API_KEY: "md-test" }) ?? "",
+      /EMAIL_SENDING_ENABLED=1/,
+    );
+    assert.match(
+      marketingEmailBlockReason({
+        EMAIL_SENDING_ENABLED: "1",
+        MAILCHIMP_TRANSACTIONAL_API_KEY: "md-test",
+      }) ?? "",
+      /BEP_MAILING_ADDRESS/,
+    );
+    assert.equal(marketingEmailBlockReason(env), null);
+    assert.equal(mailingAddress({ BEP_MAILING_ADDRESS: "  1 Main St  " }), "1 Main St");
+    assert.equal(mailingAddress({}), null);
+  });
+
+  it("recognizes the RFC 8058 one-click body", () => {
+    assert.equal(isOneClickUnsubscribeBody("List-Unsubscribe=One-Click"), true);
+    assert.equal(isOneClickUnsubscribeBody("List-Unsubscribe=One-Click\r\n"), true);
+    assert.equal(isOneClickUnsubscribeBody(""), false);
+    assert.equal(isOneClickUnsubscribeBody("token=abc"), false);
+  });
+});
+
+describe("one-click unsubscribe url", () => {
+  it("points at the POST endpoint", () => {
+    assert.equal(
+      oneClickUnsubscribeUrl("https://www.brandengagepro.com/", "abc"),
+      "https://www.brandengagepro.com/api/unsubscribe/one-click?token=abc",
+    );
+    assert.deepEqual(
+      listUnsubscribeHeaders("https://www.brandengagepro.com/api/unsubscribe/one-click?token=abc"),
+      {
+        "List-Unsubscribe": "<https://www.brandengagepro.com/api/unsubscribe/one-click?token=abc>",
+        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+      },
+    );
+  });
+});
+
 describe("buildCampaignEmail", () => {
   const email = buildCampaignEmail({
     subject: "Bourbon night <RSVP>",
     body: "Join us *|EMAIL|*\nSee you there",
     brandName: "Nellie's",
+    postalAddress: "1 Main St, Nashville, TN 37201",
   });
 
   it("escapes the subject and body in HTML", () => {
@@ -77,11 +155,13 @@ describe("buildCampaignEmail", () => {
     assert.ok(!email.html.includes("<RSVP>"));
   });
 
-  it("names the brand and carries the unsubscribe tag in both versions", () => {
+  it("names the brand and carries the unsubscribe tag and mailing address", () => {
     assert.match(email.html, /Nellie&#39;s/);
     assert.ok(email.html.includes(`href="${UNSUB_MERGE_TAG}"`));
+    assert.match(email.html, /1 Main St, Nashville, TN 37201/);
     assert.match(email.text, /joined Nellie's on Brand Engage Pro/);
     assert.ok(email.text.includes(`Unsubscribe: ${UNSUB_MERGE_TAG}`));
+    assert.match(email.text, /1 Main St, Nashville, TN 37201/);
   });
 
   it("does not let admin text merge member data", () => {
@@ -110,8 +190,8 @@ describe("buildMandrillMessage", () => {
     fromName: "Nellie's",
     replyTo: "support@brandengagepro.com",
     recipients: [
-      { email: "a@x.test", unsubUrl: "https://u/a" },
-      { email: "b@x.test", unsubUrl: "https://u/b" },
+      { email: "a@x.test", unsubUrl: "https://u/a", oneClickUrl: "https://oc/a" },
+      { email: "b@x.test", unsubUrl: "https://u/b", oneClickUrl: "https://oc/b" },
     ],
     tags: ["campaign", "nellies"],
   });
@@ -126,16 +206,30 @@ describe("buildMandrillMessage", () => {
 
   it("gives each member their own unsubscribe link", () => {
     assert.deepEqual(msg.merge_vars, [
-      { rcpt: "a@x.test", vars: [{ name: "UNSUB_URL", content: "https://u/a" }] },
-      { rcpt: "b@x.test", vars: [{ name: "UNSUB_URL", content: "https://u/b" }] },
+      {
+        rcpt: "a@x.test",
+        vars: [
+          { name: "UNSUB_URL", content: "https://u/a" },
+          { name: "UNSUB_ONECLICK", content: "https://oc/a" },
+        ],
+      },
+      {
+        rcpt: "b@x.test",
+        vars: [
+          { name: "UNSUB_URL", content: "https://u/b" },
+          { name: "UNSUB_ONECLICK", content: "https://oc/b" },
+        ],
+      },
     ]);
     assert.equal(msg.merge, true);
   });
 
-  it("sets subject, sender and reply-to", () => {
+  it("sets subject, sender, reply-to and one-click headers", () => {
     assert.equal(msg.subject, "Hello");
     assert.equal(msg.from_name, "Nellie's");
-    assert.deepEqual(msg.headers, { "Reply-To": "support@brandengagepro.com" });
+    assert.equal(msg.headers["Reply-To"], "support@brandengagepro.com");
+    assert.equal(msg.headers["List-Unsubscribe"], "<*|UNSUB_ONECLICK|*>");
+    assert.equal(msg.headers["List-Unsubscribe-Post"], "List-Unsubscribe=One-Click");
   });
 });
 
