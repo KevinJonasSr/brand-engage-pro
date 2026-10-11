@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { isAiFeatureOn } from "@/lib/ai-features";
+import { scrollBehavior } from "@/lib/motion";
 import { createPredictionAction } from "@/app/brands/[slug]/community/predictions-actions";
 import type {
   AwardStrategy,
@@ -143,7 +144,7 @@ export function CreatePredictionForm({ brands }: Props) {
     }
     setSuggestions([]);
     // Scroll to top of the form
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: scrollBehavior() });
   }
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {

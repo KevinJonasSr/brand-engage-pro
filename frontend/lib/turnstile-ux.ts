@@ -153,7 +153,13 @@ export function scrollToTurnstileChallenge() {
   if (typeof document === "undefined") return;
   const el = document.getElementById(TURNSTILE_CHALLENGE_ID);
   if (!el) return;
-  el.scrollIntoView({ behavior: "smooth", block: "center" });
+  // Inline check (this file has no imports so node --test can load it);
+  // same rule as scrollBehavior() in lib/motion.ts.
+  const reduce =
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
   const focusable = el.querySelector<HTMLElement>(
     "button, [tabindex]:not([tabindex='-1'])",
   );
