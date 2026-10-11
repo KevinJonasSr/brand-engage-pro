@@ -106,13 +106,13 @@ export default async function BrandPage({
   );
   const premiumDescriptionForBrand = {
     specials: isRestaurant
-      ? "Premium members get off-menu specials, member-only pours, and small-batch dishes we don\u2019t put on the regular menu."
-      : "Premium members get member-only perks and first access to new offers.",
+      ? "Select members get off-menu specials, member-only pours, and small-batch dishes we don\u2019t put on the regular menu."
+      : "Select members get member-only perks and first access to new offers.",
     events: isRestaurant
-      ? "Premium members get small member events, early RSVPs, and behind-the-scenes moments."
+      ? "Select members get small member events, early RSVPs, and behind-the-scenes moments."
       : slug === JGE_BRAND_SLUG
-        ? "Premium is a separate paid membership. It includes the Music Row house tour, early listens from our writers and artists, and a limited number of live sessions."
-        : "Premium members get member-only events, early RSVPs, and behind-the-scenes moments.",
+        ? "Select members get the Music Row house tour, early listens from our writers and artists, and a limited number of live sessions."
+        : "Select members get member-only events, early RSVPs, and behind-the-scenes moments.",
   };
   const ctaGradient = `linear-gradient(to right, ${brand.accentFrom}, ${brand.accentTo})`;
 
@@ -238,12 +238,6 @@ export default async function BrandPage({
               Founding Members →
             </Link>
           )}
-          <Link
-            href={`/premium?c=${encodeURIComponent(brand.slug)}`}
-            className="text-white/70 underline-offset-4 hover:text-white hover:underline"
-          >
-            Premium
-          </Link>
         </div>
       </section>
 

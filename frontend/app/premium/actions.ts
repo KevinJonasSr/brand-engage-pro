@@ -10,6 +10,7 @@ import {
   pickPriceId,
 } from "@/lib/stripe-helpers";
 import { getCurrentCommunityId, normalizeCommunitySlug } from "@/lib/community";
+import { PREMIUM_SALES_OPEN, premiumClosedRedirect } from "@/lib/premium-sales";
 
 function getCanonicalOrigin(): string | null {
   const configured = process.env.NEXT_PUBLIC_APP_URL ?? process.env.NEXT_PUBLIC_SITE_URL;
@@ -27,6 +28,11 @@ function getCanonicalOrigin(): string | null {
  * Always use standard Premium prices ($10/mo / $99/yr).
  */
 export async function createCheckoutSessionAction(formData: FormData) {
+  if (!PREMIUM_SALES_OPEN) {
+    redirect(
+      premiumClosedRedirect(normalizeCommunitySlug(formData.get("community_id")?.toString())),
+    );
+  }
   const billingPeriod = (formData.get("billing_period") ?? "monthly") as
     | "monthly"
     | "annual";

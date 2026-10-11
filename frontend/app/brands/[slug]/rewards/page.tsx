@@ -86,7 +86,7 @@ export default async function RewardsPage({
           </p>
           <p className="mt-2 text-xs text-white/45">
             Move up from Bronze to Platinum as you earn points. The first 100 members join as
-            Founders for free. Premium is a separate paid membership. Your balance starts at 0
+            Founders for free. Brands pay, guests join free. Your balance starts at 0
             when you join.
           </p>
         </div>

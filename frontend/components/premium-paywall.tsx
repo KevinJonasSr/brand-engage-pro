@@ -5,7 +5,7 @@ interface PremiumPaywallProps {
   feature: string;
   /** Optional longer description of what they'll get. */
   description?: string;
-  /** Community slug — paywall links go to /premium scoped to this community. */
+  /** Community slug — the join link is scoped to this community. */
   communityId?: string;
   /** Community accent colors. Falls back to the default aurora→ember gradient. */
   accentFrom?: string | null;
@@ -36,27 +36,16 @@ export default function PremiumPaywall({
 }: PremiumPaywallProps) {
   const from = accentFrom ?? "#D4A017";
   const to = accentTo ?? "#9B2335";
-  const premiumHref = `/premium${communityId ? `?c=${encodeURIComponent(communityId)}` : ""}`;
-  const signupHref = `/signup${communityId ? `?ref=${encodeURIComponent(communityId)}&next=${encodeURIComponent(premiumHref)}` : `?next=${encodeURIComponent(premiumHref)}`}`;
+  // Premium sales are closed (brands pay, guests join free), so the only
+  // CTA left is the free join for signed-out viewers.
+  const signupHref = `/signup${communityId ? `?ref=${encodeURIComponent(communityId)}` : ""}`;
+  const ctaHref = reason === "signed-out" ? signupHref : null;
+  const ctaLabel = "Join free";
 
-  const ctaHref = reason === "signed-out"
-    ? signupHref
-    : premiumHref;
-
-  let ctaLabel: string;
-  let featureCopy: string;
-
-  if (reason === "signed-out") {
-    ctaLabel = "Create free profile";
-    featureCopy = `${feature} is for Premium members`;
-  } else if (reason === "needs-founder") {
-    ctaLabel = "Become a Founding Member";
-    featureCopy = `${feature} is for Founders only`;
-  } else {
-    // needs-premium
-    ctaLabel = "Upgrade to Premium — $10/mo";
-    featureCopy = `${feature} is for Premium members`;
-  }
+  const featureCopy =
+    reason === "needs-founder"
+      ? `${feature} is for Founders only`
+      : `${feature} is for select members`;
 
   if (compact) {
     return (
@@ -76,13 +65,15 @@ export default function PremiumPaywall({
             <p className="truncate text-xs text-white/55">{description}</p>
           )}
         </div>
-        <Link
-          href={ctaHref}
-          className="flex-none rounded-full px-3 py-1.5 text-xs font-semibold text-white shadow-glass transition hover:brightness-110"
-          style={{ backgroundImage: `linear-gradient(90deg, ${from}, ${to})` }}
-        >
-          {reason === "signed-out" ? "Join" : reason === "needs-founder" ? "Founders" : "Upgrade"}
-        </Link>
+        {ctaHref && (
+          <Link
+            href={ctaHref}
+            className="flex-none rounded-full px-3 py-1.5 text-xs font-semibold text-white shadow-glass transition hover:brightness-110"
+            style={{ backgroundImage: `linear-gradient(90deg, ${from}, ${to})` }}
+          >
+            Join
+          </Link>
+        )}
       </div>
     );
   }
@@ -98,9 +89,7 @@ export default function PremiumPaywall({
             <p className="text-sm font-semibold text-white/90">
               {reason === "needs-founder"
                 ? "Founders only — the free first 100 who join"
-                : reason === "signed-out"
-                  ? "Join to unlock Premium"
-                  : "Upgrade to Premium"}
+                : "Members only"}
             </p>
             <h3 className="mt-2 text-lg font-bold text-white">{featureCopy}</h3>
             {description && (
@@ -116,7 +105,7 @@ export default function PremiumPaywall({
           {reason === "needs-founder" ? (
             <>
               <p className="text-xs text-white/60">
-                Founding is a free first-100 badge. Premium is a separate paid club. Founders get:
+                Founding is a free first-100 badge. Founders get:
               </p>
               <ul className="space-y-1 text-xs text-white/70">
                 <li>✓ Exclusive founder-only posts & events</li>
@@ -127,24 +116,21 @@ export default function PremiumPaywall({
           ) : (
             <>
               <p className="text-xs text-white/60">
-                Premium members get exclusive access to:
+                Brands pay, guests join free. Join to earn points toward every reward.
               </p>
-              <ul className="space-y-1 text-xs text-white/70">
-                <li>✓ Member-only posts, perks, and updates</li>
-                <li>✓ Early event RSVPs & member-only events</li>
-                <li>✓ Exclusive polls & challenges</li>
-              </ul>
             </>
           )}
         </div>
 
-        <Link
-          href={ctaHref}
-          className="inline-block rounded-full px-5 py-2 text-sm font-semibold text-white shadow-glass transition hover:brightness-110"
-          style={{ backgroundImage: `linear-gradient(90deg, ${from}, ${to})` }}
-        >
-          {ctaLabel}
-        </Link>
+        {ctaHref && (
+          <Link
+            href={ctaHref}
+            className="inline-block rounded-full px-5 py-2 text-sm font-semibold text-white shadow-glass transition hover:brightness-110"
+            style={{ backgroundImage: `linear-gradient(90deg, ${from}, ${to})` }}
+          >
+            {ctaLabel}
+          </Link>
+        )}
       </div>
     </section>
   );

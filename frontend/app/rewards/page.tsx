@@ -27,7 +27,6 @@ type EarnMore = {
 const earnMore: EarnMore[] = [
   { title: "Share your referral link", detail: "Every friend who joins and finishes their profile", reward: "+150 pts", href: "/referrals" },
   { title: "Check in on a visit", detail: "Scan the brand QR once per day", reward: "+25 pts", href: "/brands" },
-  { title: "Post in the community", detail: "Say hello or share a visit", reward: "+5 pts", href: "/brands" },
   { title: "Redeem brand rewards", detail: "Food, drink, and loyalty perks at the brand", reward: "—", href: "/brands" },
 ];
 
@@ -120,8 +119,8 @@ export default async function RewardsPage() {
             </p>
             <p className="mt-3 text-xs text-white/50">
               Tiers go Bronze, Silver, Gold, then Platinum as you earn points from visits. The first
-              100 members of each brand join as Founders for free. Premium is a separate paid
-              membership. At Nellie&apos;s, you earn from visits and check-ins, and you also get a
+              100 members of each brand join as Founders for free. Brands pay, guests join free.
+              At Nellie&apos;s, you earn from visits and check-ins, and you also get a
               welcome dessert, 1,500 bonus points after 3 visits, and a birthday entrée. Bourbon
               &amp; Cigar Night is September 23 at 7:00 PM ET in the Private Dining Room.
             </p>

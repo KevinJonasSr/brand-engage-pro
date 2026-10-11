@@ -160,10 +160,7 @@ export default async function BillingPage({
 
       {hasStripe && !hasCustomer && (
         <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 text-sm text-white/70">
-          You don&apos;t have a paid subscription.{" "}
-          <Link href="/premium" className="underline hover:text-white">
-            See Premium
-          </Link>
+          You don&apos;t have a paid subscription. Membership is free for guests.
         </div>
       )}
 
