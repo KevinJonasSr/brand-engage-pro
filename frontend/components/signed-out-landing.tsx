@@ -1,9 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { Brand } from "@/lib/brands";
 import { featuredBrandsForGuestHome } from "@/lib/guest-home-featured-brands";
 import type { ReactNode } from "react";
 import GuestResultsSection from "@/components/guest-results-section";
+import { MessageStackHero } from "@/components/message-stack-hero";
 import type { GuestResults } from "@/lib/guest-results";
 
 /* ── Icon set (Lucide-style, 24×24, 1.5px stroke) ─────────────────────── */
@@ -102,7 +102,7 @@ export default function SignedOutLanding({
           <div className="absolute -top-24 left-1/2 h-[420px] w-[820px] -translate-x-1/2 rounded-full bg-gradient-to-br from-aurora/40 via-ember/20 to-transparent blur-3xl" />
         </div>
 
-        <div className="relative mx-auto grid max-w-6xl gap-10 px-6 pt-12 pb-20 lg:grid-cols-[1.15fr_1fr] lg:pt-16 lg:pb-28">
+        <div className="relative mx-auto grid max-w-6xl gap-10 px-6 pt-12 pb-20 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:pt-16 lg:pb-28">
           <div className="flex flex-col justify-center">
             <p className="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-iron/15 bg-iron/5 px-3 py-1 text-xs uppercase tracking-widest text-iron/70">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
@@ -145,75 +145,8 @@ export default function SignedOutLanding({
             </p>
           </div>
 
-          {/* Honest start state — no fake points / Gold theater */}
-          <div className="lg:hidden mt-8 rounded-lg border border-iron/10 bg-linen bg-gradient-to-br from-aurora/40 via-parchment to-parchment p-6 shadow-glass">
-            <p className="text-xs uppercase tracking-widest text-iron/60">Your member start</p>
-            <p className="mt-4 text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>0</p>
-            <p className="text-xs text-iron/50">points until you join</p>
-            <ul className="mt-4 space-y-2 text-xs text-iron/70">
-              <li className="rounded-xl bg-parchment/30 px-3 py-2">+100 welcome points after you finish your profile</li>
-              <li className="rounded-xl bg-parchment/30 px-3 py-2">+25 pts per daily check-in visit</li>
-              <li className="rounded-xl bg-parchment/30 px-3 py-2">Redeem food & drink rewards at the brand</li>
-            </ul>
-          </div>
-
-          <div className="relative hidden lg:block">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="relative h-[440px] w-[360px]">
-                <div className="absolute left-8 top-12 h-[380px] w-[320px] rotate-3 rounded-lg border border-iron/10 bg-linen bg-gradient-to-br from-ember/25 via-parchment to-aurora/25 shadow-glass">
-                  <div className="p-6 text-iron/70">
-                    <p className="text-xs uppercase tracking-widest">How members earn</p>
-                    <p className="mt-2 text-sm font-semibold text-iron">Visits · check-ins · community</p>
-                    <p className="mt-1 text-xs text-iron/60">
-                      Real points only — no demo balances
-                    </p>
-                  </div>
-                </div>
-                <div className="absolute left-0 top-0 h-[380px] w-[320px] -rotate-2 rounded-lg border border-iron/10 bg-linen bg-gradient-to-br from-aurora/40 via-parchment to-parchment p-6 shadow-glass">
-                  <p className="text-xs uppercase tracking-widest text-iron/60">
-                    Sign up to start at 0
-                  </p>
-                  <p
-                    className="mt-6 text-4xl font-semibold text-iron"
-                    style={{ fontFamily: "var(--font-display)" }}
-                  >
-                    0
-                  </p>
-                  <p className="text-xs text-iron/50">total points (before you join)</p>
-                  <div className="mt-6 space-y-2 text-xs text-iron/80">
-                    <div className="rounded-xl bg-parchment/30 px-3 py-2">
-                      Finish profile → <span className="text-sage-ink">+100 welcome pts</span>
-                    </div>
-                    <div className="rounded-xl bg-parchment/30 px-3 py-2">
-                      Daily check-in → <span className="text-sage-ink">+25 pts</span>
-                    </div>
-                    <div className="rounded-xl bg-parchment/30 px-3 py-2">
-                      Redeem on the brand rewards page
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <MessageStackHero />
         </div>
-      </section>
-
-      {/* ─── Nellie's photo band (real photo, not AI) ─────────────────────── */}
-      <section className="mx-auto max-w-6xl px-6 pt-16">
-        <figure className="group overflow-hidden rounded-lg border border-iron/10">
-          <div className="relative aspect-[16/10] sm:aspect-[21/9]">
-            <Image
-              src="/brands/nellies/dining-room.jpg"
-              alt="The dining room at Nellie's Southern Kitchen"
-              fill
-              sizes="(min-width: 1152px) 1104px, 100vw"
-              className="bep-photo-zoom object-cover"
-            />
-          </div>
-          <figcaption className="bg-parchment/30 px-5 py-3 text-sm text-iron/70">
-            The dining room at Nellie&apos;s Southern Kitchen in Belmont, NC.
-          </figcaption>
-        </figure>
       </section>
 
       {/* ─── How it works ─────────────────────────────────────────────────── */}
