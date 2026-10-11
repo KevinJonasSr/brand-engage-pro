@@ -3,7 +3,8 @@ import { getCurrentMember } from "@/lib/data/member";
 import { getCurrentCommunityId } from "@/lib/community";
 import { listRewardsForCommunity } from "@/lib/data/rewards";
 import { isMarketplaceMusicSku } from "@/lib/marketplace-music-skus";
-import { NELLIES_BRAND_SLUG } from "@/lib/nellies-launch";
+import { isNelliesThreeVisitRewardActive } from "@/lib/data/nellies-three-visit-reward";
+import { NELLIES_BRAND_SLUG, nelliesMemberOfferSummary, nelliesOfferPitch } from "@/lib/nellies-launch";
 import PreviewSignupBanner from "@/components/preview-signup-banner";
 
 export const metadata = { title: "Marketplace" };
@@ -14,10 +15,13 @@ export const metadata = { title: "Marketplace" };
  */
 export default async function MarketplacePage() {
   const communityId = await getCurrentCommunityId();
-  const [member, catalog] = await Promise.all([
+  const [member, catalog, threeVisitRewardActive] = await Promise.all([
     getCurrentMember(),
     listRewardsForCommunity(communityId),
+    isNelliesThreeVisitRewardActive(),
   ]);
+  const nelliesSummary = nelliesMemberOfferSummary(threeVisitRewardActive);
+  const nelliesPitch = nelliesOfferPitch(threeVisitRewardActive);
   // Purge music SKUs even if a stale active row slipped past migration 0050.
   const rewards = catalog.filter((r) => !isMarketplaceMusicSku(r.title));
   const isSignedIn = member !== null;
@@ -30,7 +34,7 @@ export default async function MarketplacePage() {
           <PreviewSignupBanner
             eyebrow="🛍️ Brand rewards"
             headline="Join to unlock brand rewards"
-            body="Earn points after you join, then use them on each brand’s rewards page. At Nellie's: free dessert with an entrée when you join, 1,500 bonus points after 3 visits, and a birthday entrée up to $30. Bourbon & Cigar Night is September 23 at 7:00 PM ET in the Private Dining Room."
+            body={`Earn points after you join, then use them on each brand’s rewards page. At Nellie's: ${nelliesSummary}. Bourbon & Cigar Night is September 23 at 7:00 PM ET in the Private Dining Room.`}
             bullets={[
               "Move up from Bronze to Platinum as you earn points",
               "The first 100 members of each brand join as Founders for free. Brands pay, guests join free.",
@@ -65,8 +69,8 @@ export default async function MarketplacePage() {
             <p className="mt-3 text-sm text-iron/70">
               {communityId.toLowerCase() === NELLIES_BRAND_SLUG ? (
                 <>
-                  Nellie&apos;s member offers (welcome dessert, 1,500 bonus points after 3 visits,
-                  birthday entrée, Bourbon &amp; Cigar Night) are on the Nellie&apos;s page. Jonas
+                  Nellie&apos;s member offers ({nelliesPitch}, Bourbon &amp; Cigar Night) are on
+                  the Nellie&apos;s page. Jonas
                   Group Entertainment lists its member rewards, like signed lyric sheets and
                   vinyl, on its rewards page.
                 </>

@@ -2,10 +2,13 @@
  * Nellie's / Jackie launch — guest-visible set and real perk rules.
  *
  * Jackie's three are NOT 1-pt catalog SKUs (rewards_catalog.point_cost > 0).
- * They display on the brand page as specials; grants happen on join,
- * 3rd check-in, and birthday-month redeem.
+ * Welcome dessert and the birthday entrée display on the brand page as
+ * specials. The 1,500 three-visit bonus displays, and the check-in
+ * trigger pays it, only while rewards_catalog row
+ * NELLIES_THREE_VISIT_REWARD_ID is active. Turning that row off pauses
+ * both. Turning it back on resumes both. Do not delete the rule.
  *
- * Jackie's three always show first. After them, active DB specials and
+ * Active Jackie offers show first. After them, active DB specials and
  * upcoming DB events show too, unless they are on the hide list below.
  */
 
@@ -24,6 +27,12 @@ export const NELLIES_BOURBON_DETAIL_FALLBACK =
 
 export const NELLIES_THREE_VISIT_THRESHOLD = 3;
 export const NELLIES_THREE_VISIT_BONUS = 1500;
+/**
+ * rewards_catalog.id for "1,500 Bonus Points". The row's active flag
+ * gates the check-in trigger (migration 0075) and the brand-page card.
+ */
+export const NELLIES_THREE_VISIT_REWARD_ID =
+  "064a11f6-7508-4104-beb5-25cef405e9f7";
 export const NELLIES_WELCOME_PERK_SLUG = "nsk-welcome-dessert";
 export const NELLIES_BIRTHDAY_PERK_SLUG = "nsk-birthday-entree";
 
@@ -58,6 +67,36 @@ export const NELLIES_PUBLISHED_OFFERS: readonly NelliesLaunchOffer[] = [
     rule: "birthday-month",
   },
 ];
+
+/** Offers to render. The 1,500 card is included only while its catalog row is active. */
+export function nelliesPublicOffers(options?: {
+  threeVisitRewardActive?: boolean;
+}): readonly NelliesLaunchOffer[] {
+  if (options?.threeVisitRewardActive) return NELLIES_PUBLISHED_OFFERS;
+  return NELLIES_PUBLISHED_OFFERS.filter((offer) => offer.rule !== "third-checkin");
+}
+
+/** Guest sentence for Nellie's member offers. Omits the paused 1,500 bonus. */
+export function nelliesMemberOfferSummary(threeVisitRewardActive: boolean): string {
+  if (threeVisitRewardActive) {
+    return "free dessert with an entrée when you join, 1,500 bonus points after three visits, and a birthday entrée up to $30";
+  }
+  return "free dessert with an entrée when you join and a birthday entrée up to $30";
+}
+
+/** Shorter public pitch. Same active-flag gate as the brand-page card. */
+export function nelliesOfferPitch(threeVisitRewardActive: boolean): string {
+  if (threeVisitRewardActive) {
+    return "free dessert when you join, 1,500 bonus points after 3 visits, and a birthday entrée";
+  }
+  return "free dessert when you join and a birthday entrée";
+}
+
+/** True for the 1,500 three-visit title, including close variants of that name. */
+export function isNelliesThreeVisitOfferTitle(title: string): boolean {
+  const index = jackieOfferIndexForTitle(title);
+  return index >= 0 && NELLIES_PUBLISHED_OFFERS[index]?.rule === "third-checkin";
+}
 
 export const NELLIES_PUBLISHED_OFFER_SLUGS: readonly string[] =
   NELLIES_PUBLISHED_OFFERS.map((o) => o.slug);
@@ -211,11 +250,22 @@ export function isNelliesHiddenTitle(title: string): boolean {
   return HIDDEN_TITLE_KEYS.has(t) || HIDDEN_PATTERNS.some((re) => re.test(t));
 }
 
+/**
+ * Whether the 1,500 three-visit bonus should be written.
+ * award_nellies_three_visit_bonus (migration 0075) is the writer. It
+ * uses this same rule: catalog reward active, third-or-later visit, once.
+ * Visit check-in points (25) are a separate ledger row and are not this bonus.
+ */
 export function shouldAwardThreeVisitBonus(
   checkinCount: number,
   alreadyAwarded: boolean,
+  rewardActive: boolean,
 ): boolean {
-  return !alreadyAwarded && checkinCount >= NELLIES_THREE_VISIT_THRESHOLD;
+  return (
+    rewardActive &&
+    !alreadyAwarded &&
+    checkinCount >= NELLIES_THREE_VISIT_THRESHOLD
+  );
 }
 
 export function isBirthdayRedemptionOpen(
@@ -275,20 +325,32 @@ export function jackieLaunchSpecials(): LaunchSpecial[] {
 }
 
 /**
- * Guest brand page reads specials, not catalog.active. Always return
- * Jackie's three first as info cards (0 pt / not SKUs). Prefer matching DB
- * rows only for stable ids — never copy point_cost from a 1-pt SKU.
- * Other active DB specials follow in their own sort order, minus hidden ones.
+ * Guest brand page reads specials, not catalog.active, then this filter.
+ * Welcome dessert and the birthday entrée stay first as info cards
+ * (0 pt / not SKUs). The 1,500 card is included only when
+ * threeVisitRewardActive is true (the catalog row is on). A specials
+ * row for that title is dropped while the catalog row is off, so an
+ * active special cannot keep advertising a paused reward. Prefer
+ * matching DB rows only for stable ids — never copy point_cost from a
+ * 1-pt SKU. Other active DB specials follow in their own sort order,
+ * minus hidden ones.
  */
 export function applyNelliesLaunchSpecials<T extends { title: string; id: string }>(
   brandSlug: string,
   rows: T[],
+  options?: { threeVisitRewardActive?: boolean },
 ): Array<T | LaunchSpecial> {
   if (brandSlug.toLowerCase() !== NELLIES_BRAND_SLUG) {
     return rows;
   }
+  const threeVisitRewardActive = options?.threeVisitRewardActive === true;
   const seeded = jackieLaunchSpecials();
-  const slots: Array<T | LaunchSpecial> = [...seeded];
+  const threeVisitIndex = NELLIES_PUBLISHED_OFFERS.findIndex(
+    (offer) => offer.rule === "third-checkin",
+  );
+  const slots: Array<T | LaunchSpecial | null> = seeded.map((special, index) =>
+    !threeVisitRewardActive && index === threeVisitIndex ? null : special,
+  );
   const extras: T[] = [];
   for (const row of rows) {
     if (isNelliesHiddenTitle(row.title)) continue;
@@ -297,6 +359,8 @@ export function applyNelliesLaunchSpecials<T extends { title: string; id: string
       if (!isBourbonCigarTitle(row.title)) extras.push(row);
       continue;
     }
+    // Catalog row is off: do not keep a specials-table copy of the bonus.
+    if (slots[index] == null) continue;
     const seed = seeded[index];
     slots[index] = {
       ...row,
@@ -309,7 +373,10 @@ export function applyNelliesLaunchSpecials<T extends { title: string; id: string
       tier: "public",
     } as T;
   }
-  return [...slots, ...extras];
+  return [
+    ...slots.filter((slot): slot is T | LaunchSpecial => slot != null),
+    ...extras,
+  ];
 }
 
 export type LaunchEvent = {

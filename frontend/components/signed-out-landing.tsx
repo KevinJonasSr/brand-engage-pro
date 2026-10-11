@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import GuestResultsSection from "@/components/guest-results-section";
 import { MessageStackHero } from "@/components/message-stack-hero";
 import type { GuestResults } from "@/lib/guest-results";
+import { nelliesMemberOfferSummary, nelliesOfferPitch } from "@/lib/nellies-launch";
 
 /* ── Icon set (Lucide-style, 24×24, 1.5px stroke) ─────────────────────── */
 function IconUsers() {
@@ -84,11 +85,16 @@ function IconBadge({ icon }: { icon: ReactNode }) {
 export default function SignedOutLanding({
   brands,
   results = null,
+  threeVisitRewardActive = false,
 }: {
   brands: Brand[];
   results?: GuestResults | null;
+  /** Nellie's 1,500 three-visit catalog row. Off hides that line. */
+  threeVisitRewardActive?: boolean;
 }) {
   const featured = featuredBrandsForGuestHome(brands);
+  const nelliesPitch = nelliesOfferPitch(threeVisitRewardActive);
+  const nelliesSummary = nelliesMemberOfferSummary(threeVisitRewardActive);
 
   return (
     <main className="overflow-hidden">
@@ -177,7 +183,7 @@ export default function SignedOutLanding({
             {
               n: "03",
               title: "Redeem real rewards",
-              body: "Use your points on rewards each brand has ready today. At Nellie's, that means free dessert when you join, 1,500 bonus points after 3 visits, and a birthday entrée.",
+              body: `Use your points on rewards each brand has ready today. At Nellie's, that means ${nelliesPitch}.`,
               icon: <IconGift />,
             },
           ].map((step) => (
@@ -238,7 +244,7 @@ export default function SignedOutLanding({
                 },
                 {
                   title: "Real rewards",
-                  body: "At Nellie's: free dessert with an entrée when you join, 1,500 bonus points after 3 visits, and a birthday entrée up to $30. Everyone starts at 0 points.",
+                  body: `At Nellie's: ${nelliesSummary}. Everyone starts at 0 points.`,
                   icon: <IconGift />,
                 },
               ].map((f) => (

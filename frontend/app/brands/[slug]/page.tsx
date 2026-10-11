@@ -99,7 +99,8 @@ export default async function BrandPage({
   const isSignedIn = member !== null;
   const needsProfile = isSignedIn && !member.first_name;
   const isNellies = slug.toLowerCase() === NELLIES_BRAND_SLUG;
-  // Nellie's: listSpecialsForBrand already puts Jackie's three first.
+  // Nellie's: listSpecialsForBrand puts active member offers first.
+  // The 1,500 card is omitted while its catalog reward is inactive.
   const guestSpecials = specials;
 
   // Fetch activity pulse + stamp card in parallel (non-blocking — both fail gracefully)
@@ -376,8 +377,9 @@ export default async function BrandPage({
         brandSlug={slug}
         viewerMemberId={member?.id ?? null}
         />
-      {/* Nellie's: Jackie's three member offers (lib/nellies-launch.ts)
-          come first, then active specials from the specials table. */}
+      {/* Nellie's: active member offers (lib/nellies-launch.ts) come
+          first, then other active specials. The 1,500 card follows the
+          catalog reward's active flag. */}
       {guestSpecials.length > 0 && (
         <section id="offers" className="glass-card p-8 scroll-mt-24">
           <Reveal>

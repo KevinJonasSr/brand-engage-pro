@@ -27,8 +27,10 @@ import {
 } from "@/lib/jge-launch";
 import {
   NELLIES_BRAND_SLUG,
+  NELLIES_THREE_VISIT_REWARD_ID,
   isBourbonCigarTitle,
   isNelliesPublishedOfferTitle,
+  isNelliesThreeVisitOfferTitle,
   resolveBourbonGuestCopy,
 } from "@/lib/nellies-launch";
 import type {
@@ -405,10 +407,19 @@ async function fetchAllSourceRows(
   if (idsByTable.specials.length > 0) {
     tasks.push(
       (async () => {
-        const { data } = await admin
-          .from("specials")
-          .select("id, community_id, title, description, tier, active")
-          .in("id", idsByTable.specials);
+        const [{ data }, bonus] = await Promise.all([
+          admin
+            .from("specials")
+            .select("id, community_id, title, description, tier, active")
+            .in("id", idsByTable.specials),
+          admin
+            .from("rewards_catalog")
+            .select("id")
+            .eq("id", NELLIES_THREE_VISIT_REWARD_ID)
+            .eq("active", true)
+            .maybeSingle(),
+        ]);
+        const threeVisitRewardActive = bonus.data != null;
         for (const row of (data ?? []) as Array<{
           id: string;
           community_id: string;
@@ -420,7 +431,8 @@ async function fetchAllSourceRows(
           if (!row.active) continue;
           if (
             row.community_id === NELLIES_BRAND_SLUG &&
-            !isNelliesPublishedOfferTitle(row.title)
+            (!isNelliesPublishedOfferTitle(row.title) ||
+              (isNelliesThreeVisitOfferTitle(row.title) && !threeVisitRewardActive))
           ) {
             continue;
           }
