@@ -35,7 +35,13 @@ const DEFAULT_CTA_BY_KIND: Record<CTAKind, Partial<CTA>> = {
   custom: { cta_label: "Complete", point_value: 25 },
 };
 
-export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
+export default function CampaignBuilder({
+  brands,
+  canBlast = false,
+}: {
+  brands: Brand[];
+  canBlast?: boolean;
+}) {
   const [brandSlug, setBrandSlug] = useState(brands[0]?.slug ?? "");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -128,11 +134,11 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
       } else {
         formData.set("target_event_rsvpers", String(targetEventRsvpers));
       }
-      if (!includeEmail) {
+      if (!canBlast || !includeEmail) {
         formData.set("email_subject", "");
         formData.set("email_body", "");
       }
-      if (!includeSms) formData.set("sms_body", "");
+      if (!canBlast || !includeSms) formData.set("sms_body", "");
       await createAndPublishCampaign(formData);
     } finally {
       setSubmitting(false);
@@ -478,6 +484,8 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
         </label>
       </Section>
 
+      {canBlast ? (
+        <>
       {/* Email */}
       <Section title="✉️ Email blast" include={includeEmail} onToggle={setIncludeEmail}>
         <input
@@ -515,6 +523,12 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
           Recorded as a campaign item; sends via Twilio to opted-in members.
         </p>
       </Section>
+        </>
+      ) : (
+        <p className="text-sm text-iron/70">
+          Text and email blasts can only be sent by the brand owner.
+        </p>
+      )}
 
       <div className="flex items-center justify-end gap-3 py-4">
         <a

@@ -9,6 +9,7 @@ import {
   requireAdminContext,
   requireBrandAccess,
 } from "@/lib/admin";
+import { canSendBlasts } from "@/lib/blast-permissions";
 import { broadcastBrandEmail, broadcastSms } from "@/lib/broadcast";
 import { createNotification } from "@/lib/data/notifications";
 
@@ -39,6 +40,13 @@ export async function createAndPublishCampaign(formData: FormData) {
   // Brand admins publish only to their own brand. Every row below carries
   // community_id; the column has no default and inserts without one fail.
   requireBrandAccess(ctx, brandSlug);
+
+  const blastEmailSubject = String(formData.get("email_subject") ?? "").trim();
+  const blastEmailBody = String(formData.get("email_body") ?? "").trim();
+  const blastSmsBody = String(formData.get("sms_body") ?? "").trim();
+  if ((blastEmailSubject || blastEmailBody || blastSmsBody) && !canSendBlasts(ctx)) {
+    throw new AdminScopeError("Only the brand owner can send blasts.");
+  }
 
   // A reused event must belong to the same brand.
   const existingEventIdRaw = String(formData.get("existing_event_id") ?? "").trim();
@@ -248,8 +256,8 @@ export async function createAndPublishCampaign(formData: FormData) {
   //    limited to this brand's followers who opted in to email (or the
   //    event's RSVPers when targetEventRsvpers is on). Each member gets their
   //    own unsubscribe link.
-  const emailSubject = String(formData.get("email_subject") ?? "").trim();
-  const emailBody = String(formData.get("email_body") ?? "").trim();
+  const emailSubject = blastEmailSubject;
+  const emailBody = blastEmailBody;
   if (emailSubject && emailBody) {
     const result = await broadcastBrandEmail({
       subject: emailSubject,
@@ -270,7 +278,7 @@ export async function createAndPublishCampaign(formData: FormData) {
 
   // 9) SMS blast — iterate opted-in members via Twilio (throttled).
   //    Honors the per-event RSVP filter when attached.
-  const smsBody = String(formData.get("sms_body") ?? "").trim();
+  const smsBody = blastSmsBody;
   if (smsBody) {
     const result = await broadcastSms({
       body: smsBody,

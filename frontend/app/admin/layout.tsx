@@ -9,6 +9,7 @@ import { readBrandBilling } from "@/lib/brand-billing-server";
 import { billingBanner, type BillingBanner } from "@/lib/brand-billing";
 import { BillingBannerNotice } from "./billing/billing-banner";
 import { visibleAdminNav } from "@/lib/ai-features";
+import { canSendBlasts } from "@/lib/blast-permissions";
 
 const adminNav = [
   { href: "/admin", label: "Overview" },
@@ -136,7 +137,9 @@ export default async function AdminLayout({
         </div>
 
         <nav className="mb-8 flex flex-wrap gap-2">
-          {visibleAdminNav(adminNav).map((item) => (
+          {visibleAdminNav(adminNav)
+            .filter((item) => item.href !== "/admin/broadcast" || canSendBlasts(ctx))
+            .map((item) => (
             <Link
               key={item.href}
               href={item.href}
