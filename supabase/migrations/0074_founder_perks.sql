@@ -1,6 +1,6 @@
 -- 0074_founder_perks.sql
 --
--- NOT YET APPLIED to prod. Needs Kevin's yes before it runs.
+-- APPLIED to prod (shipped in PR #86).
 --
 -- Founder perks (item 9). The Founder badge now carries two real perks:
 --   * Founders earn 1.5x points for life. Premium also earns 1.5x, and the
