@@ -1,6 +1,6 @@
 -- 0073_brand_billing.sql
 --
--- NOT YET APPLIED to prod. Needs Kevin's yes before it runs.
+-- APPLIED to prod (shipped in PR #85).
 --
 -- Brand billing (item 8). Brands pay, guests are always free.
 --   * The first 10 businesses are free (plan = 'free', free_slot 1..10).

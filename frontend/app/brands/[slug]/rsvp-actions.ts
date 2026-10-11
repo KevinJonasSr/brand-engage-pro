@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { notifyRsvpConfirmation } from "@/lib/notifications/triggers/rsvp-confirmation";
+import { isFoundersWindowError } from "@/lib/founder-perks";
 
 export async function toggleRsvpAction(formData: FormData) {
   const eventId = String(formData.get("event_id") ?? "").trim();
@@ -22,6 +23,12 @@ export async function toggleRsvpAction(formData: FormData) {
       .insert({ event_id: eventId, member_id: user.id });
     if (error) {
       revalidatePath(`/brands/${brandSlug}`);
+      if (isFoundersWindowError(error.message)) {
+        return {
+          ok: false as const,
+          error: "Founders RSVP first. Opens to everyone soon.",
+        };
+      }
       return {
         ok: false as const,
         error: error.message.includes("capacity")

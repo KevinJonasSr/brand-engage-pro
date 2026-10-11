@@ -1,24 +1,44 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
+import { formatCountdown, msUntilOpen } from "@/lib/founder-perks";
 import { toggleRsvpAction } from "./rsvp-actions";
+
+const COUNTDOWN_TICK_MS = 30 * 1000;
 
 export default function RsvpButton({
   eventId,
   brandSlug,
   initialRsvped,
   atCapacity,
+  opensAt = null,
+  isFounder = false,
 }: {
   eventId: string;
   brandSlug: string;
   initialRsvped: boolean;
   atCapacity: boolean;
+  /** When RSVPs open to non-founders. Null means open now. */
+  opensAt?: string | null;
+  isFounder?: boolean;
 }) {
   const router = useRouter();
   const [rsvped, setRsvped] = useState(initialRsvped);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [msLeft, setMsLeft] = useState(() => msUntilOpen(opensAt));
+
+  useEffect(() => {
+    if (!opensAt) return;
+    const tick = () => setMsLeft(msUntilOpen(opensAt));
+    tick();
+    const id = setInterval(tick, COUNTDOWN_TICK_MS);
+    return () => clearInterval(id);
+  }, [opensAt]);
+
+  const inFoundersWindow = msLeft > 0;
+  const heldForFounders = inFoundersWindow && !isFounder && !rsvped;
 
   async function handleClick() {
     const next = !rsvped;
@@ -39,7 +59,14 @@ export default function RsvpButton({
     });
   }
 
-  const disabled = pending || (!rsvped && atCapacity);
+  const disabled = pending || heldForFounders || (!rsvped && atCapacity);
+  const label = rsvped
+    ? "✓ RSVPed"
+    : heldForFounders
+      ? `Opens in ${formatCountdown(msLeft)}`
+      : atCapacity
+        ? "Full"
+        : "RSVP · +10 pts";
 
   return (
     <div className="flex flex-col items-end gap-1">
@@ -53,8 +80,14 @@ export default function RsvpButton({
             : "bg-gradient-to-r from-aurora to-ember text-white"
         }`}
       >
-        {rsvped ? "✓ RSVPed" : atCapacity ? "Full" : "RSVP · +10 pts"}
+        <span suppressHydrationWarning>{label}</span>
       </button>
+      {heldForFounders && (
+        <p className="text-xs text-amber-200/80">Founders RSVP first</p>
+      )}
+      {inFoundersWindow && isFounder && !rsvped && (
+        <p className="text-xs text-amber-200/80">Founder early access</p>
+      )}
       {error && <p className="text-xs text-rose-300">{error}</p>}
     </div>
   );

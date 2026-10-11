@@ -487,6 +487,8 @@ export default async function BrandPage({
                       brandSlug={brand.slug}
                       initialRsvped={rsvped}
                       atCapacity={atCapacity}
+                      opensAt={e.rsvpOpensAt ?? null}
+                      isFounder={entitlement?.isFounder ?? false}
                     />
                   )}
                   {!isSignedIn && (
