@@ -102,7 +102,7 @@ export default async function OnboardingPage({
       fallback={
         <div className="min-h-screen bg-gradient-to-b from-linen via-parchment to-parchment text-iron">
           <div className="mx-auto flex max-w-6xl items-center justify-center px-6 py-24">
-            <p className="text-iron/60">Loading onboarding…</p>
+            <p className="text-iron/70">Loading onboarding…</p>
           </div>
         </div>
       }

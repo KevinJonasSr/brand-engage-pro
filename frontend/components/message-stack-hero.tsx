@@ -42,7 +42,7 @@ export function MessageStackHero() {
                 className="bep-message rounded-lg border border-iron/15 bg-linen px-4 py-3 shadow-[0_18px_40px_-18px_rgba(30,27,23,0.45),0_2px_6px_rgba(30,27,23,0.08)]"
                 style={{ "--message-delay": `${TIMELINE[i].messageDelayMs}ms` } as CSSProperties}
               >
-                <p className="flex items-baseline justify-between gap-3 font-mono text-[10px] uppercase tracking-widest text-iron/50">
+                <p className="flex items-baseline justify-between gap-3 font-mono text-[10px] uppercase tracking-widest text-iron/70">
                   <span>Nellie&apos;s</span>
                   <span>{m.time}</span>
                 </p>
@@ -58,7 +58,7 @@ export function MessageStackHero() {
           ))}
         </ol>
       </div>
-      <figcaption className="mt-3 text-xs text-iron/60">
+      <figcaption className="mt-3 text-xs text-iron/70">
         The dining room at Nellie&apos;s Southern Kitchen in Belmont, NC.
       </figcaption>
     </figure>

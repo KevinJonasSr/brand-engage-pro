@@ -137,7 +137,7 @@ export default async function BrandCommunityPage({
       {posts.length === 0 ? (
         <section className="glass-card p-8 text-center">
           <p className="text-sm font-semibold">Nothing posted yet</p>
-          <p className="mt-2 text-xs text-iron/60">
+          <p className="mt-2 text-xs text-iron/70">
             {isSignedIn
               ? "Be the first to post and kick off the conversation."
               : "Be the first in when the community fills up — sign in to post."}

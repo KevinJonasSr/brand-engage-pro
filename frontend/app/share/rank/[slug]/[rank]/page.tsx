@@ -72,9 +72,9 @@ export default async function RankSharePage({
           boxShadow: `0 0 60px ${brand.accentFrom}22`,
         }}
       >
-        <p className="text-[10px] tracking-[0.2em] uppercase text-iron/30 font-medium">Brand Engage Pro</p>
+        <p className="text-[10px] tracking-[0.2em] uppercase text-iron/70 font-medium">Brand Engage Pro</p>
         <div className="flex flex-col gap-1">
-          <p className="text-xs tracking-widest uppercase text-iron/50">Leaderboard</p>
+          <p className="text-xs tracking-widest uppercase text-iron/70">Leaderboard</p>
           <div
             className="text-7xl font-extrabold leading-none"
             style={{
@@ -85,9 +85,9 @@ export default async function RankSharePage({
           >
             {rankDisplay}
           </div>
-          <p className="text-iron/60 text-sm mt-1">{brand.name} member community</p>
+          <p className="text-iron/70 text-sm mt-1">{brand.name} member community</p>
         </div>
-        <p className="text-iron/60 text-sm max-w-xs">
+        <p className="text-iron/70 text-sm max-w-xs">
           Earn points by engaging — posts, RSVPs, referrals, early badges. Climb the chart.
         </p>
         <ShareButton
@@ -102,11 +102,11 @@ export default async function RankSharePage({
       <div className="mt-8 flex flex-col items-center gap-3">
         <Link
           href={`/brands/${brand.slug}`}
-          className="text-sm text-iron/50 hover:text-iron transition-colors"
+          className="text-sm text-iron/70 hover:text-iron transition-colors"
         >
           Visit brand experience →
         </Link>
-        <p className="text-xs text-iron/30 max-w-xs text-center">
+        <p className="text-xs text-iron/70 max-w-xs text-center">
           Join {brand.name}&apos;s community on Brand Engage Pro and start earning your spot.
         </p>
       </div>

@@ -55,7 +55,7 @@ export default async function LeaderboardPage({
       <header className="mb-8 text-center">
         <Link
           href={`/brands/${slug}`}
-          className="text-xs uppercase tracking-[0.25em] text-iron/55 hover:text-iron"
+          className="text-xs uppercase tracking-[0.25em] text-iron/70 hover:text-iron"
         >
           ← {board.brandName}
         </Link>
@@ -74,7 +74,7 @@ export default async function LeaderboardPage({
       {board.top.length === 0 ? (
         <div className="rounded-lg border border-iron/10 bg-iron/5 p-8 text-center">
           <p className="text-base font-medium text-iron">No activity yet</p>
-          <p className="mt-1 text-sm text-iron/55">
+          <p className="mt-1 text-sm text-iron/70">
             Be the first to top the chart — react to a post, RSVP an event, or
             redeem a reward.
           </p>
@@ -82,7 +82,7 @@ export default async function LeaderboardPage({
       ) : (
         <>
           {/* Podium */}
-          <section className="rounded-lg border border-iron/10 bg-gradient-to-b from-amber-500/5 via-violet-500/5 to-rose-500/5 p-5 sm:p-6">
+          <section className="rounded-lg border border-iron/10 bg-gradient-to-b from-amber-500/5 via-parchment/40 to-rose-500/5 p-5 sm:p-6">
             <LeaderboardPodium
               entries={podiumEntries}
               viewerMemberId={user?.id ?? null}
@@ -92,7 +92,7 @@ export default async function LeaderboardPage({
           {/* Ranks 4–10 */}
           {restEntries.length > 0 && (
             <section className="mt-6">
-              <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-iron/55">
+              <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-iron/70">
                 Climbers
               </h2>
               <LeaderboardList
@@ -105,14 +105,14 @@ export default async function LeaderboardPage({
           {/* Viewer's standing if they're below #10 */}
           {viewerOnBoard && !viewerInTop10 && board.viewerEntry && (
             <section className="mt-6">
-              <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-iron/55">
+              <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-iron/70">
                 Your standing
               </h2>
               <LeaderboardList
                 entries={[board.viewerEntry]}
                 viewerMemberId={user?.id ?? null}
               />
-              <p className="mt-2 text-center text-xs text-iron/55">
+              <p className="mt-2 text-center text-xs text-iron/70">
                 You&apos;re #{board.viewerEntry.rank} of {board.totalMembers} members
                 with activity this month.
               </p>
@@ -121,7 +121,7 @@ export default async function LeaderboardPage({
         </>
       )}
 
-      <footer className="mt-10 rounded-xl border border-iron/5 bg-iron/3 p-4 text-xs text-iron/55">
+      <footer className="mt-10 rounded-xl border border-iron/5 bg-iron/3 p-4 text-xs text-iron/70">
         <p className="font-semibold uppercase tracking-wide text-iron/65">
           How points are scored
         </p>

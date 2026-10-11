@@ -19,7 +19,7 @@ export default function BirthdayForm({
     return (
       <div className="rounded-lg border border-iron/10 bg-iron/[0.02] p-4">
         <div className="font-medium">Birthday month: {savedLabel}</div>
-        <p className="mt-1 text-sm text-iron/60">
+        <p className="mt-1 text-sm text-iron/70">
           Your birthday entrée at Nellie&apos;s (up to $30) opens in {savedLabel}.
           Need to change it? Contact us and we&apos;ll fix it.
         </p>
@@ -63,7 +63,7 @@ export default function BirthdayForm({
             </option>
           ))}
         </select>
-        <span className="mt-2 block text-sm text-iron/60">
+        <span className="mt-2 block text-sm text-iron/70">
           Needed for the birthday entrée (up to $30) during your birthday month.
           You can set it once.
         </span>

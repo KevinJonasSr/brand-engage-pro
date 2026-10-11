@@ -117,7 +117,7 @@ export default function PushOptInPrompt({
   }
 
   return (
-    <div className="rounded-lg border border-aurora/30 bg-gradient-to-r from-aurora/15 via-cyan-500/10 to-emerald-500/10 p-4 shadow-lg shadow-aurora/10">
+    <div className="rounded-lg border border-aurora/30 bg-gradient-to-r from-aurora/15 via-parchment/40 to-sage/10 p-4 shadow-lg shadow-aurora/10">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-start gap-3">
           <div

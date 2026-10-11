@@ -97,7 +97,7 @@ export default function CaptionSuggester({
 
       {captions && (
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-wide text-iron/50">
+          <p className="text-xs uppercase tracking-wide text-iron/70">
             Pick one (it'll fill in your post body):
           </p>
           <div className="flex flex-col gap-1.5">
@@ -116,7 +116,7 @@ export default function CaptionSuggester({
             type="button"
             onClick={handleSuggest}
             disabled={loading}
-            className="text-xs text-iron/50 hover:text-iron"
+            className="text-xs text-iron/70 hover:text-iron"
           >
             {loading ? "Regenerating…" : "↻ Regenerate"}
           </button>

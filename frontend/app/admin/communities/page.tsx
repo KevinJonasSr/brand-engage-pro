@@ -41,7 +41,7 @@ export default async function AdminCommunitiesPage() {
   return (
     <main className="mx-auto max-w-4xl px-6 py-10">
       <div className="mb-8">
-        <p className="text-xs uppercase tracking-widest text-iron/50">
+        <p className="text-xs uppercase tracking-widest text-iron/70">
           Admin
         </p>
         <h1
@@ -50,7 +50,7 @@ export default async function AdminCommunitiesPage() {
         >
           Pick a community to manage
         </h1>
-        <p className="mt-2 text-sm text-iron/60">
+        <p className="mt-2 text-sm text-iron/70">
           {ctx.isSuperAdmin
             ? "You're a super-admin — you can administer every community. Your selection sticks for this session and can be changed here any time."
             : "You've got admin access to multiple communities. Pick one to manage."}
@@ -92,11 +92,11 @@ export default async function AdminCommunitiesPage() {
                     }}
                   />
                   <div className="mt-2 flex items-baseline justify-between gap-3">
-                    <span className="text-xs uppercase tracking-widest text-iron/40">
+                    <span className="text-xs uppercase tracking-widest text-iron/70">
                       {c.type.replace("_", " ")}
                     </span>
                     {!c.active && (
-                      <span className="rounded-full bg-iron/10 px-2 py-0.5 text-xs text-iron/60">
+                      <span className="rounded-full bg-iron/10 px-2 py-0.5 text-xs text-iron/70">
                         Inactive
                       </span>
                     )}
@@ -110,7 +110,7 @@ export default async function AdminCommunitiesPage() {
                     {c.display_name}
                   </p>
                   {c.tagline && (
-                    <p className="mt-1 text-xs text-iron/55 line-clamp-2">
+                    <p className="mt-1 text-xs text-iron/70 line-clamp-2">
                       {c.tagline}
                     </p>
                   )}

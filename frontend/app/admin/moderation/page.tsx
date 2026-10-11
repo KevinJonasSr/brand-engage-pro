@@ -128,7 +128,7 @@ export default async function AdminModerationPage() {
   return (
     <main className="mx-auto max-w-5xl space-y-8 px-6 py-12">
       <header className="space-y-2">
-        <p className="text-sm uppercase tracking-wide text-iron/60">
+        <p className="text-sm uppercase tracking-wide text-iron/70">
           Admin · Moderation
         </p>
         <h1
@@ -164,7 +164,7 @@ export default async function AdminModerationPage() {
       </header>
 
       {queue.length === 0 ? (
-        <div className="glass-card p-8 text-center text-sm text-iron/60">
+        <div className="glass-card p-8 text-center text-sm text-iron/70">
           No items pending review. The classifier is doing its job.
         </div>
       ) : (
@@ -220,7 +220,7 @@ function QueueCard({ row }: { row: QueueRow }) {
             {row.categories?.map((c) => (
               <span
                 key={c}
-                className="rounded-full border border-iron/10 bg-parchment/30 px-2 py-0.5 uppercase tracking-wide text-iron/60"
+                className="rounded-full border border-iron/10 bg-parchment/30 px-2 py-0.5 uppercase tracking-wide text-iron/70"
               >
                 {c}
               </span>
@@ -236,7 +236,7 @@ function QueueCard({ row }: { row: QueueRow }) {
 
           {row.reason && (
             <p className="rounded-lg border border-iron/10 bg-parchment/30 p-3 text-xs text-iron/70">
-              <span className="text-iron/50">AI reason: </span>
+              <span className="text-iron/70">AI reason: </span>
               {row.reason}
             </p>
           )}
@@ -250,7 +250,7 @@ function QueueCard({ row }: { row: QueueRow }) {
             </p>
           )}
 
-          <p className="text-xs text-iron/40">
+          <p className="text-xs text-iron/70">
             Classified{" "}
             {row.classified_at
               ? new Date(row.classified_at).toLocaleString()

@@ -28,7 +28,7 @@ export default function MemberCtaBlock({
     <section className="rounded-lg border border-aurora/30 bg-gradient-to-br from-aurora/15 via-parchment to-linen p-5">
       <div className="mb-3 flex items-center justify-between">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-iron/60">Earn points</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-iron/70">Earn points</p>
           <h2
             className="mt-1 text-xl font-semibold"
             style={{ fontFamily: "var(--font-display)" }}
@@ -67,7 +67,7 @@ export default function MemberCtaBlock({
                   href={a.url}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-xs text-iron/60 hover:text-iron"
+                  className="text-xs text-iron/70 hover:text-iron"
                 >
                   Open link ↗
                 </a>
@@ -91,7 +91,7 @@ export default function MemberCtaBlock({
                   </button>
                 </form>
               ) : (
-                <span className="text-xs text-iron/50">Sign in to complete</span>
+                <span className="text-xs text-iron/70">Sign in to complete</span>
               )}
             </div>
           </div>

@@ -103,7 +103,7 @@ export default function PostCard({
             </p>
             <KindBadge kind={post.kind} />
           </div>
-          <p className="text-xs text-iron/50">{relativeTime(post.created_at)}</p>
+          <p className="text-xs text-iron/70">{relativeTime(post.created_at)}</p>
         </div>
         <div className="flex items-center gap-2">
           {post.pinned && (
@@ -116,7 +116,7 @@ export default function PostCard({
               <input type="hidden" name="post_id" value={post.id} />
               <input type="hidden" name="brand_slug" value={post.brand_slug} />
               <input type="hidden" name="currently_pinned" value={String(post.pinned)} />
-              <button className="text-xs text-iron/60 hover:text-iron">
+              <button className="text-xs text-iron/70 hover:text-iron">
                 {post.pinned ? "Unpin" : "Pin"}
               </button>
             </form>
@@ -237,7 +237,7 @@ export default function PostCard({
       {showComments && (
         <div className="space-y-3 border-t border-iron/5 pt-3">
           {initialComments.length === 0 && (
-            <p className="text-xs text-iron/50">
+            <p className="text-xs text-iron/70">
               No comments yet — be the first.
             </p>
           )}
@@ -247,7 +247,7 @@ export default function PostCard({
                 <p className="text-xs font-semibold">
                   {c.author_first_name?.trim() || "Member"}
                 </p>
-                <p className="text-xs uppercase tracking-wide text-iron/40">
+                <p className="text-xs uppercase tracking-wide text-iron/70">
                   {relativeTime(c.created_at)}
                 </p>
               </div>

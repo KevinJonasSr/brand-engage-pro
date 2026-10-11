@@ -137,7 +137,7 @@ export default function SignedOutLanding({
                 Sign in
               </Link>
             </div>
-            <p className="mt-4 text-xs text-iron/50">
+            <p className="mt-4 text-xs text-iron/70">
               Free · 60 seconds · No credit card
             </p>
             <p className="mt-2 text-xs font-medium text-aurora-ink">
@@ -151,7 +151,7 @@ export default function SignedOutLanding({
 
       {/* ─── How it works ─────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-6 py-20">
-        <p className="text-xs uppercase tracking-widest text-iron/50">
+        <p className="text-xs uppercase tracking-widest text-iron/70">
           How it works
         </p>
         <h2
@@ -186,7 +186,7 @@ export default function SignedOutLanding({
               className="rounded-lg border border-iron/10 bg-gradient-to-br from-iron/5 to-transparent p-6"
             >
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono text-iron/40">
+                <span className="text-xs font-mono text-iron/70">
                   {step.n}
                 </span>
                 <IconBadge icon={step.icon} />
@@ -203,7 +203,7 @@ export default function SignedOutLanding({
         <div className="mx-auto max-w-6xl px-6 py-20">
           <div className="grid gap-8 md:grid-cols-2">
             <div>
-              <p className="text-xs uppercase tracking-widest text-iron/50">
+              <p className="text-xs uppercase tracking-widest text-iron/70">
                 What you get
               </p>
               <h2
@@ -248,7 +248,7 @@ export default function SignedOutLanding({
                 >
                   <IconBadge icon={f.icon} />
                   <h3 className="mt-3 font-semibold">{f.title}</h3>
-                  <p className="mt-1 text-xs text-iron/60">{f.body}</p>
+                  <p className="mt-1 text-xs text-iron/70">{f.body}</p>
                 </div>
               ))}
             </div>
@@ -261,7 +261,7 @@ export default function SignedOutLanding({
         <section className="mx-auto max-w-6xl px-6 py-20">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-widest text-iron/50">
+              <p className="text-xs uppercase tracking-widest text-iron/70">
                 Featured brands
               </p>
               <h2
@@ -294,11 +294,11 @@ export default function SignedOutLanding({
                 />
                 <p className="mt-2 text-base font-semibold">{a.name}</p>
                 {a.tagline && (
-                  <p className="mt-1 text-xs text-iron/55 line-clamp-2">
+                  <p className="mt-1 text-xs text-iron/70 line-clamp-2">
                     {a.tagline}
                   </p>
                 )}
-                <p className="mt-4 text-xs text-iron/50 transition group-hover:text-iron/80">
+                <p className="mt-4 text-xs text-iron/70 transition group-hover:text-iron/80">
                   Visit page →
                 </p>
               </Link>
@@ -317,7 +317,7 @@ export default function SignedOutLanding({
             aria-hidden
             className="pointer-events-none absolute inset-0 bg-[radial-gradient(600px_circle_at_50%_-20%,rgba(212,160,23,0.35),transparent)]"
           />
-          <p className="relative text-xs uppercase tracking-widest text-iron/60">
+          <p className="relative text-xs uppercase tracking-widest text-iron/70">
             Ready for +100 welcome points?
           </p>
           <h2

@@ -31,7 +31,7 @@ export default async function OnboardingChatPage() {
   return (
     <main className="mx-auto max-w-2xl space-y-6 px-6 py-10">
       <header className="space-y-2">
-        <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
+        <p className="text-xs uppercase tracking-[0.3em] text-iron/70">
           Welcome
         </p>
         <h1

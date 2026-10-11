@@ -25,10 +25,10 @@ export default function StampCard({
     <div className="glass-card p-6 space-y-4">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-sm uppercase tracking-wide text-iron/60">Stamp Card</p>
+          <p className="text-sm uppercase tracking-wide text-iron/70">Stamp Card</p>
           <p className="mt-0.5 text-base font-semibold">{rewardTitle}</p>
           {rewardDescription && (
-            <p className="mt-0.5 text-xs text-iron/55">{rewardDescription}</p>
+            <p className="mt-0.5 text-xs text-iron/70">{rewardDescription}</p>
           )}
         </div>
         {completedRounds > 0 && (
@@ -75,7 +75,7 @@ export default function StampCard({
           🎉 Reward ready — show this to your server!
         </p>
       ) : (
-        <p className="text-xs text-iron/50 text-center">
+        <p className="text-xs text-iron/70 text-center">
           {stampsRequired - stampsInCurrentRound} more{" "}
           {stampsRequired - stampsInCurrentRound === 1 ? "visit" : "visits"} to earn{" "}
           <span className="text-iron/70">{rewardTitle}</span>

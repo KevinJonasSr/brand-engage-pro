@@ -12,7 +12,7 @@ export default function ForgotPasswordForm() {
     <Suspense
       fallback={
         <main className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center px-6 py-12">
-          <div className="glass-card p-8 text-center text-sm text-iron/60">Loading…</div>
+          <div className="glass-card p-8 text-center text-sm text-iron/70">Loading…</div>
         </main>
       }
     >
@@ -55,7 +55,7 @@ function ForgotPasswordFields() {
     <main className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center gap-6 px-6 py-12">
       <div className="glass-card space-y-6 p-8">
         <div className="space-y-2">
-          <p className="text-sm uppercase tracking-wide text-iron/60">Brand Engage Pro</p>
+          <p className="text-sm uppercase tracking-wide text-iron/70">Brand Engage Pro</p>
           <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
             Forgot password
           </h1>
@@ -77,7 +77,7 @@ function ForgotPasswordFields() {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <label className="block space-y-1">
-              <span className="text-xs uppercase tracking-wide text-iron/60">Email</span>
+              <span className="text-xs uppercase tracking-wide text-iron/70">Email</span>
               <input
                 type="email"
                 required
@@ -98,7 +98,7 @@ function ForgotPasswordFields() {
             {status === "error" && message && (
               <p className="text-sm text-ember">{message}</p>
             )}
-            <p className="text-center text-sm text-iron/60">
+            <p className="text-center text-sm text-iron/70">
               Remembered it?{" "}
               <Link href={loginHref} className="text-iron underline-offset-4 hover:underline">
                 Sign in

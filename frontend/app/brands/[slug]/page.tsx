@@ -230,7 +230,7 @@ export default async function BrandPage({
       {/* Founder wall link */}
       <Reveal>
       <section className="rounded-lg border border-iron/10 bg-iron/5 backdrop-blur p-4">
-        <p className="text-xs uppercase tracking-wide text-iron/50">
+        <p className="text-xs uppercase tracking-wide text-iron/70">
           Optional upgrades
         </p>
         <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
@@ -262,7 +262,7 @@ export default async function BrandPage({
       {goals.length > 0 && (
         <Reveal>
         <section className="glass-card p-8">
-          <p className="text-sm uppercase tracking-wide text-iron/60">
+          <p className="text-sm uppercase tracking-wide text-iron/70">
             Community goals
           </p>
           <div className="mt-4 space-y-5">
@@ -273,13 +273,13 @@ export default async function BrandPage({
                     {g.title}
                     {g.completed && <span className="ml-2">🏆</span>}
                   </p>
-                  <p className="text-sm text-iron/60">
+                  <p className="text-sm text-iron/70">
                     {g.current.toLocaleString()} / {g.target.toLocaleString()}{" "}
                     · {g.pct}%
                   </p>
                 </div>
                 {g.description && (
-                  <p className="mt-1 text-sm text-iron/60">{g.description}</p>
+                  <p className="mt-1 text-sm text-iron/70">{g.description}</p>
                 )}
                 <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-iron/10">
                   <div
@@ -293,7 +293,7 @@ export default async function BrandPage({
                 <div className="mt-2">
                   <Link
                     href={`/share/goal/${brand.slug}/${g.id}`}
-                    className="text-xs text-iron/50 hover:text-iron"
+                    className="text-xs text-iron/70 hover:text-iron"
                   >
                     Share this goal →
                   </Link>
@@ -314,14 +314,14 @@ export default async function BrandPage({
       <section className="grid gap-6 lg:grid-cols-[2fr_1fr]">
 
         <div className="glass-card p-8">
-          <p className="text-sm uppercase tracking-wide text-iron/60">About</p>
+          <p className="text-sm uppercase tracking-wide text-iron/70">About</p>
           <p className="mt-4 text-base leading-relaxed text-iron/80 whitespace-pre-line">{brand.bio}</p>
         </div>
         <div className="glass-card p-8">
-          <p className="text-sm uppercase tracking-wide text-iron/60">Follow</p>
+          <p className="text-sm uppercase tracking-wide text-iron/70">Follow</p>
           <div className="mt-4 flex flex-wrap gap-3">
             {brand.social.length === 0 ? (
-              <p className="text-xs text-iron/40">Social links pending.</p>
+              <p className="text-xs text-iron/70">Social links pending.</p>
             ) : (
               brand.social.map((s) => (
                 <SocialIcon key={s.label} label={s.label} href={s.href} />
@@ -381,7 +381,7 @@ export default async function BrandPage({
       {guestSpecials.length > 0 && (
         <section id="offers" className="glass-card p-8 scroll-mt-24">
           <Reveal>
-            <p className="text-sm uppercase tracking-wide text-iron/60">
+            <p className="text-sm uppercase tracking-wide text-iron/70">
               {isNellies ? "Member offers & specials" : "Specials"}
             </p>
           </Reveal>
@@ -441,7 +441,7 @@ export default async function BrandPage({
                       </div>
                       {s.redemption_code && (
                         isSignedIn ? (
-                          <p className="mt-3 text-xs text-iron/50">
+                          <p className="mt-3 text-xs text-iron/70">
                             Show code{" "}
                             <code className="rounded bg-iron/10 px-1.5 py-0.5 font-mono text-iron/90">
                               {s.redemption_code}
@@ -449,7 +449,7 @@ export default async function BrandPage({
                             at the register.
                           </p>
                         ) : (
-                          <p className="mt-3 text-xs text-iron/50">
+                          <p className="mt-3 text-xs text-iron/70">
                             Member code unlocked after{" "}
                             <Link
                               href={`/signup?ref=${brand.slug}`}
@@ -474,7 +474,7 @@ export default async function BrandPage({
       {/* Upcoming */}
       <section id="upcoming" className="glass-card p-8 scroll-mt-24">
         <Reveal>
-          <p className="text-sm uppercase tracking-wide text-iron/60">Upcoming</p>
+          <p className="text-sm uppercase tracking-wide text-iron/70">Upcoming</p>
         </Reveal>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           {brand.upcoming.map((e, i) => {
@@ -514,21 +514,21 @@ export default async function BrandPage({
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-sm font-semibold">{e.title}</p>
-                    <p className="text-xs text-iron/60">{e.detail}</p>
+                    <p className="text-xs text-iron/70">{e.detail}</p>
                     {e.location && (
-                      <p className="mt-1 text-xs text-iron/60">📍 {e.location}</p>
+                      <p className="mt-1 text-xs text-iron/70">📍 {e.location}</p>
                     )}
-                    <p className="mt-3 text-xs uppercase tracking-wide text-iron/40">
+                    <p className="mt-3 text-xs uppercase tracking-wide text-iron/70">
                       {e.date}
                     </p>
                     {eventId && count > 0 && (
-                      <p className="mt-1 text-xs text-iron/50">
+                      <p className="mt-1 text-xs text-iron/70">
                         {count}
                         {e.capacity ? ` / ${e.capacity}` : ""} RSVPed
                       </p>
                     )}
                     {eventId && count === 0 && isSignedIn && (
-                      <p className="mt-1 text-xs text-iron/50">
+                      <p className="mt-1 text-xs text-iron/70">
                         Be the first to RSVP
                       </p>
                     )}
@@ -564,7 +564,7 @@ export default async function BrandPage({
                   <div className="mt-3 flex items-center gap-3 text-xs">
                     <a
                       href={`/api/events/${eventId}/ics`}
-                      className="text-iron/60 hover:text-iron"
+                      className="text-iron/70 hover:text-iron"
                     >
                       📅 Add to calendar
                     </a>
@@ -573,7 +573,7 @@ export default async function BrandPage({
                         href={e.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-iron/60 hover:text-iron"
+                        className="text-iron/70 hover:text-iron"
                       >
                         Details ↗
                       </a>
@@ -591,8 +591,8 @@ export default async function BrandPage({
         <section className="glass-card p-8">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <p className="text-sm uppercase tracking-wide text-iron/60">Member club rewards</p>
-              <p className="mt-1 text-xs text-iron/50">
+              <p className="text-sm uppercase tracking-wide text-iron/70">Member club rewards</p>
+              <p className="mt-1 text-xs text-iron/70">
                 Live redeemables on the brand rewards page (points you earn after joining — new
                 accounts start at 0).
               </p>
@@ -611,7 +611,7 @@ export default async function BrandPage({
                 href={`/brands/${brand.slug}/rewards`}
                 className="rounded-lg bg-parchment/30 p-5 transition hover:bg-parchment/40"
               >
-                <p className="text-xs uppercase tracking-wide text-iron/50">{m.tier}</p>
+                <p className="text-xs uppercase tracking-wide text-iron/70">{m.tier}</p>
                 <p className="mt-1 text-sm font-semibold">{m.title}</p>
                 <p className="mt-3 text-sm font-semibold text-sage-ink">{m.points}</p>
               </Link>

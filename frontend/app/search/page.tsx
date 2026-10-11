@@ -67,7 +67,7 @@ function Shell({ query, children }: { query: string; children: React.ReactNode }
     <div className="min-h-screen bg-linen">
       <main className="mx-auto flex max-w-5xl flex-col gap-6 px-6 py-12">
         <header className="space-y-3">
-          <p className="text-xs uppercase tracking-wide text-iron/60">Search</p>
+          <p className="text-xs uppercase tracking-wide text-iron/70">Search</p>
           <h1
             className="text-3xl font-semibold"
             style={{ fontFamily: "var(--font-display)" }}
@@ -126,7 +126,7 @@ function ResultsGrouped({ results }: { results: SearchResults }) {
 
   return (
     <>
-      <p className="text-xs text-iron/50">
+      <p className="text-xs text-iron/70">
         {results.totalHits} {results.totalHits === 1 ? "result" : "results"}
         {" · "}
         {results.durationMs}ms
@@ -185,7 +185,7 @@ function renderPost(h: SearchHit) {
         <p className="text-sm font-semibold text-iron">{h.data.title}</p>
       ) : null}
       <p className="mt-1 line-clamp-3 text-xs text-iron/70">{h.data.body}</p>
-      <p className="mt-2 text-xs uppercase tracking-wide text-iron/40">
+      <p className="mt-2 text-xs uppercase tracking-wide text-iron/70">
         in {h.data.brand_slug} · {absoluteDate(h.data.created_at)}
       </p>
     </Link>
@@ -200,7 +200,7 @@ function renderComment(h: SearchHit) {
       className="block"
     >
       <p className="line-clamp-3 text-xs text-iron/80">{h.data.body}</p>
-      <p className="mt-2 text-xs uppercase tracking-wide text-iron/40">
+      <p className="mt-2 text-xs uppercase tracking-wide text-iron/70">
         comment in {h.data.brand_slug} · {absoluteDate(h.data.created_at)}
       </p>
     </Link>
@@ -215,7 +215,7 @@ function renderEvent(h: SearchHit) {
       {h.data.detail ? (
         <p className="mt-1 line-clamp-2 text-xs text-iron/70">{h.data.detail}</p>
       ) : null}
-      <p className="mt-2 text-xs uppercase tracking-wide text-iron/40">
+      <p className="mt-2 text-xs uppercase tracking-wide text-iron/70">
         {h.data.brand_slug}
         {(() => { const f = absoluteDate(h.data.event_date); return f ? ` · ${f}` : ""; })()}
       </p>
@@ -233,7 +233,7 @@ function renderReward(h: SearchHit) {
           {h.data.description}
         </p>
       ) : null}
-      <p className="mt-2 text-xs uppercase tracking-wide text-iron/40">
+      <p className="mt-2 text-xs uppercase tracking-wide text-iron/70">
         {h.data.point_cost.toLocaleString()} pts
       </p>
     </Link>
@@ -251,7 +251,7 @@ function renderSpecial(h: SearchHit) {
           {h.data.description}
         </p>
       ) : null}
-      <p className="mt-2 text-xs uppercase tracking-wide text-iron/40">
+      <p className="mt-2 text-xs uppercase tracking-wide text-iron/70">
         {h.data.community_id} · {h.data.tier === "public" ? "Members" : h.data.tier}
       </p>
     </Link>

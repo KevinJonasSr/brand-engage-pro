@@ -17,7 +17,7 @@ export default async function MeIndexPage() {
   return (
     <main className="mx-auto max-w-2xl px-4 py-10 sm:py-14">
       <header className="mb-8">
-        <p className="text-xs uppercase tracking-widest text-iron/60">
+        <p className="text-xs uppercase tracking-widest text-iron/70">
           Your account
         </p>
         <h1 className="mt-1 text-3xl font-semibold tracking-tight">Me</h1>
@@ -94,9 +94,9 @@ function Row({
       >
         <div>
           <div className="font-medium">{title}</div>
-          <div className="mt-0.5 text-sm text-iron/60">{body}</div>
+          <div className="mt-0.5 text-sm text-iron/70">{body}</div>
         </div>
-        <span aria-hidden className="text-iron/30">
+        <span aria-hidden className="text-iron/70">
           →
         </span>
       </Link>

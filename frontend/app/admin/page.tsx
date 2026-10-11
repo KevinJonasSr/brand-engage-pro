@@ -53,7 +53,7 @@ export default async function AdminOverviewPage() {
         <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
           Platform overview
         </h1>
-        <p className="mt-2 text-sm text-iron/60">
+        <p className="mt-2 text-sm text-iron/70">
           Quick glance at the member base. Use the tabs above to dive in.
         </p>
       </div>
@@ -63,7 +63,7 @@ export default async function AdminOverviewPage() {
             key={c.label}
             className="rounded-lg border border-iron/10 bg-parchment/30 p-5"
           >
-            <p className="text-xs uppercase tracking-wide text-iron/60">{c.label}</p>
+            <p className="text-xs uppercase tracking-wide text-iron/70">{c.label}</p>
             <p className="mt-2 text-3xl font-semibold">{c.value}</p>
           </div>
         ))}

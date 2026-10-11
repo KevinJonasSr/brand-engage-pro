@@ -148,7 +148,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
         <p className="text-sm font-semibold">Campaign basics</p>
         <div className="grid gap-3 md:grid-cols-2">
           <label className="block">
-            <span className="text-xs uppercase tracking-wide text-iron/60">Brand</span>
+            <span className="text-xs uppercase tracking-wide text-iron/70">Brand</span>
             <select
               value={brandSlug}
               onChange={(e) => setBrandSlug(e.target.value)}
@@ -162,7 +162,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
             </select>
           </label>
           <label className="block">
-            <span className="text-xs uppercase tracking-wide text-iron/60">Campaign title</span>
+            <span className="text-xs uppercase tracking-wide text-iron/70">Campaign title</span>
             <input
               name="title"
               value={title}
@@ -174,7 +174,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
           </label>
         </div>
         <label className="block">
-          <span className="text-xs uppercase tracking-wide text-iron/60">Internal description</span>
+          <span className="text-xs uppercase tracking-wide text-iron/70">Internal description</span>
           <textarea
             name="description"
             value={description}
@@ -218,7 +218,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
           className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
         />
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-wide text-iron/50">Options</p>
+          <p className="text-xs uppercase tracking-wide text-iron/70">Options</p>
           {pollOptions.map((opt, i) => (
             <div key={i} className="flex items-center gap-2">
               <input
@@ -246,7 +246,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
             <button
               type="button"
               onClick={() => setPollOptions([...pollOptions, ""])}
-              className="text-xs text-iron/60 hover:text-iron"
+              className="text-xs text-iron/70 hover:text-iron"
             >
               + Add option
             </button>
@@ -350,7 +350,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
           </div>
         </div>
         {ctas.length === 0 ? (
-          <p className="text-xs text-iron/50">
+          <p className="text-xs text-iron/70">
             No CTAs yet. Add one or more to reward members for taking action.
           </p>
         ) : (
@@ -495,7 +495,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
           placeholder="Email body"
           className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
         />
-        <p className="text-xs text-iron/50">
+        <p className="text-xs text-iron/70">
           Goes to this brand&apos;s followers who said yes to email. Each email has its own unsubscribe link.
         </p>
       </Section>
@@ -511,7 +511,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
           placeholder="Short SMS (160 char max)"
           className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
         />
-        <p className="text-xs text-iron/50">
+        <p className="text-xs text-iron/70">
           Recorded as a campaign item; sends via Twilio to opted-in members.
         </p>
       </Section>
@@ -519,7 +519,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
       <div className="flex items-center justify-end gap-3 py-4">
         <a
           href="/admin/campaigns"
-          className="text-sm text-iron/60 hover:text-iron"
+          className="text-sm text-iron/70 hover:text-iron"
         >
           Cancel
         </a>

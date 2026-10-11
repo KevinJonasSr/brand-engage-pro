@@ -78,7 +78,7 @@ export default async function AdminBriefsPage() {
         >
           Daily admin briefs
         </h1>
-        <p className="text-xs text-iron/60">
+        <p className="text-xs text-iron/70">
           Latest {briefs.length} briefs. Generated daily at 13:00 UTC.
         </p>
       </header>
@@ -108,7 +108,7 @@ function BriefCard({ brief, defaultOpen }: { brief: BriefRow; defaultOpen: boole
       <summary className="flex cursor-pointer items-center justify-between gap-3 px-5 py-4 text-sm">
         <div>
           <p className="font-semibold text-iron">{created}</p>
-          <p className="text-xs text-iron/50">
+          <p className="text-xs text-iron/70">
             {brief.metrics.platform.posts} posts ·{" "}
             {brief.metrics.platform.reactions} reactions ·{" "}
             {brief.metrics.platform.signups} signups
@@ -119,7 +119,7 @@ function BriefCard({ brief, defaultOpen }: { brief: BriefRow; defaultOpen: boole
             )}
           </p>
         </div>
-        <span className="text-xs uppercase tracking-wide text-iron/40">
+        <span className="text-xs uppercase tracking-wide text-iron/70">
           {brief.model.replace("claude-", "")}
         </span>
       </summary>
@@ -130,7 +130,7 @@ function BriefCard({ brief, defaultOpen }: { brief: BriefRow; defaultOpen: boole
         </pre>
 
         <details className="rounded-xl border border-iron/10 bg-parchment/40">
-          <summary className="cursor-pointer px-3 py-2 text-xs uppercase tracking-wide text-iron/50">
+          <summary className="cursor-pointer px-3 py-2 text-xs uppercase tracking-wide text-iron/70">
             Raw metrics (jsonb)
           </summary>
           <pre className="overflow-x-auto px-3 py-2 text-xs leading-relaxed text-iron/70">
@@ -140,7 +140,7 @@ function BriefCard({ brief, defaultOpen }: { brief: BriefRow; defaultOpen: boole
 
         {brief.metrics.anomalies.length > 0 && (
           <div className="space-y-1">
-            <p className="text-xs uppercase tracking-wide text-iron/50">
+            <p className="text-xs uppercase tracking-wide text-iron/70">
               Anomalies (rule-based)
             </p>
             <ul className="space-y-1">

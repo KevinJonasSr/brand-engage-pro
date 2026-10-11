@@ -122,7 +122,7 @@ export function PredictionVoteForm({
 
       {predictionType === "numeric" && (
         <label className="block">
-          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-iron/55">
+          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-iron/70">
             Your guess{numericUnit ? ` (${numericUnit})` : ""}
           </span>
           <input
@@ -138,7 +138,7 @@ export function PredictionVoteForm({
 
       {predictionType === "date" && (
         <label className="block">
-          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-iron/55">
+          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-iron/70">
             Your guess
           </span>
           <input

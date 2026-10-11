@@ -96,7 +96,7 @@ export default async function FraudSignalsPage() {
   return (
     <main className="space-y-8">
       <header className="space-y-2">
-        <p className="text-sm uppercase tracking-wide text-iron/60">
+        <p className="text-sm uppercase tracking-wide text-iron/70">
           Admin · Fraud signals
         </p>
         <h1
@@ -118,7 +118,7 @@ export default async function FraudSignalsPage() {
           Pending review ({pendingRows.length})
         </h2>
         {pendingRows.length === 0 ? (
-          <p className="rounded-lg border border-iron/10 bg-parchment/30 p-6 text-sm text-iron/60">
+          <p className="rounded-lg border border-iron/10 bg-parchment/30 p-6 text-sm text-iron/70">
             No pending flags. The scanner is conservative by design — most
             members are legitimate.
           </p>
@@ -156,12 +156,12 @@ export default async function FraudSignalsPage() {
                   >
                     {s.status}
                   </span>
-                  <span className="text-iron/40">
+                  <span className="text-iron/70">
                     {membersById.get(s.member_id)?.first_name ??
                       s.member_id.slice(0, 8)}{" "}
                     · {s.verdict} · {Math.round(s.confidence * 100)}%
                   </span>
-                  <span className="text-iron/40">
+                  <span className="text-iron/70">
                     {s.reviewed_at
                       ? new Date(s.reviewed_at).toLocaleString()
                       : ""}
@@ -207,25 +207,25 @@ function PendingFlagCard({
           {signal.triggers.map((t) => (
             <span
               key={t}
-              className="rounded-full border border-iron/15 bg-iron/5 px-2 py-0.5 text-iron/60"
+              className="rounded-full border border-iron/15 bg-iron/5 px-2 py-0.5 text-iron/70"
             >
               {t}
             </span>
           ))}
-          <span className="ml-auto text-iron/40">
+          <span className="ml-auto text-iron/70">
             scanned {new Date(signal.scanned_at).toLocaleString()}
           </span>
         </div>
 
         <div className="grid gap-3 text-xs sm:grid-cols-2">
           <div>
-            <p className="text-xs uppercase tracking-wide text-iron/50">
+            <p className="text-xs uppercase tracking-wide text-iron/70">
               Member
             </p>
             <p className="text-iron/85">
               {member?.first_name ?? "—"} · {member?.email ?? "—"}
             </p>
-            <p className="text-iron/60">
+            <p className="text-iron/70">
               {member?.total_points ?? 0} pts · signed up{" "}
               {member?.created_at
                 ? new Date(member.created_at).toLocaleDateString()
@@ -233,7 +233,7 @@ function PendingFlagCard({
             </p>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-wide text-iron/50">
+            <p className="text-xs uppercase tracking-wide text-iron/70">
               Activity (24h)
             </p>
             <p className="text-iron/85">
@@ -245,7 +245,7 @@ function PendingFlagCard({
 
         {signal.reasons.length > 0 && (
           <div>
-            <p className="text-xs uppercase tracking-wide text-iron/50">
+            <p className="text-xs uppercase tracking-wide text-iron/70">
               Claude's reasons
             </p>
             <ul className="mt-1 list-disc space-y-1 pl-5 text-xs text-iron/80">
@@ -258,7 +258,7 @@ function PendingFlagCard({
 
         {evidence.post_samples && evidence.post_samples.length > 0 && (
           <details className="text-xs">
-            <summary className="cursor-pointer text-iron/60 hover:text-iron">
+            <summary className="cursor-pointer text-iron/70 hover:text-iron">
               Post samples ({evidence.post_samples.length})
             </summary>
             <ul className="mt-2 space-y-1 pl-3 text-iron/70">
@@ -273,7 +273,7 @@ function PendingFlagCard({
 
         {evidence.comment_samples && evidence.comment_samples.length > 0 && (
           <details className="text-xs">
-            <summary className="cursor-pointer text-iron/60 hover:text-iron">
+            <summary className="cursor-pointer text-iron/70 hover:text-iron">
               Comment samples ({evidence.comment_samples.length})
             </summary>
             <ul className="mt-2 space-y-1 pl-3 text-iron/70">

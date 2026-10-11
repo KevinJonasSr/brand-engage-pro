@@ -42,12 +42,12 @@ export default function RewardCardWithForm({
         <h3 className="line-clamp-2 text-sm font-semibold">{reward.title}</h3>
 
         {reward.description && (
-          <p className="mt-1 line-clamp-2 text-xs text-iron/60">{reward.description}</p>
+          <p className="mt-1 line-clamp-2 text-xs text-iron/70">{reward.description}</p>
         )}
 
         <div className="mt-3 flex items-baseline gap-2">
           <span className="text-2xl font-bold text-iron">{reward.point_cost.toLocaleString()}</span>
-          <span className="text-xs text-iron/60">pts</span>
+          <span className="text-xs text-iron/70">pts</span>
         </div>
 
         {reward.requires_tier && (
@@ -61,7 +61,7 @@ export default function RewardCardWithForm({
         )}
 
         {reward.stock !== null && (
-          <p className="mt-2 text-xs text-iron/50">Only {reward.stock} left</p>
+          <p className="mt-2 text-xs text-iron/70">Only {reward.stock} left</p>
         )}
 
         {isSignedIn ? (

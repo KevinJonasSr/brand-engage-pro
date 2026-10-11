@@ -148,7 +148,7 @@ export default async function AdminCommunityPage() {
         >
           Community moderation
         </h1>
-        <p className="mt-2 text-sm text-iron/60">
+        <p className="mt-2 text-sm text-iron/70">
           Cross-brand feed — pin, delete, and jump to the member who authored a post.
         </p>
       </div>
@@ -160,11 +160,11 @@ export default async function AdminCommunityPage() {
         </header>
         <div className="divide-y divide-iron/5">
           {posts.length === 0 && (
-            <p className="py-6 text-center text-xs text-iron/50">No posts yet.</p>
+            <p className="py-6 text-center text-xs text-iron/70">No posts yet.</p>
           )}
           {posts.map((p) => (
             <div key={p.id} className="flex items-start gap-3 py-3">
-              <div className="w-20 shrink-0 text-xs text-iron/50">
+              <div className="w-20 shrink-0 text-xs text-iron/70">
                 {timeAgo(p.created_at)}
               </div>
               <div className="min-w-0 flex-1 space-y-1">
@@ -220,11 +220,11 @@ export default async function AdminCommunityPage() {
         </header>
         <div className="divide-y divide-iron/5">
           {comments.length === 0 && (
-            <p className="py-6 text-center text-xs text-iron/50">No comments yet.</p>
+            <p className="py-6 text-center text-xs text-iron/70">No comments yet.</p>
           )}
           {comments.map((c) => (
             <div key={c.id} className="flex items-start gap-3 py-3">
-              <div className="w-20 shrink-0 text-xs text-iron/50">
+              <div className="w-20 shrink-0 text-xs text-iron/70">
                 {timeAgo(c.created_at)}
               </div>
               <div className="min-w-0 flex-1">
@@ -235,7 +235,7 @@ export default async function AdminCommunityPage() {
                   >
                     {c.author_first_name ?? "Anonymous"}
                   </Link>
-                  <span className="text-iron/40"> on post {c.post_id.slice(0, 8)}…</span>
+                  <span className="text-iron/70"> on post {c.post_id.slice(0, 8)}…</span>
                 </p>
                 <p className="mt-1 line-clamp-2 text-sm text-iron/80">{c.body}</p>
               </div>
@@ -258,11 +258,11 @@ export default async function AdminCommunityPage() {
         </header>
         <div className="divide-y divide-iron/5">
           {entries.length === 0 && (
-            <p className="py-6 text-center text-xs text-iron/50">No entries yet.</p>
+            <p className="py-6 text-center text-xs text-iron/70">No entries yet.</p>
           )}
           {entries.map((e) => (
             <div key={e.id} className="flex items-start gap-3 py-3">
-              <div className="w-20 shrink-0 text-xs text-iron/50">
+              <div className="w-20 shrink-0 text-xs text-iron/70">
                 {timeAgo(e.created_at)}
               </div>
               {e.image_url && (
@@ -281,7 +281,7 @@ export default async function AdminCommunityPage() {
                   >
                     {e.member_first_name ?? "Anonymous"}
                   </Link>
-                  <span className="text-iron/40">
+                  <span className="text-iron/70">
                     {" "}entry on challenge {e.post_id.slice(0, 8)}…
                   </span>
                 </p>

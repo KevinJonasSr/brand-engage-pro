@@ -158,7 +158,7 @@ export default async function Home({
               appears here. */}
           {!needsProfile && memberHome && <MemberHomeDashboard data={memberHome} streak={streak} recap={recap} />}
           <section className="glass-card p-6">
-            <p className="flex items-center gap-2 text-sm uppercase tracking-wide text-iron/60">
+            <p className="flex items-center gap-2 text-sm uppercase tracking-wide text-iron/70">
               <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-amber-500/20 text-aurora-ink">
                 ★
               </span>
@@ -167,7 +167,7 @@ export default async function Home({
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {kpiCards.map((kpi) => (
                 <div key={kpi.label} className="rounded-lg border border-iron/10 bg-parchment/30 p-4">
-                  <p className="text-xs uppercase tracking-wide text-iron/50">{kpi.label}</p>
+                  <p className="text-xs uppercase tracking-wide text-iron/70">{kpi.label}</p>
                   <p className="mt-2 text-2xl font-semibold">{kpi.value}</p>
                   {kpi.delta && <p className="text-sm text-sage-ink">{kpi.delta}</p>}
                 </div>
@@ -177,19 +177,19 @@ export default async function Home({
 
           <section className="grid gap-6 lg:grid-cols-2">
             <div className="glass-card space-y-4 p-6">
-              <p className="flex items-center gap-2 text-sm uppercase tracking-wide text-iron/60">
+              <p className="flex items-center gap-2 text-sm uppercase tracking-wide text-iron/70">
                 <span>📅</span> Upcoming Events
               </p>
-              <div className="rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-6 text-center text-xs text-iron/60">
+              <div className="rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-6 text-center text-xs text-iron/70">
                 No events scheduled yet. New offers and member events will show here.
               </div>
             </div>
             <div className="glass-card space-y-4 p-6">
-              <p className="flex items-center gap-2 text-sm uppercase tracking-wide text-iron/60">
+              <p className="flex items-center gap-2 text-sm uppercase tracking-wide text-iron/70">
                 <span>🎁</span> Recommended Offers
               </p>
               {offers.length === 0 ? (
-                <div className="rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-6 text-center text-xs text-iron/60">
+                <div className="rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-6 text-center text-xs text-iron/70">
                   No offers right now. New offers will show up here as soon as they go live.
                 </div>
               ) : (
@@ -215,7 +215,7 @@ export default async function Home({
                     )}
                     <div className="p-5">
                       <p className="text-base font-semibold">{offer.title}</p>
-                      <p className="mt-1 text-xs uppercase tracking-wide text-iron/50">
+                      <p className="mt-1 text-xs uppercase tracking-wide text-iron/70">
                         {offer.tier}
                       </p>
                       <div className="mt-4 flex items-center justify-between">
@@ -234,7 +234,7 @@ export default async function Home({
           </section>
 
           <section className="glass-card p-6">
-            <p className="flex items-center gap-2 text-sm uppercase tracking-wide text-iron/60">
+            <p className="flex items-center gap-2 text-sm uppercase tracking-wide text-iron/70">
               <span>⚡</span> Quick Actions
             </p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -281,7 +281,7 @@ export default async function Home({
                       </span>
                       {tier.display_name}
                     </span>
-                    <span className="text-sm uppercase tracking-wide text-iron/60">
+                    <span className="text-sm uppercase tracking-wide text-iron/70">
                       {unlocked ? "Unlocked" : `${formatPts(tier.min_points)}`}
                     </span>
                   </div>
@@ -292,8 +292,8 @@ export default async function Home({
 
           {inviteUrl && (
             <section className="glass-card p-6">
-              <p className="text-sm uppercase tracking-wide text-iron/60">Your invite</p>
-              <p className="mt-2 text-xs text-iron/60">
+              <p className="text-sm uppercase tracking-wide text-iron/70">Your invite</p>
+              <p className="mt-2 text-xs text-iron/70">
                 Share the QR for instant sign-ups. Every verified join earns you 150 pts.
               </p>
               <div className="mt-4">

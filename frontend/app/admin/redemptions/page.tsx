@@ -57,9 +57,9 @@ export default async function AdminRedemptionsPage() {
                       {member?.first_name || "Member"} · {redemption.reward.title}
                     </p>
                     {redemption.delivery_details && (
-                      <p className="mt-1 text-xs text-iron/60">{redemption.delivery_details}</p>
+                      <p className="mt-1 text-xs text-iron/70">{redemption.delivery_details}</p>
                     )}
-                    <p className="mt-1 text-xs text-iron/40">
+                    <p className="mt-1 text-xs text-iron/70">
                       {new Date(redemption.created_at).toLocaleDateString()}
                     </p>
                   </div>
@@ -72,7 +72,7 @@ export default async function AdminRedemptionsPage() {
         </div>
       ) : (
         <div className="glass-card rounded-lg p-8 text-center">
-          <p className="text-iron/60">No pending redemptions. You&apos;re all caught up!</p>
+          <p className="text-iron/70">No pending redemptions. You&apos;re all caught up!</p>
         </div>
       )}
     </div>

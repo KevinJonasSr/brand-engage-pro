@@ -35,7 +35,7 @@ export default function EditableEventRow({
         <button
           type="button"
           onClick={() => setEditing(true)}
-          className="mt-2 inline-flex text-xs text-iron/60 hover:text-iron"
+          className="mt-2 inline-flex text-xs text-iron/70 hover:text-iron"
         >
           ✏️ Edit
         </button>

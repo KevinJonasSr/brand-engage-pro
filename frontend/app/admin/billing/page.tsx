@@ -95,7 +95,7 @@ export default async function BillingPage({
     <div className="space-y-6">
       <header>
         <h1 className="text-2xl font-bold text-iron">Billing</h1>
-        <p className="mt-1 text-sm text-iron/60">
+        <p className="mt-1 text-sm text-iron/70">
           ${BRAND_MONTHLY_PRICE_USD} per business per month after a {BRAND_TRIAL_DAYS}-day
           free trial. The first {BRAND_FREE_SLOT_LIMIT} businesses are free. Your
           guests never pay and are never affected by billing.
@@ -123,7 +123,7 @@ export default async function BillingPage({
         <section className="rounded-lg border border-iron/10 bg-parchment/40 p-6">
           <dl className="grid gap-4 text-sm sm:grid-cols-2">
             <div>
-              <dt className="text-iron/50">Plan</dt>
+              <dt className="text-iron/70">Plan</dt>
               <dd className="text-iron">
                 {isFree
                   ? `Free (slot ${row?.free_slot} of ${BRAND_FREE_SLOT_LIMIT})`
@@ -131,7 +131,7 @@ export default async function BillingPage({
               </dd>
             </div>
             <div>
-              <dt className="text-iron/50">Status</dt>
+              <dt className="text-iron/70">Status</dt>
               <dd className="text-iron">
                 {row ? STATUS_LABELS[row.status] : "Not started"}
                 {row?.cancel_at_period_end ? " (ends at period end)" : ""}
@@ -139,19 +139,19 @@ export default async function BillingPage({
             </div>
             {row?.trial_ends_at && (
               <div>
-                <dt className="text-iron/50">Trial ends</dt>
+                <dt className="text-iron/70">Trial ends</dt>
                 <dd className="text-iron">{formatDate(row.trial_ends_at)}</dd>
               </div>
             )}
             {row?.current_period_end && !isFree && (
               <div>
-                <dt className="text-iron/50">Current period ends</dt>
+                <dt className="text-iron/70">Current period ends</dt>
                 <dd className="text-iron">{formatDate(row.current_period_end)}</dd>
               </div>
             )}
             {graceLeft !== null && (
               <div>
-                <dt className="text-iron/50">Days left to fix payment</dt>
+                <dt className="text-iron/70">Days left to fix payment</dt>
                 <dd className="text-iron">{graceLeft}</dd>
               </div>
             )}
@@ -184,19 +184,19 @@ export default async function BillingPage({
             </div>
           )}
           {canManage && !isFree && !stripeReady && (
-            <p className="mt-3 text-xs text-iron/50">
+            <p className="mt-3 text-xs text-iron/70">
               Billing is not switched on yet. The team is setting up Stripe.
             </p>
           )}
           {!canManage && (
-            <p className="mt-6 text-xs text-iron/50">
+            <p className="mt-6 text-xs text-iron/70">
               Only owners and admins can change billing.
             </p>
           )}
 
           {ctx.isSuperAdmin && !isFree && !isLive && (
             <form action={grantFreeSlotAction} className="mt-6 border-t border-iron/10 pt-4">
-              <p className="mb-2 text-xs text-iron/50">
+              <p className="mb-2 text-xs text-iron/70">
                 Super admin: move this business into one of the {BRAND_FREE_SLOT_LIMIT} free slots.
               </p>
               <button

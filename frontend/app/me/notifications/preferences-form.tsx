@@ -183,7 +183,7 @@ export function PreferencesForm({
 
       <Section title="Quiet hours">
         <div className="rounded-xl border border-iron/10 bg-iron/[0.02] p-4">
-          <p className="text-sm text-iron/60">
+          <p className="text-sm text-iron/70">
             We hold non-urgent alerts during this window. RSVP and redemption
             confirmations always come through.
           </p>
@@ -209,7 +209,7 @@ export function PreferencesForm({
             <span className="text-sage-ink">Saved.</span>
           )}
           {!savedAt && !error && !hadRow && dirty && (
-            <span className="text-iron/50">
+            <span className="text-iron/70">
               First save creates your preferences row.
             </span>
           )}
@@ -221,7 +221,7 @@ export function PreferencesForm({
           className={
             "inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-medium transition " +
             (!dirty || pending
-              ? "bg-iron/10 text-iron/50 cursor-not-allowed"
+              ? "bg-iron/10 text-iron/70 cursor-not-allowed"
               : "bg-iron text-linen hover:bg-iron/90")
           }
         >
@@ -241,7 +241,7 @@ function Section({
 }) {
   return (
     <div>
-      <h3 className="mb-2 text-xs uppercase tracking-widest text-iron/50">
+      <h3 className="mb-2 text-xs uppercase tracking-widest text-iron/70">
         {title}
       </h3>
       <div className="space-y-3">{children}</div>
@@ -294,7 +294,7 @@ function PrefRow({
       </span>
       <div className="flex-1">
         <div className="font-medium">{row.title}</div>
-        <p className="mt-0.5 text-sm text-iron/60">{row.body}</p>
+        <p className="mt-0.5 text-sm text-iron/70">{row.body}</p>
       </div>
       <span className="mt-1 shrink-0">
         <input
@@ -308,7 +308,7 @@ function PrefRow({
         <span
           className={
             "block h-6 w-11 rounded-full transition " +
-            (on ? "bg-emerald-500" : "bg-iron/15")
+            (on ? "bg-sage-ink" : "bg-iron/15")
           }
         >
           <span

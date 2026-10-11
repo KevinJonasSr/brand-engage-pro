@@ -77,11 +77,11 @@ export default async function AdminTeamPage() {
   return (
     <main className="mx-auto max-w-4xl px-6 py-10 space-y-8">
       <div>
-        <p className="text-xs uppercase tracking-widest text-iron/50">
+        <p className="text-xs uppercase tracking-widest text-iron/70">
           {communityId}
         </p>
         <h1 className="mt-1 text-2xl font-bold text-iron">Team</h1>
-        <p className="mt-2 text-sm text-iron/60">
+        <p className="mt-2 text-sm text-iron/70">
           Give your staff access to the brand dashboard. They need a Brand
           Engage account first — have them sign up on the member site, then
           add their email here.
@@ -91,7 +91,7 @@ export default async function AdminTeamPage() {
       <section className="rounded-lg border border-iron/10 bg-parchment/30 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-iron/10 text-left text-xs uppercase tracking-wide text-iron/40">
+            <tr className="border-b border-iron/10 text-left text-xs uppercase tracking-wide text-iron/70">
               <th className="px-4 py-3">Person</th>
               <th className="px-4 py-3">Role</th>
               <th className="px-4 py-3" />
@@ -100,7 +100,7 @@ export default async function AdminTeamPage() {
           <tbody>
             {team.length === 0 && (
               <tr>
-                <td colSpan={3} className="px-4 py-6 text-iron/50">
+                <td colSpan={3} className="px-4 py-6 text-iron/70">
                   No team members yet — add one below.
                 </td>
               </tr>
@@ -111,10 +111,10 @@ export default async function AdminTeamPage() {
                   <p className="font-medium text-iron">
                     {t.name ?? t.email ?? t.user_id.slice(0, 8)}
                     {t.user_id === ctx.user.id && (
-                      <span className="ml-2 text-xs text-iron/40">(you)</span>
+                      <span className="ml-2 text-xs text-iron/70">(you)</span>
                     )}
                   </p>
-                  {t.email && <p className="text-xs text-iron/40">{t.email}</p>}
+                  {t.email && <p className="text-xs text-iron/70">{t.email}</p>}
                 </td>
                 <td className="px-4 py-3 capitalize text-iron/80">{t.role}</td>
                 <td className="px-4 py-3 text-right">
@@ -131,7 +131,7 @@ export default async function AdminTeamPage() {
                       </form>
                     )}
                   {t.role === "owner" && !ctx.isSuperAdmin && (
-                    <span className="text-xs text-iron/30">
+                    <span className="text-xs text-iron/70">
                       Owners are managed by platform staff
                     </span>
                   )}
@@ -148,7 +148,7 @@ export default async function AdminTeamPage() {
           action={addTeamMemberAction}
           className="mt-4 flex flex-wrap items-end gap-3"
         >
-          <label className="flex flex-col gap-1 text-xs text-iron/50">
+          <label className="flex flex-col gap-1 text-xs text-iron/70">
             Email
             <input
               type="email"
@@ -158,7 +158,7 @@ export default async function AdminTeamPage() {
               className="w-64 rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm text-iron"
             />
           </label>
-          <label className="flex flex-col gap-1 text-xs text-iron/50">
+          <label className="flex flex-col gap-1 text-xs text-iron/70">
             Role
             <select
               name="role"
@@ -177,7 +177,7 @@ export default async function AdminTeamPage() {
             Add
           </button>
         </form>
-        <dl className="mt-6 grid gap-2 text-xs text-iron/50 sm:grid-cols-2">
+        <dl className="mt-6 grid gap-2 text-xs text-iron/70 sm:grid-cols-2">
           {(Object.keys(ROLE_DESCRIPTIONS) as AdminRole[]).map((r) => (
             <div key={r}>
               <dt className="font-semibold capitalize text-iron/70">{r}</dt>

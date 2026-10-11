@@ -203,7 +203,7 @@ export default function VideoUploader({
               style={{ width: `${progress}%` }}
             />
           </div>
-          <p className="text-xs text-iron/60">{progress}%</p>
+          <p className="text-xs text-iron/70">{progress}%</p>
         </div>
       )}
 

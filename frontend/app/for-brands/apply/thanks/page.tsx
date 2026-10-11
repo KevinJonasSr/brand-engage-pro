@@ -5,7 +5,7 @@ export const metadata = { title: "Application received" };
 export default function ThanksPage() {
   return (
     <main className="mx-auto max-w-2xl space-y-6 px-6 py-20 text-center">
-      <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
+      <p className="text-xs uppercase tracking-[0.3em] text-iron/70">
         Application received
       </p>
       <h1

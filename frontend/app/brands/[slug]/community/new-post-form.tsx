@@ -154,7 +154,7 @@ export default function NewPostForm({
                           : v === "founder-only"
                             ? "border border-amber-300/70 bg-gradient-to-r from-amber-500/30 to-yellow-500/30 text-iron"
                             : "border border-cyan-300/70 bg-gradient-to-r from-aurora/30 to-cyan-500/30 text-iron"
-                        : "text-iron/60 hover:text-iron/80"
+                        : "text-iron/70 hover:text-iron/80"
                     }`}
                   >
                     {labels[v]}
@@ -206,7 +206,7 @@ export default function NewPostForm({
 
       {kind === "poll" && (
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-wide text-iron/50">Options</p>
+          <p className="text-xs uppercase tracking-wide text-iron/70">Options</p>
           {pollOptions.map((opt, i) => (
             <div key={i} className="flex items-center gap-2">
               <input
@@ -238,7 +238,7 @@ export default function NewPostForm({
             <button
               type="button"
               onClick={() => setPollOptions([...pollOptions, ""])}
-              className="text-xs text-iron/60 hover:text-iron"
+              className="text-xs text-iron/70 hover:text-iron"
             >
               + Add option
             </button>
@@ -271,7 +271,7 @@ export default function NewPostForm({
 
       <div className="flex items-center justify-between gap-3">
         {kind === "poll" ? (
-          <span className="text-xs text-iron/50">
+          <span className="text-xs text-iron/70">
             {pollOptions.filter((o) => o.trim()).length} of 6 options
           </span>
         ) : (

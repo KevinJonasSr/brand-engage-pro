@@ -78,7 +78,7 @@ export function RedeemForm({
             </div>
             <h2 className="text-xl font-semibold">Redeemed!</h2>
             <p className="mt-1 text-sm text-iron/70">{rewardTitle}</p>
-            <p className="mt-1 text-xs text-iron/50">
+            <p className="mt-1 text-xs text-iron/70">
               {pointCost.toLocaleString()} points spent. Show this redemption to
               your server or host — pickup tonight, not shipping.
             </p>
@@ -105,7 +105,7 @@ export function RedeemForm({
                   setRedeemed(false);
                   onSuccess();
                 }}
-                className="text-xs text-iron/60 hover:text-iron"
+                className="text-xs text-iron/70 hover:text-iron"
               >
                 Done
               </button>
@@ -115,7 +115,7 @@ export function RedeemForm({
           // ─── Original confirm-and-redeem form ───────────────────────
           <>
             <h2 className="text-lg font-semibold">{rewardTitle}</h2>
-            <p className="mt-1 text-sm text-iron/60">
+            <p className="mt-1 text-sm text-iron/70">
               Cost: {pointCost.toLocaleString()} points
             </p>
 

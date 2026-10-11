@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getMemberProfileBySlug } from "@/lib/data/member-profile";
 import ShareButton from "@/components/share-button";
+import { IRON, LINEN, contrastRatio, darkenUntil, resolveBrandAccent } from "@/lib/brand-accent";
 
 export const dynamic = "force-dynamic";
 
@@ -91,7 +92,7 @@ export default async function MemberProfilePage({
       <section
         className="relative overflow-hidden rounded-lg border border-iron/15 p-8 shadow-glass md:p-10"
         style={{
-          background: `radial-gradient(circle at 15% 10%, ${tier.from}55, transparent 55%), radial-gradient(circle at 85% 95%, ${tier.to}55, transparent 60%), #050b1f`,
+          background: `radial-gradient(circle at 15% 10%, ${tier.from}55, transparent 55%), radial-gradient(circle at 85% 95%, ${tier.to}55, transparent 60%), ${LINEN}`,
         }}
       >
         <div className="relative flex flex-col items-start gap-6 md:flex-row md:items-center">
@@ -108,6 +109,7 @@ export default async function MemberProfilePage({
               className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-iron/20 text-3xl font-bold"
               style={{
                 backgroundImage: `linear-gradient(135deg, ${tier.from}, ${tier.to})`,
+                color: contrastRatio(tier.from, LINEN) >= contrastRatio(tier.from, IRON) ? LINEN : IRON,
               }}
             >
               {initial}
@@ -116,7 +118,7 @@ export default async function MemberProfilePage({
           <div className="flex-1">
             <p
               className="text-xs font-medium uppercase tracking-[0.3em]"
-              style={{ color: tier.to }}
+              style={{ color: darkenUntil(tier.from, LINEN, 4.5) }}
             >
               {tier.label} tier
             </p>
@@ -130,7 +132,7 @@ export default async function MemberProfilePage({
               @{profile.profileSlug} · Member since {formatMemberSince(profile.memberSince)}
             </p>
             {socialHandle && (
-              <p className="mt-1 text-xs text-iron/55">
+              <p className="mt-1 text-xs text-iron/70">
                 Find them on TikTok/Instagram: {socialHandle}
               </p>
             )}
@@ -143,19 +145,19 @@ export default async function MemberProfilePage({
             <p className="text-2xl font-bold tabular-nums">
               {profile.totalPoints.toLocaleString()}
             </p>
-            <p className="mt-1 text-xs text-iron/60">total points</p>
+            <p className="mt-1 text-xs text-iron/70">total points</p>
           </div>
           <div className="rounded-lg bg-iron/5 px-3 py-4">
             <p className="text-2xl font-bold tabular-nums">
               {profile.founderBadges.length}
             </p>
-            <p className="mt-1 text-xs text-iron/60">founder badges</p>
+            <p className="mt-1 text-xs text-iron/70">founder badges</p>
           </div>
           <div className="rounded-lg bg-iron/5 px-3 py-4">
             <p className="text-2xl font-bold tabular-nums">
               {profile.brands.length}
             </p>
-            <p className="mt-1 text-xs text-iron/60">brands followed</p>
+            <p className="mt-1 text-xs text-iron/70">brands followed</p>
           </div>
         </div>
 
@@ -185,7 +187,7 @@ export default async function MemberProfilePage({
                 href={`/share/founder/${f.communitySlug}/${f.founderNumber}`}
                 className="group relative overflow-hidden rounded-lg border border-iron/10 p-5 transition hover:border-iron/30"
                 style={{
-                  background: `radial-gradient(circle at 15% 10%, ${f.accentFrom}33, transparent 60%), radial-gradient(circle at 85% 90%, ${f.accentTo}33, transparent 60%), rgba(255,255,255,0.03)`,
+                  background: `radial-gradient(circle at 15% 10%, ${f.accentFrom}33, transparent 60%), radial-gradient(circle at 85% 90%, ${f.accentTo}33, transparent 60%), ${LINEN}`,
                 }}
               >
                 <div className="flex items-center justify-between">
@@ -194,18 +196,13 @@ export default async function MemberProfilePage({
                   </p>
                   <p
                     className="text-3xl font-bold tabular-nums"
-                    style={{
-                      backgroundImage: `linear-gradient(135deg, ${f.accentFrom}, ${f.accentTo})`,
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                      backgroundClip: "text",
-                    }}
+                    style={{ color: resolveBrandAccent(f.accentFrom, f.accentTo).accentInk }}
                   >
                     #{f.founderNumber}
                   </p>
                 </div>
                 <p className="mt-2 text-lg font-semibold">{f.communityName}</p>
-                <p className="mt-3 text-xs text-iron/55 transition group-hover:text-iron/80">
+                <p className="mt-3 text-xs text-iron/70 transition group-hover:text-iron/80">
                   See badge →
                 </p>
               </Link>
@@ -230,7 +227,7 @@ export default async function MemberProfilePage({
               >
                 <p className="text-sm font-semibold">{b.name}</p>
                 {b.description && (
-                  <p className="mt-1 text-xs text-iron/60 line-clamp-2">
+                  <p className="mt-1 text-xs text-iron/70 line-clamp-2">
                     {b.description}
                   </p>
                 )}
@@ -291,7 +288,7 @@ export default async function MemberProfilePage({
         <p className="text-sm font-medium text-iron/85">
           Want a profile of your own?
         </p>
-        <p className="mt-1 text-xs text-iron/55">
+        <p className="mt-1 text-xs text-iron/70">
           Follow brands, earn perks, unlock specials and badges. Your member
           profile builds itself.
         </p>

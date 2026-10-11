@@ -25,7 +25,7 @@ export default async function AdminRewardsPage() {
         <h1 className="text-2xl font-bold">Rewards Catalog</h1>
         <Link
           href="/admin/rewards/new"
-          className="rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 px-4 py-2 text-sm font-medium text-iron hover:opacity-90"
+          className="rounded-lg bg-ember px-4 py-2 text-sm font-medium text-linen hover:bg-ember/90"
         >
           New Reward
         </Link>
@@ -83,7 +83,7 @@ export default async function AdminRewardsPage() {
         </div>
       ) : (
         <div className="glass-card rounded-lg p-8 text-center">
-          <p className="text-iron/60">No rewards yet. Create one to get started.</p>
+          <p className="text-iron/70">No rewards yet. Create one to get started.</p>
         </div>
       )}
     </div>

@@ -60,7 +60,7 @@ export default function ModerationButton({
     className ??
     (variant === "delete"
       ? "text-xs text-ember/80 hover:text-ember disabled:opacity-50"
-      : "text-xs text-iron/60 hover:text-iron disabled:opacity-50");
+      : "text-xs text-iron/70 hover:text-iron disabled:opacity-50");
 
   return (
     <span className="inline-flex items-center gap-1.5">

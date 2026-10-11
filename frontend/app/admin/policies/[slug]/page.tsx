@@ -24,7 +24,7 @@ export default async function AdminPolicyEditPage({
     <div className="space-y-5">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <Link href="/admin/policies" className="text-xs text-iron/60 hover:text-iron">
+          <Link href="/admin/policies" className="text-xs text-iron/70 hover:text-iron">
             ← Back to policies
           </Link>
           <h1
@@ -33,7 +33,7 @@ export default async function AdminPolicyEditPage({
           >
             Edit {policy.title}
           </h1>
-          <p className="mt-1 text-xs text-iron/60">/{publicSlug}</p>
+          <p className="mt-1 text-xs text-iron/70">/{publicSlug}</p>
         </div>
         <Link
           href={`/${publicSlug}`}

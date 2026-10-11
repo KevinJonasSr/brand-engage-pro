@@ -83,10 +83,10 @@ export default async function BadgeSharePage({
           boxShadow: `0 0 60px ${brand.accentFrom}22`,
         }}
       >
-        <p className="text-[10px] tracking-[0.2em] uppercase text-iron/30 font-medium">Brand Engage Pro</p>
+        <p className="text-[10px] tracking-[0.2em] uppercase text-iron/70 font-medium">Brand Engage Pro</p>
         <div className="text-7xl leading-none">{badgeIcon}</div>
         <div className="flex flex-col gap-1">
-          <p className="text-xs tracking-widest uppercase text-iron/50">Badge Unlocked</p>
+          <p className="text-xs tracking-widest uppercase text-iron/70">Badge Unlocked</p>
           <h1
             className="text-3xl font-bold"
             style={{
@@ -97,9 +97,9 @@ export default async function BadgeSharePage({
           >
             {badgeName}
           </h1>
-          <p className="text-iron/60 text-sm">for {brand.name}</p>
+          <p className="text-iron/70 text-sm">for {brand.name}</p>
         </div>
-        <p className="text-iron/60 text-sm max-w-xs">{badgeDesc}</p>
+        <p className="text-iron/70 text-sm max-w-xs">{badgeDesc}</p>
         <ShareButton
           title={shareTitle}
           text={shareText}
@@ -112,11 +112,11 @@ export default async function BadgeSharePage({
       <div className="mt-8 flex flex-col items-center gap-3">
         <Link
           href={`/brands/${brand.slug}`}
-          className="text-sm text-iron/50 hover:text-iron transition-colors"
+          className="text-sm text-iron/70 hover:text-iron transition-colors"
         >
           Visit brand experience →
         </Link>
-        <p className="text-xs text-iron/30 max-w-xs text-center">
+        <p className="text-xs text-iron/70 max-w-xs text-center">
           Earn your own badges by engaging with {brand.name}&apos;s community on Brand Engage Pro.
         </p>
       </div>

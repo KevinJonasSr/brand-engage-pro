@@ -32,9 +32,9 @@ export default async function GoalsAdminPage() {
   return (
     <main className="mx-auto max-w-4xl px-6 py-10">
       <div className="mb-8">
-        <p className="text-xs uppercase tracking-widest text-iron/50">Admin</p>
+        <p className="text-xs uppercase tracking-widest text-iron/70">Admin</p>
         <h1 className="mt-1 text-3xl font-semibold text-iron">Brand Goals</h1>
-        <p className="mt-2 text-sm text-iron/60">
+        <p className="mt-2 text-sm text-iron/70">
           Rally your members around a shared target — check-ins, signups,
           points. Active goals show live progress on the brand page and get
           a shareable progress card.
@@ -46,7 +46,7 @@ export default async function GoalsAdminPage() {
         <h2 className="text-sm font-semibold text-iron">Create a goal</h2>
         <form action={createGoalAction} className="mt-3 grid gap-3 sm:grid-cols-2">
           <label className="sm:col-span-2">
-            <span className="mb-1 block text-xs text-iron/50">Title</span>
+            <span className="mb-1 block text-xs text-iron/70">Title</span>
             <input
               type="text"
               name="title"
@@ -56,7 +56,7 @@ export default async function GoalsAdminPage() {
             />
           </label>
           <label className="sm:col-span-2">
-            <span className="mb-1 block text-xs text-iron/50">
+            <span className="mb-1 block text-xs text-iron/70">
               Description (optional)
             </span>
             <input
@@ -67,7 +67,7 @@ export default async function GoalsAdminPage() {
             />
           </label>
           <label>
-            <span className="mb-1 block text-xs text-iron/50">Metric</span>
+            <span className="mb-1 block text-xs text-iron/70">Metric</span>
             <select
               name="metric"
               defaultValue="ledger_count"
@@ -79,7 +79,7 @@ export default async function GoalsAdminPage() {
             </select>
           </label>
           <label>
-            <span className="mb-1 block text-xs text-iron/50">
+            <span className="mb-1 block text-xs text-iron/70">
               Source filter (e.g. checkin, referral — optional)
             </span>
             <input
@@ -90,7 +90,7 @@ export default async function GoalsAdminPage() {
             />
           </label>
           <label>
-            <span className="mb-1 block text-xs text-iron/50">Target</span>
+            <span className="mb-1 block text-xs text-iron/70">Target</span>
             <input
               type="number"
               name="target"
@@ -101,7 +101,7 @@ export default async function GoalsAdminPage() {
             />
           </label>
           <label>
-            <span className="mb-1 block text-xs text-iron/50">
+            <span className="mb-1 block text-xs text-iron/70">
               Ends (optional)
             </span>
             <input
@@ -124,7 +124,7 @@ export default async function GoalsAdminPage() {
       {/* Goal list */}
       <div className="space-y-4">
         {goals.length === 0 && (
-          <p className="rounded-xl border border-iron/10 bg-parchment/30 px-4 py-3 text-sm text-iron/60">
+          <p className="rounded-xl border border-iron/10 bg-parchment/30 px-4 py-3 text-sm text-iron/70">
             No goals yet — create your first one above.
           </p>
         )}
@@ -139,7 +139,7 @@ export default async function GoalsAdminPage() {
                   {g.title}
                   {g.completed && <span className="ml-2">🏆</span>}
                 </h3>
-                <p className="mt-0.5 text-xs text-iron/50">
+                <p className="mt-0.5 text-xs text-iron/70">
                   {METRIC_LABELS[g.metric] ?? g.metric}
                   {g.metric_ref ? ` · source: ${g.metric_ref}` : ""}
                   {g.ends_at
@@ -151,7 +151,7 @@ export default async function GoalsAdminPage() {
                 className={`rounded-full px-3 py-1 text-xs font-semibold ${
                   g.active
                     ? "bg-emerald-500/20 text-sage-ink"
-                    : "bg-iron/10 text-iron/50"
+                    : "bg-iron/10 text-iron/70"
                 }`}
               >
                 {g.active ? "ACTIVE" : "HIDDEN"}
@@ -167,7 +167,7 @@ export default async function GoalsAdminPage() {
               </div>
               <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-iron/10">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-purple-400 to-orange-400"
+                  className="h-full rounded-full bg-aurora"
                   style={{ width: `${Math.max(2, g.pct)}%` }}
                 />
               </div>
@@ -176,7 +176,7 @@ export default async function GoalsAdminPage() {
             <div className="mt-4 flex items-center gap-3 border-t border-iron/10 pt-3">
               <Link
                 href={`/share/goal/${g.community_id}/${g.id}`}
-                className="text-xs text-iron/50 hover:text-iron"
+                className="text-xs text-iron/70 hover:text-iron"
               >
                 Share card →
               </Link>

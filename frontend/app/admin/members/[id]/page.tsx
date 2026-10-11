@@ -106,7 +106,7 @@ export default async function AdminMemberDetailPage({
 
   return (
     <div className="space-y-6">
-      <Link href="/admin/members" className="text-xs text-iron/60 hover:text-iron">
+      <Link href="/admin/members" className="text-xs text-iron/70 hover:text-iron">
         ← Back to members
       </Link>
 
@@ -180,7 +180,7 @@ export default async function AdminMemberDetailPage({
           { l: "Referrals", v: referrals.length },
         ].map((k) => (
           <div key={k.l} className="rounded-lg border border-iron/10 bg-parchment/30 p-4">
-            <p className="text-xs uppercase tracking-wide text-iron/60">{k.l}</p>
+            <p className="text-xs uppercase tracking-wide text-iron/70">{k.l}</p>
             <p className="mt-1 text-2xl font-semibold">{k.v}</p>
           </div>
         ))}
@@ -190,7 +190,7 @@ export default async function AdminMemberDetailPage({
       <section className="rounded-lg border border-iron/10 bg-parchment/20 p-4">
         <p className="mb-3 text-sm font-semibold">Badges earned</p>
         {badges.length === 0 ? (
-          <p className="text-xs text-iron/50">No badges yet.</p>
+          <p className="text-xs text-iron/70">No badges yet.</p>
         ) : (
           <div className="flex flex-wrap gap-2">
             {badges.map((b) => {
@@ -213,14 +213,14 @@ export default async function AdminMemberDetailPage({
       <section className="rounded-lg border border-iron/10 bg-parchment/20 p-4">
         <p className="mb-3 text-sm font-semibold">Points ledger · {ledger.length}</p>
         {ledger.length === 0 ? (
-          <p className="text-xs text-iron/50">No ledger entries.</p>
+          <p className="text-xs text-iron/70">No ledger entries.</p>
         ) : (
           <div className="divide-y divide-iron/5">
             {ledger.map((l, i) => (
               <div key={i} className="flex items-start justify-between gap-3 py-2 text-xs">
                 <div className="min-w-0 flex-1">
                   <p className="text-iron/80">{l.note ?? l.source}</p>
-                  <p className="text-iron/40">
+                  <p className="text-iron/70">
                     {new Date(l.created_at as string).toLocaleString()} · {l.source}
                   </p>
                 </div>
@@ -245,10 +245,10 @@ export default async function AdminMemberDetailPage({
         <div className="rounded-lg border border-iron/10 bg-parchment/20 p-4">
           <p className="mb-2 text-sm font-semibold">Posts · {posts.length}</p>
           <div className="space-y-2 text-xs text-iron/70">
-            {posts.length === 0 && <p className="text-iron/40">None.</p>}
+            {posts.length === 0 && <p className="text-iron/70">None.</p>}
             {posts.map((p) => (
               <p key={p.id as string} className="line-clamp-2">
-                <span className="text-iron/50">/{p.brand_slug as string} · {p.kind as string}</span>{" "}
+                <span className="text-iron/70">/{p.brand_slug as string} · {p.kind as string}</span>{" "}
                 {p.body as string}
               </p>
             ))}
@@ -257,7 +257,7 @@ export default async function AdminMemberDetailPage({
         <div className="rounded-lg border border-iron/10 bg-parchment/20 p-4">
           <p className="mb-2 text-sm font-semibold">Comments · {comments.length}</p>
           <div className="space-y-2 text-xs text-iron/70">
-            {comments.length === 0 && <p className="text-iron/40">None.</p>}
+            {comments.length === 0 && <p className="text-iron/70">None.</p>}
             {comments.map((c) => (
               <p key={c.id as string} className="line-clamp-2">{c.body as string}</p>
             ))}
@@ -266,7 +266,7 @@ export default async function AdminMemberDetailPage({
         <div className="rounded-lg border border-iron/10 bg-parchment/20 p-4">
           <p className="mb-2 text-sm font-semibold">Challenge entries · {entries.length}</p>
           <div className="space-y-2 text-xs text-iron/70">
-            {entries.length === 0 && <p className="text-iron/40">None.</p>}
+            {entries.length === 0 && <p className="text-iron/70">None.</p>}
             {entries.map((e) => (
               <p key={e.id as string} className="line-clamp-2">{(e.body as string) ?? "(image only)"}</p>
             ))}

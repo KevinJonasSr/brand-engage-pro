@@ -48,6 +48,16 @@ h3 {
   font-weight: 400;
 }
 
+/*
+ * Keyboard focus ring everywhere. Unlayered on purpose so it beats the
+ * focus:outline-none utilities scattered through the app (44 at audit time);
+ * mouse clicks don't trigger :focus-visible, so this only shows for keyboards.
+ */
+:focus-visible {
+  outline: 2px solid var(--color-ember);
+  outline-offset: 2px;
+}
+
 /* Paper card: flat linen, one iron hairline, 8px corners. No glass. */
 .glass-card {
   background-color: var(--color-linen);

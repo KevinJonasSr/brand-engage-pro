@@ -32,7 +32,7 @@ function tierForStreak(days: number): {
 } {
   if (days >= 365)
     return {
-      bg: "from-purple-500/30 via-amber-500/20 to-rose-500/30",
+      bg: "from-ember/25 via-aurora/20 to-ember/15",
       ring: "ring-amber-300/50",
       textAccent: "text-aurora-ink",
       flame: "👑",
@@ -64,7 +64,7 @@ function tierForStreak(days: number): {
     };
   if (days >= 1)
     return {
-      bg: "from-aurora/20 via-cyan-500/15 to-emerald-500/15",
+      bg: "from-aurora/20 via-parchment/40 to-sage/15",
       ring: "ring-aurora/30",
       textAccent: "text-aurora-ink",
       flame: "🔥",
@@ -73,7 +73,7 @@ function tierForStreak(days: number): {
   return {
     bg: "from-iron/5 via-iron/3 to-iron/0",
     ring: "ring-iron/10",
-    textAccent: "text-iron/50",
+    textAccent: "text-iron/70",
     flame: "🪵",
     label: null,
   };
@@ -114,12 +114,12 @@ export default function StreakTile({
             {tier.flame}
           </div>
           <div>
-            <p className="text-xs uppercase tracking-[0.25em] text-iron/55">
+            <p className="text-xs uppercase tracking-[0.25em] text-iron/70">
               {currentStreakDays === 0 ? "Daily streak" : "Day streak"}
             </p>
             <p className="mt-1 text-3xl font-semibold leading-none text-iron">
               {currentStreakDays}
-              <span className="ml-1 text-base font-medium text-iron/55">
+              <span className="ml-1 text-base font-medium text-iron/70">
                 day{currentStreakDays === 1 ? "" : "s"}
               </span>
             </p>
@@ -129,7 +129,7 @@ export default function StreakTile({
               </p>
             )}
             {currentStreakDays === 0 && (
-              <p className="mt-1 text-xs text-iron/55">
+              <p className="mt-1 text-xs text-iron/70">
                 Visit Brand Engage tomorrow to start your streak.
               </p>
             )}
@@ -138,13 +138,13 @@ export default function StreakTile({
 
         {nextMilestone && currentStreakDays > 0 && (
           <div className="text-right">
-            <p className="text-xs uppercase tracking-wide text-iron/55">
+            <p className="text-xs uppercase tracking-wide text-iron/70">
               Next milestone
             </p>
             <p className="mt-1 text-sm font-semibold text-iron">
               Day {nextMilestone.next}
             </p>
-            <p className="text-xs text-iron/55">
+            <p className="text-xs text-iron/70">
               {nextMilestone.daysRemaining} day
               {nextMilestone.daysRemaining === 1 ? "" : "s"} away
             </p>

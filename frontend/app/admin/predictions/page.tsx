@@ -179,7 +179,7 @@ function PredictionRow({ row, phase, href }: PredictionRowProps) {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-base font-semibold text-iron">{row.title}</p>
-            <p className="mt-1 text-xs text-iron/55">
+            <p className="mt-1 text-xs text-iron/70">
               {row.brand_slug} · {row.prediction_type ?? "—"} ·{" "}
               {row.points_for_correct ?? 0} pts
               {row.visibility !== "public" ? ` · ${row.visibility}` : ""}
@@ -197,7 +197,7 @@ function PredictionRow({ row, phase, href }: PredictionRowProps) {
               </span>
             )}
             {phase === "resolved" && (
-              <span className="rounded-full bg-iron/10 px-2 py-1 text-iron/60">
+              <span className="rounded-full bg-iron/10 px-2 py-1 text-iron/70">
                 Resolved
               </span>
             )}
@@ -225,7 +225,7 @@ function Section({
         : "bg-iron/40";
   return (
     <section>
-      <h2 className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-iron/55">
+      <h2 className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-iron/70">
         <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
         {title}
       </h2>
@@ -236,7 +236,7 @@ function Section({
 
 function Empty({ msg }: { msg: string }) {
   return (
-    <p className="rounded-lg border border-iron/10 bg-iron/3 p-4 text-sm text-iron/55">
+    <p className="rounded-lg border border-iron/10 bg-iron/3 p-4 text-sm text-iron/70">
       {msg}
     </p>
   );

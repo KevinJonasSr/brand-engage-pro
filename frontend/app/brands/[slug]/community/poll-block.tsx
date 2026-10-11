@@ -19,7 +19,7 @@ export default function PollBlock({
 
   return (
     <div className="space-y-2 rounded-lg border border-iron/10 bg-parchment/30 p-4">
-      <p className="text-xs uppercase tracking-wide text-iron/50">
+      <p className="text-xs uppercase tracking-wide text-iron/70">
         📊 Poll · {total} {total === 1 ? "vote" : "votes"}
         {hasVoted && " · you voted"}
       </p>
@@ -65,15 +65,15 @@ export default function PollBlock({
         })}
       </div>
       {!currentUserId && (
-        <p className="text-xs text-iron/50">Sign in to vote (+1 pt).</p>
+        <p className="text-xs text-iron/70">Sign in to vote (+1 pt).</p>
       )}
       {currentUserId && !hasVoted && (
-        <p className="text-xs text-iron/50">
+        <p className="text-xs text-iron/70">
           Tap an option to cast your vote (+1 pt).
         </p>
       )}
       {currentUserId && hasVoted && (
-        <p className="text-xs text-iron/50">
+        <p className="text-xs text-iron/70">
           Tap a different option to change your vote.
         </p>
       )}

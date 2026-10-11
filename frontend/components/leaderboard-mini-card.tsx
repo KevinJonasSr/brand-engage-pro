@@ -37,18 +37,18 @@ export default async function LeaderboardMiniCard({
   return (
     <Link
       href={`/brands/${brandSlug}/leaderboard`}
-      className="group block rounded-lg border border-iron/10 bg-gradient-to-br from-amber-500/10 via-violet-500/5 to-rose-500/10 p-5 transition hover:border-iron/20"
+      className="group block rounded-lg border border-iron/10 bg-gradient-to-br from-amber-500/10 via-parchment/40 to-rose-500/10 p-5 transition hover:border-iron/20"
     >
       <header className="flex items-center justify-between">
         <div>
-          <p className="text-xs uppercase tracking-[0.25em] text-iron/55">
+          <p className="text-xs uppercase tracking-[0.25em] text-iron/70">
             Top members · {board.monthLabel}
           </p>
           <p className="mt-1 text-base font-semibold text-iron">
             This month&apos;s leaderboard
           </p>
         </div>
-        <span className="text-xs font-medium text-iron/55 transition group-hover:text-iron">
+        <span className="text-xs font-medium text-iron/70 transition group-hover:text-iron">
           See all →
         </span>
       </header>

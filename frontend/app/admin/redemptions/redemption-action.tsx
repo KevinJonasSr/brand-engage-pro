@@ -74,7 +74,7 @@ export default function RedemptionAction({
               setBusinessError(null);
             }}
             disabled={submitting}
-            className="rounded-lg border border-iron/10 px-3 py-1 text-xs text-iron/60 hover:bg-iron/5 disabled:opacity-50"
+            className="rounded-lg border border-iron/10 px-3 py-1 text-xs text-iron/70 hover:bg-iron/5 disabled:opacity-50"
           >
             Cancel
           </button>

@@ -60,7 +60,7 @@ export default function PrivacyForm({
         <p className="text-xs text-sage-ink/80">Saved.</p>
       )}
 
-      <div className="rounded-lg border border-iron/10 bg-iron/[0.02] p-4 text-xs text-iron/60">
+      <div className="rounded-lg border border-iron/10 bg-iron/[0.02] p-4 text-xs text-iron/70">
         <p className="font-semibold text-iron/80">What's never shown publicly</p>
         <p className="mt-2">
           Your email, phone number, mailing address, last login, payment
@@ -99,7 +99,7 @@ function Toggle({
       />
       <div className="flex-1">
         <div className="font-medium">{label}</div>
-        <div className="mt-1 text-sm text-iron/60">{description}</div>
+        <div className="mt-1 text-sm text-iron/70">{description}</div>
       </div>
     </label>
   );

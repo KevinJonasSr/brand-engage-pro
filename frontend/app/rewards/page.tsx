@@ -94,7 +94,7 @@ export default async function RewardsPage() {
           )}
 
           <section className="rounded-lg border border-iron/10 bg-gradient-to-br from-aurora/20 via-parchment to-linen p-6 shadow-glass">
-            <p className="text-sm uppercase tracking-wide text-iron/60">Rewards & loyalty tiers</p>
+            <p className="text-sm uppercase tracking-wide text-iron/70">Rewards & loyalty tiers</p>
             <h1 className="mt-2 text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
               {isSignedIn
                 ? nextTier
@@ -117,7 +117,7 @@ export default async function RewardsPage() {
                 </>
               )}
             </p>
-            <p className="mt-3 text-xs text-iron/50">
+            <p className="mt-3 text-xs text-iron/70">
               Tiers go Bronze, Silver, Gold, then Platinum as you earn points from visits. The first
               100 members of each brand join as Founders for free. Brands pay, guests join free.
               At Nellie&apos;s, you earn from visits and check-ins, and you also get a
@@ -135,16 +135,16 @@ export default async function RewardsPage() {
               </div>
               <div className="h-3 rounded-full bg-parchment/40">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-amber-300 to-rose-400"
+                  className="h-full rounded-full bg-aurora"
                   style={{ width: `${pct}%` }}
                 />
               </div>
-              <div className="flex flex-wrap items-center gap-4 text-xs uppercase tracking-wide text-iron/50">
+              <div className="flex flex-wrap items-center gap-4 text-xs uppercase tracking-wide text-iron/70">
                 {tiers.map((t) => (
                   <span
                     key={t.slug}
                     className={`flex items-center gap-2 text-sm ${
-                      isSignedIn && t.slug === currentSlug ? "text-iron" : "text-iron/60"
+                      isSignedIn && t.slug === currentSlug ? "text-iron" : "text-iron/70"
                     }`}
                   >
                     <span>{tierIcon(t.slug)}</span> {t.display_name}
@@ -157,7 +157,7 @@ export default async function RewardsPage() {
           <section className="glass-card p-6">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
-                <p className="text-sm uppercase tracking-wide text-iron/60">Badge gallery</p>
+                <p className="text-sm uppercase tracking-wide text-iron/70">Badge gallery</p>
                 <h2 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
                   {isSignedIn
                     ? `${earnedCount} / ${totalBadges} unlocked`
@@ -166,7 +166,7 @@ export default async function RewardsPage() {
               </div>
               {isSignedIn && (
                 <div className="text-right">
-                  <p className="text-xs uppercase tracking-wide text-iron/50">Progress</p>
+                  <p className="text-xs uppercase tracking-wide text-iron/70">Progress</p>
                   <p className="text-sm font-semibold text-sage-ink">
                     {totalBadges > 0 ? Math.round((earnedCount / totalBadges) * 100) : 0}%
                   </p>
@@ -176,7 +176,7 @@ export default async function RewardsPage() {
             {!isSignedIn ? (
               <div className="mt-6 rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-8 text-center">
                 <p className="text-sm font-semibold">0 badges yet</p>
-                <p className="mt-2 text-xs text-iron/60">
+                <p className="mt-2 text-xs text-iron/70">
                   Join free, finish your profile (+100 welcome points), and earn badges from real visits and community.
                 </p>
                 <Link
@@ -189,7 +189,7 @@ export default async function RewardsPage() {
             ) : badges.length === 0 ? (
               <div className="mt-6 rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-8 text-center">
                 <p className="text-sm font-semibold">No badges yet</p>
-                <p className="mt-2 text-xs text-iron/60">
+                <p className="mt-2 text-xs text-iron/70">
                   Complete your profile, check in, and post in the community to start earning.
                 </p>
               </div>
@@ -200,7 +200,7 @@ export default async function RewardsPage() {
                   if (catBadges.length === 0) return null;
                   return (
                     <div key={cat} className="space-y-3">
-                      <p className="text-xs uppercase tracking-wide text-iron/50">
+                      <p className="text-xs uppercase tracking-wide text-iron/70">
                         {CATEGORY_LABELS[cat]} · {catBadges.filter((b) => b.earned).length}/{catBadges.length}
                       </p>
                       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
@@ -232,14 +232,14 @@ export default async function RewardsPage() {
                                 </span>
                                 <div className="min-w-0 flex-1">
                                   <p className="text-sm font-semibold leading-tight">{badge.name}</p>
-                                  <p className="mt-0.5 text-xs text-iron/60">
+                                  <p className="mt-0.5 text-xs text-iron/70">
                                     {badge.earned ? "Unlocked" : "Locked"}
                                     {badge.point_value > 0 && ` · +${badge.point_value} pts`}
                                   </p>
                                 </div>
                               </div>
                               {badge.description && (
-                                <p className="mt-2 text-xs text-iron/60">{badge.description}</p>
+                                <p className="mt-2 text-xs text-iron/70">{badge.description}</p>
                               )}
                               {hasThreshold && !badge.earned && (
                                 <div className="mt-3 space-y-1">
@@ -249,7 +249,7 @@ export default async function RewardsPage() {
                                       style={{ width: `${badgePct}%` }}
                                     />
                                   </div>
-                                  <p className="text-xs text-iron/50">
+                                  <p className="text-xs text-iron/70">
                                     {progress} / {badge.threshold}
                                   </p>
                                 </div>
@@ -275,7 +275,7 @@ export default async function RewardsPage() {
           )}
 
           <section className="glass-card p-6">
-            <p className="text-sm uppercase tracking-wide text-iron/60">Earn more points</p>
+            <p className="text-sm uppercase tracking-wide text-iron/70">Earn more points</p>
             <div className="mt-4 space-y-4">
               {earnMore.map((item) => (
                 <Link
@@ -284,7 +284,7 @@ export default async function RewardsPage() {
                   className="block rounded-lg bg-parchment/30 p-4 transition hover:bg-parchment/40"
                 >
                   <p className="text-sm font-semibold">{item.title}</p>
-                  <p className="text-xs text-iron/60">{item.detail}</p>
+                  <p className="text-xs text-iron/70">{item.detail}</p>
                   <div className="mt-3 flex items-center justify-between">
                     <span className="text-sm font-semibold text-sage-ink">
                       {item.reward}
@@ -297,7 +297,7 @@ export default async function RewardsPage() {
           </section>
 
           <section className="glass-card p-6">
-            <p className="text-sm uppercase tracking-wide text-iron/60">Point breakdown</p>
+            <p className="text-sm uppercase tracking-wide text-iron/70">Point breakdown</p>
             {isSignedIn ? (
               breakdown.length > 0 ? (
                 <div className="mt-4 space-y-3">
@@ -320,12 +320,12 @@ export default async function RewardsPage() {
                   </div>
                 </div>
               ) : (
-                <div className="mt-4 rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-4 text-center text-xs text-iron/60">
+                <div className="mt-4 rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-4 text-center text-xs text-iron/70">
                   Earn your first points to see a breakdown here. Finish your profile for +100 welcome points.
                 </div>
               )
             ) : (
-              <div className="mt-4 rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-4 text-center text-xs text-iron/60">
+              <div className="mt-4 rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-4 text-center text-xs text-iron/70">
                 Sign up to earn points from visits and check-ins. Your balance starts at 0.
               </div>
             )}
