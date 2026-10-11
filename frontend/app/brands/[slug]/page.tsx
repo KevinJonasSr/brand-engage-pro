@@ -177,29 +177,29 @@ export default async function BrandPage({
 
         {/* Content layer — sits above image + overlay */}
         <div className="relative p-10">
-          <p className="text-xs uppercase tracking-[0.3em] text-iron/70">
+          <p className="text-xs uppercase tracking-[0.3em] text-linen/70">
             {brand.genres.slice(0, 2).join(" · ")}{brand.genres.length > 2 ? " +" + (brand.genres.length - 2) : ""}
           </p>
           <h1
-            className="mt-3 text-5xl font-semibold leading-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]"
+            className="mt-3 text-5xl font-semibold text-linen leading-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]"
             style={{ fontFamily: "var(--font-display)" }}
           >
             {brand.name}
           </h1>
-          <p className="mt-3 max-w-xl text-lg text-iron/85 drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)]">
+          <p className="mt-3 max-w-xl text-lg text-linen/85 drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)]">
             {brand.tagline}
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link
               href={primaryCta.href}
-              className="rounded-full px-6 py-3 text-sm font-semibold text-iron transition hover:brightness-110 bep-press"
+              className="rounded-full px-6 py-3 text-sm font-semibold text-linen transition hover:brightness-110 bep-press"
               style={{ backgroundImage: ctaGradient }}
             >
               {primaryCta.label}
             </Link>
             <Link
               href={`/brands/${slug}/community`}
-              className="rounded-full border border-iron/30 bg-parchment/30 px-6 py-3 text-sm font-medium text-iron/90 backdrop-blur hover:bg-iron/10 bep-press"
+              className="rounded-full border border-linen/30 bg-iron/30 px-6 py-3 text-sm font-medium text-linen/90 backdrop-blur hover:bg-linen/10 bep-press"
             >
               Community →
             </Link>
@@ -214,12 +214,12 @@ export default async function BrandPage({
                   ? `${process.env.NEXT_PUBLIC_APP_URL}/brands/${brand.slug}`
                   : `https://brand-engage-pro.vercel.app/brands/${brand.slug}`
               }
-              variant="ghost"
+              variant="photo"
               label=""
             />
           </div>
           {!isSignedIn && (
-            <p className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-aurora/30 bg-aurora/10 px-3 py-1 text-xs font-medium text-aurora-ink">
+            <p className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-aurora/30 bg-iron/40 px-3 py-1 text-xs font-medium text-aurora backdrop-blur">
               🎁 Join free — finish your profile for +100 welcome points.
             </p>
           )}

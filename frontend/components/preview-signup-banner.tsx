@@ -44,7 +44,7 @@ export default function PreviewSignupBanner({
     : "/login";
 
   return (
-    <section className="rounded-lg border border-aurora/30 bg-gradient-to-br from-aurora/15 via-slate-900/80 to-ember/15 p-6 shadow-glass">
+    <section className="rounded-lg border border-aurora/30 bg-gradient-to-br from-aurora/15 via-parchment/80 to-ember/15 p-6 shadow-glass">
       <p className="text-xs uppercase tracking-[0.3em] text-aurora-ink">
         {eyebrow}
       </p>

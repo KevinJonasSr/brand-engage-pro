@@ -39,8 +39,8 @@ export default function FollowButton({
       disabled={pending}
       className={`rounded-full px-6 py-3 text-sm font-semibold transition disabled:opacity-50 ${
         following
-          ? "border border-emerald-500/50 bg-emerald-500/20 text-sage-ink hover:bg-emerald-500/30"
-          : "border border-iron/30 bg-iron/10 text-iron hover:bg-iron/15"
+          ? "border border-sage/60 bg-sage/30 text-linen backdrop-blur hover:bg-sage/40"
+          : "border border-linen/30 bg-iron/30 text-linen backdrop-blur hover:bg-linen/10"
       }`}
     >
       {following ? "✓ Following" : "+ Follow"}

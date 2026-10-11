@@ -348,7 +348,7 @@ export default async function ForBrandsPage() {
       </section>
 
       {/* ─── Closing CTA ───────────────────────────────────────────────────── */}
-      <section className="rounded-lg border border-iron/10 bg-gradient-to-br from-aurora/25 via-slate-900 to-ember/25 p-10 text-center md:p-16">
+      <section className="rounded-lg border border-iron/10 bg-gradient-to-br from-aurora/25 via-parchment to-ember/25 p-10 text-center md:p-16">
         <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
           Ready when you are
         </p>

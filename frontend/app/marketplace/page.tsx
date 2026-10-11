@@ -42,7 +42,7 @@ export default async function MarketplacePage() {
           />
         )}
 
-        <section className="rounded-lg border border-iron/10 bg-gradient-to-br from-amber-900/30 via-slate-900 to-linen p-6 shadow-glass">
+        <section className="rounded-lg border border-iron/10 bg-gradient-to-br from-aurora/20 via-parchment to-linen p-6 shadow-glass">
           <p className="text-sm uppercase tracking-wide text-iron/60">Marketplace</p>
           <h1 className="mt-2 text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
             Brand rewards
