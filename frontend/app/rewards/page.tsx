@@ -9,6 +9,8 @@ import {
 } from "@/lib/data/member";
 import { getTiers, tierIcon } from "@/lib/data/tiers";
 import type { Badge, BadgeCategory, TierSlug } from "@/lib/data/types";
+import { isNelliesThreeVisitRewardActive } from "@/lib/data/nellies-three-visit-reward";
+import { nelliesMemberOfferSummary, nelliesOfferPitch } from "@/lib/nellies-launch";
 
 const CATEGORY_LABELS: Record<BadgeCategory, string> = {
   welcome:   "Getting started",
@@ -38,13 +40,16 @@ function formatPts(n: number | null | undefined) {
 export const metadata = { title: "Rewards" };
 
 export default async function RewardsPage() {
-  const [member, kpis, tiers, dbBadges, breakdown] = await Promise.all([
+  const [member, kpis, tiers, dbBadges, breakdown, threeVisitRewardActive] = await Promise.all([
     getCurrentMember(),
     getCurrentMemberKpis(),
     getTiers(),
     getBadgesWithEarnedStatus(),
     getPointBreakdown(),
+    isNelliesThreeVisitRewardActive(),
   ]);
+  const nelliesSummary = nelliesMemberOfferSummary(threeVisitRewardActive);
+  const nelliesPitch = nelliesOfferPitch(threeVisitRewardActive);
 
   const isSignedIn = member !== null;
   // Guests see honest empty state — no fake 8500 pts / pre-earned badges.
@@ -81,11 +86,11 @@ export default async function RewardsPage() {
             <PreviewSignupBanner
               eyebrow="🎁 Member rewards"
               headline="Join free and earn from real visits"
-              body="New members start at 0 points and earn from visits, check-ins, and the community. At Nellie's: free dessert with an entrée when you join, 1,500 bonus points after 3 visits, and a birthday entrée up to $30. Bourbon & Cigar Night is September 23 at 7:00 PM ET in the Private Dining Room."
+              body={`New members start at 0 points and earn from visits, check-ins, and the community. At Nellie's: ${nelliesSummary}. Bourbon & Cigar Night is September 23 at 7:00 PM ET in the Private Dining Room.`}
               bullets={[
                 "+100 welcome points after you finish your profile",
                 "Move up from Bronze to Platinum as you earn points",
-                "At Nellie's: dessert when you join, 1,500 bonus points after 3 visits, and a birthday entrée",
+                `At Nellie's: ${nelliesPitch}`,
               ]}
               primaryCta="Sign up free →"
               nextPath="/rewards"
@@ -120,9 +125,9 @@ export default async function RewardsPage() {
             <p className="mt-3 text-xs text-iron/70">
               Tiers go Bronze, Silver, Gold, then Platinum as you earn points from visits. The first
               100 members of each brand join as Founders for free. Brands pay, guests join free.
-              At Nellie&apos;s, you earn from visits and check-ins, and you also get a
-              welcome dessert, 1,500 bonus points after 3 visits, and a birthday entrée. Bourbon
-              &amp; Cigar Night is September 23 at 7:00 PM ET in the Private Dining Room.
+              At Nellie&apos;s, you earn from visits and check-ins, and you also get{" "}
+              {nelliesPitch}. Bourbon &amp; Cigar Night is September 23 at 7:00 PM ET in the
+              Private Dining Room.
             </p>
             <div className="mt-8 space-y-4">
               <div className="flex items-center justify-between text-sm text-iron/70">

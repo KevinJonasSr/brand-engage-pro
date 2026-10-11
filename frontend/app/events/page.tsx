@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getBrandFromDb } from "@/lib/data/brands";
-import { NELLIES_BRAND_SLUG, NELLIES_PUBLISHED_OFFERS } from "@/lib/nellies-launch";
+import { isNelliesThreeVisitRewardActive } from "@/lib/data/nellies-three-visit-reward";
+import { NELLIES_BRAND_SLUG, nelliesPublicOffers } from "@/lib/nellies-launch";
 
 export const dynamic = "force-dynamic";
 
@@ -14,12 +15,17 @@ const RSVP_NEXT = encodeURIComponent("/brands/nellies#upcoming");
 
 /**
  * Guest-visible events/offers surface so /events is not a 404.
- * Offers are Jackie's three (lib/nellies-launch.ts). Events come from
+ * Offers are Jackie's set (lib/nellies-launch.ts). The 1,500 three-visit
+ * card is omitted while its catalog reward is inactive. Events come from
  * brand_events via getBrandFromDb, filtered by applyNelliesLaunchEvents.
  */
 export default async function EventsPage() {
-  const brand = await getBrandFromDb(NELLIES_BRAND_SLUG);
+  const [brand, threeVisitRewardActive] = await Promise.all([
+    getBrandFromDb(NELLIES_BRAND_SLUG),
+    isNelliesThreeVisitRewardActive(),
+  ]);
   const events = brand?.upcoming ?? [];
+  const offers = nelliesPublicOffers({ threeVisitRewardActive });
 
   return (
     <main className="mx-auto max-w-3xl space-y-8 px-6 py-12">
@@ -40,7 +46,7 @@ export default async function EventsPage() {
       <section id="offers" className="glass-card space-y-4 p-6">
         <p className="text-sm uppercase tracking-wide text-iron/70">Member offers</p>
         <ul className="space-y-4">
-          {NELLIES_PUBLISHED_OFFERS.map((offer) => (
+          {offers.map((offer) => (
             <li key={offer.slug} className="rounded-lg bg-parchment/30 p-5">
               <p className="text-sm font-semibold">{offer.title}</p>
               <p className="mt-1 text-xs leading-relaxed text-iron/70">{offer.description}</p>

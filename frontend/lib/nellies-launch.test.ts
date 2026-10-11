@@ -11,6 +11,8 @@ import {
   NELLIES_HIDDEN_TITLES,
   NELLIES_PUBLISHED_OFFER_SLUGS,
   NELLIES_PUBLISHED_OFFER_TITLES,
+  NELLIES_THREE_VISIT_BONUS,
+  NELLIES_THREE_VISIT_REWARD_ID,
   applyNelliesLaunchEvents,
   applyNelliesLaunchOffers,
   applyNelliesLaunchSpecials,
@@ -20,6 +22,10 @@ import {
   isNelliesHiddenTitle,
   isNelliesPublishedOfferTitle,
   jackieLaunchSpecials,
+  isNelliesThreeVisitOfferTitle,
+  nelliesMemberOfferSummary,
+  nelliesOfferPitch,
+  nelliesPublicOffers,
   resolveBourbonGuestCopy,
   shouldAwardThreeVisitBonus,
 } from "./nellies-launch.ts";
@@ -67,14 +73,18 @@ describe("Nellie's Jackie launch fixture", () => {
     assert.deepEqual(applyNelliesLaunchSpecials("jonas-group-ent", rows), rows);
   });
 
-  it("injects Jackie’s three onto the brand-page specials surface", () => {
-    const shown = applyNelliesLaunchSpecials("nellies", [
-      {
-        id: "x",
-        title: "2-for-1 Fried Chicken Tuesdays",
-        points_required: 1,
-      },
-    ]);
+  it("injects Jackie’s three onto the brand-page specials surface when the bonus is active", () => {
+    const shown = applyNelliesLaunchSpecials(
+      "nellies",
+      [
+        {
+          id: "x",
+          title: "2-for-1 Fried Chicken Tuesdays",
+          points_required: 1,
+        },
+      ],
+      { threeVisitRewardActive: true },
+    );
     assert.equal(shown.length, 3);
     assert.deepEqual(
       shown.map((s) => s.title),
@@ -87,21 +97,25 @@ describe("Nellie's Jackie launch fixture", () => {
   });
 
   it("does not leave Hallway / LIVEBOOTH as signed-out premium teasers", () => {
-    const shown = applyNelliesLaunchSpecials("nellies", [
-      {
-        id: "hallway",
-        title: "The Memorabilia Hallway Tour",
-        tier: "founder-only",
-        points_required: null,
-      },
-      {
-        id: "booth",
-        title: "Reserved Booth on Live Music Nights",
-        tier: "premium",
-        redemption_code: "LIVEBOOTH",
-        points_required: null,
-      },
-    ]);
+    const shown = applyNelliesLaunchSpecials(
+      "nellies",
+      [
+        {
+          id: "hallway",
+          title: "The Memorabilia Hallway Tour",
+          tier: "founder-only",
+          points_required: null,
+        },
+        {
+          id: "booth",
+          title: "Reserved Booth on Live Music Nights",
+          tier: "premium",
+          redemption_code: "LIVEBOOTH",
+          points_required: null,
+        },
+      ],
+      { threeVisitRewardActive: true },
+    );
     assert.deepEqual(
       shown.map((s) => s.title),
       [...NELLIES_PUBLISHED_OFFER_TITLES],
@@ -128,10 +142,12 @@ describe("Nellie's Jackie launch fixture", () => {
     );
   });
 
-  it("awards 1,500 pts on the 3rd check-in only, once", () => {
-    assert.equal(shouldAwardThreeVisitBonus(2, false), false);
-    assert.equal(shouldAwardThreeVisitBonus(3, false), true);
-    assert.equal(shouldAwardThreeVisitBonus(4, true), false);
+  it("awards 1,500 pts on the 3rd check-in only, once, and only while the catalog reward is active", () => {
+    assert.equal(shouldAwardThreeVisitBonus(2, false, true), false);
+    assert.equal(shouldAwardThreeVisitBonus(3, false, true), true);
+    assert.equal(shouldAwardThreeVisitBonus(4, true, true), false);
+    assert.equal(shouldAwardThreeVisitBonus(3, false, false), false);
+    assert.equal(shouldAwardThreeVisitBonus(4, false, false), false);
   });
 
   it("opens birthday entrée only in the stored birthday month", () => {
@@ -139,6 +155,133 @@ describe("Nellie's Jackie launch fixture", () => {
     assert.equal(isBirthdayRedemptionOpen(9, sept), true);
     assert.equal(isBirthdayRedemptionOpen(8, sept), false);
     assert.equal(isBirthdayRedemptionOpen(null, sept), false);
+  });
+});
+
+describe("paused 1,500 three-visit reward", () => {
+  const CHECKIN_POINTS = 25;
+
+  function pointsForVisit(input: {
+    visitNumber: number;
+    rewardActive: boolean;
+    bonusAlreadyAwarded: boolean;
+  }): { checkinPoints: number; bonusPoints: number } {
+    const bonus = shouldAwardThreeVisitBonus(
+      input.visitNumber,
+      input.bonusAlreadyAwarded,
+      input.rewardActive,
+    );
+    return {
+      checkinPoints: CHECKIN_POINTS,
+      bonusPoints: bonus ? NELLIES_THREE_VISIT_BONUS : 0,
+    };
+  }
+
+  it("a third check-in grants no bonus while the catalog reward is inactive, and visit points stay 25", () => {
+    assert.deepEqual(
+      pointsForVisit({ visitNumber: 1, rewardActive: false, bonusAlreadyAwarded: false }),
+      { checkinPoints: 25, bonusPoints: 0 },
+    );
+    assert.deepEqual(
+      pointsForVisit({ visitNumber: 3, rewardActive: false, bonusAlreadyAwarded: false }),
+      { checkinPoints: 25, bonusPoints: 0 },
+    );
+    assert.deepEqual(
+      pointsForVisit({ visitNumber: 3, rewardActive: true, bonusAlreadyAwarded: false }),
+      { checkinPoints: 25, bonusPoints: 1500 },
+    );
+    assert.deepEqual(
+      pointsForVisit({ visitNumber: 4, rewardActive: true, bonusAlreadyAwarded: true }),
+      { checkinPoints: 25, bonusPoints: 0 },
+    );
+  });
+
+  it("hides the 1,500 card on the brand page when the catalog reward is inactive, even if the specials row is still active", () => {
+    const shown = applyNelliesLaunchSpecials("nellies", [
+      {
+        id: "db-bonus",
+        title: "1,500 Bonus Points",
+        description: "Awarded automatically after your third verified visit check-in.",
+        active: true,
+      },
+      { id: "dessert", title: "Free Dessert w/ Entree", active: true },
+      { id: "extra", title: "Half-Price Apps on the Rooftop", active: true },
+    ]);
+    assert.deepEqual(
+      shown.map((s) => s.title),
+      ["Free Dessert w/ Entree", "Birthday Entree up to $30", "Half-Price Apps on the Rooftop"],
+    );
+    assert.equal(
+      shown.some((s) => /1,?500|bonus points/i.test(s.title)),
+      false,
+    );
+    assert.deepEqual(
+      nelliesPublicOffers().map((o) => o.title),
+      ["Free Dessert w/ Entree", "Birthday Entree up to $30"],
+    );
+    assert.equal(nelliesMemberOfferSummary(false).includes("1,500"), false);
+    assert.equal(nelliesOfferPitch(false).includes("1,500"), false);
+    assert.equal(isNelliesThreeVisitOfferTitle("1,500 Bonus Points"), true);
+    assert.equal(isNelliesThreeVisitOfferTitle("Free Dessert w/ Entree"), false);
+  });
+
+  it("shows the 1,500 card again when the catalog reward is turned back on", () => {
+    const shown = applyNelliesLaunchSpecials(
+      "nellies",
+      [{ id: "db-bonus", title: "1,500 Bonus Points", active: true }],
+      { threeVisitRewardActive: true },
+    );
+    assert.equal(
+      shown.some((s) => s.title === "1,500 Bonus Points"),
+      true,
+    );
+    assert.deepEqual(
+      nelliesPublicOffers({ threeVisitRewardActive: true }).map((o) => o.title),
+      [...NELLIES_PUBLISHED_OFFER_TITLES],
+    );
+    assert.match(nelliesMemberOfferSummary(true), /1,500 bonus points after three visits/);
+  });
+
+  it("gates the check-in trigger on that catalog row and leaves the 25-point visit award alone", () => {
+    const migration = readFileSync(
+      fileURLToPath(
+        new URL("../../supabase/migrations/0075_gate_nellies_three_visit_bonus.sql", import.meta.url),
+      ),
+      "utf8",
+    );
+    const checkins = readFileSync(
+      fileURLToPath(new URL("./data/checkins.ts", import.meta.url)),
+      "utf8",
+    );
+    const specials = readFileSync(
+      fileURLToPath(new URL("./data/specials.ts", import.meta.url)),
+      "utf8",
+    );
+    const search = readFileSync(
+      fileURLToPath(new URL("./search/query.ts", import.meta.url)),
+      "utf8",
+    );
+    assert.equal(NELLIES_THREE_VISIT_REWARD_ID, "064a11f6-7508-4104-beb5-25cef405e9f7");
+    assert.match(migration, /064a11f6-7508-4104-beb5-25cef405e9f7/);
+    assert.match(migration, /from public\.rewards_catalog/);
+    assert.match(migration, /and active/);
+    assert.match(
+      migration,
+      /create or replace function public\.award_nellies_three_visit_bonus\(\)/,
+    );
+    assert.match(migration, /create trigger award_nellies_three_visit_bonus/);
+    assert.doesNotMatch(migration, /drop function/i);
+    assert.doesNotMatch(migration, /alter type/i);
+    const gate = migration.indexOf("from public.rewards_catalog");
+    const pay = migration.indexOf("insert into public.points_ledger");
+    assert.ok(gate > 0 && pay > gate, "inactive catalog row returns before the 1,500 insert");
+    assert.match(migration, /1500/);
+    assert.match(checkins, /export const CHECKIN_POINTS = 25/);
+    assert.doesNotMatch(checkins, /1500|three.visit|NELLIES_THREE_VISIT/);
+    assert.match(specials, /threeVisitRewardActive/);
+    assert.match(search, /isNelliesThreeVisitOfferTitle/);
+    assert.match(search, /NELLIES_THREE_VISIT_REWARD_ID/);
+    assert.doesNotMatch(migration, /0b6536f3/);
   });
 });
 
@@ -297,12 +440,16 @@ describe("Bourbon & Cigar Night", () => {
 
 describe("launch content after Bourbon", () => {
   it("lets new specials show after Jackie’s three, including rooftop and happy hour titles", () => {
-    const shown = applyNelliesLaunchSpecials("nellies", [
-      { id: "m", title: "Teachers & First Responders 10% Off", tier: "public", points_required: null },
-      { id: "x", title: "Happy Hour — 50% Off Appetizers", tier: "public", points_required: null },
-      { id: "a", title: "Half-Price Apps on the Rooftop", tier: "public", points_required: null },
-      { id: "d", title: "Free Dessert w/ Entree", tier: "public", points_required: null },
-    ]);
+    const shown = applyNelliesLaunchSpecials(
+      "nellies",
+      [
+        { id: "m", title: "Teachers & First Responders 10% Off", tier: "public", points_required: null },
+        { id: "x", title: "Happy Hour — 50% Off Appetizers", tier: "public", points_required: null },
+        { id: "a", title: "Half-Price Apps on the Rooftop", tier: "public", points_required: null },
+        { id: "d", title: "Free Dessert w/ Entree", tier: "public", points_required: null },
+      ],
+      { threeVisitRewardActive: true },
+    );
     assert.deepEqual(
       shown.map((s) => s.title),
       [
@@ -345,7 +492,8 @@ describe("guest surfaces", () => {
       fileURLToPath(new URL("../app/events/page.tsx", import.meta.url)),
       "utf8",
     );
-    assert.match(eventsPage, /NELLIES_PUBLISHED_OFFERS/);
+    assert.match(eventsPage, /nelliesPublicOffers/);
+    assert.match(eventsPage, /isNelliesThreeVisitRewardActive/);
     assert.match(eventsPage, /brand\?\.upcoming/);
     assert.match(eventsPage, /Get tickets/);
     assert.match(eventsPage, /rel="noopener noreferrer"/);

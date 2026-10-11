@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { applyJgeLaunchSpecials } from "@/lib/jge-launch";
 import { applyNelliesLaunchSpecials } from "@/lib/nellies-launch";
+import { isNelliesThreeVisitRewardActive } from "@/lib/data/nellies-three-visit-reward";
 
 /**
  * Time-windowed offers a brand publishes to its members.
@@ -47,6 +48,7 @@ export async function listSpecialsForBrand(
 ): Promise<Special[]> {
   try {
     const supabase = await createClient();
+    const threeVisitRewardActive = await isNelliesThreeVisitRewardActive();
     const { data, error } = await supabase
       .from("specials")
       .select(
@@ -55,20 +57,19 @@ export async function listSpecialsForBrand(
       .eq("brand_slug", brandSlug.toLowerCase())
       .eq("active", true)
       .order("sort_order");
-    if (error || !data) {
-      return applyJgeLaunchSpecials(
-        brandSlug,
-        applyNelliesLaunchSpecials(brandSlug, []) as Special[],
-      ) as Special[];
-    }
+    const rows = !error && data ? (data as Special[]) : [];
     return applyJgeLaunchSpecials(
       brandSlug,
-      applyNelliesLaunchSpecials(brandSlug, data as Special[]) as Special[],
+      applyNelliesLaunchSpecials(brandSlug, rows, {
+        threeVisitRewardActive,
+      }) as Special[],
     ) as Special[];
   } catch {
     return applyJgeLaunchSpecials(
       brandSlug,
-      applyNelliesLaunchSpecials(brandSlug, []) as Special[],
+      applyNelliesLaunchSpecials(brandSlug, [], {
+        threeVisitRewardActive: false,
+      }) as Special[],
     ) as Special[];
   }
 }

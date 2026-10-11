@@ -6,7 +6,8 @@ import { getMemberProfileSlug } from "@/lib/data/member-profile";
 import { getSpendablePoints } from "@/lib/data/member";
 import { listRewardsForCommunity, listMyRedemptions } from "@/lib/data/rewards";
 import { resolveBrandSlug } from "@/lib/brand-aliases";
-import { NELLIES_BRAND_SLUG } from "@/lib/nellies-launch";
+import { isNelliesThreeVisitRewardActive } from "@/lib/data/nellies-three-visit-reward";
+import { NELLIES_BRAND_SLUG, nelliesMemberOfferSummary } from "@/lib/nellies-launch";
 import RewardCardWithForm from "./reward-card";
 
 export const dynamic = "force-dynamic";
@@ -52,15 +53,17 @@ export default async function RewardsPage({
   if (!brand) return notFound();
 
   const isSignedIn = user !== null;
-  const [rewards, myRedemptions, memberSlug] = await Promise.all([
+  const isNellies = slug.toLowerCase() === NELLIES_BRAND_SLUG;
+  const [rewards, myRedemptions, memberSlug, threeVisitRewardActive] = await Promise.all([
     listRewardsForCommunity(slug),
     user ? listMyRedemptions(user.id) : Promise.resolve([]),
     user ? getMemberProfileSlug(user.id).catch(() => null) : Promise.resolve(null),
+    isNellies ? isNelliesThreeVisitRewardActive() : Promise.resolve(false),
   ]);
+  const nelliesOffers = nelliesMemberOfferSummary(threeVisitRewardActive);
 
   const recentRedemptions = myRedemptions.slice(0, 5);
   const loginNext = `/brands/${slug}/rewards`;
-  const isNellies = slug.toLowerCase() === NELLIES_BRAND_SLUG;
 
   return (
     <div className="min-h-screen bg-linen px-4 py-8">
@@ -72,10 +75,8 @@ export default async function RewardsPage({
           <p className="mt-2 text-sm text-iron/70">
             {isNellies ? (
               <>
-                Join Nellie&apos;s and earn points from visits and check-ins. You also get free
-                dessert with an entrée when you join, 1,500 bonus points after three visits, and a
-                birthday entrée up to $30. Daily specials and upcoming events are on the
-                Nellie&apos;s page.
+                Join Nellie&apos;s and earn points from visits and check-ins. You also get{" "}
+                {nelliesOffers}. Daily specials and upcoming events are on the Nellie&apos;s page.
               </>
             ) : (
               <>
@@ -136,10 +137,8 @@ export default async function RewardsPage({
             <p className="text-sm text-iron/70">
               {isNellies ? (
                 <>
-                  Nellie&apos;s member offers are on the Nellie&apos;s page: a welcome dessert with an
-                  entrée when you join, 1,500 bonus points after three visits, a birthday entrée up
-                  to $30, plus daily specials and upcoming events. Earn points from visits and
-                  check-ins.
+                  Nellie&apos;s member offers are on the Nellie&apos;s page: {nelliesOffers}, plus
+                  daily specials and upcoming events. Earn points from visits and check-ins.
                 </>
               ) : (
                 <>No rewards available yet. Check back soon!</>

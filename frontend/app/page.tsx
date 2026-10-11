@@ -11,6 +11,7 @@ import { getMemberHomeData } from "@/lib/data/member-home";
 import { getFirstSessionFacts } from "@/lib/data/first-session";
 import FirstSessionChecklist from "@/components/first-session-checklist";
 import { getFeaturedOffers } from "@/lib/data/offers";
+import { isNelliesThreeVisitRewardActive } from "@/lib/data/nellies-three-visit-reward";
 import { getTiers, tierIcon } from "@/lib/data/tiers";
 import type { TierSlug } from "@/lib/data/types";
 
@@ -51,11 +52,18 @@ export default async function Home({
   const isSignedIn = member !== null;
 
   if (!isSignedIn) {
-    const [brands, results] = await Promise.all([
+    const [brands, results, threeVisitRewardActive] = await Promise.all([
       listBrandsFromDb(),
       getGuestResults(),
+      isNelliesThreeVisitRewardActive(),
     ]);
-    return <SignedOutLanding brands={brands} results={results} />;
+    return (
+      <SignedOutLanding
+        brands={brands}
+        results={results}
+        threeVisitRewardActive={threeVisitRewardActive}
+      />
+    );
   }
 
   // Signed-in path — parallel-fetch everything the dashboard needs. Each
