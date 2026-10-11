@@ -28,6 +28,7 @@ const brandCommunityActions = read(
   "../app/brands/[slug]/community/actions.ts",
 );
 const broadcastPage = read("../app/admin/broadcast/page.tsx");
+const broadcastForm = read("../app/admin/broadcast/broadcast-form.tsx");
 
 describe("offers are always brand-scoped", () => {
   it("createOfferAction resolves the brand and writes community_id", () => {
@@ -169,6 +170,6 @@ describe("brand community admin actions check the brand", () => {
 
 describe("broadcast page", () => {
   it("no longer hardcodes a brand", () => {
-    assert.doesNotMatch(broadcastPage, /value="nellies"/);
+    assert.doesNotMatch(broadcastPage + broadcastForm, /value="nellies"/);
   });
 });

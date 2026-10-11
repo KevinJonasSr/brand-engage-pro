@@ -28,6 +28,9 @@ export interface BrandEvent {
   tier: "public" | "premium";
   /** When RSVPs open to non-founders (0074). Null means open now. */
   rsvp_opens_at?: string | null;
+  created_at?: string | null;
+  /** Null inherits the brand window. 0 opens RSVPs immediately. */
+  founder_early_rsvp_hours?: number | null;
 }
 
 type BrandRow = {
@@ -216,12 +219,19 @@ export async function listBrandsForAdmin(): Promise<
 /** Admin-scoped: events for a single brand, including inactive. */
 export async function listEventsForAdmin(slug: string): Promise<BrandEvent[]> {
   const admin = createAdminClient();
-  const { data } = await admin
+  const withWindow = await admin
     .from("brand_events")
-    .select("id, brand_slug, title, detail, event_date, url, location, image_url, capacity, starts_at, ends_at, sort_order, active")
+    .select("id, brand_slug, title, detail, event_date, url, location, image_url, capacity, starts_at, ends_at, sort_order, active, created_at, rsvp_opens_at, founder_early_rsvp_hours")
     .eq("brand_slug", slug)
     .order("sort_order");
-  return (data ?? []) as BrandEvent[];
+  if (!withWindow.error) return (withWindow.data ?? []) as BrandEvent[];
+  // Migration 0076 may not be applied yet. Keep the events list working.
+  const basic = await admin
+    .from("brand_events")
+    .select("id, brand_slug, title, detail, event_date, url, location, image_url, capacity, starts_at, ends_at, sort_order, active, rsvp_opens_at")
+    .eq("brand_slug", slug)
+    .order("sort_order");
+  return (basic.data ?? []) as BrandEvent[];
 }
 
 /** Returns true if the signed-in member follows the given brand. */

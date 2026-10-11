@@ -21,6 +21,7 @@ type InitialValues = {
   socialText: string;
   active: boolean;
   sortOrder: number;
+  founderEarlyRsvpHours: number;
 };
 
 export default function BrandEditForm({
@@ -31,6 +32,7 @@ export default function BrandEditForm({
   initial: InitialValues;
 }) {
   const router = useRouter();
+  const [businessError, setBusinessError] = useState<string | null>(null);
   const [heroImage, setHeroImage] = useState<string | null>(initial.heroImage);
   const [focalX, setFocalX] = useState(initial.heroFocalX);
   const [focalY, setFocalY] = useState(initial.heroFocalY);
@@ -50,7 +52,9 @@ export default function BrandEditForm({
     formData.set("hero_focal_y", String(focalY));
     formData.set("accent_from", accentFrom);
     formData.set("accent_to", accentTo);
-    await submit(updateBrandAction, formData);
+    setBusinessError(null);
+    const result = await submit(updateBrandAction, formData);
+    if (result && "error" in result && result.error) setBusinessError(result.error);
   }
 
   return (
@@ -162,6 +166,23 @@ export default function BrandEditForm({
           </p>
         )}
       </div>
+      <Field label="Founder early RSVP (hours)">
+        <input
+          name="founder_early_rsvp_hours"
+          type="number"
+          min={0}
+          max={168}
+          required
+          defaultValue={initial.founderEarlyRsvpHours}
+          className="w-full max-w-xs rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
+        />
+        <p className="mt-1 text-xs text-iron/70">
+          How long founders can RSVP before everyone else. This applies to new
+          events. Use 0 to turn the early window off. Change one event to
+          override it. Events that already exist keep their current open time
+          until you edit that event.
+        </p>
+      </Field>
       <Field label="Social links">
         <textarea
           name="social"
@@ -191,6 +212,11 @@ export default function BrandEditForm({
         </label>
         <div className="flex flex-wrap items-center gap-3">
           <SaveStatusIndicator status={status} />
+          {businessError && (
+            <span className="text-xs text-ember" title={businessError}>
+              ✗ {businessError}
+            </span>
+          )}
           <button
             type="submit"
             disabled={submitting}

@@ -9,6 +9,7 @@ import CreateEventForm from "./create-event-form";
 import EditableEventRow from "./editable-event-row";
 import CheckinQrCard from "@/components/checkin-qr-card";
 import { checkinPath, checkinSecretFromEnv, signCheckinToken } from "@/lib/checkin-token";
+import { canRsvpNow, FOUNDER_EARLY_RSVP_HOURS } from "@/lib/founder-perks";
 import {
   deleteEventAction,
   sendReminderNowAction,
@@ -34,11 +35,20 @@ export default async function AdminBrandEditPage({
   const ctx = await getAdminContext();
   if (!canAccessBrand(ctx, slug)) notFound();
   const admin = createAdminClient();
-  const { data: brand } = await admin
+  const brandColumns =
+    "slug, name, tagline, bio, hero_image, hero_focal_x, hero_focal_y, accent_from, accent_to, genres, social, active, sort_order";
+  const withHours = await admin
     .from("brands")
-    .select("slug, name, tagline, bio, hero_image, hero_focal_x, hero_focal_y, accent_from, accent_to, genres, social, active, sort_order")
+    .select(`${brandColumns}, founder_early_rsvp_hours`)
     .eq("slug", slug)
     .maybeSingle();
+  const brandResult = withHours.error
+    ? await admin.from("brands").select(brandColumns).eq("slug", slug).maybeSingle()
+    : withHours;
+  const brand = brandResult.data;
+  const earlyHours = withHours.error
+    ? FOUNDER_EARLY_RSVP_HOURS
+    : ((withHours.data?.founder_early_rsvp_hours as number | null) ?? FOUNDER_EARLY_RSVP_HOURS);
 
   if (!brand) notFound();
 
@@ -105,6 +115,7 @@ export default async function AdminBrandEditPage({
           socialText,
           active: (brand.active as boolean) ?? true,
           sortOrder: (brand.sort_order as number) ?? 99,
+          founderEarlyRsvpHours: earlyHours,
         }}
       />
 
@@ -113,7 +124,7 @@ export default async function AdminBrandEditPage({
         <p className="text-sm font-semibold">Upcoming events</p>
         <p className="mt-1 text-xs text-iron/70">
           Shown on the brand page. Set <span className="text-iron/80">active = false</span> to hide without deleting,
-          or click ✏️ Edit on a row to change date, location, capacity, etc.
+          or click ✏️ Edit on a row to change date, location, capacity, or the founder RSVP window.
         </p>
         <div className="mt-3 space-y-3">
           {events.length === 0 && <p className="text-xs text-iron/70">No events yet.</p>}
@@ -129,6 +140,7 @@ export default async function AdminBrandEditPage({
               <EditableEventRow
                 key={e.id}
                 brandSlug={slug}
+                brandEarlyHours={earlyHours}
                 event={{
                   id: e.id,
                   title: e.title,
@@ -140,6 +152,8 @@ export default async function AdminBrandEditPage({
                   capacity: e.capacity ?? null,
                   sort_order: e.sort_order ?? 0,
                   active: e.active ?? true,
+                  founder_early_rsvp_hours: e.founder_early_rsvp_hours ?? null,
+                  rsvp_opens_at: e.rsvp_opens_at ?? null,
                 }}
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
@@ -164,6 +178,10 @@ export default async function AdminBrandEditPage({
                     <p className="mt-1 text-xs text-iron/70">
                       {rsvps.length}
                       {e.capacity ? ` / ${e.capacity}` : ""} RSVPed
+                      {" · "}
+                      {canRsvpNow({ isFounder: false, opensAt: e.rsvp_opens_at })
+                        ? "RSVPs are open to everyone"
+                        : `Founders only until ${new Date(e.rsvp_opens_at as string).toLocaleString()}`}
                     </p>
                     {/* Reminder status */}
                     {(rem24 || rem1h || remindersScheduled) && (
@@ -226,7 +244,7 @@ export default async function AdminBrandEditPage({
           })}
         </div>
 
-        <CreateEventForm slug={slug} />
+        <CreateEventForm slug={slug} brandEarlyHours={earlyHours} />
       </section>
 
       {/* Check-in QR — print or display at the register / entrance */}

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { listBrandsFromDb } from "@/lib/data/brands";
 import { canAccessBrand, getAdminContext } from "@/lib/admin";
+import { canSendBlasts } from "@/lib/blast-permissions";
 import CampaignBuilder from "./builder";
 
 export const dynamic = "force-dynamic";
@@ -23,7 +24,10 @@ export default async function NewCampaignPage() {
           Hit Publish to member out across community, marketplace, and member CTAs.
         </p>
       </div>
-      <CampaignBuilder brands={brands.map((a) => ({ slug: a.slug, name: a.name }))} />
+      <CampaignBuilder
+        brands={brands.map((a) => ({ slug: a.slug, name: a.name }))}
+        canBlast={canSendBlasts(ctx)}
+      />
     </div>
   );
 }

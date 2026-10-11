@@ -1,10 +1,14 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   MANDRILL_BATCH_SIZE,
+  appBaseUrl,
   buildCampaignEmail,
   buildMandrillMessage,
   chunk,
   countMandrillResults,
+  mailingAddress,
+  marketingEmailBlockReason,
+  oneClickUnsubscribeUrl,
   unsubscribeUrl,
   validateEmailCampaign,
 } from "@/lib/email-campaign";
@@ -13,7 +17,6 @@ import type { NotificationPreferences } from "@/lib/notifications/types";
 import { isSmsQuietTime, withStopFooter } from "@/lib/sms-compliance";
 
 const MANDRILL_SEND_URL = "https://mandrillapp.com/api/1.0/messages/send";
-const DEFAULT_APP_URL = "https://www.brandengagepro.com";
 const DEFAULT_FROM_EMAIL = "hello@brandengagepro.com";
 const DEFAULT_REPLY_TO = "support@brandengagepro.com";
 
@@ -214,8 +217,10 @@ export async function broadcastBrandEmail(params: {
   if (invalid) return { ...result, error: invalid };
   if (!params.brandSlug) return { ...result, error: "Email campaigns need a brand." };
 
-  const apiKey = process.env.MAILCHIMP_TRANSACTIONAL_API_KEY;
-  if (!apiKey) return { ...result, error: "Email sending not configured (MAILCHIMP_TRANSACTIONAL_API_KEY missing)" };
+  const blocked = marketingEmailBlockReason();
+  if (blocked) return { ...result, error: blocked };
+  const apiKey = process.env.MAILCHIMP_TRANSACTIONAL_API_KEY as string;
+  const postalAddress = mailingAddress() as string;
 
   const recipients = await loadRecipients({
     brandSlug: params.brandSlug,
@@ -234,8 +239,13 @@ export async function broadcastBrandEmail(params: {
     .maybeSingle();
   const brandName = (brand?.name as string | undefined) ?? "Brand Engage Pro";
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? DEFAULT_APP_URL;
-  const { html, text } = buildCampaignEmail({ subject: params.subject, body: params.body, brandName });
+  const appUrl = appBaseUrl();
+  const { html, text } = buildCampaignEmail({
+    subject: params.subject,
+    body: params.body,
+    brandName,
+    postalAddress,
+  });
 
   const withEmail = recipients.filter(
     (r): r is typeof r & { email: string; unsubscribe_token: string } =>
@@ -254,6 +264,7 @@ export async function broadcastBrandEmail(params: {
       recipients: batch.map((r) => ({
         email: r.email,
         unsubUrl: unsubscribeUrl(appUrl, r.unsubscribe_token),
+        oneClickUrl: oneClickUnsubscribeUrl(appUrl, r.unsubscribe_token),
       })),
       tags: ["campaign", params.brandSlug],
     });

@@ -21,6 +21,8 @@ export interface EditableEvent {
   capacity: number | null;
   sort_order: number;
   active: boolean;
+  founder_early_rsvp_hours?: number | null;
+  rsvp_opens_at?: string | null;
 }
 
 /**
@@ -33,10 +35,12 @@ export interface EditableEvent {
 export default function EditEventForm({
   event,
   brandSlug,
+  brandEarlyHours,
   onCancel,
 }: {
   event: EditableEvent;
   brandSlug: string;
+  brandEarlyHours: number;
   onCancel: () => void;
 }) {
   const router = useRouter();
@@ -126,6 +130,23 @@ export default function EditEventForm({
         placeholder="Sort order"
         className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
       />
+      <label className="text-xs text-iron/70 md:col-span-2">
+        Founder early RSVP hours
+        <input
+          name="founder_early_rsvp_hours"
+          type="number"
+          min={0}
+          max={168}
+          defaultValue={event.founder_early_rsvp_hours ?? ""}
+          placeholder="Blank keeps the current window"
+          className="mt-1 w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
+        />
+        <span className="mt-1 block">
+          Blank keeps this event&apos;s current RSVP time. 0 opens it to everyone
+          now. A number counts from when the event was created. New events use
+          the brand default ({brandEarlyHours} hours) unless you set one here.
+        </span>
+      </label>
       <label className="flex items-center gap-2 text-xs text-iron/80 md:col-span-2">
         <input
           type="checkbox"

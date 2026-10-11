@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { unsubscribeEmailByToken } from "@/lib/email-unsubscribe";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
@@ -24,23 +25,27 @@ export async function confirmUnsubscribe(formData: FormData) {
     if (findError) throw findError;
     if (!member) {
       status = "not_found";
+    } else if (ch === "email") {
+      const result = await unsubscribeEmailByToken(token);
+      if (result === "not_found") status = "not_found";
+      else if (result === "error") status = "error";
     } else {
-      const update = ch === "sms" ? { sms_opted_in: false } : { email_opted_in: false };
       const { error: updateError } = await admin
         .from("members")
-        .update(update)
+        .update({ sms_opted_in: false })
         .eq("id", member.id);
       if (updateError) throw updateError;
-      if (ch === "sms") {
-        // Keep the notification settings in step so texts stop everywhere.
-        const { error: prefsError } = await admin
-          .from("notification_preferences")
-          .upsert({ member_id: member.id, sms_enabled: false }, { onConflict: "member_id" });
-        if (prefsError) throw prefsError;
-      }
+      // Keep the notification settings in step so texts stop everywhere.
+      const { error: prefsError } = await admin
+        .from("notification_preferences")
+        .upsert({ member_id: member.id, sms_enabled: false }, { onConflict: "member_id" });
+      if (prefsError) throw prefsError;
     }
   } catch (err) {
-    console.error("[unsubscribe] failed", err);
+    console.error(
+      "[unsubscribe] failed",
+      err instanceof Error ? err.message : "error",
+    );
     status = "error";
   }
 

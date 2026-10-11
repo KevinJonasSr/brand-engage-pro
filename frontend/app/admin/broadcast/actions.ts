@@ -2,6 +2,7 @@
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import { canAccessBrand, getAdminContext, requireAdminContext, requireBrandAccess } from "@/lib/admin";
+import { canSendBlasts } from "@/lib/blast-permissions";
 import { broadcastBrandEmail, broadcastSms, type BroadcastResult } from "@/lib/broadcast";
 import { validateEmailCampaign } from "@/lib/email-campaign";
 
@@ -36,6 +37,9 @@ export async function sendBroadcast(
 ): Promise<BroadcastFormResult> {
   const ctx = await getAdminContext();
   if (!ctx) return { ok: false, error: "Unauthorized" };
+  if (!canSendBlasts(ctx)) {
+    return { ok: false, error: "Only the brand owner can send broadcasts." };
+  }
 
   // The brand comes from the admin's current brand (the community switcher),
   // not a hard-coded form value. An explicit form value is still checked below.
@@ -181,6 +185,7 @@ export async function previewRecipientCount(
 ): Promise<number> {
   // Server actions are public endpoints: check the caller before counting.
   const ctx = await requireAdminContext();
+  if (!canSendBlasts(ctx)) return 0;
   requireBrandAccess(ctx, brandSlug);
   const admin = createAdminClient();
 

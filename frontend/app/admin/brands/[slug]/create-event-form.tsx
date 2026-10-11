@@ -11,7 +11,13 @@ import { createEventAction } from "../actions";
  * page on success so the new event appears in the list above without a
  * full reload.
  */
-export default function CreateEventForm({ slug }: { slug: string }) {
+export default function CreateEventForm({
+  slug,
+  brandEarlyHours,
+}: {
+  slug: string;
+  brandEarlyHours: number;
+}) {
   const router = useRouter();
   const [businessError, setBusinessError] = useState<string | null>(null);
   const { status, submit, submitting } = useFormSave({
@@ -82,6 +88,20 @@ export default function CreateEventForm({ slug }: { slug: string }) {
         placeholder="Sort order"
         className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
       />
+      <label className="text-xs text-iron/70 md:col-span-2">
+        Founder early RSVP hours
+        <input
+          name="founder_early_rsvp_hours"
+          type="number"
+          min={0}
+          max={168}
+          placeholder={`${brandEarlyHours} (brand default)`}
+          className="mt-1 w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
+        />
+        <span className="mt-1 block">
+          Blank uses this brand&apos;s default ({brandEarlyHours} hours). 0 lets everyone RSVP immediately.
+        </span>
+      </label>
       <div className="flex flex-wrap items-center gap-3 md:col-span-2">
         <button
           type="submit"

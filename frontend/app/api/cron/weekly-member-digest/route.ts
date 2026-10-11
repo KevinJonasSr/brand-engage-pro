@@ -1,6 +1,15 @@
 import { NextResponse } from "next/server";
 import { verifyCronAuth } from "@/lib/cron-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  appBaseUrl,
+  escapeHtml,
+  listUnsubscribeHeaders,
+  mailingAddress,
+  marketingEmailBlockReason,
+  oneClickUnsubscribeUrl,
+  unsubscribeUrl,
+} from "@/lib/email-campaign";
 import { gatherWeeklyRecap } from "@/lib/personal-recap/gather";
 
 export const dynamic = "force-dynamic";
@@ -13,18 +22,18 @@ export const revalidate = 0;
  * activity in the past 7 days, computes their personal recap and sends a
  * summary email via Mailchimp transactional (Mandrill).
  *
- * Requires env vars: MAILCHIMP_TRANSACTIONAL_API_KEY (Mandrill key, starts with "md-")
- * Falls back gracefully if the key is missing — logs a warning, skips sends.
+ * Sends only when EMAIL_SENDING_ENABLED=1, BEP_MAILING_ADDRESS is set, and
+ * MAILCHIMP_TRANSACTIONAL_API_KEY is set. The key alone does not send.
  */
 export async function GET(req: Request) {
   const authErr = verifyCronAuth(req);
   if (authErr) return authErr;
 
-  const mandrillKey = process.env.MAILCHIMP_TRANSACTIONAL_API_KEY;
-  if (!mandrillKey) {
-    console.warn(
-      "[weekly-digest] MAILCHIMP_TRANSACTIONAL_API_KEY not set — skipping email sends",
-    );
+  const blocked = marketingEmailBlockReason();
+  const mandrillKey = process.env.MAILCHIMP_TRANSACTIONAL_API_KEY?.trim() ?? "";
+  const address = mailingAddress();
+  if (blocked) {
+    console.warn(`[weekly-digest] not sending: ${blocked}`);
   }
 
   const admin = createAdminClient();
@@ -32,7 +41,7 @@ export async function GET(req: Request) {
   // Fetch all email-opted-in, non-suspended members with an email address
   const { data: members, error } = await admin
     .from("members")
-    .select("id, first_name, email, current_streak_days")
+    .select("id, first_name, email, current_streak_days, unsubscribe_token")
     .eq("email_opted_in", true)
     .eq("suspended", false)
     .not("email", "is", null);
@@ -56,24 +65,26 @@ export async function GET(req: Request) {
         continue;
       }
 
-      if (mandrillKey) {
+      const token = (member.unsubscribe_token as string | null) ?? "";
+      if (!blocked && mandrillKey && address && token) {
         const ok = await sendDigestEmail({
           apiKey: mandrillKey,
           toEmail: member.email as string,
           firstName: (member.first_name as string | null) ?? "there",
           recap,
           streakDays: (member.current_streak_days as number | null) ?? 0,
+          unsubscribeToken: token,
+          postalAddress: address,
         });
         if (ok) sent++;
         else failed++;
       } else {
-        // Dry-run mode: log what would have been sent
         console.log(
           `[weekly-digest] would send to ${member.email} — ` +
             `${recap.pointsEarned} pts, ${recap.commentsAdded} comments, ` +
             `${recap.rsvpsAdded} RSVPs`,
         );
-        sent++;
+        skipped++;
       }
     } catch (err) {
       console.error("[weekly-digest] Error processing member", member.id, err);
@@ -100,10 +111,19 @@ async function sendDigestEmail(params: {
   firstName: string;
   recap: Recap;
   streakDays: number;
+  unsubscribeToken: string;
+  postalAddress: string;
 }): Promise<boolean> {
-  const { apiKey, toEmail, firstName, recap, streakDays } = params;
-
-  const html = buildEmailHtml({ firstName, recap, streakDays });
+  const { apiKey, toEmail, firstName, recap, streakDays, unsubscribeToken, postalAddress } = params;
+  const base = appBaseUrl();
+  const html = buildEmailHtml({
+    firstName,
+    recap,
+    streakDays,
+    postalAddress,
+    unsubscribeHref: unsubscribeUrl(base, unsubscribeToken),
+    homeHref: base,
+  });
 
   try {
     const res = await fetch("https://mandrillapp.com/api/1.0/messages/send", {
@@ -114,9 +134,10 @@ async function sendDigestEmail(params: {
         message: {
           html,
           subject: `Your week at ${recap.topBrandName ?? "Brand Engage Pro"} ✨`,
-          from_email: "hello@brand-engage-pro.vercel.app",
+          from_email: process.env.BEP_EMAIL_FROM ?? "hello@brandengagepro.com",
           from_name: "Brand Engage Pro",
           to: [{ email: toEmail, type: "to" }],
+          headers: listUnsubscribeHeaders(oneClickUnsubscribeUrl(base, unsubscribeToken)),
           track_opens: true,
           track_clicks: false,
           tags: ["weekly-digest"],
@@ -142,8 +163,12 @@ function buildEmailHtml(params: {
   firstName: string;
   recap: Recap;
   streakDays: number;
+  postalAddress: string;
+  unsubscribeHref: string;
+  homeHref: string;
 }): string {
-  const { firstName, recap, streakDays } = params;
+  const { firstName, recap, streakDays, postalAddress, unsubscribeHref, homeHref } = params;
+  const safeName = escapeHtml(firstName);
 
   const stats = [
     recap.pointsEarned > 0
@@ -164,7 +189,7 @@ function buildEmailHtml(params: {
     .join(" · ");
 
   const brandLine = recap.topBrandName
-    ? `<p style="color:#5a5650;font-size:13px;">Your most active brand this week: <b style="color:#1e1b17;">${recap.topBrandName}</b></p>`
+    ? `<p style="color:#5a5650;font-size:13px;">Your most active brand this week: <b style="color:#1e1b17;">${escapeHtml(recap.topBrandName)}</b></p>`
     : "";
 
   return `<!DOCTYPE html>
@@ -177,7 +202,7 @@ function buildEmailHtml(params: {
         <!-- Header -->
         <tr><td style="padding:32px 32px 0;border-bottom:1px solid rgba(30,27,23,0.14);">
           <p style="margin:0 0 4px;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#7a5a06;">Brand Engage Pro</p>
-          <h1 style="margin:0 0 24px;font-family:'Young Serif',Georgia,serif;font-size:26px;font-weight:400;line-height:1.2;color:#1e1b17;">Hey ${firstName}, here&rsquo;s your week 👋</h1>
+          <h1 style="margin:0 0 24px;font-family:'Young Serif',Georgia,serif;font-size:26px;font-weight:400;line-height:1.2;color:#1e1b17;">Hey ${safeName}, here&rsquo;s your week 👋</h1>
         </td></tr>
         <!-- Stats -->
         <tr><td style="padding:24px 32px;">
@@ -186,13 +211,13 @@ function buildEmailHtml(params: {
         </td></tr>
         <!-- CTA -->
         <tr><td style="padding:0 32px 32px;">
-          <a href="https://brand-engage-pro.vercel.app" style="display:inline-block;background:#9b2335;color:#f5efe4;font-size:14px;font-weight:600;text-decoration:none;padding:12px 28px;border-radius:999px;">
+          <a href="${escapeHtml(homeHref)}" style="display:inline-block;background:#9b2335;color:#f5efe4;font-size:14px;font-weight:600;text-decoration:none;padding:12px 28px;border-radius:999px;">
             See your dashboard →
           </a>
         </td></tr>
         <!-- Footer -->
         <tr><td style="padding:20px 32px;border-top:1px solid rgba(30,27,23,0.14);">
-          <p style="margin:0;font-size:11px;color:#5a5650;">You're getting this because you opted in to Brand Engage Pro member emails. <a href="https://brand-engage-pro.vercel.app/unsubscribe" style="color:#9b2335;">Unsubscribe</a></p>
+          <p style="margin:0;font-size:11px;color:#5a5650;">You're getting this because you opted in to Brand Engage Pro member emails. ${escapeHtml(postalAddress)} <a href="${escapeHtml(unsubscribeHref)}" style="color:#9b2335;">Unsubscribe</a></p>
         </td></tr>
       </table>
     </td></tr>
