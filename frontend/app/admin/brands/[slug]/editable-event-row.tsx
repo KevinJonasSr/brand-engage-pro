@@ -16,10 +16,12 @@ import EditEventForm, { type EditableEvent } from "./edit-event-form";
 export default function EditableEventRow({
   event,
   brandSlug,
+  brandEarlyHours,
   children,
 }: {
   event: EditableEvent;
   brandSlug: string;
+  brandEarlyHours: number;
   children: React.ReactNode;
 }) {
   const [editing, setEditing] = useState(false);
@@ -45,6 +47,7 @@ export default function EditableEventRow({
         <EditEventForm
           event={event}
           brandSlug={brandSlug}
+          brandEarlyHours={brandEarlyHours}
           onCancel={() => setEditing(false)}
         />
       )}

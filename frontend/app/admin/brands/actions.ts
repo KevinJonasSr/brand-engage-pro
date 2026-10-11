@@ -8,8 +8,12 @@ import {
   requireBrandAccess,
   requireSuperAdmin,
 } from "@/lib/admin";
+import { parseEarlyRsvpHours } from "@/lib/founder-perks";
 import { sendEventReminder, type ReminderWindowEvent } from "@/lib/reminders";
 import { parseSocialLines } from "@/lib/socials/parse";
+
+const EARLY_RSVP_HOURS_ERROR =
+  "Founder early RSVP hours must be a whole number from 0 to 168. Use 0 to turn the early window off.";
 
 /** Throws unless the caller is an admin with access to `brandSlug`. */
 async function requireBrandAdmin(brandSlug: string) {
@@ -69,6 +73,10 @@ export async function updateBrandAction(formData: FormData) {
   const socialRaw = String(formData.get("social") ?? "").trim();
   const active = String(formData.get("active") ?? "true") === "true";
   const sortOrder = parseInt(String(formData.get("sort_order") ?? "99"), 10);
+  const earlyHours = parseEarlyRsvpHours(String(formData.get("founder_early_rsvp_hours") ?? ""));
+  if (earlyHours === "invalid" || earlyHours === null) {
+    return { error: EARLY_RSVP_HOURS_ERROR };
+  }
   const genres = genresRaw
     ? genresRaw
         .split(",")
@@ -80,7 +88,7 @@ export async function updateBrandAction(formData: FormData) {
   // domain). See lib/socials/parse.ts for the full format spec.
   const social = parseSocialLines(socialRaw);
   const supa = createAdminClient();
-  await supa
+  const { error } = await supa
     .from("brands")
     .update({
       name,
@@ -95,12 +103,15 @@ export async function updateBrandAction(formData: FormData) {
       social,
       active,
       sort_order: Number.isFinite(sortOrder) ? sortOrder : 99,
+      founder_early_rsvp_hours: earlyHours,
     })
     .eq("slug", slug);
+  if (error) return { error: error.message };
   revalidatePath("/admin/brands");
   revalidatePath(`/admin/brands/${slug}`);
   revalidatePath(`/brands/${slug}`);
   revalidatePath(`/brands`);
+  return { success: true as const };
 }
 
 /**
@@ -124,6 +135,8 @@ export async function createEventAction(formData: FormData) {
   const capacityRaw = String(formData.get("capacity") ?? "").trim();
   const capacity = capacityRaw ? parseInt(capacityRaw, 10) : null;
   const sortOrder = parseInt(String(formData.get("sort_order") ?? "0"), 10) || 0;
+  const earlyHours = parseEarlyRsvpHours(String(formData.get("founder_early_rsvp_hours") ?? ""));
+  if (earlyHours === "invalid") return { error: EARLY_RSVP_HOURS_ERROR };
 
   const supa = createAdminClient();
   const { error } = await supa.from("brand_events").insert({
@@ -137,6 +150,7 @@ export async function createEventAction(formData: FormData) {
     url: url || null,
     capacity: Number.isFinite(capacity) ? capacity : null,
     sort_order: sortOrder,
+    ...(earlyHours === null ? {} : { founder_early_rsvp_hours: earlyHours }),
   });
   if (error) {
     return { error: error.message };
@@ -185,6 +199,8 @@ export async function updateEventAction(formData: FormData) {
   const sortOrder = parseInt(String(formData.get("sort_order") ?? "0"), 10) || 0;
   // Checkbox: present + "true" means active. Missing means unchecked.
   const active = String(formData.get("active") ?? "") === "true";
+  const earlyHours = parseEarlyRsvpHours(String(formData.get("founder_early_rsvp_hours") ?? ""));
+  if (earlyHours === "invalid") return { error: EARLY_RSVP_HOURS_ERROR };
 
   const supa = createAdminClient();
   const { error } = await supa
@@ -199,6 +215,8 @@ export async function updateEventAction(formData: FormData) {
       capacity: Number.isFinite(capacity) ? capacity : null,
       sort_order: sortOrder,
       active,
+      // Blank keeps the current window. A number, including 0, overrides it.
+      ...(earlyHours === null ? {} : { founder_early_rsvp_hours: earlyHours }),
     })
     .eq("id", eventId)
     .eq("brand_slug", brandSlug);
