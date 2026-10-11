@@ -99,30 +99,30 @@ export default function LeaderboardPodium({
                   <div
                     className={`mb-2 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br ${
                       TIER_COLOR[entry.current_tier ?? "bronze"] ?? TIER_COLOR.bronze
-                    } text-lg font-semibold text-white ring-2 ${theme.ring}`}
+                    } text-lg font-semibold text-iron ring-2 ${theme.ring}`}
                   >
                     {entry.display_name.charAt(0).toUpperCase()}
                   </div>
                 )}
 
-                <p className="text-center text-xs font-semibold leading-tight text-white">
+                <p className="text-center text-xs font-semibold leading-tight text-iron">
                   {entry.display_name}
                   {isViewer && (
-                    <span className="ml-1 rounded-full bg-aurora/20 px-1.5 py-0.5 text-[9px] uppercase tracking-wide text-aurora">
+                    <span className="ml-1 rounded-full bg-aurora/20 px-1.5 py-0.5 text-[9px] uppercase tracking-wide text-aurora-ink">
                       You
                     </span>
                   )}
                 </p>
-                <p className="mt-0.5 text-xs uppercase tracking-wide text-white/55">
+                <p className="mt-0.5 text-xs uppercase tracking-wide text-iron/55">
                   {entry.score.toLocaleString()} pts
                 </p>
               </>
             ) : (
               <>
-                <div className="mb-2 flex h-16 w-16 items-center justify-center rounded-full border border-dashed border-white/15 text-2xl text-white/30">
+                <div className="mb-2 flex h-16 w-16 items-center justify-center rounded-full border border-dashed border-iron/15 text-2xl text-iron/30">
                   ?
                 </div>
-                <p className="text-center text-xs text-white/40">Open</p>
+                <p className="text-center text-xs text-iron/40">Open</p>
               </>
             )}
 
@@ -134,7 +134,7 @@ export default function LeaderboardPodium({
                   : rank === 2
                     ? "from-slate-300/15 to-slate-500/25"
                     : "from-amber-700/20 to-amber-900/30"
-              } px-2 py-3 ring-1 ring-white/10`}
+              } px-2 py-3 ring-1 ring-iron/10`}
               style={{
                 height:
                   rank === 1
@@ -145,7 +145,7 @@ export default function LeaderboardPodium({
               }}
             >
               <p className="text-2xl">{theme.medal}</p>
-              <p className="mt-0.5 text-xs font-bold uppercase tracking-widest text-white/75">
+              <p className="mt-0.5 text-xs font-bold uppercase tracking-widest text-iron/75">
                 {theme.label}
               </p>
             </div>

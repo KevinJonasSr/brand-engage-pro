@@ -53,7 +53,7 @@ export default function ApplyForm({ errorCode }: { errorCode?: string }) {
       {errorMessage && (
         <p
           role="alert"
-          className="rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-100"
+          className="rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-ember"
         >
           {errorMessage}
         </p>
@@ -144,7 +144,7 @@ export default function ApplyForm({ errorCode }: { errorCode?: string }) {
 
       {/* Social */}
       <Section title="Social handles">
-        <p className="text-xs text-white/55">
+        <p className="text-xs text-iron/55">
           Paste full URLs. Leave blank for platforms you don&apos;t use.
         </p>
         {["Instagram", "Facebook", "TikTok", "YouTube", "X", "LinkedIn"].map(
@@ -197,7 +197,7 @@ export default function ApplyForm({ errorCode }: { errorCode?: string }) {
       )}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs text-white/55">
+        <p className="text-xs text-iron/55">
           By submitting you agree we may contact the email above. We never
           share your data with third parties.
         </p>
@@ -214,7 +214,7 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
     <button
       type="submit"
       disabled={pending || disabled}
-      className="rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white shadow-glass transition hover:brightness-110 disabled:opacity-60"
+      className="rounded-full bg-ember px-6 py-3 text-sm font-semibold text-linen shadow-glass transition hover:brightness-110 disabled:opacity-60"
     >
       {pending ? "Submitting…" : "Submit application →"}
     </button>
@@ -231,8 +231,8 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <fieldset className="glass-card space-y-4 rounded-2xl p-6">
-      <legend className="text-xs uppercase tracking-[0.2em] text-white/60">
+    <fieldset className="glass-card space-y-4 rounded-lg p-6">
+      <legend className="text-xs uppercase tracking-[0.2em] text-iron/60">
         {title}
       </legend>
       <div className="space-y-4">{children}</div>
@@ -264,9 +264,9 @@ function Field({
   const id = `f_${name}`;
   return (
     <label htmlFor={id} className="block">
-      <span className="block text-sm font-medium text-white/85">{label}</span>
+      <span className="block text-sm font-medium text-iron/85">{label}</span>
       {hint && (
-        <span className="mt-0.5 block text-xs text-white/45">{hint}</span>
+        <span className="mt-0.5 block text-xs text-iron/45">{hint}</span>
       )}
       {textarea ? (
         <textarea
@@ -275,7 +275,7 @@ function Field({
           required={required}
           maxLength={maxLength}
           rows={4}
-          className="mt-2 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white placeholder-white/30 focus:border-aurora focus:outline-none focus:ring-1 focus:ring-aurora"
+          className="mt-2 w-full rounded-xl border border-iron/15 bg-parchment/40 px-3 py-2 text-sm text-iron placeholder-iron/30 focus:border-aurora focus:outline-none focus:ring-1 focus:ring-aurora"
         />
       ) : (
         <input
@@ -286,7 +286,7 @@ function Field({
           maxLength={maxLength}
           min={min}
           max={max}
-          className="mt-2 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white placeholder-white/30 focus:border-aurora focus:outline-none focus:ring-1 focus:ring-aurora"
+          className="mt-2 w-full rounded-xl border border-iron/15 bg-parchment/40 px-3 py-2 text-sm text-iron placeholder-iron/30 focus:border-aurora focus:outline-none focus:ring-1 focus:ring-aurora"
         />
       )}
     </label>
@@ -307,13 +307,13 @@ function Select({
   const id = `f_${name}`;
   return (
     <label htmlFor={id} className="block">
-      <span className="block text-sm font-medium text-white/85">{label}</span>
+      <span className="block text-sm font-medium text-iron/85">{label}</span>
       <select
         id={id}
         name={name}
         required={required}
         defaultValue=""
-        className="mt-2 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white focus:border-aurora focus:outline-none focus:ring-1 focus:ring-aurora"
+        className="mt-2 w-full rounded-xl border border-iron/15 bg-parchment/40 px-3 py-2 text-sm text-iron focus:border-aurora focus:outline-none focus:ring-1 focus:ring-aurora"
       >
         <option value="" disabled>
           Choose one…
@@ -330,11 +330,11 @@ function Select({
 
 function Checkbox({ label, name }: { label: string; name: string }) {
   return (
-    <label className="flex items-start gap-3 text-sm text-white/85">
+    <label className="flex items-start gap-3 text-sm text-iron/85">
       <input
         type="checkbox"
         name={name}
-        className="mt-1 h-4 w-4 rounded border-white/30 bg-black/40 accent-aurora"
+        className="mt-1 h-4 w-4 rounded border-iron/30 bg-parchment/40 accent-aurora"
       />
       <span>{label}</span>
     </label>

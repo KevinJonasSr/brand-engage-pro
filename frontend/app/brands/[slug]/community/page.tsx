@@ -79,25 +79,25 @@ export default async function BrandCommunityPage({
         <PickedForYou memberId={member.id} brandSlug={slug} />
       )}
       <section
-        className="rounded-3xl border border-white/10 p-8"
+        className="rounded-lg border border-iron/10 p-8"
         style={{ backgroundImage: heroGradient }}
       >
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-white/60">Community</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-iron/60">Community</p>
             <h1
               className="mt-2 text-3xl font-semibold"
               style={{ fontFamily: "var(--font-display)" }}
             >
               {brand.name} community
             </h1>
-            <p className="mt-3 text-sm text-white/75">
+            <p className="mt-3 text-sm text-iron/75">
               Posts, polls, and challenges from the brand and its members.
             </p>
           </div>
           <Link
             href={`/brands/${slug}`}
-            className="rounded-full border border-white/20 px-4 py-2 text-xs text-white/70 hover:bg-white/10"
+            className="rounded-full border border-iron/20 px-4 py-2 text-xs text-iron/70 hover:bg-iron/10"
           >
             ← Brand page
           </Link>
@@ -109,20 +109,20 @@ export default async function BrandCommunityPage({
       {isSignedIn ? (
         <NewPostForm brandSlug={slug} isAdmin={isAdmin} />
       ) : (
-        <section className="rounded-3xl border border-aurora/40 bg-gradient-to-r from-aurora/20 via-slate-900 to-ember/20 p-5">
+        <section className="rounded-lg border border-aurora/40 bg-gradient-to-r from-aurora/20 via-slate-900 to-ember/20 p-5">
           <p className="text-sm">
             Sign in to post in the {brand.name} community.
           </p>
           <div className="mt-3 flex gap-2">
             <Link
               href={`/login?next=${encodeURIComponent(`/brands/${slug}/community`)}`}
-              className="rounded-full border border-white/20 px-4 py-2 text-xs text-white/80 hover:bg-white/10"
+              className="rounded-full border border-iron/20 px-4 py-2 text-xs text-iron/80 hover:bg-iron/10"
             >
               Sign in
             </Link>
             <Link
               href={`/signup?ref=${encodeURIComponent(slug)}&next=${encodeURIComponent(`/brands/${slug}/community`)}`}
-              className="rounded-full bg-gradient-to-r from-aurora to-ember px-4 py-2 text-xs font-semibold text-white shadow-glass"
+              className="rounded-full bg-ember px-4 py-2 text-xs font-semibold text-linen shadow-glass"
             >
               Create account
             </Link>
@@ -133,7 +133,7 @@ export default async function BrandCommunityPage({
       {posts.length === 0 ? (
         <section className="glass-card p-8 text-center">
           <p className="text-sm font-semibold">Nothing posted yet</p>
-          <p className="mt-2 text-xs text-white/60">
+          <p className="mt-2 text-xs text-iron/60">
             {isSignedIn
               ? "Be the first to post and kick off the conversation."
               : "Be the first in when the community fills up — sign in to post."}

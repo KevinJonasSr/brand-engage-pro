@@ -35,7 +35,7 @@ export default async function ApplyPage({
   return (
     <main className="mx-auto max-w-3xl space-y-8 px-6 py-12">
       <header className="space-y-3">
-        <p className="text-xs uppercase tracking-[0.3em] text-white/60">
+        <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
           For Brands · Apply
         </p>
         <h1
@@ -44,7 +44,7 @@ export default async function ApplyPage({
         >
           Tell us about your brand
         </h1>
-        <p className="text-sm text-white/70">
+        <p className="text-sm text-iron/70">
           We review applications within 48 hours. Required fields are marked.
         </p>
       </header>

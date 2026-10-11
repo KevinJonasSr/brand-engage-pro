@@ -162,7 +162,7 @@ export default function VideoUploader({
             poster={posterUrl ?? undefined}
             preload="metadata"
             playsInline
-            className="mt-3 w-full max-w-xs rounded-2xl border border-white/10"
+            className="mt-3 w-full max-w-xs rounded-lg border border-iron/10"
           >
             <source src={videoUrl} />
           </video>
@@ -171,14 +171,14 @@ export default function VideoUploader({
               type="button"
               onClick={() => inputRef.current?.click()}
               disabled={uploading}
-              className="rounded-full border border-white/20 px-3 py-1 text-xs text-white/70 hover:bg-white/10 disabled:opacity-50"
+              className="rounded-full border border-iron/20 px-3 py-1 text-xs text-iron/70 hover:bg-iron/10 disabled:opacity-50"
             >
               {uploading ? "Uploading…" : "Replace"}
             </button>
             <button
               type="button"
               onClick={handleRemove}
-              className="rounded-full border border-white/20 px-3 py-1 text-xs text-rose-300/80 hover:text-rose-300"
+              className="rounded-full border border-iron/20 px-3 py-1 text-xs text-ember/80 hover:text-ember"
             >
               Remove
             </button>
@@ -189,7 +189,7 @@ export default function VideoUploader({
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
-          className="rounded-full border border-dashed border-white/20 bg-black/30 px-4 py-2 text-xs text-white/70 hover:bg-black/50 disabled:opacity-50"
+          className="rounded-full border border-dashed border-iron/20 bg-parchment/30 px-4 py-2 text-xs text-iron/70 hover:bg-parchment/50 disabled:opacity-50"
         >
           {uploading ? `Uploading… ${progress}%` : `🎬 ${label}`}
         </button>
@@ -197,17 +197,17 @@ export default function VideoUploader({
 
       {uploading && progress > 0 && (
         <div className="space-y-1">
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-iron/10">
             <div
-              className="h-full bg-gradient-to-r from-aurora to-ember transition-all"
+              className="h-full bg-ember transition-all"
               style={{ width: `${progress}%` }}
             />
           </div>
-          <p className="text-xs text-white/60">{progress}%</p>
+          <p className="text-xs text-iron/60">{progress}%</p>
         </div>
       )}
 
-      {error && <p className="text-xs text-rose-300">{error}</p>}
+      {error && <p className="text-xs text-ember">{error}</p>}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { IBM_Plex_Mono, Inter, Young_Serif } from "next/font/google";
 import "./globals.css";
 import CookieBanner from "@/components/cookie-banner";
 import Footer from "@/components/footer";
@@ -21,10 +21,15 @@ import { getAdminContext } from "@/lib/admin";
 import { resolveAppUrl } from "@/lib/site-url";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-body" });
-const spaceGrotesk = Space_Grotesk({
+const youngSerif = Young_Serif({
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
+  weight: "400",
   variable: "--font-display",
+});
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-mono",
 });
 
 const appUrl = resolveAppUrl();
@@ -64,7 +69,7 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
     title: "Brand Engage Pro",
   },
   robots: {
@@ -75,7 +80,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#D4A017",
+  themeColor: "#F5EFE4",
 };
 
 const navItems = [
@@ -157,10 +162,10 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${spaceGrotesk.variable} h-full antialiased`}
+      className={`${inter.variable} ${youngSerif.variable} ${plexMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-midnight text-white">
-        <header className="sticky top-0 z-40 border-b border-white/10 bg-midnight/80 backdrop-blur">
+      <body className="min-h-full bg-linen text-iron">
+        <header className="sticky top-0 z-40 border-b border-iron/10 bg-linen/80 backdrop-blur">
           <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:gap-4 sm:px-6">
             <div className="flex min-w-0 items-center gap-3">
               <Link href="/" className="flex shrink-0 items-center gap-2">
@@ -179,17 +184,17 @@ export default async function RootLayout({
                   className="whitespace-nowrap text-base font-semibold tracking-tight sm:text-lg"
                   style={{ fontFamily: "var(--font-display)" }}
                 >
-                  Brand Engage<span className="text-aurora"> Pro</span>
+                  Brand Engage<span className="text-aurora-ink"> Pro</span>
                 </span>
               </Link>
               <MobileNav navItems={navItems} />
             </div>
-            <nav className="hidden items-center gap-1 text-sm text-white/70 md:flex">
+            <nav className="hidden items-center gap-1 text-sm text-iron/70 md:flex">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="rounded-full px-3 py-1.5 transition hover:bg-white/10 hover:text-white"
+                  className="rounded-full px-3 py-1.5 transition hover:bg-iron/10 hover:text-iron"
                 >
                   {item.label}
                 </Link>
@@ -211,11 +216,11 @@ export default async function RootLayout({
                   title={
                     unread > 0 ? `${unread} unread notification${unread === 1 ? "" : "s"}` : "Inbox"
                   }
-                  className="relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/30 text-white/80 hover:bg-white/10"
+                  className="relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-iron/15 bg-parchment/30 text-iron/80 hover:bg-iron/10"
                 >
                   <span aria-hidden>🔔</span>
                   {unread > 0 && (
-                    <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-gradient-to-r from-aurora to-ember px-1 text-xs font-semibold text-white shadow">
+                    <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-ember px-1 text-xs font-semibold text-linen shadow">
                       {unread > 9 ? "9+" : unread}
                     </span>
                   )}
@@ -226,13 +231,13 @@ export default async function RootLayout({
               <div className="flex items-center gap-2">
                 <Link
                   href="/login"
-                  className="hidden rounded-full border border-white/20 px-4 py-2 text-sm font-medium text-white/80 hover:bg-white/10 sm:inline-flex"
+                  className="hidden rounded-full border border-iron/20 px-4 py-2 text-sm font-medium text-iron/80 hover:bg-iron/10 sm:inline-flex"
                 >
                   Sign in
                 </Link>
                 <Link
                   href="/signup?next=/onboarding"
-                  className="rounded-full bg-gradient-to-r from-aurora to-ember px-4 py-2 text-sm font-semibold text-white shadow-glass transition hover:brightness-110"
+                  className="rounded-full bg-ember px-4 py-2 text-sm font-semibold text-linen shadow-glass transition hover:brightness-110"
                 >
                   Join
                 </Link>

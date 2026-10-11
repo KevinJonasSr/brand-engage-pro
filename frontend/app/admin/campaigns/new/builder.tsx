@@ -148,11 +148,11 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
         <p className="text-sm font-semibold">Campaign basics</p>
         <div className="grid gap-3 md:grid-cols-2">
           <label className="block">
-            <span className="text-xs uppercase tracking-wide text-white/60">Brand</span>
+            <span className="text-xs uppercase tracking-wide text-iron/60">Brand</span>
             <select
               value={brandSlug}
               onChange={(e) => setBrandSlug(e.target.value)}
-              className="mt-1 w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+              className="mt-1 w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
             >
               {brands.map((a) => (
                 <option key={a.slug} value={a.slug}>
@@ -162,26 +162,26 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
             </select>
           </label>
           <label className="block">
-            <span className="text-xs uppercase tracking-wide text-white/60">Campaign title</span>
+            <span className="text-xs uppercase tracking-wide text-iron/60">Campaign title</span>
             <input
               name="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
               placeholder="e.g. Spring Launch Week"
-              className="mt-1 w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+              className="mt-1 w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
             />
           </label>
         </div>
         <label className="block">
-          <span className="text-xs uppercase tracking-wide text-white/60">Internal description</span>
+          <span className="text-xs uppercase tracking-wide text-iron/60">Internal description</span>
           <textarea
             name="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
             placeholder="For your own tracking — not shown to members."
-            className="mt-1 w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+            className="mt-1 w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
           />
         </label>
       </section>
@@ -197,7 +197,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
           value={announcementTitle}
           onChange={(e) => setAnnouncementTitle(e.target.value)}
           placeholder="Headline (defaults to campaign title)"
-          className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
         />
         <textarea
           name="announcement_body"
@@ -205,7 +205,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
           onChange={(e) => setAnnouncementBody(e.target.value)}
           rows={3}
           placeholder="Body copy — what's happening and why members should care."
-          className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
         />
       </Section>
 
@@ -215,10 +215,10 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
           value={pollQuestion}
           onChange={(e) => setPollQuestion(e.target.value)}
           placeholder="Question (e.g. Which track should be the first single?)"
-          className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
         />
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-wide text-white/50">Options</p>
+          <p className="text-xs uppercase tracking-wide text-iron/50">Options</p>
           {pollOptions.map((opt, i) => (
             <div key={i} className="flex items-center gap-2">
               <input
@@ -229,13 +229,13 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
                   setPollOptions(next);
                 }}
                 placeholder={`Option ${i + 1}`}
-                className="flex-1 rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+                className="flex-1 rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
               />
               {pollOptions.length > 2 && (
                 <button
                   type="button"
                   onClick={() => setPollOptions(pollOptions.filter((_, idx) => idx !== i))}
-                  className="text-xs text-rose-300/80 hover:text-rose-300"
+                  className="text-xs text-ember/80 hover:text-ember"
                 >
                   Remove
                 </button>
@@ -246,7 +246,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
             <button
               type="button"
               onClick={() => setPollOptions([...pollOptions, ""])}
-              className="text-xs text-white/60 hover:text-white"
+              className="text-xs text-iron/60 hover:text-iron"
             >
               + Add option
             </button>
@@ -265,7 +265,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
           value={challengeTitle}
           onChange={(e) => setChallengeTitle(e.target.value)}
           placeholder="Challenge title"
-          className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
         />
         <textarea
           name="challenge_body"
@@ -273,7 +273,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
           onChange={(e) => setChallengeBody(e.target.value)}
           rows={3}
           placeholder="What should members submit? How will winners be chosen?"
-          className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
         />
       </Section>
 
@@ -289,20 +289,20 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
             value={offerTitle}
             onChange={(e) => setOfferTitle(e.target.value)}
             placeholder="Offer title"
-            className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+            className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
           />
           <input
             name="offer_price_points"
             value={offerPricePoints}
             onChange={(e) => setOfferPricePoints(e.target.value)}
             placeholder="Price in points"
-            className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+            className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
           />
           <select
             name="offer_category"
             value={offerCategory}
             onChange={(e) => setOfferCategory(e.target.value)}
-            className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+            className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
           >
             <option value="merch">Merch</option>
             <option value="experience">Experience</option>
@@ -314,7 +314,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
             name="offer_min_tier"
             value={offerMinTier}
             onChange={(e) => setOfferMinTier(e.target.value)}
-            className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+            className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
           >
             <option value="bronze">Bronze+</option>
             <option value="silver">Silver+</option>
@@ -328,7 +328,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
           onChange={(e) => setOfferDescription(e.target.value)}
           rows={2}
           placeholder="Describe what members get."
-          className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
         />
       </Section>
 
@@ -342,7 +342,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
                 key={k}
                 type="button"
                 onClick={() => addCTA(k)}
-                className="rounded-full border border-white/15 bg-white/5 px-2 py-1 text-xs text-white/80 hover:bg-white/10"
+                className="rounded-full border border-iron/15 bg-iron/5 px-2 py-1 text-xs text-iron/80 hover:bg-iron/10"
               >
                 + {CTA_KIND_LABELS[k]}
               </button>
@@ -350,21 +350,21 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
           </div>
         </div>
         {ctas.length === 0 ? (
-          <p className="text-xs text-white/50">
+          <p className="text-xs text-iron/50">
             No CTAs yet. Add one or more to reward members for taking action.
           </p>
         ) : (
           <div className="space-y-3">
             {ctas.map((c, i) => (
-              <div key={i} className="rounded-2xl border border-white/10 bg-black/30 p-3">
+              <div key={i} className="rounded-lg border border-iron/10 bg-parchment/30 p-3">
                 <div className="mb-2 flex items-center justify-between">
-                  <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-xs uppercase tracking-wide text-purple-200">
+                  <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-xs uppercase tracking-wide text-purple-800">
                     {CTA_KIND_LABELS[c.kind]}
                   </span>
                   <button
                     type="button"
                     onClick={() => removeCTA(i)}
-                    className="text-xs text-rose-300/80 hover:text-rose-300"
+                    className="text-xs text-ember/80 hover:text-ember"
                   >
                     Remove
                   </button>
@@ -374,33 +374,33 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
                     value={c.title}
                     onChange={(e) => updateCTA(i, { title: e.target.value })}
                     placeholder="Title (e.g. Pre-save new single)"
-                    className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+                    className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
                   />
                   <input
                     value={c.url}
                     onChange={(e) => updateCTA(i, { url: e.target.value })}
                     placeholder="URL (Spotify, station link, share target…)"
-                    className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+                    className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
                   />
                   <input
                     value={c.cta_label}
                     onChange={(e) => updateCTA(i, { cta_label: e.target.value })}
                     placeholder="Button label"
-                    className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+                    className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
                   />
                   <input
                     type="number"
                     value={c.point_value}
                     onChange={(e) => updateCTA(i, { point_value: parseInt(e.target.value || "0", 10) })}
                     placeholder="Points on completion"
-                    className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+                    className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
                   />
                   <textarea
                     value={c.description}
                     onChange={(e) => updateCTA(i, { description: e.target.value })}
                     rows={2}
                     placeholder="Short description shown to members"
-                    className="md:col-span-2 rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+                    className="md:col-span-2 rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
                   />
                 </div>
               </div>
@@ -416,7 +416,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
           value={eventTitle}
           onChange={(e) => setEventTitle(e.target.value)}
           placeholder="Event title (e.g. Members-Only Preview Night)"
-          className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
         />
         <div className="grid gap-2 md:grid-cols-2">
           <input
@@ -425,21 +425,21 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
             value={eventStartsAt}
             onChange={(e) => setEventStartsAt(e.target.value)}
             placeholder="Start date/time"
-            className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+            className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
           />
           <input
             name="event_date_text"
             value={eventDateText}
             onChange={(e) => setEventDateText(e.target.value)}
             placeholder="Display date (e.g. Mar 14 · 7 PM)"
-            className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+            className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
           />
           <input
             name="event_location"
             value={eventLocation}
             onChange={(e) => setEventLocation(e.target.value)}
             placeholder="Location (e.g. Nashville, TN)"
-            className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+            className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
           />
           <input
             name="event_capacity"
@@ -447,7 +447,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
             value={eventCapacity}
             onChange={(e) => setEventCapacity(e.target.value)}
             placeholder="Capacity (blank = unlimited)"
-            className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+            className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
           />
         </div>
         <input
@@ -455,7 +455,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
           value={eventUrl}
           onChange={(e) => setEventUrl(e.target.value)}
           placeholder="URL (ticket link, livestream, etc.)"
-          className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
         />
         <textarea
           name="event_detail"
@@ -463,9 +463,9 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
           onChange={(e) => setEventDetail(e.target.value)}
           rows={2}
           placeholder="Detail shown on the event card"
-          className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
         />
-        <label className="flex items-center gap-2 text-xs text-white/70">
+        <label className="flex items-center gap-2 text-xs text-iron/70">
           <input
             type="checkbox"
             name="target_event_rsvpers"
@@ -485,7 +485,7 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
           value={emailSubject}
           onChange={(e) => setEmailSubject(e.target.value)}
           placeholder="Subject line"
-          className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
         />
         <textarea
           name="email_body"
@@ -493,9 +493,9 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
           onChange={(e) => setEmailBody(e.target.value)}
           rows={4}
           placeholder="Email body"
-          className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
         />
-        <p className="text-xs text-white/50">
+        <p className="text-xs text-iron/50">
           Goes to this brand&apos;s followers who said yes to email. Each email has its own unsubscribe link.
         </p>
       </Section>
@@ -509,9 +509,9 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
           rows={2}
           maxLength={160}
           placeholder="Short SMS (160 char max)"
-          className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
         />
-        <p className="text-xs text-white/50">
+        <p className="text-xs text-iron/50">
           Recorded as a campaign item; sends via Twilio to opted-in members.
         </p>
       </Section>
@@ -519,14 +519,14 @@ export default function CampaignBuilder({ brands }: { brands: Brand[] }) {
       <div className="flex items-center justify-end gap-3 py-4">
         <a
           href="/admin/campaigns"
-          className="text-sm text-white/60 hover:text-white"
+          className="text-sm text-iron/60 hover:text-iron"
         >
           Cancel
         </a>
         <button
           type="submit"
           disabled={submitting || !title.trim() || !brandSlug}
-          className="rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-2 text-sm font-semibold text-white shadow-glass hover:brightness-110 disabled:opacity-50"
+          className="rounded-full bg-ember px-6 py-2 text-sm font-semibold text-linen shadow-glass hover:brightness-110 disabled:opacity-50"
         >
           {submitting ? "Publishing…" : "Publish campaign"}
         </button>
@@ -550,7 +550,7 @@ function Section({
     <section className="glass-card p-5">
       <header className="flex items-center justify-between">
         <p className="text-sm font-semibold">{title}</p>
-        <label className="flex cursor-pointer items-center gap-2 text-xs text-white/70">
+        <label className="flex cursor-pointer items-center gap-2 text-xs text-iron/70">
           <input
             type="checkbox"
             checked={include}

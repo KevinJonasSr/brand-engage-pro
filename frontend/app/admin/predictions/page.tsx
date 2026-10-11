@@ -84,14 +84,14 @@ export default async function AdminPredictionsPage() {
           >
             Predictions
           </h1>
-          <p className="mt-1 text-sm text-white/65">
+          <p className="mt-1 text-sm text-iron/65">
             Member-engagement polls with a correct answer revealed later.
             Awaiting-resolution rows are closed and need your verdict.
           </p>
         </div>
         <Link
           href="/admin/predictions/new"
-          className="rounded-lg bg-aurora px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90"
+          className="rounded-lg bg-aurora px-4 py-2 text-sm font-medium text-iron shadow-sm hover:opacity-90"
         >
           + New prediction
         </Link>
@@ -174,12 +174,12 @@ function PredictionRow({ row, phase, href }: PredictionRowProps) {
       : null;
 
   return (
-    <li className="glass-card rounded-2xl p-4">
+    <li className="glass-card rounded-lg p-4">
       <Link href={href} className="block">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-base font-semibold text-white">{row.title}</p>
-            <p className="mt-1 text-xs text-white/55">
+            <p className="text-base font-semibold text-iron">{row.title}</p>
+            <p className="mt-1 text-xs text-iron/55">
               {row.brand_slug} · {row.prediction_type ?? "—"} ·{" "}
               {row.points_for_correct ?? 0} pts
               {row.visibility !== "public" ? ` · ${row.visibility}` : ""}
@@ -187,17 +187,17 @@ function PredictionRow({ row, phase, href }: PredictionRowProps) {
           </div>
           <div className="text-right text-xs">
             {phase === "open" && secsLeft !== null && (
-              <span className="rounded-full bg-emerald-500/15 px-2 py-1 text-emerald-300">
+              <span className="rounded-full bg-emerald-500/15 px-2 py-1 text-sage-ink">
                 Closes in {formatPredictionCountdown(secsLeft)}
               </span>
             )}
             {phase === "closed" && (
-              <span className="rounded-full bg-amber-500/15 px-2 py-1 text-amber-300">
+              <span className="rounded-full bg-amber-500/15 px-2 py-1 text-aurora-ink">
                 Resolve →
               </span>
             )}
             {phase === "resolved" && (
-              <span className="rounded-full bg-white/10 px-2 py-1 text-white/60">
+              <span className="rounded-full bg-iron/10 px-2 py-1 text-iron/60">
                 Resolved
               </span>
             )}
@@ -222,10 +222,10 @@ function Section({
       ? "bg-amber-300"
       : accent === "emerald"
         ? "bg-emerald-300"
-        : "bg-white/40";
+        : "bg-iron/40";
   return (
     <section>
-      <h2 className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-white/55">
+      <h2 className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-iron/55">
         <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
         {title}
       </h2>
@@ -236,7 +236,7 @@ function Section({
 
 function Empty({ msg }: { msg: string }) {
   return (
-    <p className="rounded-2xl border border-white/10 bg-white/3 p-4 text-sm text-white/55">
+    <p className="rounded-lg border border-iron/10 bg-iron/3 p-4 text-sm text-iron/55">
       {msg}
     </p>
   );

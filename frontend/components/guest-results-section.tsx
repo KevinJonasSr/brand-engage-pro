@@ -25,14 +25,14 @@ export default function GuestResultsSection({
 
   return (
     <section className="mx-auto max-w-6xl px-6 py-20">
-      <p className="text-xs uppercase tracking-widest text-white/50">Results</p>
+      <p className="text-xs uppercase tracking-widest text-iron/50">Results</p>
       <h2
         className="mt-2 text-3xl font-semibold md:text-4xl"
         style={{ fontFamily: "var(--font-display)" }}
       >
         Guests keep coming back to Nellie&apos;s.
       </h2>
-      <p className="mt-4 max-w-xl text-white/70">
+      <p className="mt-4 max-w-xl text-iron/70">
         Real member check-ins at Nellie&apos;s Southern Kitchen. Team and test
         accounts are not counted.
       </p>
@@ -40,10 +40,10 @@ export default function GuestResultsSection({
         {stats.map((s) => (
           <div
             key={s.label}
-            className="rounded-2xl border border-white/10 bg-black/30 p-5"
+            className="rounded-lg border border-iron/10 bg-parchment/30 p-5"
           >
             <p className="text-3xl font-semibold">{s.value}</p>
-            <p className="mt-1 text-xs uppercase tracking-wide text-white/50">
+            <p className="mt-1 text-xs uppercase tracking-wide text-iron/50">
               {s.label}
             </p>
           </div>

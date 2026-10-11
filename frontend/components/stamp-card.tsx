@@ -23,15 +23,15 @@ export default function StampCard({
     <div className="glass-card p-6 space-y-4">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-sm uppercase tracking-wide text-white/60">Stamp Card</p>
+          <p className="text-sm uppercase tracking-wide text-iron/60">Stamp Card</p>
           <p className="mt-0.5 text-base font-semibold">{rewardTitle}</p>
           {rewardDescription && (
-            <p className="mt-0.5 text-xs text-white/55">{rewardDescription}</p>
+            <p className="mt-0.5 text-xs text-iron/55">{rewardDescription}</p>
           )}
         </div>
         {completedRounds > 0 && (
           <span
-            className="shrink-0 rounded-full px-3 py-1 text-xs font-semibold text-white"
+            className="shrink-0 rounded-full px-3 py-1 text-xs font-semibold text-iron"
             style={{ backgroundImage: `linear-gradient(90deg, ${accentFrom}, ${accentTo})` }}
           >
             {completedRounds}× earned
@@ -53,8 +53,8 @@ export default function StampCard({
               aria-hidden
               className={`flex aspect-square items-center justify-center rounded-xl border text-lg transition ${
                 filled
-                  ? "border-transparent text-white"
-                  : "border-white/15 bg-black/20 text-white/20"
+                  ? "border-transparent text-iron"
+                  : "border-iron/15 bg-parchment/20 text-iron/20"
               }`}
               style={
                 filled
@@ -69,20 +69,20 @@ export default function StampCard({
       </div>
 
       {justCompleted ? (
-        <p className="rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm font-medium text-emerald-300 text-center">
+        <p className="rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm font-medium text-sage-ink text-center">
           🎉 Reward ready — show this to your server!
         </p>
       ) : (
-        <p className="text-xs text-white/50 text-center">
+        <p className="text-xs text-iron/50 text-center">
           {stampsRequired - stampsInCurrentRound} more{" "}
           {stampsRequired - stampsInCurrentRound === 1 ? "visit" : "visits"} to earn{" "}
-          <span className="text-white/70">{rewardTitle}</span>
+          <span className="text-iron/70">{rewardTitle}</span>
         </p>
       )}
 
       {/* Check-in needs the signed token in the store QR code, so there is
           no link here. A plain link would fail once the secret is set. */}
-      <p className="w-full rounded-full border border-white/20 py-2 text-center text-sm font-medium text-white/80">
+      <p className="w-full rounded-full border border-iron/20 py-2 text-center text-sm font-medium text-iron/80">
         Scan the QR code at the counter to check in
       </p>
     </div>

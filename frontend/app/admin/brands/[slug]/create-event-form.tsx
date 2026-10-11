@@ -41,58 +41,58 @@ export default function CreateEventForm({ slug }: { slug: string }) {
         name="title"
         required
         placeholder="Event title"
-        className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+        className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
       />
       <input
         name="starts_at"
         type="datetime-local"
         placeholder="Start date/time"
-        className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+        className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
       />
       <input
         name="event_date"
         placeholder="Display date (Mar 14 · 7 PM)"
-        className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+        className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
       />
       <input
         name="location"
         placeholder="Location (Nashville, TN)"
-        className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+        className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
       />
       <input
         name="detail"
         placeholder="Detail (Brand Engage Pro members only)"
-        className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+        className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
       />
       <input
         name="url"
         placeholder="URL (ticket link / livestream)"
-        className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+        className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
       />
       <input
         name="capacity"
         type="number"
         placeholder="Capacity (blank = unlimited)"
-        className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+        className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
       />
       <input
         name="sort_order"
         type="number"
         defaultValue="0"
         placeholder="Sort order"
-        className="rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+        className="rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
       />
       <div className="flex flex-wrap items-center gap-3 md:col-span-2">
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-full bg-gradient-to-r from-aurora to-ember px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          className="rounded-full bg-ember px-4 py-2 text-sm font-semibold text-linen disabled:opacity-50"
         >
           {submitting ? "Adding…" : "+ Add event"}
         </button>
         <SaveStatusIndicator status={status} />
         {businessError && (
-          <span className="text-xs text-rose-300" title={businessError}>
+          <span className="text-xs text-ember" title={businessError}>
             ✗ {businessError}
           </span>
         )}

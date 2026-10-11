@@ -18,8 +18,8 @@ export default function PollBlock({
   const hasVoted = poll.my_option_id !== null;
 
   return (
-    <div className="space-y-2 rounded-2xl border border-white/10 bg-black/30 p-4">
-      <p className="text-xs uppercase tracking-wide text-white/50">
+    <div className="space-y-2 rounded-lg border border-iron/10 bg-parchment/30 p-4">
+      <p className="text-xs uppercase tracking-wide text-iron/50">
         📊 Poll · {total} {total === 1 ? "vote" : "votes"}
         {hasVoted && " · you voted"}
       </p>
@@ -41,12 +41,12 @@ export default function PollBlock({
                 disabled={!currentUserId}
                 className={`relative w-full overflow-hidden rounded-xl border px-3 py-2 text-left text-sm transition ${
                   mine
-                    ? "border-aurora/60 bg-aurora/20 text-white"
-                    : "border-white/10 bg-black/40 text-white/80 hover:bg-black/60"
+                    ? "border-aurora/60 bg-aurora/20 text-iron"
+                    : "border-iron/10 bg-parchment/40 text-iron/80 hover:bg-parchment/60"
                 } disabled:cursor-not-allowed disabled:opacity-60`}
               >
                 <span
-                  className="absolute inset-y-0 left-0 bg-white/10"
+                  className="absolute inset-y-0 left-0 bg-iron/10"
                   style={{ width: `${pct}%` }}
                   aria-hidden
                 />
@@ -55,7 +55,7 @@ export default function PollBlock({
                     {mine && "✓ "}
                     {o.label}
                   </span>
-                  <span className="text-xs text-white/70">
+                  <span className="text-xs text-iron/70">
                     {o.vote_count} · {pct}%
                   </span>
                 </span>
@@ -65,15 +65,15 @@ export default function PollBlock({
         })}
       </div>
       {!currentUserId && (
-        <p className="text-xs text-white/50">Sign in to vote (+1 pt).</p>
+        <p className="text-xs text-iron/50">Sign in to vote (+1 pt).</p>
       )}
       {currentUserId && !hasVoted && (
-        <p className="text-xs text-white/50">
+        <p className="text-xs text-iron/50">
           Tap an option to cast your vote (+1 pt).
         </p>
       )}
       {currentUserId && hasVoted && (
-        <p className="text-xs text-white/50">
+        <p className="text-xs text-iron/50">
           Tap a different option to change your vote.
         </p>
       )}

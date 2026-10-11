@@ -27,19 +27,19 @@ export default async function AdminRedemptionsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Redemption Queue</h1>
-        <div className="rounded-full bg-yellow-500/20 px-3 py-1 text-xs font-semibold text-yellow-300">
+        <div className="rounded-full bg-yellow-500/20 px-3 py-1 text-xs font-semibold text-aurora-ink">
           {pending.length} pending
         </div>
       </div>
 
       {pending.length > 0 ? (
-        <div className="glass-card divide-y divide-white/5 rounded-2xl overflow-hidden">
+        <div className="glass-card divide-y divide-iron/5 rounded-lg overflow-hidden">
           {pending.map((redemption) => {
             const member = memberMap.get(redemption.member_id);
             return (
               <div
                 key={redemption.id}
-                className="flex items-center justify-between gap-4 p-4 hover:bg-black/20"
+                className="flex items-center justify-between gap-4 p-4 hover:bg-parchment/20"
               >
                 <div className="flex items-center gap-3 flex-1">
                   {member?.avatar_url && (
@@ -57,9 +57,9 @@ export default async function AdminRedemptionsPage() {
                       {member?.first_name || "Member"} · {redemption.reward.title}
                     </p>
                     {redemption.delivery_details && (
-                      <p className="mt-1 text-xs text-white/60">{redemption.delivery_details}</p>
+                      <p className="mt-1 text-xs text-iron/60">{redemption.delivery_details}</p>
                     )}
-                    <p className="mt-1 text-xs text-white/40">
+                    <p className="mt-1 text-xs text-iron/40">
                       {new Date(redemption.created_at).toLocaleDateString()}
                     </p>
                   </div>
@@ -71,8 +71,8 @@ export default async function AdminRedemptionsPage() {
           })}
         </div>
       ) : (
-        <div className="glass-card rounded-2xl p-8 text-center">
-          <p className="text-white/60">No pending redemptions. You&apos;re all caught up!</p>
+        <div className="glass-card rounded-lg p-8 text-center">
+          <p className="text-iron/60">No pending redemptions. You&apos;re all caught up!</p>
         </div>
       )}
     </div>

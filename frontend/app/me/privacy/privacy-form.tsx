@@ -40,7 +40,7 @@ export default function PrivacyForm({
                 href={profileUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="underline underline-offset-2 hover:text-white"
+                className="underline underline-offset-2 hover:text-iron"
               >
                 {profileUrl}
               </a>
@@ -57,15 +57,15 @@ export default function PrivacyForm({
       />
 
       {savedAt && !pending && (
-        <p className="text-xs text-emerald-300/80">Saved.</p>
+        <p className="text-xs text-sage-ink/80">Saved.</p>
       )}
 
-      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4 text-xs text-white/60">
-        <p className="font-semibold text-white/80">What's never shown publicly</p>
+      <div className="rounded-lg border border-iron/10 bg-iron/[0.02] p-4 text-xs text-iron/60">
+        <p className="font-semibold text-iron/80">What's never shown publicly</p>
         <p className="mt-2">
           Your email, phone number, mailing address, last login, payment
           details, and any moderation flags are{" "}
-          <span className="text-white/80">never</span> displayed on your public
+          <span className="text-iron/80">never</span> displayed on your public
           profile or anywhere else other members can see — regardless of the
           toggle above. Only your first name, avatar, tier, badges, and the
           communities you follow appear publicly.
@@ -89,7 +89,7 @@ function Toggle({
   disabled?: boolean;
 }) {
   return (
-    <label className="flex items-start gap-4 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+    <label className="flex items-start gap-4 rounded-lg border border-iron/10 bg-iron/[0.02] p-4">
       <input
         type="checkbox"
         checked={checked}
@@ -99,7 +99,7 @@ function Toggle({
       />
       <div className="flex-1">
         <div className="font-medium">{label}</div>
-        <div className="mt-1 text-sm text-white/60">{description}</div>
+        <div className="mt-1 text-sm text-iron/60">{description}</div>
       </div>
     </label>
   );

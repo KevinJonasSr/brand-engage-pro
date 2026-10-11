@@ -202,17 +202,17 @@ export function SaveStatusIndicator({
   if (status.kind === "idle") return null;
   if (status.kind === "saving") {
     return (
-      <span className={`${className} text-white/60`}>
+      <span className={`${className} text-iron/60`}>
         Saving{status.attempt > 1 ? ` — retrying (${status.attempt})` : "…"}
       </span>
     );
   }
   if (status.kind === "saved") {
-    return <span className={`${className} text-emerald-300`}>✓ Saved</span>;
+    return <span className={`${className} text-sage-ink`}>✓ Saved</span>;
   }
   return (
     <span
-      className={`${className} text-rose-300`}
+      className={`${className} text-ember`}
       title={status.message}
     >
       ✗ {status.message}

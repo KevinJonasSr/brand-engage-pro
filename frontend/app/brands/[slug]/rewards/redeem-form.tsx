@@ -64,8 +64,8 @@ export function RedeemForm({
   const shareText = `Cashed in ${pointCost.toLocaleString()} points for ${rewardTitle} from ${brandName}'s member club. ${brandUrl}`;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="glass-card w-full max-w-md rounded-2xl p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-parchment/50 p-4">
+      <div className="glass-card w-full max-w-md rounded-lg p-6">
         {redeemed ? (
           // ─── Success state ──────────────────────────────────────────
           // Big "you got it" moment with a share CTA. The notification
@@ -77,8 +77,8 @@ export function RedeemForm({
               🎉
             </div>
             <h2 className="text-xl font-semibold">Redeemed!</h2>
-            <p className="mt-1 text-sm text-white/70">{rewardTitle}</p>
-            <p className="mt-1 text-xs text-white/50">
+            <p className="mt-1 text-sm text-iron/70">{rewardTitle}</p>
+            <p className="mt-1 text-xs text-iron/50">
               {pointCost.toLocaleString()} points spent. Show this redemption to
               your server or host — pickup tonight, not shipping.
             </p>
@@ -94,7 +94,7 @@ export function RedeemForm({
               {memberSlug && (
                 <a
                   href={`/members/${memberSlug}`}
-                  className="text-xs text-white/65 underline hover:text-white"
+                  className="text-xs text-iron/65 underline hover:text-iron"
                 >
                   View your updated profile →
                 </a>
@@ -105,7 +105,7 @@ export function RedeemForm({
                   setRedeemed(false);
                   onSuccess();
                 }}
-                className="text-xs text-white/60 hover:text-white"
+                className="text-xs text-iron/60 hover:text-iron"
               >
                 Done
               </button>
@@ -115,26 +115,26 @@ export function RedeemForm({
           // ─── Original confirm-and-redeem form ───────────────────────
           <>
             <h2 className="text-lg font-semibold">{rewardTitle}</h2>
-            <p className="mt-1 text-sm text-white/60">
+            <p className="mt-1 text-sm text-iron/60">
               Cost: {pointCost.toLocaleString()} points
             </p>
 
             <form onSubmit={handleSubmit} className="mt-4 space-y-4">
               <div>
-                <label className="block text-xs font-medium uppercase tracking-wide text-white/80">
+                <label className="block text-xs font-medium uppercase tracking-wide text-iron/80">
                   Pickup note (optional)
                 </label>
                 <textarea
                   value={deliveryDetails}
                   onChange={(e) => setDeliveryDetails(e.target.value)}
                   placeholder="E.g., dining tonight, name on the reservation, pickup preference"
-                  className="mt-2 w-full rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-sm text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+                  className="mt-2 w-full rounded-lg border border-iron/10 bg-parchment/50 px-3 py-2 text-sm text-iron placeholder-iron/40 focus:border-iron/30 focus:outline-none"
                   rows={3}
                 />
               </div>
 
               {error && (
-                <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+                <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-ember">
                   {error}
                 </div>
               )}
@@ -144,14 +144,14 @@ export function RedeemForm({
                   type="button"
                   onClick={onClose}
                   disabled={loading}
-                  className="flex-1 rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-white/80 hover:bg-white/5 disabled:opacity-50"
+                  className="flex-1 rounded-lg border border-iron/10 px-4 py-2 text-sm font-medium text-iron/80 hover:bg-iron/5 disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 rounded-lg bg-gradient-to-r from-aurora to-ember px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
+                  className="flex-1 rounded-lg bg-ember px-4 py-2 text-sm font-medium text-linen hover:opacity-90 disabled:opacity-50"
                 >
                   {loading ? "Redeeming..." : "Confirm Redeem"}
                 </button>

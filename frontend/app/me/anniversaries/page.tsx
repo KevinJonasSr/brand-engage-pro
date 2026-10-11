@@ -87,26 +87,26 @@ export default async function AnniversariesPage() {
   return (
     <main className="mx-auto max-w-2xl px-4 py-10 sm:py-14">
       <nav className="mb-6 text-sm">
-        <Link href="/me" className="text-white/50 hover:text-white">
+        <Link href="/me" className="text-iron/50 hover:text-iron">
           ← Account
         </Link>
       </nav>
 
       <header className="mb-8">
-        <p className="text-xs uppercase tracking-widest text-white/60">
+        <p className="text-xs uppercase tracking-widest text-iron/60">
           Milestones
         </p>
         <h1 className="mt-1 text-3xl font-semibold tracking-tight">
           Your anniversaries
         </h1>
-        <p className="mt-3 text-white/70">
+        <p className="mt-3 text-iron/70">
           Every milestone with a community you follow.
         </p>
       </header>
 
       {entries.length === 0 ? (
-        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-8 text-center">
-          <p className="text-white/70">
+        <div className="rounded-lg border border-iron/10 bg-iron/[0.02] p-8 text-center">
+          <p className="text-iron/70">
             No milestones yet — keep showing up. Your first 1-month
             anniversary will appear here automatically.
           </p>
@@ -116,19 +116,19 @@ export default async function AnniversariesPage() {
           {entries.map((e) => (
             <li
               key={e.id}
-              className="flex items-start gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-4"
+              className="flex items-start gap-4 rounded-xl border border-iron/10 bg-iron/[0.02] p-4"
             >
               <span aria-hidden className="mt-0.5 text-2xl">
                 🎉
               </span>
               <div className="flex-1">
                 <div className="font-medium">{e.label}</div>
-                <p className="mt-0.5 text-sm text-white/60">
+                <p className="mt-0.5 text-sm text-iron/60">
                   {absoluteDate(e.celebrated_at)}
                   {e.points_awarded > 0 && (
                     <>
                       {" · "}
-                      <span className="text-emerald-300">
+                      <span className="text-sage-ink">
                         +{e.points_awarded.toLocaleString()} pts
                       </span>
                     </>

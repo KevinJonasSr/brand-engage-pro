@@ -79,25 +79,25 @@ export default function CaptionSuggester({
   }
 
   return (
-    <div className="space-y-2 rounded-2xl border border-white/10 bg-black/30 p-3">
+    <div className="space-y-2 rounded-lg border border-iron/10 bg-parchment/30 p-3">
       {!captions && (
         <button
           type="button"
           onClick={handleSuggest}
           disabled={loading}
-          className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs text-white hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 rounded-full border border-iron/15 bg-iron/10 px-3 py-1.5 text-xs text-iron hover:bg-iron/15 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? "Generating…" : "✨ Suggest captions"}
         </button>
       )}
 
       {error && (
-        <p className="text-xs text-rose-300/80">{error}</p>
+        <p className="text-xs text-ember/80">{error}</p>
       )}
 
       {captions && (
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-wide text-white/50">
+          <p className="text-xs uppercase tracking-wide text-iron/50">
             Pick one (it'll fill in your post body):
           </p>
           <div className="flex flex-col gap-1.5">
@@ -106,7 +106,7 @@ export default function CaptionSuggester({
                 key={i}
                 type="button"
                 onClick={() => handlePick(c)}
-                className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-left text-xs text-white/90 transition hover:border-white/30 hover:bg-black/60"
+                className="rounded-xl border border-iron/10 bg-parchment/40 px-3 py-2 text-left text-xs text-iron/90 transition hover:border-iron/30 hover:bg-parchment/60"
               >
                 {c}
               </button>
@@ -116,7 +116,7 @@ export default function CaptionSuggester({
             type="button"
             onClick={handleSuggest}
             disabled={loading}
-            className="text-xs text-white/50 hover:text-white"
+            className="text-xs text-iron/50 hover:text-iron"
           >
             {loading ? "Regenerating…" : "↻ Regenerate"}
           </button>

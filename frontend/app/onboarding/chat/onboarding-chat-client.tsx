@@ -83,10 +83,10 @@ export default function OnboardingChatClient({
             className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm whitespace-pre-wrap ${
+              className={`max-w-[80%] rounded-lg px-4 py-2 text-sm whitespace-pre-wrap ${
                 m.role === "user"
-                  ? "bg-aurora/30 text-white"
-                  : "bg-white/10 text-white/90"
+                  ? "bg-aurora/30 text-iron"
+                  : "bg-iron/10 text-iron/90"
               }`}
             >
               {m.content}
@@ -95,7 +95,7 @@ export default function OnboardingChatClient({
         ))}
         {busy && !done && (
           <div className="flex justify-start">
-            <div className="rounded-2xl bg-white/10 px-4 py-2 text-sm text-white/60">
+            <div className="rounded-lg bg-iron/10 px-4 py-2 text-sm text-iron/60">
               <span className="inline-block animate-pulse">…</span>
             </div>
           </div>
@@ -112,13 +112,13 @@ export default function OnboardingChatClient({
             disabled={busy}
             rows={2}
             maxLength={2000}
-            className="flex-1 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm placeholder-white/40 outline-none focus:border-aurora/40 disabled:opacity-50"
+            className="flex-1 rounded-lg border border-iron/10 bg-parchment/40 px-4 py-3 text-sm placeholder-iron/40 outline-none focus:border-aurora/40 disabled:opacity-50"
           />
           <button
             type="button"
             onClick={handleSend}
             disabled={busy || !input.trim()}
-            className="rounded-full bg-gradient-to-r from-aurora to-ember px-5 py-3 text-sm font-semibold text-white shadow-glass transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-full bg-ember px-5 py-3 text-sm font-semibold text-linen shadow-glass transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Send
           </button>
@@ -128,7 +128,7 @@ export default function OnboardingChatClient({
           type="button"
           onClick={handleFinish}
           disabled={busy || isPending}
-          className="rounded-full bg-gradient-to-r from-aurora to-ember px-5 py-3 text-sm font-semibold text-white shadow-glass transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-full bg-ember px-5 py-3 text-sm font-semibold text-linen shadow-glass transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isPending ? "Saving…" : "Save & continue"}
         </button>
@@ -136,7 +136,7 @@ export default function OnboardingChatClient({
 
       <Link
         href="/"
-        className="text-center text-xs text-white/50 hover:text-white/80"
+        className="text-center text-xs text-iron/50 hover:text-iron/80"
       >
         Skip for now
       </Link>

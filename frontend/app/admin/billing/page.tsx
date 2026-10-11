@@ -94,8 +94,8 @@ export default async function BillingPage({
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-bold text-white">Billing</h1>
-        <p className="mt-1 text-sm text-white/60">
+        <h1 className="text-2xl font-bold text-iron">Billing</h1>
+        <p className="mt-1 text-sm text-iron/60">
           ${BRAND_MONTHLY_PRICE_USD} per business per month after a {BRAND_TRIAL_DAYS}-day
           free trial. The first {BRAND_FREE_SLOT_LIMIT} businesses are free. Your
           guests never pay and are never affected by billing.
@@ -103,56 +103,56 @@ export default async function BillingPage({
       </header>
 
       {notice && (
-        <div className="rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white/80">
+        <div className="rounded-xl border border-iron/15 bg-iron/5 px-4 py-3 text-sm text-iron/80">
           {notice}
         </div>
       )}
       {granted && (
-        <div className="rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
+        <div className="rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm text-sage-ink">
           Free slot {granted} granted.
         </div>
       )}
       {banner && <BillingBannerNotice banner={banner} />}
 
       {!load.ok ? (
-        <section className="rounded-2xl border border-white/10 bg-black/40 p-6 text-sm text-white/70">
+        <section className="rounded-lg border border-iron/10 bg-parchment/40 p-6 text-sm text-iron/70">
           Billing is not set up for this site yet. Nothing is locked and nothing
           is charged.
         </section>
       ) : (
-        <section className="rounded-2xl border border-white/10 bg-black/40 p-6">
+        <section className="rounded-lg border border-iron/10 bg-parchment/40 p-6">
           <dl className="grid gap-4 text-sm sm:grid-cols-2">
             <div>
-              <dt className="text-white/50">Plan</dt>
-              <dd className="text-white">
+              <dt className="text-iron/50">Plan</dt>
+              <dd className="text-iron">
                 {isFree
                   ? `Free (slot ${row?.free_slot} of ${BRAND_FREE_SLOT_LIMIT})`
                   : `$${BRAND_MONTHLY_PRICE_USD} per month`}
               </dd>
             </div>
             <div>
-              <dt className="text-white/50">Status</dt>
-              <dd className="text-white">
+              <dt className="text-iron/50">Status</dt>
+              <dd className="text-iron">
                 {row ? STATUS_LABELS[row.status] : "Not started"}
                 {row?.cancel_at_period_end ? " (ends at period end)" : ""}
               </dd>
             </div>
             {row?.trial_ends_at && (
               <div>
-                <dt className="text-white/50">Trial ends</dt>
-                <dd className="text-white">{formatDate(row.trial_ends_at)}</dd>
+                <dt className="text-iron/50">Trial ends</dt>
+                <dd className="text-iron">{formatDate(row.trial_ends_at)}</dd>
               </div>
             )}
             {row?.current_period_end && !isFree && (
               <div>
-                <dt className="text-white/50">Current period ends</dt>
-                <dd className="text-white">{formatDate(row.current_period_end)}</dd>
+                <dt className="text-iron/50">Current period ends</dt>
+                <dd className="text-iron">{formatDate(row.current_period_end)}</dd>
               </div>
             )}
             {graceLeft !== null && (
               <div>
-                <dt className="text-white/50">Days left to fix payment</dt>
-                <dd className="text-white">{graceLeft}</dd>
+                <dt className="text-iron/50">Days left to fix payment</dt>
+                <dd className="text-iron">{graceLeft}</dd>
               </div>
             )}
           </dl>
@@ -164,7 +164,7 @@ export default async function BillingPage({
                   <button
                     type="submit"
                     disabled={!stripeReady}
-                    className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-black hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-iron hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     {row?.trial_used ? "Start plan" : `Start ${BRAND_TRIAL_DAYS}-day free trial`}
                   </button>
@@ -175,7 +175,7 @@ export default async function BillingPage({
                   <button
                     type="submit"
                     disabled={!stripeReady}
-                    className="rounded-lg border border-white/20 px-4 py-2 text-sm text-white hover:border-white/40 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="rounded-lg border border-iron/20 px-4 py-2 text-sm text-iron hover:border-iron/40 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     Manage card and invoices
                   </button>
@@ -184,24 +184,24 @@ export default async function BillingPage({
             </div>
           )}
           {canManage && !isFree && !stripeReady && (
-            <p className="mt-3 text-xs text-white/50">
+            <p className="mt-3 text-xs text-iron/50">
               Billing is not switched on yet. The team is setting up Stripe.
             </p>
           )}
           {!canManage && (
-            <p className="mt-6 text-xs text-white/50">
+            <p className="mt-6 text-xs text-iron/50">
               Only owners and admins can change billing.
             </p>
           )}
 
           {ctx.isSuperAdmin && !isFree && !isLive && (
-            <form action={grantFreeSlotAction} className="mt-6 border-t border-white/10 pt-4">
-              <p className="mb-2 text-xs text-white/50">
+            <form action={grantFreeSlotAction} className="mt-6 border-t border-iron/10 pt-4">
+              <p className="mb-2 text-xs text-iron/50">
                 Super admin: move this business into one of the {BRAND_FREE_SLOT_LIMIT} free slots.
               </p>
               <button
                 type="submit"
-                className="rounded-lg border border-emerald-400/40 px-4 py-2 text-sm text-emerald-200 hover:border-emerald-300"
+                className="rounded-lg border border-emerald-400/40 px-4 py-2 text-sm text-sage-ink hover:border-emerald-300"
               >
                 Grant free slot
               </button>

@@ -121,12 +121,12 @@ function timeAgo(iso: string): string {
 function KindChip({ kind }: { kind: string }) {
   const tone =
     kind === "announcement"
-      ? "bg-sky-500/20 text-sky-200"
+      ? "bg-sky-500/20 text-sky-800"
       : kind === "poll"
-        ? "bg-fuchsia-500/20 text-fuchsia-200"
+        ? "bg-fuchsia-500/20 text-fuchsia-800"
         : kind === "challenge"
-          ? "bg-amber-500/20 text-amber-200"
-          : "bg-white/10 text-white/70";
+          ? "bg-amber-500/20 text-aurora-ink"
+          : "bg-iron/10 text-iron/70";
   return (
     <span className={`rounded-full px-2 py-0.5 text-xs uppercase tracking-wide ${tone}`}>
       {kind}
@@ -148,23 +148,23 @@ export default async function AdminCommunityPage() {
         >
           Community moderation
         </h1>
-        <p className="mt-2 text-sm text-white/60">
+        <p className="mt-2 text-sm text-iron/60">
           Cross-brand feed — pin, delete, and jump to the member who authored a post.
         </p>
       </div>
 
       {/* Posts */}
-      <section className="rounded-2xl border border-white/10 bg-black/20 p-4">
+      <section className="rounded-lg border border-iron/10 bg-parchment/20 p-4">
         <header className="mb-3 flex items-center justify-between">
           <p className="text-sm font-semibold">Posts · {posts.length}</p>
         </header>
-        <div className="divide-y divide-white/5">
+        <div className="divide-y divide-iron/5">
           {posts.length === 0 && (
-            <p className="py-6 text-center text-xs text-white/50">No posts yet.</p>
+            <p className="py-6 text-center text-xs text-iron/50">No posts yet.</p>
           )}
           {posts.map((p) => (
             <div key={p.id} className="flex items-start gap-3 py-3">
-              <div className="w-20 shrink-0 text-xs text-white/50">
+              <div className="w-20 shrink-0 text-xs text-iron/50">
                 {timeAgo(p.created_at)}
               </div>
               <div className="min-w-0 flex-1 space-y-1">
@@ -172,24 +172,24 @@ export default async function AdminCommunityPage() {
                   <KindChip kind={p.kind} />
                   <Link
                     href={`/brands/${p.brand_slug}/community`}
-                    className="rounded-full bg-white/5 px-2 py-0.5 text-white/70 hover:bg-white/10"
+                    className="rounded-full bg-iron/5 px-2 py-0.5 text-iron/70 hover:bg-iron/10"
                   >
                     /{p.brand_slug}
                   </Link>
                   {p.pinned && (
-                    <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-amber-200">
+                    <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-aurora-ink">
                       Pinned
                     </span>
                   )}
                   <Link
                     href={`/admin/members/${p.author_id}`}
-                    className="text-white/70 hover:text-white"
+                    className="text-iron/70 hover:text-iron"
                   >
                     {p.author_first_name ?? "Anonymous"}
                   </Link>
                 </div>
                 {p.title && <p className="text-sm font-semibold">{p.title}</p>}
-                <p className="line-clamp-3 text-sm text-white/80">{p.body}</p>
+                <p className="line-clamp-3 text-sm text-iron/80">{p.body}</p>
               </div>
               <div className="flex shrink-0 flex-col items-end gap-1">
                 <ModerationButton
@@ -214,30 +214,30 @@ export default async function AdminCommunityPage() {
       </section>
 
       {/* Comments */}
-      <section className="rounded-2xl border border-white/10 bg-black/20 p-4">
+      <section className="rounded-lg border border-iron/10 bg-parchment/20 p-4">
         <header className="mb-3">
           <p className="text-sm font-semibold">Recent comments · {comments.length}</p>
         </header>
-        <div className="divide-y divide-white/5">
+        <div className="divide-y divide-iron/5">
           {comments.length === 0 && (
-            <p className="py-6 text-center text-xs text-white/50">No comments yet.</p>
+            <p className="py-6 text-center text-xs text-iron/50">No comments yet.</p>
           )}
           {comments.map((c) => (
             <div key={c.id} className="flex items-start gap-3 py-3">
-              <div className="w-20 shrink-0 text-xs text-white/50">
+              <div className="w-20 shrink-0 text-xs text-iron/50">
                 {timeAgo(c.created_at)}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-xs">
                   <Link
                     href={`/admin/members/${c.author_id}`}
-                    className="font-semibold text-white/70 hover:text-white"
+                    className="font-semibold text-iron/70 hover:text-iron"
                   >
                     {c.author_first_name ?? "Anonymous"}
                   </Link>
-                  <span className="text-white/40"> on post {c.post_id.slice(0, 8)}…</span>
+                  <span className="text-iron/40"> on post {c.post_id.slice(0, 8)}…</span>
                 </p>
-                <p className="mt-1 line-clamp-2 text-sm text-white/80">{c.body}</p>
+                <p className="mt-1 line-clamp-2 text-sm text-iron/80">{c.body}</p>
               </div>
               <ModerationButton
                 action={adminDeleteCommentAction}
@@ -252,17 +252,17 @@ export default async function AdminCommunityPage() {
       </section>
 
       {/* Challenge entries */}
-      <section className="rounded-2xl border border-white/10 bg-black/20 p-4">
+      <section className="rounded-lg border border-iron/10 bg-parchment/20 p-4">
         <header className="mb-3">
           <p className="text-sm font-semibold">Challenge entries · {entries.length}</p>
         </header>
-        <div className="divide-y divide-white/5">
+        <div className="divide-y divide-iron/5">
           {entries.length === 0 && (
-            <p className="py-6 text-center text-xs text-white/50">No entries yet.</p>
+            <p className="py-6 text-center text-xs text-iron/50">No entries yet.</p>
           )}
           {entries.map((e) => (
             <div key={e.id} className="flex items-start gap-3 py-3">
-              <div className="w-20 shrink-0 text-xs text-white/50">
+              <div className="w-20 shrink-0 text-xs text-iron/50">
                 {timeAgo(e.created_at)}
               </div>
               {e.image_url && (
@@ -277,15 +277,15 @@ export default async function AdminCommunityPage() {
                 <p className="text-xs">
                   <Link
                     href={`/admin/members/${e.member_id}`}
-                    className="font-semibold text-white/70 hover:text-white"
+                    className="font-semibold text-iron/70 hover:text-iron"
                   >
                     {e.member_first_name ?? "Anonymous"}
                   </Link>
-                  <span className="text-white/40">
+                  <span className="text-iron/40">
                     {" "}entry on challenge {e.post_id.slice(0, 8)}…
                   </span>
                 </p>
-                {e.body && <p className="mt-1 line-clamp-2 text-sm text-white/80">{e.body}</p>}
+                {e.body && <p className="mt-1 line-clamp-2 text-sm text-iron/80">{e.body}</p>}
               </div>
               <ModerationButton
                 action={adminDeleteEntryAction}

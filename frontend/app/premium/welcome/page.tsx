@@ -167,9 +167,9 @@ export default async function PremiumWelcomePage({
                   >
                     #{founderNumber}
                   </p>
-                  <p className="mt-6 text-white/75">
+                  <p className="mt-6 text-iron/75">
                     One of the first 100 paying members of{" "}
-                    <span className="text-white">
+                    <span className="text-iron">
                       {community?.display_name ?? "this community"}
                     </span>
                     . Your {billingPeriod === "annual" ? "annual" : "monthly"}{" "}
@@ -186,9 +186,9 @@ export default async function PremiumWelcomePage({
                     🌟 Founding Member badge · +500 pts
                   </div>
                   {customerEmail && (
-                    <p className="mt-6 text-xs text-white/50">
+                    <p className="mt-6 text-xs text-iron/50">
                       Receipt on its way to{" "}
-                      <span className="text-white/80">{customerEmail}</span>.
+                      <span className="text-iron/80">{customerEmail}</span>.
                     </p>
                   )}
                 </>
@@ -200,16 +200,16 @@ export default async function PremiumWelcomePage({
                   >
                     Claiming your founder slot…
                   </h1>
-                  <p className="mt-4 text-white/70">
+                  <p className="mt-4 text-iron/70">
                     Stripe confirmed your payment and we&apos;re assigning your
                     Founding Member number. Refresh in a moment to see which slot
                     you got — your badge and locked-in pricing are already
                     yours.
                   </p>
                   {customerEmail && (
-                    <p className="mt-6 text-xs text-white/50">
+                    <p className="mt-6 text-xs text-iron/50">
                       Receipt on its way to{" "}
-                      <span className="text-white/80">{customerEmail}</span>.
+                      <span className="text-iron/80">{customerEmail}</span>.
                     </p>
                   )}
                 </>
@@ -232,14 +232,14 @@ export default async function PremiumWelcomePage({
                 </span>
                 .
               </h1>
-              <p className="mt-4 text-white/70">
+              <p className="mt-4 text-iron/70">
                 {billingPeriod === "annual"
                   ? "Your annual membership is active."
                   : "Your monthly membership is active."}{" "}
                 {customerEmail && (
                   <>
                     A receipt is on its way to{" "}
-                    <span className="text-white">{customerEmail}</span>.
+                    <span className="text-iron">{customerEmail}</span>.
                   </>
                 )}
               </p>
@@ -253,7 +253,7 @@ export default async function PremiumWelcomePage({
             >
               Processing…
             </h1>
-            <p className="mt-4 text-white/70">
+            <p className="mt-4 text-iron/70">
               Stripe is confirming your payment. Refresh in a moment or head
               back to the community — your Premium perks will be live
               within seconds.
@@ -264,7 +264,7 @@ export default async function PremiumWelcomePage({
         <div className="mt-10 flex flex-wrap justify-center gap-3">
           <Link
             href={community?.slug ? `/brands/${community.slug}` : "/"}
-            className="rounded-full px-6 py-3 text-sm font-semibold text-white shadow-glass transition hover:brightness-110"
+            className="rounded-full px-6 py-3 text-sm font-semibold text-iron shadow-glass transition hover:brightness-110"
             style={{
               backgroundImage: `linear-gradient(90deg, ${accentFrom}, ${accentTo})`,
             }}
@@ -283,21 +283,21 @@ export default async function PremiumWelcomePage({
           {memberSlug && (
             <Link
               href={`/members/${memberSlug}`}
-              className="rounded-full border border-white/25 px-5 py-3 text-sm font-medium text-white/80 hover:bg-white/10"
+              className="rounded-full border border-iron/25 px-5 py-3 text-sm font-medium text-iron/80 hover:bg-iron/10"
             >
               View your profile →
             </Link>
           )}
           <Link
             href="/inbox"
-            className="rounded-full border border-white/25 px-5 py-3 text-sm font-medium text-white/80 hover:bg-white/10"
+            className="rounded-full border border-iron/25 px-5 py-3 text-sm font-medium text-iron/80 hover:bg-iron/10"
           >
             Open inbox
           </Link>
         </div>
 
         {isFounder && status === "complete" && founderNumber !== null && (
-          <p className="mt-12 text-xs uppercase tracking-widest text-white/45">
+          <p className="mt-12 text-xs uppercase tracking-widest text-iron/45">
             Locked-in pricing for life
           </p>
         )}

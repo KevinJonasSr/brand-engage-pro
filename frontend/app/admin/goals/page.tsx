@@ -32,9 +32,9 @@ export default async function GoalsAdminPage() {
   return (
     <main className="mx-auto max-w-4xl px-6 py-10">
       <div className="mb-8">
-        <p className="text-xs uppercase tracking-widest text-white/50">Admin</p>
-        <h1 className="mt-1 text-3xl font-semibold text-white">Brand Goals</h1>
-        <p className="mt-2 text-sm text-white/60">
+        <p className="text-xs uppercase tracking-widest text-iron/50">Admin</p>
+        <h1 className="mt-1 text-3xl font-semibold text-iron">Brand Goals</h1>
+        <p className="mt-2 text-sm text-iron/60">
           Rally your members around a shared target — check-ins, signups,
           points. Active goals show live progress on the brand page and get
           a shareable progress card.
@@ -42,36 +42,36 @@ export default async function GoalsAdminPage() {
       </div>
 
       {/* New goal */}
-      <div className="mb-8 rounded-2xl border border-white/10 bg-black/40 p-5">
-        <h2 className="text-sm font-semibold text-white">Create a goal</h2>
+      <div className="mb-8 rounded-lg border border-iron/10 bg-parchment/40 p-5">
+        <h2 className="text-sm font-semibold text-iron">Create a goal</h2>
         <form action={createGoalAction} className="mt-3 grid gap-3 sm:grid-cols-2">
           <label className="sm:col-span-2">
-            <span className="mb-1 block text-xs text-white/50">Title</span>
+            <span className="mb-1 block text-xs text-iron/50">Title</span>
             <input
               type="text"
               name="title"
               required
               placeholder="500 check-ins this month"
-              className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-white/40 focus:outline-none"
+              className="w-full rounded-lg border border-iron/15 bg-parchment/40 px-3 py-2 text-sm text-iron placeholder:text-iron/30 focus:border-iron/40 focus:outline-none"
             />
           </label>
           <label className="sm:col-span-2">
-            <span className="mb-1 block text-xs text-white/50">
+            <span className="mb-1 block text-xs text-iron/50">
               Description (optional)
             </span>
             <input
               type="text"
               name="description"
               placeholder="Hit the target and everyone unlocks a bonus drop"
-              className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-white/40 focus:outline-none"
+              className="w-full rounded-lg border border-iron/15 bg-parchment/40 px-3 py-2 text-sm text-iron placeholder:text-iron/30 focus:border-iron/40 focus:outline-none"
             />
           </label>
           <label>
-            <span className="mb-1 block text-xs text-white/50">Metric</span>
+            <span className="mb-1 block text-xs text-iron/50">Metric</span>
             <select
               name="metric"
               defaultValue="ledger_count"
-              className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white focus:border-white/40 focus:outline-none"
+              className="w-full rounded-lg border border-iron/15 bg-parchment/40 px-3 py-2 text-sm text-iron focus:border-iron/40 focus:outline-none"
             >
               <option value="ledger_count">Activity count (by source)</option>
               <option value="member_count">Total members</option>
@@ -79,41 +79,41 @@ export default async function GoalsAdminPage() {
             </select>
           </label>
           <label>
-            <span className="mb-1 block text-xs text-white/50">
+            <span className="mb-1 block text-xs text-iron/50">
               Source filter (e.g. checkin, referral — optional)
             </span>
             <input
               type="text"
               name="metric_ref"
               placeholder="checkin"
-              className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-white/40 focus:outline-none"
+              className="w-full rounded-lg border border-iron/15 bg-parchment/40 px-3 py-2 text-sm text-iron placeholder:text-iron/30 focus:border-iron/40 focus:outline-none"
             />
           </label>
           <label>
-            <span className="mb-1 block text-xs text-white/50">Target</span>
+            <span className="mb-1 block text-xs text-iron/50">Target</span>
             <input
               type="number"
               name="target"
               required
               min={1}
               placeholder="500"
-              className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-white/40 focus:outline-none"
+              className="w-full rounded-lg border border-iron/15 bg-parchment/40 px-3 py-2 text-sm text-iron placeholder:text-iron/30 focus:border-iron/40 focus:outline-none"
             />
           </label>
           <label>
-            <span className="mb-1 block text-xs text-white/50">
+            <span className="mb-1 block text-xs text-iron/50">
               Ends (optional)
             </span>
             <input
               type="date"
               name="ends_at"
-              className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white focus:border-white/40 focus:outline-none"
+              className="w-full rounded-lg border border-iron/15 bg-parchment/40 px-3 py-2 text-sm text-iron focus:border-iron/40 focus:outline-none"
             />
           </label>
           <div className="sm:col-span-2">
             <button
               type="submit"
-              className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-white/90"
+              className="rounded-lg bg-iron px-4 py-2 text-sm font-semibold text-linen hover:bg-iron/90"
             >
               Create goal
             </button>
@@ -124,22 +124,22 @@ export default async function GoalsAdminPage() {
       {/* Goal list */}
       <div className="space-y-4">
         {goals.length === 0 && (
-          <p className="rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white/60">
+          <p className="rounded-xl border border-iron/10 bg-parchment/30 px-4 py-3 text-sm text-iron/60">
             No goals yet — create your first one above.
           </p>
         )}
         {goals.map((g) => (
           <div
             key={g.id}
-            className="rounded-2xl border border-white/10 bg-black/40 p-5"
+            className="rounded-lg border border-iron/10 bg-parchment/40 p-5"
           >
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <h3 className="text-lg font-semibold text-white">
+                <h3 className="text-lg font-semibold text-iron">
                   {g.title}
                   {g.completed && <span className="ml-2">🏆</span>}
                 </h3>
-                <p className="mt-0.5 text-xs text-white/50">
+                <p className="mt-0.5 text-xs text-iron/50">
                   {METRIC_LABELS[g.metric] ?? g.metric}
                   {g.metric_ref ? ` · source: ${g.metric_ref}` : ""}
                   {g.ends_at
@@ -150,8 +150,8 @@ export default async function GoalsAdminPage() {
               <span
                 className={`rounded-full px-3 py-1 text-xs font-semibold ${
                   g.active
-                    ? "bg-emerald-500/20 text-emerald-300"
-                    : "bg-white/10 text-white/50"
+                    ? "bg-emerald-500/20 text-sage-ink"
+                    : "bg-iron/10 text-iron/50"
                 }`}
               >
                 {g.active ? "ACTIVE" : "HIDDEN"}
@@ -160,12 +160,12 @@ export default async function GoalsAdminPage() {
 
             <div className="mt-4">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-white/70">
+                <span className="text-iron/70">
                   {g.current.toLocaleString()} / {g.target.toLocaleString()}
                 </span>
-                <span className="font-semibold text-white">{g.pct}%</span>
+                <span className="font-semibold text-iron">{g.pct}%</span>
               </div>
-              <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-white/10">
+              <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-iron/10">
                 <div
                   className="h-full rounded-full bg-gradient-to-r from-purple-400 to-orange-400"
                   style={{ width: `${Math.max(2, g.pct)}%` }}
@@ -173,10 +173,10 @@ export default async function GoalsAdminPage() {
               </div>
             </div>
 
-            <div className="mt-4 flex items-center gap-3 border-t border-white/10 pt-3">
+            <div className="mt-4 flex items-center gap-3 border-t border-iron/10 pt-3">
               <Link
                 href={`/share/goal/${g.community_id}/${g.id}`}
-                className="text-xs text-white/50 hover:text-white"
+                className="text-xs text-iron/50 hover:text-iron"
               >
                 Share card →
               </Link>
@@ -189,7 +189,7 @@ export default async function GoalsAdminPage() {
                 />
                 <button
                   type="submit"
-                  className="rounded-lg border border-white/20 px-3 py-1.5 text-xs text-white/70 hover:bg-white/10"
+                  className="rounded-lg border border-iron/20 px-3 py-1.5 text-xs text-iron/70 hover:bg-iron/10"
                 >
                   {g.active ? "Hide" : "Activate"}
                 </button>

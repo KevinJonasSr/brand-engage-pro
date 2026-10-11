@@ -150,10 +150,10 @@ export default async function FounderWallPage({
     <main className="mx-auto max-w-7xl space-y-10 px-6 py-12">
       {/* Hero */}
       <section
-        className="relative overflow-hidden rounded-3xl border border-white/10 p-10"
+        className="relative overflow-hidden rounded-lg border border-iron/10 p-10"
         style={{ backgroundImage: heroGradient }}
       >
-        <p className="text-xs uppercase tracking-[0.3em] text-white/60">
+        <p className="text-xs uppercase tracking-[0.3em] text-iron/60">
           Founding Members
         </p>
         <h1
@@ -162,39 +162,39 @@ export default async function FounderWallPage({
         >
           Founding Members of {brand.name}
         </h1>
-        <p className="mt-3 max-w-2xl text-lg text-white/80">
+        <p className="mt-3 max-w-2xl text-lg text-iron/80">
           The free first 100 who join — a Founding badge. Brands pay, guests join free.
         </p>
-        <ul className="mt-4 flex flex-wrap gap-2 text-sm text-white/85">
-          <li className="rounded-full border border-white/20 bg-white/10 px-3 py-1">
+        <ul className="mt-4 flex flex-wrap gap-2 text-sm text-iron/85">
+          <li className="rounded-full border border-iron/20 bg-iron/10 px-3 py-1">
             1.5x points for life
           </li>
-          <li className="rounded-full border border-white/20 bg-white/10 px-3 py-1">
+          <li className="rounded-full border border-iron/20 bg-iron/10 px-3 py-1">
             RSVP to events 48 hours before everyone else
           </li>
         </ul>
       </section>
 
       {/* Scarcity Counter */}
-      <section className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-6">
+      <section className="rounded-lg border border-iron/10 bg-iron/5 backdrop-blur p-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <p className="text-sm text-white/60">Founder slots</p>
+            <p className="text-sm text-iron/60">Founder slots</p>
             <p className="mt-1 text-3xl font-semibold">
-              {claimedCount} <span className="text-lg text-white/60">/ {founderCap}</span>
+              {claimedCount} <span className="text-lg text-iron/60">/ {founderCap}</span>
             </p>
           </div>
           <div className="text-right">
             {isFull ? (
-              <p className="text-sm font-semibold text-amber-400">
+              <p className="text-sm font-semibold text-aurora-ink">
                 All founder slots claimed
               </p>
             ) : (
               <>
-                <p className="text-3xl font-semibold text-emerald-400">
+                <p className="text-3xl font-semibold text-sage-ink">
                   {remainingCount}
                 </p>
-                <p className="mt-1 text-xs text-white/60">
+                <p className="mt-1 text-xs text-iron/60">
                   {remainingCount === 1 ? "spot" : "spots"} remaining
                 </p>
               </>
@@ -205,29 +205,29 @@ export default async function FounderWallPage({
 
       {/* Founders Grid or Empty State */}
       {founders.length === 0 ? (
-        <section className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-12 text-center">
+        <section className="rounded-lg border border-iron/10 bg-iron/5 backdrop-blur p-12 text-center">
           <p className="text-lg font-semibold">Be the first.</p>
-          <p className="mt-2 text-sm text-white/70">
+          <p className="mt-2 text-sm text-iron/70">
             Founding badges #{1}-{founderCap} go to the first members who join — free,
             not a Premium purchase.
           </p>
           <Link
             href={`/signup?ref=${encodeURIComponent(slug)}&next=${encodeURIComponent(`/brands/${slug}/founders`)}`}
-            className="mt-6 inline-block rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-3 text-sm font-semibold text-white shadow-lg hover:brightness-110"
+            className="mt-6 inline-block rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-3 text-sm font-semibold text-linen shadow-lg hover:brightness-110"
           >
             Join free for a Founding badge →
           </Link>
         </section>
       ) : (
         <section>
-          <p className="mb-6 text-sm text-white/60">
+          <p className="mb-6 text-sm text-iron/60">
             {claimedCount} {claimedCount === 1 ? "founder" : "founders"}
           </p>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
             {founders.map((founder) => (
               <div
                 key={founder.member_id}
-                className="group rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-4 text-center transition hover:bg-white/10 hover:border-white/20"
+                className="group rounded-lg border border-iron/10 bg-iron/5 backdrop-blur p-4 text-center transition hover:bg-iron/10 hover:border-iron/20"
               >
                 {/* Founder Number */}
                 <div
@@ -245,11 +245,11 @@ export default async function FounderWallPage({
                       alt={founder.first_name || `Founder #${founder.founder_number}`}
                       width={56}
                       height={56}
-                      className="rounded-full object-cover border border-white/10 group-hover:border-white/20"
+                      className="rounded-full object-cover border border-iron/10 group-hover:border-iron/20"
                     />
                   ) : (
                     <div
-                      className="flex h-14 w-14 items-center justify-center rounded-full border border-white/10 group-hover:border-white/20 text-lg font-semibold text-white/70"
+                      className="flex h-14 w-14 items-center justify-center rounded-full border border-iron/10 group-hover:border-iron/20 text-lg font-semibold text-iron/70"
                       style={{
                         backgroundImage: `linear-gradient(135deg, ${brand.accentFrom}20, ${brand.accentTo}20)`,
                       }}
@@ -260,12 +260,12 @@ export default async function FounderWallPage({
                 </div>
 
                 {/* Name */}
-                <p className="text-sm font-semibold text-white truncate">
+                <p className="text-sm font-semibold text-iron truncate">
                   {founder.first_name || `Founder #${founder.founder_number}`}
                 </p>
 
                 {/* Joined date */}
-                <p className="mt-2 text-xs text-white/50">
+                <p className="mt-2 text-xs text-iron/50">
                   Member since {formatDate(founder.joined_at)}
                 </p>
               </div>
@@ -275,20 +275,20 @@ export default async function FounderWallPage({
       )}
 
       {/* CTA at the bottom */}
-      <section className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-8 text-center">
+      <section className="rounded-lg border border-iron/10 bg-iron/5 backdrop-blur p-8 text-center">
         <p className="text-lg font-semibold">
           {isFull
             ? "All Founding spots are claimed"
             : "Want to be a Founding Member?"}
         </p>
-        <p className="mt-2 text-sm text-white/70">
+        <p className="mt-2 text-sm text-iron/70">
           {isFull
             ? "You can still join free and earn points toward every reward."
             : "Join free to claim a Founding badge. Brands pay, guests join free."}
         </p>
         <Link
           href={`/signup?ref=${encodeURIComponent(slug)}`}
-          className="mt-6 inline-block rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-3 text-sm font-semibold text-white shadow-lg hover:brightness-110"
+          className="mt-6 inline-block rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-3 text-sm font-semibold text-linen shadow-lg hover:brightness-110"
         >
           {isFull ? "Join free →" : "Become a Founding Member →"}
         </Link>
@@ -298,7 +298,7 @@ export default async function FounderWallPage({
       <div className="text-center">
         <Link
           href={`/brands/${slug}`}
-          className="text-xs text-white/50 hover:text-white/70 transition"
+          className="text-xs text-iron/50 hover:text-iron/70 transition"
         >
           ← Back to {brand.name}
         </Link>

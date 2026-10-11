@@ -56,7 +56,7 @@ export default function LoginClient({
 function LoginFallback() {
   return (
     <main className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center px-6 py-12">
-      <div className="glass-card p-8 text-center text-sm text-white/60">Loading…</div>
+      <div className="glass-card p-8 text-center text-sm text-iron/60">Loading…</div>
     </main>
   );
 }
@@ -364,23 +364,23 @@ function LoginForm({
     <main className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center gap-6 px-6 py-12">
       <div className="glass-card space-y-6 p-8">
         <div className="space-y-2">
-          <p className="text-sm uppercase tracking-wide text-white/60">Brand Engage Pro</p>
+          <p className="text-sm uppercase tracking-wide text-iron/60">Brand Engage Pro</p>
           <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
             Welcome back
           </h1>
-          <p className="text-sm text-white/70">Sign in to access your rewards and perks.</p>
+          <p className="text-sm text-iron/70">Sign in to access your rewards and perks.</p>
         </div>
 
         {/* Shared email — outside the password form so magic-link never hits
             browser constraint validation on an empty password field. */}
         <label className="block space-y-1">
-          <span className="text-xs uppercase tracking-wide text-white/60">Email</span>
+          <span className="text-xs uppercase tracking-wide text-iron/60">Email</span>
           <input
             type="email"
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-white/50 focus:border-white/40 focus:outline-none"
+            className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-4 py-3 text-sm text-iron placeholder:text-iron/50 focus:border-iron/40 focus:outline-none"
             placeholder="you@email.com"
           />
         </label>
@@ -390,11 +390,11 @@ function LoginForm({
         <form onSubmit={handlePassword} className="space-y-4">
           <label className="block space-y-1">
             <div className="flex items-center justify-between gap-3">
-              <span className="text-xs uppercase tracking-wide text-white/60">Password</span>
+              <span className="text-xs uppercase tracking-wide text-iron/60">Password</span>
               {forgotPasswordEnabled && (
                 <Link
                   href={forgotHref}
-                  className="text-xs text-white/60 underline-offset-2 hover:text-white hover:underline"
+                  className="text-xs text-iron/60 underline-offset-2 hover:text-iron hover:underline"
                 >
                   Forgot password?
                 </Link>
@@ -407,14 +407,14 @@ function LoginForm({
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-white/40 focus:outline-none"
+              className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-4 py-3 text-sm text-iron placeholder:text-iron/40 focus:border-iron/40 focus:outline-none"
               placeholder="••••••••"
             />
           </label>
 
           {turnstileRequired && (
             <div className="space-y-2">
-              <p className="text-xs uppercase tracking-wide text-white/45">Security check</p>
+              <p className="text-xs uppercase tracking-wide text-iron/45">Security check</p>
               <TurnstileWidget
                 key={turnstileKey}
                 onSuccess={handleTurnstileSuccess}
@@ -425,7 +425,7 @@ function LoginForm({
                 theme="dark"
               />
               {showParentChallengeError && (
-                <p className="text-xs text-rose-300">
+                <p className="text-xs text-ember">
                   Security check failed. Retry above to sign in.
                 </p>
               )}
@@ -436,30 +436,30 @@ function LoginForm({
             <button
               type="submit"
               disabled={status === "loading" || !passwordCaptchaReady}
-              className="w-full rounded-full bg-gradient-to-r from-aurora to-ember px-4 py-3 text-sm font-semibold text-white shadow-glass disabled:opacity-60"
+              className="w-full rounded-full bg-ember px-4 py-3 text-sm font-semibold text-linen shadow-glass disabled:opacity-60"
             >
               {status === "loading" ? "Signing in…" : "Sign in"}
             </button>
             {status !== "loading" && !passwordCaptchaReady && passwordHelper && (
-              <p className="text-center text-xs text-white/50">{passwordHelper}</p>
+              <p className="text-center text-xs text-iron/50">{passwordHelper}</p>
             )}
           </div>
         </form>
 
         {magicLinkEnabled && (
           <>
-            <div className="flex items-center gap-3 text-xs uppercase tracking-wide text-white/50">
-              <div className="h-px flex-1 bg-white/10" />
+            <div className="flex items-center gap-3 text-xs uppercase tracking-wide text-iron/50">
+              <div className="h-px flex-1 bg-iron/10" />
               or
-              <div className="h-px flex-1 bg-white/10" />
+              <div className="h-px flex-1 bg-iron/10" />
             </div>
 
             {/* Magic-link path — deliberately outside the password <form>.
                 type=button so it never triggers password constraint validation. */}
             <div className="space-y-3">
-              <p className="text-xs text-white/45">
+              <p className="text-xs text-iron/45">
                 Prefer a passwordless email link? We&apos;ll send it to the{" "}
-                <span className="text-white/70">email above</span>
+                <span className="text-iron/70">email above</span>
                 {magicLinkOpen && turnstileLoadState !== "error" && !turnstileError
                   ? ". Complete the security check above, then send."
                   : "."}{" "}
@@ -473,7 +473,7 @@ function LoginForm({
                   void handleMagicLink();
                 }}
                 disabled={magicLinkDisabled}
-                className="w-full rounded-full border border-white/20 px-4 py-3 text-sm font-medium text-white/80 hover:bg-white/10 disabled:opacity-60"
+                className="w-full rounded-full border border-iron/20 px-4 py-3 text-sm font-medium text-iron/80 hover:bg-iron/10 disabled:opacity-60"
               >
                 {magicLinkButtonLabel({
                   cooldown: magicCooldown,
@@ -486,21 +486,21 @@ function LoginForm({
         )}
 
         {magicLinkEnabled && persistentHelper && status !== "error" && status !== "magic-sent" && (
-          <p className="text-sm text-emerald-300">{persistentHelper}</p>
+          <p className="text-sm text-sage-ink">{persistentHelper}</p>
         )}
         {message && (
           <p
             className={`text-sm ${
-              status === "error" ? "text-red-300" : "text-emerald-300"
+              status === "error" ? "text-ember" : "text-sage-ink"
             }`}
           >
             {message}
           </p>
         )}
 
-        <p className="text-center text-sm text-white/60">
+        <p className="text-center text-sm text-iron/60">
           New member?{" "}
-          <Link href={signupHref} className="text-white underline-offset-4 hover:underline">
+          <Link href={signupHref} className="text-iron underline-offset-4 hover:underline">
             Create an account
           </Link>
         </p>

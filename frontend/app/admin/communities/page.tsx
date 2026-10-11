@@ -41,7 +41,7 @@ export default async function AdminCommunitiesPage() {
   return (
     <main className="mx-auto max-w-4xl px-6 py-10">
       <div className="mb-8">
-        <p className="text-xs uppercase tracking-widest text-white/50">
+        <p className="text-xs uppercase tracking-widest text-iron/50">
           Admin
         </p>
         <h1
@@ -50,7 +50,7 @@ export default async function AdminCommunitiesPage() {
         >
           Pick a community to manage
         </h1>
-        <p className="mt-2 text-sm text-white/60">
+        <p className="mt-2 text-sm text-iron/60">
           {ctx.isSuperAdmin
             ? "You're a super-admin — you can administer every community. Your selection sticks for this session and can be changed here any time."
             : "You've got admin access to multiple communities. Pick one to manage."}
@@ -58,7 +58,7 @@ export default async function AdminCommunitiesPage() {
             <>
               {" "}
               Currently managing{" "}
-              <span className="font-semibold text-white">
+              <span className="font-semibold text-iron">
                 {ctx.currentCommunityId}
               </span>
               .
@@ -76,12 +76,12 @@ export default async function AdminCommunitiesPage() {
                 <input type="hidden" name="community_id" value={c.slug} />
                 <button
                   type="submit"
-                  className={`group relative block w-full overflow-hidden rounded-2xl border p-5 text-left transition ${
+                  className={`group relative block w-full overflow-hidden rounded-lg border p-5 text-left transition ${
                     isCurrent
                       ? "border-aurora bg-aurora/10"
                       : c.active
-                        ? "border-white/10 bg-black/30 hover:border-white/30 hover:bg-white/5"
-                        : "border-white/5 bg-black/20 opacity-70 hover:opacity-90"
+                        ? "border-iron/10 bg-parchment/30 hover:border-iron/30 hover:bg-iron/5"
+                        : "border-iron/5 bg-parchment/20 opacity-70 hover:opacity-90"
                   }`}
                 >
                   <div
@@ -92,16 +92,16 @@ export default async function AdminCommunitiesPage() {
                     }}
                   />
                   <div className="mt-2 flex items-baseline justify-between gap-3">
-                    <span className="text-xs uppercase tracking-widest text-white/40">
+                    <span className="text-xs uppercase tracking-widest text-iron/40">
                       {c.type.replace("_", " ")}
                     </span>
                     {!c.active && (
-                      <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-white/60">
+                      <span className="rounded-full bg-iron/10 px-2 py-0.5 text-xs text-iron/60">
                         Inactive
                       </span>
                     )}
                     {isCurrent && (
-                      <span className="rounded-full bg-aurora/30 px-2 py-0.5 text-xs text-white">
+                      <span className="rounded-full bg-aurora/30 px-2 py-0.5 text-xs text-iron">
                         Current
                       </span>
                     )}
@@ -110,11 +110,11 @@ export default async function AdminCommunitiesPage() {
                     {c.display_name}
                   </p>
                   {c.tagline && (
-                    <p className="mt-1 text-xs text-white/55 line-clamp-2">
+                    <p className="mt-1 text-xs text-iron/55 line-clamp-2">
                       {c.tagline}
                     </p>
                   )}
-                  <p className="mt-4 text-xs text-white/45 transition group-hover:text-white/80">
+                  <p className="mt-4 text-xs text-iron/45 transition group-hover:text-iron/80">
                     Manage →
                   </p>
                 </button>

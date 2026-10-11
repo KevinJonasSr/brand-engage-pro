@@ -68,13 +68,13 @@ export default async function FounderSharePage({
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
       <section
-        className="relative overflow-hidden rounded-3xl border border-white/15 p-10 shadow-glass md:p-14"
+        className="relative overflow-hidden rounded-lg border border-iron/15 p-10 shadow-glass md:p-14"
         style={{
           background: `radial-gradient(circle at 15% 10%, ${brand.accentFrom}66, transparent 55%), radial-gradient(circle at 85% 95%, ${brand.accentTo}66, transparent 60%), #050b1f`,
         }}
       >
         <div className="relative flex flex-col items-center gap-6 text-center">
-          <p className="text-xs font-medium uppercase tracking-[0.3em] text-white/70">
+          <p className="text-xs font-medium uppercase tracking-[0.3em] text-iron/70">
             Founding Member
           </p>
           <p
@@ -89,7 +89,7 @@ export default async function FounderSharePage({
           >
             of {brand.name}
           </p>
-          <p className="max-w-xl text-sm text-white/70">
+          <p className="max-w-xl text-sm text-iron/70">
             One of 100 founding members of {brand.name} on Brand Engage Pro.
             Founders earn 1.5x points for life and RSVP to events 48 hours
             before everyone else.
@@ -104,7 +104,7 @@ export default async function FounderSharePage({
             />
             <Link
               href={`/brands/${brand.slug}`}
-              className="rounded-full border border-white/30 px-5 py-2.5 text-sm font-medium text-white/85 hover:bg-white/10"
+              className="rounded-full border border-iron/30 px-5 py-2.5 text-sm font-medium text-iron/85 hover:bg-iron/10"
             >
               Visit member club →
             </Link>
@@ -112,8 +112,8 @@ export default async function FounderSharePage({
         </div>
       </section>
 
-      <section className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-white/75 md:p-8">
-        <p className="font-medium text-white/90">
+      <section className="mt-10 rounded-lg border border-iron/10 bg-iron/5 p-6 text-sm text-iron/75 md:p-8">
+        <p className="font-medium text-iron/90">
           Want to claim a slot at {brand.name}?
         </p>
         <p className="mt-2">
@@ -121,7 +121,7 @@ export default async function FounderSharePage({
           and RSVP to events 48 hours before everyone else.{" "}
           <Link
             href={`/brands/${brand.slug}`}
-            className="text-aurora underline hover:text-white"
+            className="text-aurora-ink underline hover:text-iron"
           >
             See what&apos;s live at {brand.name} →
           </Link>

@@ -55,17 +55,17 @@ async function loadCampaigns(scope: string | null) {
 
 function itemBadge(kind: string, count: number) {
   const toneMap: Record<string, string> = {
-    announcement: "bg-sky-500/20 text-sky-200",
-    poll: "bg-fuchsia-500/20 text-fuchsia-200",
-    challenge: "bg-amber-500/20 text-amber-200",
-    offer: "bg-emerald-500/20 text-emerald-200",
-    action: "bg-purple-500/20 text-purple-200",
-    event: "bg-rose-500/20 text-rose-200",
-    email: "bg-blue-500/20 text-blue-200",
-    sms: "bg-green-500/20 text-green-200",
-    badge: "bg-yellow-500/20 text-yellow-200",
+    announcement: "bg-sky-500/20 text-sky-800",
+    poll: "bg-fuchsia-500/20 text-fuchsia-800",
+    challenge: "bg-amber-500/20 text-aurora-ink",
+    offer: "bg-emerald-500/20 text-sage-ink",
+    action: "bg-purple-500/20 text-purple-800",
+    event: "bg-rose-500/20 text-ember",
+    email: "bg-blue-500/20 text-blue-800",
+    sms: "bg-green-500/20 text-sage-ink",
+    badge: "bg-yellow-500/20 text-aurora-ink",
   };
-  const tone = toneMap[kind] ?? "bg-white/10 text-white/70";
+  const tone = toneMap[kind] ?? "bg-iron/10 text-iron/70";
   return (
     <span key={kind} className={`rounded-full px-2 py-0.5 text-xs uppercase tracking-wide ${tone}`}>
       {kind}
@@ -86,22 +86,22 @@ export default async function AdminCampaignsPage() {
           <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
             Campaigns
           </h1>
-          <p className="mt-1 text-sm text-white/60">
+          <p className="mt-1 text-sm text-iron/60">
             Bundle announcements, polls, challenges, offers, and member CTAs into a single coordinated drop.
           </p>
         </div>
         <Link
           href="/admin/campaigns/new"
-          className="rounded-full bg-gradient-to-r from-aurora to-ember px-5 py-2 text-sm font-semibold text-white shadow-glass hover:brightness-110"
+          className="rounded-full bg-ember px-5 py-2 text-sm font-semibold text-linen shadow-glass hover:brightness-110"
         >
           + New campaign
         </Link>
       </div>
 
       {campaigns.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-white/15 bg-black/20 p-8 text-center">
+        <div className="rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-8 text-center">
           <p className="text-sm font-semibold">No campaigns yet</p>
-          <p className="mt-2 text-xs text-white/60">
+          <p className="mt-2 text-xs text-iron/60">
             Create your first campaign to publish an announcement, poll, challenge, offer, and member CTAs in one shot.
           </p>
         </div>
@@ -112,36 +112,36 @@ export default async function AdminCampaignsPage() {
             return (
               <div
                 key={c.id as string}
-                className="rounded-2xl border border-white/10 bg-black/30 p-4"
+                className="rounded-lg border border-iron/10 bg-parchment/30 p-4"
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs uppercase tracking-wide text-white/70">
+                      <span className="rounded-full bg-iron/10 px-2 py-0.5 text-xs uppercase tracking-wide text-iron/70">
                         /{c.brand_slug as string}
                       </span>
                       {active ? (
-                        <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs uppercase tracking-wide text-emerald-200">
+                        <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs uppercase tracking-wide text-sage-ink">
                           Live
                         </span>
                       ) : (
-                        <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs uppercase tracking-wide text-white/50">
+                        <span className="rounded-full bg-iron/10 px-2 py-0.5 text-xs uppercase tracking-wide text-iron/50">
                           Ended
                         </span>
                       )}
                     </div>
                     <h2 className="mt-2 text-lg font-semibold">{c.title as string}</h2>
                     {c.description && (
-                      <p className="mt-1 text-sm text-white/70">{c.description as string}</p>
+                      <p className="mt-1 text-sm text-iron/70">{c.description as string}</p>
                     )}
                     <div className="mt-3 flex flex-wrap gap-1.5">
                       {Object.entries(c.items).length === 0 ? (
-                        <span className="text-xs text-white/40">No items</span>
+                        <span className="text-xs text-iron/40">No items</span>
                       ) : (
                         Object.entries(c.items).map(([kind, count]) => itemBadge(kind, count))
                       )}
                     </div>
-                    <p className="mt-2 text-xs text-white/40">
+                    <p className="mt-2 text-xs text-iron/40">
                       {c.published_at
                         ? `Published ${new Date(c.published_at as string).toLocaleString()}`
                         : "Draft"}
@@ -149,12 +149,12 @@ export default async function AdminCampaignsPage() {
                     {(c.broadcast.emailSent != null || c.broadcast.smsSent != null) && (
                       <div className="mt-2 flex flex-wrap gap-3 text-xs">
                         {c.broadcast.emailSent != null && (
-                          <span className={c.broadcast.emailFailed ? "text-rose-300" : "text-emerald-300"}>
+                          <span className={c.broadcast.emailFailed ? "text-ember" : "text-sage-ink"}>
                             ✉️ {c.broadcast.emailFailed ? `failed: ${c.broadcast.emailFailed.slice(0, 60)}` : `sent · ${c.broadcast.emailSent} recipients`}
                           </span>
                         )}
                         {c.broadcast.smsSent != null && (
-                          <span className={c.broadcast.smsFailed ? "text-rose-300" : "text-emerald-300"}>
+                          <span className={c.broadcast.smsFailed ? "text-ember" : "text-sage-ink"}>
                             💬 {c.broadcast.smsFailed ? `failed: ${c.broadcast.smsFailed.slice(0, 60)}` : `sent · ${c.broadcast.smsSent} recipients`}
                           </span>
                         )}
@@ -164,7 +164,7 @@ export default async function AdminCampaignsPage() {
                   {active && (
                     <form action={deactivateCampaignAction}>
                       <input type="hidden" name="campaign_id" value={c.id as string} />
-                      <button className="rounded-full border border-white/20 px-3 py-1 text-xs text-white/70 hover:bg-white/10">
+                      <button className="rounded-full border border-iron/20 px-3 py-1 text-xs text-iron/70 hover:bg-iron/10">
                         End campaign
                       </button>
                     </form>

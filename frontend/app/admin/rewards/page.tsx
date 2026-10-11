@@ -25,16 +25,16 @@ export default async function AdminRewardsPage() {
         <h1 className="text-2xl font-bold">Rewards Catalog</h1>
         <Link
           href="/admin/rewards/new"
-          className="rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+          className="rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 px-4 py-2 text-sm font-medium text-iron hover:opacity-90"
         >
           New Reward
         </Link>
       </div>
 
       {rewards && rewards.length > 0 ? (
-        <div className="glass-card overflow-hidden rounded-2xl">
+        <div className="glass-card overflow-hidden rounded-lg">
           <table className="w-full text-sm">
-            <thead className="border-b border-white/10 bg-black/30">
+            <thead className="border-b border-iron/10 bg-parchment/30">
               <tr>
                 <th className="px-4 py-3 text-left font-semibold">Title</th>
                 <th className="px-4 py-3 text-left font-semibold">Cost</th>
@@ -44,13 +44,13 @@ export default async function AdminRewardsPage() {
                 <th className="px-4 py-3 text-left font-semibold">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-iron/5">
               {rewards.map((reward: any) => (
-                <tr key={reward.id} className="hover:bg-black/20">
+                <tr key={reward.id} className="hover:bg-parchment/20">
                   <td className="px-4 py-3">{reward.title}</td>
                   <td className="px-4 py-3">{reward.point_cost.toLocaleString()}</td>
                   <td className="px-4 py-3">
-                    <span className="inline-flex rounded-full bg-blue-500/20 px-2 py-1 text-xs text-blue-300">
+                    <span className="inline-flex rounded-full bg-blue-500/20 px-2 py-1 text-xs text-blue-800">
                       {reward.kind}
                     </span>
                   </td>
@@ -60,8 +60,8 @@ export default async function AdminRewardsPage() {
                       <button
                         className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
                           reward.active
-                            ? "bg-green-500/20 text-green-300"
-                            : "bg-red-500/20 text-red-300"
+                            ? "bg-green-500/20 text-sage-ink"
+                            : "bg-red-500/20 text-ember"
                         }`}
                       >
                         {reward.active ? "Active" : "Inactive"}
@@ -71,7 +71,7 @@ export default async function AdminRewardsPage() {
                   <td className="px-4 py-3">
                     <Link
                       href={`/admin/rewards/${reward.id}`}
-                      className="text-blue-400 hover:text-blue-300"
+                      className="text-blue-800 hover:text-blue-800"
                     >
                       Edit
                     </Link>
@@ -82,8 +82,8 @@ export default async function AdminRewardsPage() {
           </table>
         </div>
       ) : (
-        <div className="glass-card rounded-2xl p-8 text-center">
-          <p className="text-white/60">No rewards yet. Create one to get started.</p>
+        <div className="glass-card rounded-lg p-8 text-center">
+          <p className="text-iron/60">No rewards yet. Create one to get started.</p>
         </div>
       )}
     </div>

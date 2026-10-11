@@ -107,13 +107,13 @@ export default function CommentComposer({ postId, brandSlug }: Props) {
     <div className="space-y-2">
       {/* Drafts panel — only rendered when we have drafts or an error. */}
       {(drafts !== null || draftError !== null || loadingDrafts) && (
-        <div className="space-y-2 rounded-2xl border border-white/10 bg-white/5 p-3">
-          <div className="flex items-center justify-between text-xs uppercase tracking-wide text-white/60">
+        <div className="space-y-2 rounded-lg border border-iron/10 bg-iron/5 p-3">
+          <div className="flex items-center justify-between text-xs uppercase tracking-wide text-iron/60">
             <span>✨ AI draft suggestions</span>
             <button
               type="button"
               onClick={dismissDrafts}
-              className="text-white/50 hover:text-white"
+              className="text-iron/50 hover:text-iron"
               aria-label="Dismiss drafts"
             >
               ×
@@ -121,11 +121,11 @@ export default function CommentComposer({ postId, brandSlug }: Props) {
           </div>
 
           {loadingDrafts && (
-            <p className="text-xs text-white/50">Drafting 3 options…</p>
+            <p className="text-xs text-iron/50">Drafting 3 options…</p>
           )}
 
           {draftError && (
-            <p className="text-xs text-rose-300">{draftError}</p>
+            <p className="text-xs text-ember">{draftError}</p>
           )}
 
           {drafts && drafts.length > 0 && (
@@ -135,12 +135,12 @@ export default function CommentComposer({ postId, brandSlug }: Props) {
                   key={i}
                   type="button"
                   onClick={() => pickDraft(d)}
-                  className="rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-left text-sm text-white/85 transition hover:border-white/30 hover:bg-black/40"
+                  className="rounded-xl border border-iron/10 bg-parchment/30 px-3 py-2 text-left text-sm text-iron/85 transition hover:border-iron/30 hover:bg-parchment/40"
                 >
                   {d}
                 </button>
               ))}
-              <p className="text-xs text-white/40">
+              <p className="text-xs text-iron/40">
                 Pick one to fill the box. You can still edit before
                 posting.
               </p>
@@ -168,7 +168,7 @@ export default function CommentComposer({ postId, brandSlug }: Props) {
             type="button"
             onClick={handleDraftClick}
             disabled={loadingDrafts}
-            className="rounded-full border border-white/15 bg-black/30 px-3 py-2 text-xs text-white/70 hover:border-white/30 hover:bg-black/40 disabled:opacity-50"
+            className="rounded-full border border-iron/15 bg-parchment/30 px-3 py-2 text-xs text-iron/70 hover:border-iron/30 hover:bg-parchment/40 disabled:opacity-50"
             aria-label="Draft a reply with AI"
             title="Draft a reply with AI"
           >
@@ -185,7 +185,7 @@ export default function CommentComposer({ postId, brandSlug }: Props) {
           value={body}
           onChange={(e) => handleTextChange(e.target.value)}
           placeholder="Add a comment… (+2 pts)"
-          className="flex-1 resize-none rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-white/40 focus:outline-none"
+          className="flex-1 resize-none rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm text-iron placeholder:text-iron/40 focus:border-iron/40 focus:outline-none"
         />
 
         <SubmitButton />
@@ -201,7 +201,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="rounded-full bg-white/10 px-4 py-2 text-sm text-white/90 hover:bg-white/15 disabled:opacity-50"
+      className="rounded-full bg-iron/10 px-4 py-2 text-sm text-iron/90 hover:bg-iron/15 disabled:opacity-50"
     >
       {pending ? "…" : "Post"}
     </button>

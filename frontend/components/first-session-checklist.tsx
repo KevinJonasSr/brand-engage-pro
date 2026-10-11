@@ -65,7 +65,7 @@ export default function FirstSessionChecklist({
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-wide text-white/60">
+          <p className="text-xs uppercase tracking-wide text-iron/60">
             {FIRST_SESSION_EYEBROW}
           </p>
           <h2
@@ -75,13 +75,13 @@ export default function FirstSessionChecklist({
           >
             {FIRST_SESSION_TITLE}
           </h2>
-          <p className="mt-1 text-xs text-white/70">{FIRST_SESSION_BLURB}</p>
+          <p className="mt-1 text-xs text-iron/70">{FIRST_SESSION_BLURB}</p>
         </div>
         {dismissible && (
           <button
             type="button"
             onClick={dismiss}
-            className="rounded-full p-1 text-white/50 transition hover:bg-white/10 hover:text-white"
+            className="rounded-full p-1 text-iron/50 transition hover:bg-iron/10 hover:text-iron"
             aria-label="Dismiss first-session checklist"
           >
             <X size={16} />
@@ -89,12 +89,12 @@ export default function FirstSessionChecklist({
         )}
       </div>
 
-      <p className="mt-3 text-xs text-white/50">
+      <p className="mt-3 text-xs text-iron/50">
         {done} of {steps.length} done
       </p>
-      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-iron/10">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-aurora to-ember"
+          className="h-full rounded-full bg-ember"
           style={{ width: `${(done / steps.length) * 100}%` }}
         />
       </div>
@@ -104,35 +104,35 @@ export default function FirstSessionChecklist({
           <li key={step.id}>
             <Link
               href={step.href}
-              className={`flex items-start gap-3 rounded-2xl px-3 py-2.5 transition ${
+              className={`flex items-start gap-3 rounded-lg px-3 py-2.5 transition ${
                 step.done
-                  ? "bg-emerald-500/10 text-white/70"
-                  : "bg-black/30 hover:bg-white/10"
+                  ? "bg-emerald-500/10 text-iron/70"
+                  : "bg-parchment/30 hover:bg-iron/10"
               }`}
             >
               {step.done ? (
                 <CheckCircle2
                   size={18}
-                  className="mt-0.5 shrink-0 text-emerald-300"
+                  className="mt-0.5 shrink-0 text-sage-ink"
                   aria-hidden
                 />
               ) : (
                 <Circle
                   size={18}
-                  className="mt-0.5 shrink-0 text-white/40"
+                  className="mt-0.5 shrink-0 text-iron/40"
                   aria-hidden
                 />
               )}
               <span className="min-w-0">
-                <span className="block text-sm font-semibold text-white">
+                <span className="block text-sm font-semibold text-iron">
                   {step.label}
                 </span>
-                <span className="mt-0.5 block text-xs text-white/60">
+                <span className="mt-0.5 block text-xs text-iron/60">
                   {step.detail}
                 </span>
               </span>
               {!step.done && (
-                <span className="ml-auto shrink-0 self-center text-xs text-white/50">
+                <span className="ml-auto shrink-0 self-center text-xs text-iron/50">
                   Go →
                 </span>
               )}

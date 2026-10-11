@@ -60,7 +60,7 @@ export default function BrandEditForm({
             name="name"
             required
             defaultValue={initial.name}
-            className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
           />
         </Field>
         <Field label="Tagline">
@@ -68,7 +68,7 @@ export default function BrandEditForm({
             name="tagline"
             defaultValue={initial.tagline}
             placeholder="Short one-liner under the name"
-            className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
           />
         </Field>
       </div>
@@ -78,7 +78,7 @@ export default function BrandEditForm({
           rows={4}
           defaultValue={initial.bio}
           placeholder="What members read on the brand page."
-          className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
         />
       </Field>
       <Field label="Hero image">
@@ -107,7 +107,7 @@ export default function BrandEditForm({
             type="color"
             value={accentFrom}
             onChange={(e) => setAccentFrom(e.target.value)}
-            className="h-10 w-full cursor-pointer rounded-2xl border border-white/10 bg-black/40 p-1"
+            className="h-10 w-full cursor-pointer rounded-lg border border-iron/10 bg-parchment/40 p-1"
           />
         </Field>
         <Field label="Accent to">
@@ -115,7 +115,7 @@ export default function BrandEditForm({
             type="color"
             value={accentTo}
             onChange={(e) => setAccentTo(e.target.value)}
-            className="h-10 w-full cursor-pointer rounded-2xl border border-white/10 bg-black/40 p-1"
+            className="h-10 w-full cursor-pointer rounded-lg border border-iron/10 bg-parchment/40 p-1"
           />
         </Field>
         <Field label="Genres">
@@ -123,7 +123,7 @@ export default function BrandEditForm({
             name="genres"
             defaultValue={initial.genresText}
             placeholder="Country, Rock"
-            className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
           />
         </Field>
         <Field label="Sort order">
@@ -131,27 +131,27 @@ export default function BrandEditForm({
             name="sort_order"
             type="number"
             defaultValue={initial.sortOrder}
-            className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+            className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
           />
         </Field>
       </div>
       {/* Live preview of accent gradient */}
       <div
-        className="rounded-2xl border border-white/10 p-4"
+        className="rounded-lg border border-iron/10 p-4"
         style={{
           backgroundImage: `linear-gradient(to bottom right, ${accentFrom}66, #0f172a, #000000)`,
         }}
       >
-        <p className="text-xs uppercase tracking-[0.3em] text-white/60">{initial.genresText}</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-iron/60">{initial.genresText}</p>
         <p
           className="mt-2 text-2xl font-semibold"
           style={{ fontFamily: "var(--font-display)" }}
         >
           {initial.name}
         </p>
-        <p className="text-sm text-white/70">{initial.tagline}</p>
+        <p className="text-sm text-iron/70">{initial.tagline}</p>
         <span
-          className="mt-3 inline-flex rounded-full px-4 py-1.5 text-xs font-semibold text-white"
+          className="mt-3 inline-flex rounded-full px-4 py-1.5 text-xs font-semibold text-iron"
           style={{ backgroundImage: `linear-gradient(to right, ${accentFrom}, ${accentTo})` }}
         >
           CTA preview
@@ -163,18 +163,18 @@ export default function BrandEditForm({
           rows={4}
           defaultValue={initial.socialText}
           placeholder="One link per line. Paste full URLs — labels auto-detect:&#10;https://instagram.com/brand&#10;https://tiktok.com/@brand&#10;https://facebook.com/brand"
-          className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+          className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
         />
-        <p className="mt-1 text-xs text-white/50">
+        <p className="mt-1 text-xs text-iron/50">
           Recognized brands: Instagram, TikTok, Facebook, YouTube, X / Twitter,
           Threads, Spotify, Apple Music, SoundCloud, LinkedIn, Pinterest,
           Snapchat. Other URLs render as a labeled pill. Explicit format
-          <code className="mx-1 rounded bg-white/10 px-1">Label | URL</code>
+          <code className="mx-1 rounded bg-iron/10 px-1">Label | URL</code>
           still works.
         </p>
       </Field>
       <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-        <label className="flex items-center gap-2 text-xs text-white/70">
+        <label className="flex items-center gap-2 text-xs text-iron/70">
           <input
             type="checkbox"
             name="active"
@@ -189,7 +189,7 @@ export default function BrandEditForm({
           <button
             type="submit"
             disabled={submitting}
-            className="rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-2 text-sm font-semibold text-white disabled:opacity-50"
+            className="rounded-full bg-ember px-6 py-2 text-sm font-semibold text-linen disabled:opacity-50"
           >
             {submitting ? "Saving…" : "Save changes"}
           </button>
@@ -202,7 +202,7 @@ export default function BrandEditForm({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="text-xs uppercase tracking-wide text-white/60">{label}</span>
+      <span className="text-xs uppercase tracking-wide text-iron/60">{label}</span>
       <div className="mt-1">{children}</div>
     </label>
   );

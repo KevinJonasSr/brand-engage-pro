@@ -55,7 +55,7 @@ export default async function UnsubscribePage({
           <h1 className="text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
             Stop {what}{firstName ? `, ${firstName}` : ""}?
           </h1>
-          <p className="text-sm text-white/70">
+          <p className="text-sm text-iron/70">
             Press the button to stop getting {what} from Brand Engage Pro.
           </p>
           <form action={confirmUnsubscribe}>
@@ -63,7 +63,7 @@ export default async function UnsubscribePage({
             <input type="hidden" name="channel" value={ch} />
             <button
               type="submit"
-              className="mt-2 rounded-full bg-white px-6 py-2 text-sm font-semibold text-black hover:bg-white/90"
+              className="mt-2 rounded-full bg-iron px-6 py-2 text-sm font-semibold text-linen hover:bg-iron/90"
             >
               Unsubscribe from {what}
             </button>
@@ -75,7 +75,7 @@ export default async function UnsubscribePage({
           <h1 className="text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
             You&apos;re unsubscribed{firstName ? `, ${firstName}` : ""}.
           </h1>
-          <p className="text-sm text-white/70">
+          <p className="text-sm text-iron/70">
             We&apos;ve stopped sending {what} from Brand Engage Pro.
             You can turn it back on anytime from your profile.
           </p>
@@ -84,7 +84,7 @@ export default async function UnsubscribePage({
       {status === "not_found" && (
         <>
           <h1 className="text-2xl font-semibold">Link not recognized</h1>
-          <p className="text-sm text-white/70">
+          <p className="text-sm text-iron/70">
             The unsubscribe token in this link doesn&apos;t match any account. If you&apos;re still
             getting messages you don&apos;t want, email support@brandengagepro.com.
           </p>
@@ -93,7 +93,7 @@ export default async function UnsubscribePage({
       {status === "no_token" && (
         <>
           <h1 className="text-2xl font-semibold">Missing unsubscribe token</h1>
-          <p className="text-sm text-white/70">
+          <p className="text-sm text-iron/70">
             Unsubscribe links in our emails include a token. Use the link in a recent email, or
             email support@brandengagepro.com for help.
           </p>
@@ -102,14 +102,14 @@ export default async function UnsubscribePage({
       {status === "error" && (
         <>
           <h1 className="text-2xl font-semibold">Something went wrong</h1>
-          <p className="text-sm text-white/70">
+          <p className="text-sm text-iron/70">
             Please try again in a moment, or email support@brandengagepro.com.
           </p>
         </>
       )}
       <Link
         href="/"
-        className="mt-4 rounded-full border border-white/20 px-5 py-2 text-sm text-white/80 hover:bg-white/10"
+        className="mt-4 rounded-full border border-iron/20 px-5 py-2 text-sm text-iron/80 hover:bg-iron/10"
       >
         ← Member Home
       </Link>

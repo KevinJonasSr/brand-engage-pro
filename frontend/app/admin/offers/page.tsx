@@ -34,32 +34,32 @@ export default async function AdminOffersPage() {
           <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
             Offers
           </h1>
-          <p className="mt-2 text-sm text-white/60">
+          <p className="mt-2 text-sm text-iron/60">
             Active offers appear on the marketplace. Inactive ones are hidden but not deleted.
           </p>
         </div>
       </div>
 
-      <div className="rounded-2xl border border-white/10 bg-black/30 p-5">
-        <h2 className="text-sm uppercase tracking-wide text-white/60">Add a new offer</h2>
+      <div className="rounded-lg border border-iron/10 bg-parchment/30 p-5">
+        <h2 className="text-sm uppercase tracking-wide text-iron/60">Add a new offer</h2>
         <form action={createOfferAction} className="mt-4 grid gap-3 md:grid-cols-2">
           <BrandField />
           <input
             name="title"
             placeholder="Limited merch drop"
             required
-            className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+            className="rounded-xl border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
           />
           <input
             name="slug"
             placeholder="limited-merch-drop"
             required
-            className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+            className="rounded-xl border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
           />
           <select
             name="category"
             required
-            className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+            className="rounded-xl border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
             defaultValue="merch"
           >
             <option value="merch">Merch</option>
@@ -71,7 +71,7 @@ export default async function AdminOffersPage() {
           <select
             name="min_tier"
             required
-            className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+            className="rounded-xl border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
             defaultValue="bronze"
           >
             <option value="bronze">Bronze+</option>
@@ -84,23 +84,23 @@ export default async function AdminOffersPage() {
             type="number"
             min={0}
             placeholder="Price in points"
-            className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+            className="rounded-xl border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
           />
           <input
             name="inventory"
             type="number"
             min={0}
             placeholder="Inventory (optional)"
-            className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+            className="rounded-xl border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
           />
           <textarea
             name="description"
             placeholder="Description"
             rows={2}
-            className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm md:col-span-2"
+            className="rounded-xl border border-iron/10 bg-parchment/40 px-3 py-2 text-sm md:col-span-2"
           />
           <div className="md:col-span-2">
-            <p className="mb-2 text-xs uppercase tracking-wide text-white/60">
+            <p className="mb-2 text-xs uppercase tracking-wide text-iron/60">
               Image / ad mat (optional)
             </p>
             <ImageUploader
@@ -108,22 +108,22 @@ export default async function AdminOffersPage() {
               name="image_url"
               label="Add image or ad mat"
             />
-            <p className="mt-1 text-xs text-white/50">
+            <p className="mt-1 text-xs text-iron/50">
               Recommended: landscape, 1200×800 or larger. JPEG, PNG, WebP, or GIF.
             </p>
           </div>
           <button
             type="submit"
-            className="rounded-full bg-gradient-to-r from-aurora to-ember px-4 py-2 text-sm font-semibold text-white md:col-span-2"
+            className="rounded-full bg-ember px-4 py-2 text-sm font-semibold text-linen md:col-span-2"
           >
             Create offer
           </button>
         </form>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-white/10">
+      <div className="overflow-hidden rounded-lg border border-iron/10">
         <table className="w-full text-sm">
-          <thead className="bg-black/40 text-left text-xs uppercase tracking-wide text-white/50">
+          <thead className="bg-parchment/40 text-left text-xs uppercase tracking-wide text-iron/50">
             <tr>
               <th className="px-4 py-3">Image</th>
               <th className="px-4 py-3">Title</th>
@@ -137,13 +137,13 @@ export default async function AdminOffersPage() {
           <tbody>
             {offers.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-6 text-center text-white/50">
+                <td colSpan={7} className="px-4 py-6 text-center text-iron/50">
                   No offers yet — create one above.
                 </td>
               </tr>
             )}
             {offers.map((o) => (
-              <tr key={o.id} className="border-t border-white/5 align-top">
+              <tr key={o.id} className="border-t border-iron/5 align-top">
                 <td className="px-4 py-3">
                   <div className="w-32">
                     <OfferImageEditor offerId={o.id} initialUrl={o.image_url ?? null} />
@@ -162,7 +162,7 @@ export default async function AdminOffersPage() {
                 <td className="px-4 py-3">
                   <span
                     className={`rounded-full px-2 py-1 text-xs ${
-                      o.active ? "bg-emerald-500/20 text-emerald-300" : "bg-white/10 text-white/50"
+                      o.active ? "bg-emerald-500/20 text-sage-ink" : "bg-iron/10 text-iron/50"
                     }`}
                   >
                     {o.active ? "active" : "hidden"}
@@ -172,7 +172,7 @@ export default async function AdminOffersPage() {
                   <form action={toggleOfferActiveAction}>
                     <input type="hidden" name="id" value={o.id} />
                     <input type="hidden" name="active" value={String(!o.active)} />
-                    <button className="text-xs text-white/70 hover:text-white">
+                    <button className="text-xs text-iron/70 hover:text-iron">
                       {o.active ? "Hide" : "Activate"}
                     </button>
                   </form>

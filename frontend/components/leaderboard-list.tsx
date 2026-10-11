@@ -14,11 +14,11 @@ interface LeaderboardListProps {
 }
 
 const TIER_BADGE: Record<string, string> = {
-  bronze:   "bg-amber-700/30 text-amber-300",
-  silver:   "bg-slate-400/25 text-slate-200",
-  gold:     "bg-yellow-500/25 text-yellow-300",
-  platinum: "bg-violet-500/30 text-violet-200",
-  founder:  "bg-rose-500/30 text-rose-200",
+  bronze:   "bg-amber-700/30 text-aurora-ink",
+  silver:   "bg-slate-400/25 text-iron/70",
+  gold:     "bg-yellow-500/25 text-aurora-ink",
+  platinum: "bg-violet-500/30 text-violet-800",
+  founder:  "bg-rose-500/30 text-ember",
 };
 
 export default function LeaderboardList({
@@ -33,7 +33,7 @@ export default function LeaderboardList({
       {entries.map((entry) => {
         const isViewer = viewerMemberId === entry.member_id;
         const tierBadgeClass =
-          TIER_BADGE[entry.current_tier ?? ""] ?? "bg-white/10 text-white/60";
+          TIER_BADGE[entry.current_tier ?? ""] ?? "bg-iron/10 text-iron/60";
 
         return (
           <li
@@ -41,15 +41,15 @@ export default function LeaderboardList({
             className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 transition ${
               isViewer
                 ? "border-aurora/40 bg-aurora/5"
-                : "border-white/10 bg-white/3 hover:border-white/20"
+                : "border-iron/10 bg-iron/3 hover:border-iron/20"
             }`}
           >
-            <span className="w-6 shrink-0 text-center text-sm font-semibold tabular-nums text-white/70">
+            <span className="w-6 shrink-0 text-center text-sm font-semibold tabular-nums text-iron/70">
               {entry.rank}
             </span>
 
             {entry.avatar_url ? (
-              <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full ring-1 ring-white/15">
+              <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full ring-1 ring-iron/15">
                 <Image
                   src={entry.avatar_url}
                   alt={entry.display_name}
@@ -59,16 +59,16 @@ export default function LeaderboardList({
                 />
               </div>
             ) : (
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-sm font-semibold text-white">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-iron/10 text-sm font-semibold text-iron">
                 {entry.display_name.charAt(0).toUpperCase()}
               </div>
             )}
 
             <div className="min-w-0 flex-1">
-              <p className="flex items-center gap-2 text-sm font-medium text-white">
+              <p className="flex items-center gap-2 text-sm font-medium text-iron">
                 <span className="truncate">{entry.display_name}</span>
                 {isViewer && (
-                  <span className="rounded-full bg-aurora/25 px-1.5 py-0.5 text-[9px] uppercase tracking-wide text-aurora">
+                  <span className="rounded-full bg-aurora/25 px-1.5 py-0.5 text-[9px] uppercase tracking-wide text-aurora-ink">
                     You
                   </span>
                 )}
@@ -81,7 +81,7 @@ export default function LeaderboardList({
                 )}
               </p>
               {showBreakdown && (
-                <p className="mt-0.5 text-xs text-white/55">
+                <p className="mt-0.5 text-xs text-iron/55">
                   {entry.reactions > 0 && `${entry.reactions} reactions`}
                   {entry.comments > 0 && ` · ${entry.comments} comments`}
                   {entry.rsvps > 0 && ` · ${entry.rsvps} RSVPs`}
@@ -91,10 +91,10 @@ export default function LeaderboardList({
             </div>
 
             <div className="text-right">
-              <p className="text-sm font-semibold tabular-nums text-white">
+              <p className="text-sm font-semibold tabular-nums text-iron">
                 {entry.score.toLocaleString()}
               </p>
-              <p className="text-xs uppercase tracking-wide text-white/45">
+              <p className="text-xs uppercase tracking-wide text-iron/45">
                 pts
               </p>
             </div>

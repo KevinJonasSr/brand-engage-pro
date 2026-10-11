@@ -21,12 +21,12 @@ export default function CheckinQrCard({
 
   return (
     <div className="glass-card space-y-4 p-6">
-      <p className="text-sm uppercase tracking-wide text-white/60">Check-in QR</p>
-      <p className="text-xs text-white/50">
+      <p className="text-sm uppercase tracking-wide text-iron/60">Check-in QR</p>
+      <p className="text-xs text-iron/50">
         Display this at your register or entrance. Members scan to earn{" "}
-        <span className="text-emerald-300">+25 pts</span> per visit (once per day).
+        <span className="text-sage-ink">+25 pts</span> per visit (once per day).
       </p>
-      <div className="flex justify-center rounded-2xl bg-white p-5">
+      <div className="flex justify-center rounded-lg bg-iron p-5">
         <QRCodeSVG
           value={url}
           size={200}
@@ -35,8 +35,8 @@ export default function CheckinQrCard({
           level="M"
         />
       </div>
-      <p className="text-center text-xs text-white/40 font-mono break-all">{url}</p>
-      <p className="text-center text-xs font-semibold text-white/70">
+      <p className="text-center text-xs text-iron/40 font-mono break-all">{url}</p>
+      <p className="text-center text-xs font-semibold text-iron/70">
         Scan to check in to {brandName}
       </p>
     </div>

@@ -18,7 +18,7 @@ export default async function NewCampaignPage() {
         <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
           New campaign
         </h1>
-        <p className="mt-1 text-sm text-white/60">
+        <p className="mt-1 text-sm text-iron/60">
           Build a multi-surface drop. Fill in only the sections you want — everything else stays empty.
           Hit Publish to member out across community, marketplace, and member CTAs.
         </p>

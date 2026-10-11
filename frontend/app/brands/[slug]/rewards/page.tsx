@@ -14,10 +14,10 @@ export const dynamic = "force-dynamic";
 async function MemberPoints({ isSignedIn }: { isSignedIn: boolean }) {
   if (!isSignedIn) {
     return (
-      <div className="rounded-lg border border-dashed border-white/15 bg-black/30 px-4 py-3">
-        <p className="text-xs uppercase tracking-wide text-white/60">Your points</p>
-        <p className="mt-1 text-2xl font-bold text-white">0</p>
-        <p className="mt-1 text-xs text-white/50">
+      <div className="rounded-lg border border-dashed border-iron/15 bg-parchment/30 px-4 py-3">
+        <p className="text-xs uppercase tracking-wide text-iron/60">Your points</p>
+        <p className="mt-1 text-2xl font-bold text-iron">0</p>
+        <p className="mt-1 text-xs text-iron/50">
           Sign in to earn and redeem. New accounts start at 0.
         </p>
       </div>
@@ -27,9 +27,9 @@ async function MemberPoints({ isSignedIn }: { isSignedIn: boolean }) {
   const points = await getSpendablePoints();
 
   return (
-    <div className="rounded-lg border border-white/10 bg-black/30 px-4 py-2">
-      <p className="text-xs uppercase tracking-wide text-white/60">Your Points</p>
-      <p className="mt-1 text-2xl font-bold text-white">
+    <div className="rounded-lg border border-iron/10 bg-parchment/30 px-4 py-2">
+      <p className="text-xs uppercase tracking-wide text-iron/60">Your Points</p>
+      <p className="mt-1 text-2xl font-bold text-iron">
         {points.toLocaleString()}
       </p>
     </div>
@@ -63,13 +63,13 @@ export default async function RewardsPage({
   const isNellies = slug.toLowerCase() === NELLIES_BRAND_SLUG;
 
   return (
-    <div className="min-h-screen bg-midnight px-4 py-8">
+    <div className="min-h-screen bg-linen px-4 py-8">
       <div className="mx-auto max-w-4xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold" style={{ fontFamily: "var(--font-display)" }}>
             Rewards · {brand.name}
           </h1>
-          <p className="mt-2 text-sm text-white/60">
+          <p className="mt-2 text-sm text-iron/60">
             {isNellies ? (
               <>
                 Join Nellie&apos;s and earn points from visits and check-ins. You also get free
@@ -84,7 +84,7 @@ export default async function RewardsPage({
               </>
             )}
           </p>
-          <p className="mt-2 text-xs text-white/45">
+          <p className="mt-2 text-xs text-iron/45">
             Move up from Bronze to Platinum as you earn points. The first 100 members join as
             Founders for free. Brands pay, guests join free. Your balance starts at 0
             when you join.
@@ -92,21 +92,21 @@ export default async function RewardsPage({
         </div>
 
         {!isSignedIn && (
-          <div className="mb-6 rounded-2xl border border-aurora/40 bg-gradient-to-r from-aurora/20 via-slate-900 to-ember/20 px-5 py-4">
+          <div className="mb-6 rounded-lg border border-aurora/40 bg-gradient-to-r from-aurora/20 via-slate-900 to-ember/20 px-5 py-4">
             <p className="text-sm font-semibold">Browse rewards — redeem after you join</p>
-            <p className="mt-1 text-xs text-white/70">
+            <p className="mt-1 text-xs text-iron/70">
               Finish your profile for +100 welcome points, then earn from visits and check-ins.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Link
                 href={`/signup?ref=${encodeURIComponent(slug)}&next=${encodeURIComponent(loginNext)}`}
-                className="rounded-full bg-gradient-to-r from-aurora to-ember px-4 py-2 text-xs font-semibold text-white"
+                className="rounded-full bg-ember px-4 py-2 text-xs font-semibold text-linen"
               >
                 Create free account →
               </Link>
               <Link
                 href={`/login?next=${encodeURIComponent(loginNext)}`}
-                className="rounded-full border border-white/20 px-4 py-2 text-xs text-white/80 hover:bg-white/10"
+                className="rounded-full border border-iron/20 px-4 py-2 text-xs text-iron/80 hover:bg-iron/10"
               >
                 Sign in
               </Link>
@@ -132,8 +132,8 @@ export default async function RewardsPage({
             ))}
           </div>
         ) : (
-          <div className="glass-card mb-12 rounded-2xl p-8 text-center">
-            <p className="text-sm text-white/60">
+          <div className="glass-card mb-12 rounded-lg p-8 text-center">
+            <p className="text-sm text-iron/60">
               {isNellies ? (
                 <>
                   Nellie&apos;s member offers are on the Nellie&apos;s page: a welcome dessert with an
@@ -159,17 +159,17 @@ export default async function RewardsPage({
                 >
                   <div>
                     <p className="text-sm font-medium">{r.reward.title}</p>
-                    <p className="text-xs text-white/60">
+                    <p className="text-xs text-iron/60">
                       {r.point_cost.toLocaleString()} points • {r.status}
                     </p>
                   </div>
                   <span
                     className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
                       r.status === "fulfilled"
-                        ? "bg-green-500/20 text-green-300"
+                        ? "bg-green-500/20 text-sage-ink"
                         : r.status === "cancelled"
-                          ? "bg-red-500/20 text-red-300"
-                          : "bg-yellow-500/20 text-yellow-300"
+                          ? "bg-red-500/20 text-ember"
+                          : "bg-yellow-500/20 text-aurora-ink"
                     }`}
                   >
                     {r.status === "fulfilled"

@@ -76,19 +76,19 @@ export default function RsvpButton({
         disabled={disabled}
         className={`rounded-full px-3 py-1 text-xs font-semibold transition disabled:opacity-50 ${
           rsvped
-            ? "bg-emerald-500/20 text-emerald-200 hover:bg-emerald-500/30"
-            : "bg-gradient-to-r from-aurora to-ember text-white"
+            ? "bg-emerald-500/20 text-sage-ink hover:bg-emerald-500/30"
+            : "bg-ember text-linen"
         }`}
       >
         <span suppressHydrationWarning>{label}</span>
       </button>
       {heldForFounders && (
-        <p className="text-xs text-amber-200/80">Founders RSVP first</p>
+        <p className="text-xs text-aurora-ink/80">Founders RSVP first</p>
       )}
       {inFoundersWindow && isFounder && !rsvped && (
-        <p className="text-xs text-amber-200/80">Founder early access</p>
+        <p className="text-xs text-aurora-ink/80">Founder early access</p>
       )}
-      {error && <p className="text-xs text-rose-300">{error}</p>}
+      {error && <p className="text-xs text-ember">{error}</p>}
     </div>
   );
 }

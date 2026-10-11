@@ -88,16 +88,16 @@ export default async function AdminLayout({
       : null;
 
   return (
-    <div className="min-h-screen bg-midnight">
+    <div className="min-h-screen bg-linen">
       <div className="mx-auto max-w-6xl px-6 py-8">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/10 bg-black/40 px-4 py-3">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-lg border border-iron/10 bg-parchment/40 px-4 py-3">
           <div className="flex flex-wrap items-center gap-3 text-sm">
-            <span className="rounded-full bg-amber-500/20 px-3 py-1 text-xs uppercase tracking-wide text-amber-300">
+            <span className="rounded-full bg-amber-500/20 px-3 py-1 text-xs uppercase tracking-wide text-aurora-ink">
               Admin
             </span>
             {currentCommunity && (
               <span
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/40 px-3 py-1 text-xs"
+                className="inline-flex items-center gap-2 rounded-full border border-iron/15 bg-parchment/40 px-3 py-1 text-xs"
                 title={`Managing ${currentCommunity.display_name}`}
               >
                 <span
@@ -107,29 +107,29 @@ export default async function AdminLayout({
                     backgroundImage: `linear-gradient(135deg, ${currentCommunity.accent_from}, ${currentCommunity.accent_to})`,
                   }}
                 />
-                <span className="font-semibold text-white">
+                <span className="font-semibold text-iron">
                   {currentCommunity.display_name}
                 </span>
                 {(ctx.isSuperAdmin || ctx.communities.length > 1) && (
                   <Link
                     href="/admin/communities"
-                    className="text-white/50 hover:text-white"
+                    className="text-iron/50 hover:text-iron"
                   >
                     switch
                   </Link>
                 )}
               </span>
             )}
-            <span className="text-white/60">{ctx.user.email}</span>
+            <span className="text-iron/60">{ctx.user.email}</span>
             {ctx.isSuperAdmin && (
-              <span className="rounded-full bg-aurora/20 px-2 py-0.5 text-xs uppercase tracking-wide text-aurora">
+              <span className="rounded-full bg-aurora/20 px-2 py-0.5 text-xs uppercase tracking-wide text-aurora-ink">
                 Super-admin
               </span>
             )}
           </div>
           <Link
             href="/"
-            className="text-xs text-white/60 hover:text-white"
+            className="text-xs text-iron/60 hover:text-iron"
           >
             ← Back to member site
           </Link>
@@ -140,11 +140,11 @@ export default async function AdminLayout({
             <Link
               key={item.href}
               href={item.href}
-              className="relative inline-flex rounded-lg border border-white/10 px-3 py-2 text-xs font-medium text-white/60 hover:border-white/20 hover:text-white"
+              className="relative inline-flex rounded-lg border border-iron/10 px-3 py-2 text-xs font-medium text-iron/60 hover:border-iron/20 hover:text-iron"
             >
               {item.label}
               {item.href === "/admin/redemptions" && pendingCount > 0 && (
-                <span className="absolute right-0 top-0 inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white translate-x-1 -translate-y-1">
+                <span className="absolute right-0 top-0 inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-linen translate-x-1 -translate-y-1">
                   {pendingCount > 9 ? "9+" : pendingCount}
                 </span>
               )}

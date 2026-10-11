@@ -78,9 +78,9 @@ export default async function RsvpSharePage({
   const shareText = `RSVP confirmed for ${eventTitle}${eventDate ? ` on ${eventDate}` : ""}${location ? ` at ${location}` : ""}. Join me: ${shareUrl}`;
 
   return (
-    <main className="min-h-screen bg-[#050b1f] text-white flex flex-col items-center justify-center px-6 py-16">
+    <main className="min-h-screen bg-linen text-iron flex flex-col items-center justify-center px-6 py-16">
       <div
-        className="w-full max-w-lg rounded-2xl border border-white/20 p-8 flex flex-col items-center gap-6 text-center"
+        className="w-full max-w-lg rounded-lg border border-iron/20 p-8 flex flex-col items-center gap-6 text-center"
         style={{
           background:
             `radial-gradient(circle at 20% 15%, ${brand.accentFrom}66, transparent 55%), ` +
@@ -89,9 +89,9 @@ export default async function RsvpSharePage({
           boxShadow: `0 0 60px ${brand.accentFrom}22`,
         }}
       >
-        <p className="text-[10px] tracking-[0.2em] uppercase text-white/30 font-medium">Brand Engage Pro</p>
+        <p className="text-[10px] tracking-[0.2em] uppercase text-iron/30 font-medium">Brand Engage Pro</p>
         <div className="flex flex-col gap-1">
-          <p className="text-xs tracking-widest uppercase text-white/50">I&apos;m going</p>
+          <p className="text-xs tracking-widest uppercase text-iron/50">I&apos;m going</p>
           <h1
             className="text-3xl font-bold"
             style={{
@@ -105,11 +105,11 @@ export default async function RsvpSharePage({
         </div>
         {(eventDate || location) && (
           <div className="flex flex-col items-center gap-1">
-            {eventDate && <p className="text-white/80 text-sm font-medium">{eventDate}</p>}
-            {location && <p className="text-white/50 text-sm">{location}</p>}
+            {eventDate && <p className="text-iron/80 text-sm font-medium">{eventDate}</p>}
+            {location && <p className="text-iron/50 text-sm">{location}</p>}
           </div>
         )}
-        <p className="text-white/60 text-sm max-w-xs">
+        <p className="text-iron/60 text-sm max-w-xs">
           RSVP confirmed via Brand Engage Pro — the {brand.name} community app.
         </p>
         <div className="flex flex-col gap-3 w-full">
@@ -125,7 +125,7 @@ export default async function RsvpSharePage({
               href={ticketUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-center text-sm text-white/50 hover:text-white transition-colors py-2"
+              className="text-center text-sm text-iron/50 hover:text-iron transition-colors py-2"
             >
               Get tickets →
             </a>
@@ -136,7 +136,7 @@ export default async function RsvpSharePage({
       <div className="mt-8 flex flex-col items-center gap-3">
         <Link
           href={`/brands/${brand.slug}`}
-          className="text-sm text-white/50 hover:text-white transition-colors"
+          className="text-sm text-iron/50 hover:text-iron transition-colors"
         >
           Visit brand experience →
         </Link>

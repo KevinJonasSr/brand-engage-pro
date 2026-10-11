@@ -89,7 +89,7 @@ export default async function MemberProfilePage({
     <main className="mx-auto max-w-4xl px-6 py-12">
       {/* ─── Header ──────────────────────────────────────────────────── */}
       <section
-        className="relative overflow-hidden rounded-3xl border border-white/15 p-8 shadow-glass md:p-10"
+        className="relative overflow-hidden rounded-lg border border-iron/15 p-8 shadow-glass md:p-10"
         style={{
           background: `radial-gradient(circle at 15% 10%, ${tier.from}55, transparent 55%), radial-gradient(circle at 85% 95%, ${tier.to}55, transparent 60%), #050b1f`,
         }}
@@ -101,11 +101,11 @@ export default async function MemberProfilePage({
               alt={`${displayName} avatar`}
               width={96}
               height={96}
-              className="h-24 w-24 rounded-full border-2 border-white/20 object-cover"
+              className="h-24 w-24 rounded-full border-2 border-iron/20 object-cover"
             />
           ) : (
             <div
-              className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-white/20 text-3xl font-bold"
+              className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-iron/20 text-3xl font-bold"
               style={{
                 backgroundImage: `linear-gradient(135deg, ${tier.from}, ${tier.to})`,
               }}
@@ -126,11 +126,11 @@ export default async function MemberProfilePage({
             >
               {displayName}
             </h1>
-            <p className="mt-2 text-sm text-white/65">
+            <p className="mt-2 text-sm text-iron/65">
               @{profile.profileSlug} · Member since {formatMemberSince(profile.memberSince)}
             </p>
             {socialHandle && (
-              <p className="mt-1 text-xs text-white/55">
+              <p className="mt-1 text-xs text-iron/55">
                 Find them on TikTok/Instagram: {socialHandle}
               </p>
             )}
@@ -139,23 +139,23 @@ export default async function MemberProfilePage({
 
         {/* Stats row */}
         <div className="relative mt-8 grid grid-cols-3 gap-3 text-center">
-          <div className="rounded-2xl bg-white/5 px-3 py-4">
+          <div className="rounded-lg bg-iron/5 px-3 py-4">
             <p className="text-2xl font-bold tabular-nums">
               {profile.totalPoints.toLocaleString()}
             </p>
-            <p className="mt-1 text-xs text-white/60">total points</p>
+            <p className="mt-1 text-xs text-iron/60">total points</p>
           </div>
-          <div className="rounded-2xl bg-white/5 px-3 py-4">
+          <div className="rounded-lg bg-iron/5 px-3 py-4">
             <p className="text-2xl font-bold tabular-nums">
               {profile.founderBadges.length}
             </p>
-            <p className="mt-1 text-xs text-white/60">founder badges</p>
+            <p className="mt-1 text-xs text-iron/60">founder badges</p>
           </div>
-          <div className="rounded-2xl bg-white/5 px-3 py-4">
+          <div className="rounded-lg bg-iron/5 px-3 py-4">
             <p className="text-2xl font-bold tabular-nums">
               {profile.brands.length}
             </p>
-            <p className="mt-1 text-xs text-white/60">brands followed</p>
+            <p className="mt-1 text-xs text-iron/60">brands followed</p>
           </div>
         </div>
 
@@ -183,13 +183,13 @@ export default async function MemberProfilePage({
               <Link
                 key={f.communitySlug}
                 href={`/share/founder/${f.communitySlug}/${f.founderNumber}`}
-                className="group relative overflow-hidden rounded-2xl border border-white/10 p-5 transition hover:border-white/30"
+                className="group relative overflow-hidden rounded-lg border border-iron/10 p-5 transition hover:border-iron/30"
                 style={{
                   background: `radial-gradient(circle at 15% 10%, ${f.accentFrom}33, transparent 60%), radial-gradient(circle at 85% 90%, ${f.accentTo}33, transparent 60%), rgba(255,255,255,0.03)`,
                 }}
               >
                 <div className="flex items-center justify-between">
-                  <p className="text-xs font-medium uppercase tracking-widest text-white/65">
+                  <p className="text-xs font-medium uppercase tracking-widest text-iron/65">
                     Founding Member of
                   </p>
                   <p
@@ -205,7 +205,7 @@ export default async function MemberProfilePage({
                   </p>
                 </div>
                 <p className="mt-2 text-lg font-semibold">{f.communityName}</p>
-                <p className="mt-3 text-xs text-white/55 transition group-hover:text-white/80">
+                <p className="mt-3 text-xs text-iron/55 transition group-hover:text-iron/80">
                   See badge →
                 </p>
               </Link>
@@ -226,15 +226,15 @@ export default async function MemberProfilePage({
             {profile.badges.map((b) => (
               <div
                 key={b.slug + b.earnedAt}
-                className="rounded-2xl border border-white/10 bg-black/30 p-4"
+                className="rounded-lg border border-iron/10 bg-parchment/30 p-4"
               >
                 <p className="text-sm font-semibold">{b.name}</p>
                 {b.description && (
-                  <p className="mt-1 text-xs text-white/60 line-clamp-2">
+                  <p className="mt-1 text-xs text-iron/60 line-clamp-2">
                     {b.description}
                   </p>
                 )}
-                <p className="mt-3 text-xs text-white/45">
+                <p className="mt-3 text-xs text-iron/45">
                   Earned{" "}
                   {new Date(b.earnedAt).toLocaleDateString("en-US", {
                     month: "short",
@@ -261,7 +261,7 @@ export default async function MemberProfilePage({
               <Link
                 key={b.slug}
                 href={`/brands/${b.slug}`}
-                className="rounded-full border border-white/15 bg-black/30 px-4 py-1.5 text-sm text-white/85 hover:border-white/30 hover:bg-white/5"
+                className="rounded-full border border-iron/15 bg-parchment/30 px-4 py-1.5 text-sm text-iron/85 hover:border-iron/30 hover:bg-iron/5"
               >
                 {b.name}
               </Link>
@@ -273,31 +273,31 @@ export default async function MemberProfilePage({
       {profile.founderBadges.length === 0 &&
         profile.badges.length === 0 &&
         profile.brands.length === 0 && (
-          <section className="mt-12 rounded-3xl border border-white/10 bg-white/5 p-8 text-center">
-            <p className="text-sm text-white/70">
+          <section className="mt-12 rounded-lg border border-iron/10 bg-iron/5 p-8 text-center">
+            <p className="text-sm text-iron/70">
               {displayName} just joined Brand Engage Pro. Their member journey
               starts here.
             </p>
             <Link
               href="/brands"
-              className="mt-4 inline-flex rounded-full border border-white/25 px-4 py-2 text-xs font-medium text-white/85 hover:bg-white/10"
+              className="mt-4 inline-flex rounded-full border border-iron/25 px-4 py-2 text-xs font-medium text-iron/85 hover:bg-iron/10"
             >
               Browse brands
             </Link>
           </section>
         )}
 
-      <section className="mt-16 rounded-3xl border border-white/10 bg-white/5 p-6 text-center">
-        <p className="text-sm font-medium text-white/85">
+      <section className="mt-16 rounded-lg border border-iron/10 bg-iron/5 p-6 text-center">
+        <p className="text-sm font-medium text-iron/85">
           Want a profile of your own?
         </p>
-        <p className="mt-1 text-xs text-white/55">
+        <p className="mt-1 text-xs text-iron/55">
           Follow brands, earn perks, unlock specials and badges. Your member
           profile builds itself.
         </p>
         <Link
           href="/brands"
-          className="mt-4 inline-flex rounded-full bg-gradient-to-r from-aurora to-ember px-5 py-2.5 text-sm font-semibold text-white shadow-glass transition hover:brightness-110"
+          className="mt-4 inline-flex rounded-full bg-ember px-5 py-2.5 text-sm font-semibold text-linen shadow-glass transition hover:brightness-110"
         >
           Find your brands →
         </Link>

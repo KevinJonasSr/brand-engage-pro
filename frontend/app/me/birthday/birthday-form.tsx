@@ -17,9 +17,9 @@ export default function BirthdayForm({
   const savedLabel = birthdayMonthLabel(savedMonth);
   if (savedLabel) {
     return (
-      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+      <div className="rounded-lg border border-iron/10 bg-iron/[0.02] p-4">
         <div className="font-medium">Birthday month: {savedLabel}</div>
-        <p className="mt-1 text-sm text-white/60">
+        <p className="mt-1 text-sm text-iron/60">
           Your birthday entrée at Nellie&apos;s (up to $30) opens in {savedLabel}.
           Need to change it? Contact us and we&apos;ll fix it.
         </p>
@@ -45,7 +45,7 @@ export default function BirthdayForm({
   return (
     <form
       onSubmit={onSubmit}
-      className="space-y-4 rounded-2xl border border-white/10 bg-white/[0.02] p-4"
+      className="space-y-4 rounded-lg border border-iron/10 bg-iron/[0.02] p-4"
     >
       <label className="block">
         <span className="font-medium">Birthday month</span>
@@ -54,7 +54,7 @@ export default function BirthdayForm({
           value={choice}
           onChange={(e) => setChoice(e.target.value)}
           disabled={pending}
-          className="mt-2 block w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-white"
+          className="mt-2 block w-full rounded-xl border border-iron/15 bg-parchment/40 px-3 py-2 text-iron"
         >
           <option value="">Choose a month</option>
           {BIRTHDAY_MONTHS.map((name, i) => (
@@ -63,14 +63,14 @@ export default function BirthdayForm({
             </option>
           ))}
         </select>
-        <span className="mt-2 block text-sm text-white/60">
+        <span className="mt-2 block text-sm text-iron/60">
           Needed for the birthday entrée (up to $30) during your birthday month.
           You can set it once.
         </span>
       </label>
 
       {error && (
-        <p role="alert" className="text-sm text-rose-300">
+        <p role="alert" className="text-sm text-ember">
           {error}
         </p>
       )}
@@ -78,7 +78,7 @@ export default function BirthdayForm({
       <button
         type="submit"
         disabled={pending || !choice}
-        className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black disabled:opacity-50"
+        className="rounded-full bg-iron px-5 py-2 text-sm font-semibold text-linen disabled:opacity-50"
       >
         {pending ? "Saving..." : "Save"}
       </button>

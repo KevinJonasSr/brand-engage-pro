@@ -67,7 +67,7 @@ function IconCalendar() {
 
 function IconBadge({ icon }: { icon: ReactNode }) {
   return (
-    <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-aurora/20 to-ember/10 text-aurora">
+    <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-aurora/20 to-ember/10 text-aurora-ink">
       {icon}
     </span>
   );
@@ -93,7 +93,7 @@ export default function SignedOutLanding({
   return (
     <main className="overflow-hidden">
       {/* ─── Hero ─────────────────────────────────────────────────────────── */}
-      <section className="relative border-b border-white/5">
+      <section className="relative border-b border-iron/5">
         {/* Soft aurora glow behind the hero */}
         <div
           aria-hidden
@@ -104,7 +104,7 @@ export default function SignedOutLanding({
 
         <div className="relative mx-auto grid max-w-6xl gap-10 px-6 pt-12 pb-20 lg:grid-cols-[1.15fr_1fr] lg:pt-16 lg:pb-28">
           <div className="flex flex-col justify-center">
-            <p className="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs uppercase tracking-widest text-white/70">
+            <p className="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-iron/15 bg-iron/5 px-3 py-1 text-xs uppercase tracking-widest text-iron/70">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
               The member-loyalty platform
             </p>
@@ -118,7 +118,7 @@ export default function SignedOutLanding({
                 Become a regular.
               </span>
             </h1>
-            <p className="mt-6 max-w-xl text-lg text-white/70">
+            <p className="mt-6 max-w-xl text-lg text-iron/70">
               Follow the brands you love, earn points for every visit and
               check-in, and unlock real perks — member specials, dining rewards,
               and first access casual customers never get.
@@ -126,68 +126,68 @@ export default function SignedOutLanding({
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
                 href="/signup?next=/onboarding"
-                className="rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white shadow-glass transition hover:brightness-110"
+                className="rounded-full bg-ember px-6 py-3 text-sm font-semibold text-linen shadow-glass transition hover:brightness-110"
               >
                 Create your member profile →
               </Link>
               <Link
                 href="/login"
-                className="rounded-full border border-white/20 px-5 py-3 text-sm font-medium text-white/80 hover:bg-white/10"
+                className="rounded-full border border-iron/20 px-5 py-3 text-sm font-medium text-iron/80 hover:bg-iron/10"
               >
                 Sign in
               </Link>
             </div>
-            <p className="mt-4 text-xs text-white/50">
+            <p className="mt-4 text-xs text-iron/50">
               Free · 60 seconds · No credit card
             </p>
-            <p className="mt-2 text-xs font-medium text-aurora">
+            <p className="mt-2 text-xs font-medium text-aurora-ink">
               Join free and unlock your first member perk today.
             </p>
           </div>
 
           {/* Honest start state — no fake points / Gold theater */}
-          <div className="lg:hidden mt-8 rounded-3xl border border-white/10 bg-gradient-to-br from-aurora/40 via-slate-900 to-black p-6 shadow-glass">
-            <p className="text-xs uppercase tracking-widest text-white/60">Your member start</p>
+          <div className="lg:hidden mt-8 rounded-lg border border-iron/10 bg-gradient-to-br from-aurora/40 via-slate-900 to-parchment p-6 shadow-glass">
+            <p className="text-xs uppercase tracking-widest text-iron/60">Your member start</p>
             <p className="mt-4 text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>0</p>
-            <p className="text-xs text-white/50">points until you join</p>
-            <ul className="mt-4 space-y-2 text-xs text-white/70">
-              <li className="rounded-xl bg-black/30 px-3 py-2">+100 welcome points after you finish your profile</li>
-              <li className="rounded-xl bg-black/30 px-3 py-2">+25 pts per daily check-in visit</li>
-              <li className="rounded-xl bg-black/30 px-3 py-2">Redeem food & drink rewards at the brand</li>
+            <p className="text-xs text-iron/50">points until you join</p>
+            <ul className="mt-4 space-y-2 text-xs text-iron/70">
+              <li className="rounded-xl bg-parchment/30 px-3 py-2">+100 welcome points after you finish your profile</li>
+              <li className="rounded-xl bg-parchment/30 px-3 py-2">+25 pts per daily check-in visit</li>
+              <li className="rounded-xl bg-parchment/30 px-3 py-2">Redeem food & drink rewards at the brand</li>
             </ul>
           </div>
 
           <div className="relative hidden lg:block">
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="relative h-[440px] w-[360px]">
-                <div className="absolute left-8 top-12 h-[380px] w-[320px] rotate-3 rounded-3xl border border-white/10 bg-gradient-to-br from-ember/25 via-slate-900 to-aurora/25 shadow-glass">
-                  <div className="p-6 text-white/70">
+                <div className="absolute left-8 top-12 h-[380px] w-[320px] rotate-3 rounded-lg border border-iron/10 bg-gradient-to-br from-ember/25 via-slate-900 to-aurora/25 shadow-glass">
+                  <div className="p-6 text-iron/70">
                     <p className="text-xs uppercase tracking-widest">How members earn</p>
-                    <p className="mt-2 text-sm font-semibold text-white">Visits · check-ins · community</p>
-                    <p className="mt-1 text-xs text-white/60">
+                    <p className="mt-2 text-sm font-semibold text-iron">Visits · check-ins · community</p>
+                    <p className="mt-1 text-xs text-iron/60">
                       Real points only — no demo balances
                     </p>
                   </div>
                 </div>
-                <div className="absolute left-0 top-0 h-[380px] w-[320px] -rotate-2 rounded-3xl border border-white/10 bg-gradient-to-br from-aurora/40 via-slate-900 to-black p-6 shadow-glass">
-                  <p className="text-xs uppercase tracking-widest text-white/60">
+                <div className="absolute left-0 top-0 h-[380px] w-[320px] -rotate-2 rounded-lg border border-iron/10 bg-gradient-to-br from-aurora/40 via-slate-900 to-parchment p-6 shadow-glass">
+                  <p className="text-xs uppercase tracking-widest text-iron/60">
                     Sign up to start at 0
                   </p>
                   <p
-                    className="mt-6 text-4xl font-semibold text-white"
+                    className="mt-6 text-4xl font-semibold text-iron"
                     style={{ fontFamily: "var(--font-display)" }}
                   >
                     0
                   </p>
-                  <p className="text-xs text-white/50">total points (before you join)</p>
-                  <div className="mt-6 space-y-2 text-xs text-white/80">
-                    <div className="rounded-xl bg-black/30 px-3 py-2">
-                      Finish profile → <span className="text-emerald-300">+100 welcome pts</span>
+                  <p className="text-xs text-iron/50">total points (before you join)</p>
+                  <div className="mt-6 space-y-2 text-xs text-iron/80">
+                    <div className="rounded-xl bg-parchment/30 px-3 py-2">
+                      Finish profile → <span className="text-sage-ink">+100 welcome pts</span>
                     </div>
-                    <div className="rounded-xl bg-black/30 px-3 py-2">
-                      Daily check-in → <span className="text-emerald-300">+25 pts</span>
+                    <div className="rounded-xl bg-parchment/30 px-3 py-2">
+                      Daily check-in → <span className="text-sage-ink">+25 pts</span>
                     </div>
-                    <div className="rounded-xl bg-black/30 px-3 py-2">
+                    <div className="rounded-xl bg-parchment/30 px-3 py-2">
                       Redeem on the brand rewards page
                     </div>
                   </div>
@@ -200,7 +200,7 @@ export default function SignedOutLanding({
 
       {/* ─── Nellie's photo band (real photo, not AI) ─────────────────────── */}
       <section className="mx-auto max-w-6xl px-6 pt-16">
-        <figure className="group overflow-hidden rounded-lg border border-white/10">
+        <figure className="group overflow-hidden rounded-lg border border-iron/10">
           <div className="relative aspect-[16/10] sm:aspect-[21/9]">
             <Image
               src="/brands/nellies/dining-room.jpg"
@@ -210,7 +210,7 @@ export default function SignedOutLanding({
               className="bep-photo-zoom object-cover"
             />
           </div>
-          <figcaption className="bg-black/30 px-5 py-3 text-sm text-white/70">
+          <figcaption className="bg-parchment/30 px-5 py-3 text-sm text-iron/70">
             The dining room at Nellie&apos;s Southern Kitchen in Belmont, NC.
           </figcaption>
         </figure>
@@ -218,7 +218,7 @@ export default function SignedOutLanding({
 
       {/* ─── How it works ─────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-6 py-20">
-        <p className="text-xs uppercase tracking-widest text-white/50">
+        <p className="text-xs uppercase tracking-widest text-iron/50">
           How it works
         </p>
         <h2
@@ -250,27 +250,27 @@ export default function SignedOutLanding({
           ].map((step) => (
             <div
               key={step.n}
-              className="rounded-3xl border border-white/10 bg-gradient-to-br from-white/5 to-transparent p-6"
+              className="rounded-lg border border-iron/10 bg-gradient-to-br from-iron/5 to-transparent p-6"
             >
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono text-white/40">
+                <span className="text-xs font-mono text-iron/40">
                   {step.n}
                 </span>
                 <IconBadge icon={step.icon} />
               </div>
               <h3 className="mt-6 text-lg font-semibold">{step.title}</h3>
-              <p className="mt-2 text-sm text-white/65">{step.body}</p>
+              <p className="mt-2 text-sm text-iron/65">{step.body}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* ─── Feature pillars ──────────────────────────────────────────────── */}
-      <section className="border-y border-white/5 bg-black/20">
+      <section className="border-y border-iron/5 bg-parchment/20">
         <div className="mx-auto max-w-6xl px-6 py-20">
           <div className="grid gap-8 md:grid-cols-2">
             <div>
-              <p className="text-xs uppercase tracking-widest text-white/50">
+              <p className="text-xs uppercase tracking-widest text-iron/50">
                 What you get
               </p>
               <h2
@@ -281,7 +281,7 @@ export default function SignedOutLanding({
                 <br />
                 A real member club.
               </h2>
-              <p className="mt-6 max-w-md text-white/70">
+              <p className="mt-6 max-w-md text-iron/70">
                 Everything in one place — events, community, rewards, and the
                 stuff casual customers never see.
               </p>
@@ -311,11 +311,11 @@ export default function SignedOutLanding({
               ].map((f) => (
                 <div
                   key={f.title}
-                  className="rounded-2xl border border-white/10 bg-black/30 p-5"
+                  className="rounded-lg border border-iron/10 bg-parchment/30 p-5"
                 >
                   <IconBadge icon={f.icon} />
                   <h3 className="mt-3 font-semibold">{f.title}</h3>
-                  <p className="mt-1 text-xs text-white/60">{f.body}</p>
+                  <p className="mt-1 text-xs text-iron/60">{f.body}</p>
                 </div>
               ))}
             </div>
@@ -328,7 +328,7 @@ export default function SignedOutLanding({
         <section className="mx-auto max-w-6xl px-6 py-20">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-widest text-white/50">
+              <p className="text-xs uppercase tracking-widest text-iron/50">
                 Featured brands
               </p>
               <h2
@@ -340,7 +340,7 @@ export default function SignedOutLanding({
             </div>
             <Link
               href="/brands"
-              className="hidden items-center gap-1 text-sm font-medium text-white/70 hover:text-white sm:inline-flex"
+              className="hidden items-center gap-1 text-sm font-medium text-iron/70 hover:text-iron sm:inline-flex"
             >
               See all →
             </Link>
@@ -350,7 +350,7 @@ export default function SignedOutLanding({
               <Link
                 key={a.slug}
                 href={`/brands/${a.slug}`}
-                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/30 p-5 transition hover:border-white/25 hover:bg-white/5"
+                className="group relative overflow-hidden rounded-lg border border-iron/10 bg-parchment/30 p-5 transition hover:border-iron/25 hover:bg-iron/5"
               >
                 <div
                   aria-hidden
@@ -361,11 +361,11 @@ export default function SignedOutLanding({
                 />
                 <p className="mt-2 text-base font-semibold">{a.name}</p>
                 {a.tagline && (
-                  <p className="mt-1 text-xs text-white/55 line-clamp-2">
+                  <p className="mt-1 text-xs text-iron/55 line-clamp-2">
                     {a.tagline}
                   </p>
                 )}
-                <p className="mt-4 text-xs text-white/50 transition group-hover:text-white/80">
+                <p className="mt-4 text-xs text-iron/50 transition group-hover:text-iron/80">
                   Visit page →
                 </p>
               </Link>
@@ -379,12 +379,12 @@ export default function SignedOutLanding({
 
       {/* ─── Closing CTA ──────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-6 py-24">
-        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-aurora/25 via-slate-900 to-ember/25 p-10 text-center shadow-glass md:p-16">
+        <div className="relative overflow-hidden rounded-lg border border-iron/10 bg-gradient-to-br from-aurora/25 via-slate-900 to-ember/25 p-10 text-center shadow-glass md:p-16">
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0 bg-[radial-gradient(600px_circle_at_50%_-20%,rgba(212,160,23,0.35),transparent)]"
           />
-          <p className="relative text-xs uppercase tracking-widest text-white/60">
+          <p className="relative text-xs uppercase tracking-widest text-iron/60">
             Ready for +100 welcome points?
           </p>
           <h2
@@ -393,21 +393,21 @@ export default function SignedOutLanding({
           >
             Join free in under a minute.
           </h2>
-          <p className="relative mt-4 text-white/70">
+          <p className="relative mt-4 text-iron/70">
             Create your account, finish your member profile, and earn{" "}
-            <span className="text-white">+100 welcome points</span>. Then check
+            <span className="text-iron">+100 welcome points</span>. Then check
             in on visits for +25 pts and redeem brand rewards.
           </p>
           <div className="relative mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/signup?next=/onboarding"
-              className="rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white shadow-glass transition hover:brightness-110"
+              className="rounded-full bg-ember px-6 py-3 text-sm font-semibold text-linen shadow-glass transition hover:brightness-110"
             >
               Create member profile →
             </Link>
             <Link
               href="/brands"
-              className="rounded-full border border-white/25 px-5 py-3 text-sm font-medium text-white/80 hover:bg-white/10"
+              className="rounded-full border border-iron/25 px-5 py-3 text-sm font-medium text-iron/80 hover:bg-iron/10"
             >
               Browse brands
             </Link>

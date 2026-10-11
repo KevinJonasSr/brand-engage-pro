@@ -28,7 +28,7 @@ function ConsentCheckboxLabel() {
       I have read the{" "}
       <Link
         href="/terms"
-        className="text-white underline underline-offset-4 hover:text-aurora"
+        className="text-iron underline underline-offset-4 hover:text-aurora-ink"
         onClick={(e) => e.stopPropagation()}
       >
         Terms
@@ -36,7 +36,7 @@ function ConsentCheckboxLabel() {
       and{" "}
       <Link
         href="/privacy"
-        className="text-white underline underline-offset-4 hover:text-aurora"
+        className="text-iron underline underline-offset-4 hover:text-aurora-ink"
         onClick={(e) => e.stopPropagation()}
       >
         Privacy Policy
@@ -137,22 +137,22 @@ export function ConsentModal({
   const acceptLabel = consentAcceptLabel(canAccept);
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 px-4 py-8">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-parchment/70 px-4 py-8">
       <div className="glass-card relative z-[70] flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden p-0">
-        <div className="border-b border-white/10 px-6 py-4">
-          <h2 className="text-lg font-semibold text-white" style={{ fontFamily: "var(--font-display)" }}>
+        <div className="border-b border-iron/10 px-6 py-4">
+          <h2 className="text-lg font-semibold text-iron" style={{ fontFamily: "var(--font-display)" }}>
             {title}
           </h2>
-          <p className="mt-1 text-sm text-white/80">
+          <p className="mt-1 text-sm text-iron/80">
             Scroll each document to the end, or confirm below that you have read them.
           </p>
           {docs.length > 0 && (
             <div className="mt-3">
-              <p className="text-sm font-semibold text-white">
+              <p className="text-sm font-semibold text-iron">
                 {consentProgressLabel(reviewedCount, docs.length)}
               </p>
               <div
-                className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/15"
+                className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-iron/15"
                 role="progressbar"
                 aria-valuemin={0}
                 aria-valuemax={docs.length}
@@ -160,7 +160,7 @@ export function ConsentModal({
                 aria-label={consentProgressLabel(reviewedCount, docs.length)}
               >
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-aurora to-ember transition-all"
+                  className="h-full rounded-full bg-ember transition-all"
                   style={{ width: `${progressPct}%` }}
                 />
               </div>
@@ -176,8 +176,8 @@ export function ConsentModal({
                   className={
                     "rounded-full px-3 py-1 text-xs font-medium transition " +
                     (activeTab === i
-                      ? "bg-aurora/20 text-aurora"
-                      : "text-white/50 hover:text-white/80")
+                      ? "bg-aurora/20 text-aurora-ink"
+                      : "text-iron/50 hover:text-iron/80")
                   }
                 >
                   {d.title}
@@ -202,14 +202,14 @@ export function ConsentModal({
             </div>
           </div>
           {showKeepScrollingCue && (
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 border-t border-amber-300/40 bg-amber-400/20 px-6 py-2.5 text-sm font-semibold text-amber-100">
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 border-t border-amber-300/40 bg-amber-400/20 px-6 py-2.5 text-sm font-semibold text-aurora-ink">
               {CONSENT_COPY.keepScrollingCue}
             </div>
           )}
         </div>
 
-        <div className="border-t border-white/10 px-6 py-4">
-          <label className="mb-4 flex cursor-pointer items-start gap-3 rounded-xl border border-white/25 bg-white/10 px-3 py-3 text-base font-medium text-white">
+        <div className="border-t border-iron/10 px-6 py-4">
+          <label className="mb-4 flex cursor-pointer items-start gap-3 rounded-xl border border-iron/25 bg-iron/10 px-3 py-3 text-base font-medium text-iron">
             <input
               type="checkbox"
               checked={acknowledged}
@@ -222,7 +222,7 @@ export function ConsentModal({
             <button
               type="button"
               onClick={onCancel}
-              className="rounded-full px-4 py-2 text-sm text-white/60 hover:text-white"
+              className="rounded-full px-4 py-2 text-sm text-iron/60 hover:text-iron"
             >
               Cancel
             </button>
@@ -233,14 +233,14 @@ export function ConsentModal({
                 onClick={() => onAccept(CONSENT_VERSION)}
                 className={
                   canAccept
-                    ? "rounded-full bg-gradient-to-r from-aurora to-ember px-5 py-2.5 text-sm font-semibold text-white shadow-glass"
-                    : "rounded-full border border-white/35 bg-white/15 px-5 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed"
+                    ? "rounded-full bg-ember px-5 py-2.5 text-sm font-semibold text-linen shadow-glass"
+                    : "rounded-full border border-iron/35 bg-iron/15 px-5 py-2.5 text-sm font-semibold text-iron disabled:cursor-not-allowed"
                 }
               >
                 {acceptLabel}
               </button>
               {!canAccept && (
-                <p className="max-w-xs text-right text-sm font-semibold text-amber-200">
+                <p className="max-w-xs text-right text-sm font-semibold text-aurora-ink">
                   {CONSENT_COPY.keepScrollingCue}
                 </p>
               )}

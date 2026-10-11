@@ -26,9 +26,9 @@ export default function RewardCardWithForm({
 
   return (
     <>
-      <div className="glass-card group overflow-hidden rounded-2xl p-4 transition hover:border-white/20">
+      <div className="glass-card group overflow-hidden rounded-lg p-4 transition hover:border-iron/20">
         {reward.image_url && (
-          <div className="relative mb-3 h-32 w-full overflow-hidden rounded-lg bg-black/20">
+          <div className="relative mb-3 h-32 w-full overflow-hidden rounded-lg bg-parchment/20">
             <Image
               src={reward.image_url}
               alt={reward.title}
@@ -42,16 +42,16 @@ export default function RewardCardWithForm({
         <h3 className="line-clamp-2 text-sm font-semibold">{reward.title}</h3>
 
         {reward.description && (
-          <p className="mt-1 line-clamp-2 text-xs text-white/60">{reward.description}</p>
+          <p className="mt-1 line-clamp-2 text-xs text-iron/60">{reward.description}</p>
         )}
 
         <div className="mt-3 flex items-baseline gap-2">
-          <span className="text-2xl font-bold text-white">{reward.point_cost.toLocaleString()}</span>
-          <span className="text-xs text-white/60">pts</span>
+          <span className="text-2xl font-bold text-iron">{reward.point_cost.toLocaleString()}</span>
+          <span className="text-xs text-iron/60">pts</span>
         </div>
 
         {reward.requires_tier && (
-          <div className="mt-2 inline-flex rounded-full bg-amber-500/20 px-2 py-1 text-xs uppercase tracking-wide text-amber-300">
+          <div className="mt-2 inline-flex rounded-full bg-amber-500/20 px-2 py-1 text-xs uppercase tracking-wide text-aurora-ink">
             {reward.requires_tier === "founder-only"
               ? "Founding"
               : reward.requires_tier === "premium"
@@ -61,20 +61,20 @@ export default function RewardCardWithForm({
         )}
 
         {reward.stock !== null && (
-          <p className="mt-2 text-xs text-white/50">Only {reward.stock} left</p>
+          <p className="mt-2 text-xs text-iron/50">Only {reward.stock} left</p>
         )}
 
         {isSignedIn ? (
           <button
             onClick={() => setShowForm(true)}
-            className="mt-4 w-full rounded-lg bg-gradient-to-r from-aurora to-ember px-3 py-2 text-xs font-medium text-white hover:opacity-90"
+            className="mt-4 w-full rounded-lg bg-ember px-3 py-2 text-xs font-medium text-linen hover:opacity-90"
           >
             Redeem →
           </button>
         ) : (
           <Link
             href={`/login?next=${encodeURIComponent(rewardsPath)}`}
-            className="mt-4 block w-full rounded-lg border border-white/20 px-3 py-2 text-center text-xs font-medium text-white/85 hover:bg-white/10"
+            className="mt-4 block w-full rounded-lg border border-iron/20 px-3 py-2 text-center text-xs font-medium text-iron/85 hover:bg-iron/10"
           >
             Sign in to redeem →
           </Link>

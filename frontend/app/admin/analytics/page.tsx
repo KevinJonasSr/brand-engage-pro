@@ -87,12 +87,12 @@ async function loadAnalytics() {
 
 function KpiCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-      <p className="text-xs uppercase tracking-wide text-white/60">{label}</p>
+    <div className="rounded-lg border border-iron/10 bg-parchment/30 p-4">
+      <p className="text-xs uppercase tracking-wide text-iron/60">{label}</p>
       <p className="mt-1 text-2xl font-semibold">
         {typeof value === "number" ? value.toLocaleString() : value}
       </p>
-      {sub && <p className="mt-1 text-xs text-white/50">{sub}</p>}
+      {sub && <p className="mt-1 text-xs text-iron/50">{sub}</p>}
     </div>
   );
 }
@@ -114,13 +114,13 @@ export default async function AdminAnalyticsPage() {
         <h1 className="text-2xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
           Analytics
         </h1>
-        <p className="mt-1 text-sm text-white/60">
+        <p className="mt-1 text-sm text-iron/60">
           Quick health check on the member base. Rollups are live — no cached counts.
         </p>
       </div>
 
       <section>
-        <p className="mb-2 text-xs uppercase tracking-wide text-white/50">Members</p>
+        <p className="mb-2 text-xs uppercase tracking-wide text-iron/50">Members</p>
         <div className="grid gap-3 sm:grid-cols-3">
           <KpiCard label="Total members" value={a.membersAll} />
           <KpiCard label="New · 7d" value={a.members7} sub={a.members7 === 0 ? "No signups yet this week" : undefined} />
@@ -129,7 +129,7 @@ export default async function AdminAnalyticsPage() {
       </section>
 
       <section>
-        <p className="mb-2 text-xs uppercase tracking-wide text-white/50">Community</p>
+        <p className="mb-2 text-xs uppercase tracking-wide text-iron/50">Community</p>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <KpiCard label="Posts total" value={a.postsAll} sub={`${a.posts7} past 7d`} />
           <KpiCard label="Comments total" value={a.commentsAll} sub={`${a.comments7} past 7d`} />
@@ -139,7 +139,7 @@ export default async function AdminAnalyticsPage() {
       </section>
 
       <section>
-        <p className="mb-2 text-xs uppercase tracking-wide text-white/50">Points + CTAs</p>
+        <p className="mb-2 text-xs uppercase tracking-wide text-iron/50">Points + CTAs</p>
         <div className="grid gap-3 sm:grid-cols-2">
           <KpiCard label="Points issued (all-time)" value={a.totalPoints.toLocaleString()} />
           <KpiCard label="CTA completions" value={a.actionCompletions} />
@@ -147,12 +147,12 @@ export default async function AdminAnalyticsPage() {
       </section>
 
       <section className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+        <div className="rounded-lg border border-iron/10 bg-parchment/30 p-4">
           <p className="mb-3 text-sm font-semibold">Top referrers</p>
           {a.topReferrers.length === 0 ? (
-            <p className="text-xs text-white/50">No verified referrals yet.</p>
+            <p className="text-xs text-iron/50">No verified referrals yet.</p>
           ) : (
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-iron/5">
               {a.topReferrers.map((r) => (
                 <div
                   key={r.id}
@@ -160,23 +160,23 @@ export default async function AdminAnalyticsPage() {
                 >
                   <Link
                     href={`/admin/members/${r.id}`}
-                    className="text-white/80 hover:text-white"
+                    className="text-iron/80 hover:text-iron"
                   >
                     {r.name ?? "Anonymous"}
                   </Link>
-                  <span className="text-white/70">{r.count} verified</span>
+                  <span className="text-iron/70">{r.count} verified</span>
                 </div>
               ))}
             </div>
           )}
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+        <div className="rounded-lg border border-iron/10 bg-parchment/30 p-4">
           <p className="mb-3 text-sm font-semibold">Most active brands (by post count)</p>
           {a.topBrands.length === 0 ? (
-            <p className="text-xs text-white/50">No community activity yet.</p>
+            <p className="text-xs text-iron/50">No community activity yet.</p>
           ) : (
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-iron/5">
               {a.topBrands.map((row) => (
                 <div
                   key={row.slug}
@@ -184,11 +184,11 @@ export default async function AdminAnalyticsPage() {
                 >
                   <Link
                     href={`/brands/${row.slug}/community`}
-                    className="text-white/80 hover:text-white"
+                    className="text-iron/80 hover:text-iron"
                   >
                     /{row.slug}
                   </Link>
-                  <span className="text-white/70">{row.count} posts</span>
+                  <span className="text-iron/70">{row.count} posts</span>
                 </div>
               ))}
             </div>

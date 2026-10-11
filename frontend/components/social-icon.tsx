@@ -99,7 +99,7 @@ export default function SocialIcon({ label, href }: SocialIconProps) {
         href={href}
         rel="noreferrer"
         target="_blank"
-        className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/80 transition hover:bg-white/20 hover:text-white"
+        className="inline-flex items-center gap-1.5 rounded-full bg-iron/10 px-3 py-1 text-xs font-medium text-iron/80 transition hover:bg-iron/20 hover:text-iron"
         aria-label={label}
         title={label}
       >
@@ -116,14 +116,14 @@ export default function SocialIcon({ label, href }: SocialIconProps) {
       href={href}
       rel="noreferrer"
       target="_blank"
-      className="group inline-flex h-10 w-10 items-center justify-center rounded-full ring-1 ring-white/10 transition hover:scale-110 hover:ring-white/30"
+      className="group inline-flex h-10 w-10 items-center justify-center rounded-full ring-1 ring-iron/10 transition hover:scale-110 hover:ring-iron/30"
       style={{ background: icon.color, ...(useGradient ? {} : { backgroundColor: icon.color }) }}
       aria-label={label}
       title={label}
     >
       <svg
         viewBox="0 0 24 24"
-        className="h-5 w-5 fill-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)]"
+        className="h-5 w-5 fill-iron drop-shadow-[0_1px_1px_rgba(0,0,0,0.4)]"
         aria-hidden="true"
       >
         <path d={icon.path} />

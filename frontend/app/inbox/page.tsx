@@ -78,14 +78,14 @@ export default async function InboxPage({
     <main className="mx-auto max-w-2xl px-6 py-10">
       <div className="mb-8 flex items-end justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-widest text-white/50">Notifications</p>
+          <p className="text-xs uppercase tracking-widest text-iron/50">Notifications</p>
           <h1
             className="mt-1 text-3xl font-semibold"
             style={{ fontFamily: "var(--font-display)" }}
           >
             Inbox
           </h1>
-          <p className="mt-1 text-sm text-white/60">
+          <p className="mt-1 text-sm text-iron/60">
             {unreadCount > 0
               ? `${unreadCount} unread`
               : "You're all caught up."}
@@ -93,19 +93,19 @@ export default async function InboxPage({
         </div>
         {all.length > 0 && (
           <div className="flex items-center gap-2">
-            <Link href="/me/notifications" className="rounded-full border border-white/10 px-3 py-1.5 text-sm text-white/70 transition hover:border-white/20 hover:text-white">
+            <Link href="/me/notifications" className="rounded-full border border-iron/10 px-3 py-1.5 text-sm text-iron/70 transition hover:border-iron/20 hover:text-iron">
               Preferences
             </Link>
             {unreadCount > 0 && (
               <form action={markAllReadAction}>
-                <button type="submit" className="rounded-full border border-white/20 px-4 py-2 text-xs font-medium text-white/80 hover:bg-white/10">
+                <button type="submit" className="rounded-full border border-iron/20 px-4 py-2 text-xs font-medium text-iron/80 hover:bg-iron/10">
                   Mark all read
                 </button>
               </form>
             )}
             {all.length > unreadCount && (
               <form action={archiveReadAction}>
-                <button type="submit" className="rounded-full border border-white/20 px-4 py-2 text-xs font-medium text-white/60 hover:bg-white/10">
+                <button type="submit" className="rounded-full border border-iron/20 px-4 py-2 text-xs font-medium text-iron/60 hover:bg-iron/10">
                   Archive read
                 </button>
               </form>
@@ -119,8 +119,8 @@ export default async function InboxPage({
           href="/inbox"
           className={`rounded-full px-3 py-1.5 ${
             filter === "all"
-              ? "bg-white/15 text-white"
-              : "text-white/60 hover:bg-white/10 hover:text-white"
+              ? "bg-iron/15 text-iron"
+              : "text-iron/60 hover:bg-iron/10 hover:text-iron"
           }`}
         >
           All
@@ -129,13 +129,13 @@ export default async function InboxPage({
           href="/inbox?filter=unread"
           className={`rounded-full px-3 py-1.5 ${
             filter === "unread"
-              ? "bg-white/15 text-white"
-              : "text-white/60 hover:bg-white/10 hover:text-white"
+              ? "bg-iron/15 text-iron"
+              : "text-iron/60 hover:bg-iron/10 hover:text-iron"
           }`}
         >
           Unread
           {unreadCount > 0 && (
-            <span className="ml-1 rounded-full bg-ember px-1.5 py-0.5 text-xs font-semibold text-white">
+            <span className="ml-1 rounded-full bg-ember px-1.5 py-0.5 text-xs font-semibold text-linen">
               {unreadCount}
             </span>
           )}
@@ -143,8 +143,8 @@ export default async function InboxPage({
       </div>
 
       {items.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-white/15 p-10 text-center text-white/60">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-white/5 text-2xl">
+        <div className="rounded-lg border border-dashed border-iron/15 p-10 text-center text-iron/60">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-iron/5 text-2xl">
             🔔
           </div>
           <p className="text-sm">
@@ -157,10 +157,10 @@ export default async function InboxPage({
         <div className="space-y-4">
         {Array.from(groupedKinds.entries()).map(([groupName, groupItems]) => (
           <section key={groupName}>
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-widest text-white/40">
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-widest text-iron/40">
               {groupName}
             </h3>
-            <ul className="divide-y divide-white/10 overflow-hidden rounded-2xl border border-white/10 bg-black/30">
+            <ul className="divide-y divide-iron/10 overflow-hidden rounded-lg border border-iron/10 bg-parchment/30">
               {groupItems.map((n) => (
             <li key={n.id}>
               <form action={markNotificationReadAction}>
@@ -170,27 +170,27 @@ export default async function InboxPage({
                 )}
                 <button
                   type="submit"
-                  className={`flex w-full items-start gap-4 px-4 py-4 text-left transition hover:bg-white/5 ${
+                  className={`flex w-full items-start gap-4 px-4 py-4 text-left transition hover:bg-iron/5 ${
                     n.read_at ? "opacity-70" : ""
                   }`}
                 >
-                  <div className="flex-shrink-0 rounded-full bg-white/10 p-2 text-lg leading-none">
+                  <div className="flex-shrink-0 rounded-full bg-iron/10 p-2 text-lg leading-none">
                     {n.icon || fallbackIcon(n.kind)}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline gap-2">
-                      <span className="text-xs uppercase tracking-widest text-white/40">
+                      <span className="text-xs uppercase tracking-widest text-iron/40">
                         {kindLabel(n.kind)}
                       </span>
-                      <span className="text-xs text-white/40">
+                      <span className="text-xs text-iron/40">
                         · {relativeTime(n.created_at)}
                       </span>
                     </div>
-                    <p className="mt-0.5 text-sm font-semibold text-white">
+                    <p className="mt-0.5 text-sm font-semibold text-iron">
                       {n.title}
                     </p>
                     {n.body && (
-                      <p className="mt-0.5 text-xs text-white/65 line-clamp-2">
+                      <p className="mt-0.5 text-xs text-iron/65 line-clamp-2">
                         {n.body}
                       </p>
                     )}

@@ -117,25 +117,25 @@ export default function PushOptInPrompt({
   }
 
   return (
-    <div className="rounded-2xl border border-aurora/30 bg-gradient-to-r from-aurora/15 via-cyan-500/10 to-emerald-500/10 p-4 shadow-lg shadow-aurora/10">
+    <div className="rounded-lg border border-aurora/30 bg-gradient-to-r from-aurora/15 via-cyan-500/10 to-emerald-500/10 p-4 shadow-lg shadow-aurora/10">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-start gap-3">
           <div
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-black/30 text-xl ring-1 ring-aurora/30"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-parchment/30 text-xl ring-1 ring-aurora/30"
             aria-hidden
           >
             🔔
           </div>
           <div>
-            <p className="text-sm font-semibold text-white">
+            <p className="text-sm font-semibold text-iron">
               Hear about new offers right away
             </p>
-            <p className="mt-0.5 text-xs text-white/70">
+            <p className="mt-0.5 text-xs text-iron/70">
               Enable notifications to hear when a brand posts, opens an
               activation or offering, or replies to you.
             </p>
             {error && (
-              <p className="mt-1 text-xs text-rose-300">{error}</p>
+              <p className="mt-1 text-xs text-ember">{error}</p>
             )}
           </div>
         </div>
@@ -143,7 +143,7 @@ export default function PushOptInPrompt({
           <button
             type="button"
             onClick={dismiss}
-            className="rounded-lg px-3 py-2 text-xs font-medium text-white/70 hover:text-white"
+            className="rounded-lg px-3 py-2 text-xs font-medium text-iron/70 hover:text-iron"
           >
             Not now
           </button>
@@ -151,7 +151,7 @@ export default function PushOptInPrompt({
             type="button"
             onClick={enablePush}
             disabled={busy}
-            className="rounded-lg bg-aurora px-3 py-2 text-xs font-semibold text-black hover:opacity-90 disabled:opacity-60"
+            className="rounded-lg bg-aurora px-3 py-2 text-xs font-semibold text-iron hover:opacity-90 disabled:opacity-60"
           >
             {busy ? "Enabling…" : "Enable notifications"}
           </button>

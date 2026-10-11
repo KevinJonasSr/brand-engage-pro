@@ -51,11 +51,11 @@ export default async function BrandsIndexPage({ searchParams }: { searchParams?:
   return (
     <main className="mx-auto max-w-6xl space-y-6 px-6 py-12">
       <header className="space-y-2">
-        <p className="text-sm uppercase tracking-wide text-white/60">Brands</p>
+        <p className="text-sm uppercase tracking-wide text-iron/60">Brands</p>
         <h1 className="text-3xl font-semibold" style={{ fontFamily: "var(--font-display)" }}>
           Member clubs on Brand Engage Pro
         </h1>
-        <p className="max-w-2xl text-sm text-white/70">
+        <p className="max-w-2xl text-sm text-iron/70">
           Each brand has a dedicated hub with rewards, drops, and behind-the-scenes access for their regulars.
         </p>
       </header>
@@ -68,8 +68,8 @@ export default async function BrandsIndexPage({ searchParams }: { searchParams?:
             className={
               "inline-flex items-center rounded-full border px-3 py-1 text-xs transition " +
               (genreFilter === null
-                ? "border-white/40 bg-white/15 text-white"
-                : "border-white/10 bg-black/30 text-white/70 hover:border-white/30")
+                ? "border-iron/40 bg-iron/15 text-iron"
+                : "border-iron/10 bg-parchment/30 text-iron/70 hover:border-iron/30")
             }
           >
             All
@@ -81,8 +81,8 @@ export default async function BrandsIndexPage({ searchParams }: { searchParams?:
               className={
                 "inline-flex items-center rounded-full border px-3 py-1 text-xs transition " +
                 (genreFilter === g
-                  ? "border-white/40 bg-white/15 text-white"
-                  : "border-white/10 bg-black/30 text-white/70 hover:border-white/30")
+                  ? "border-iron/40 bg-iron/15 text-iron"
+                  : "border-iron/10 bg-parchment/30 text-iron/70 hover:border-iron/30")
               }
             >
               {g}
@@ -96,11 +96,11 @@ export default async function BrandsIndexPage({ searchParams }: { searchParams?:
           <Link
             key={a.slug}
             href={`/brands/${a.slug}`}
-            className="group relative overflow-hidden rounded-3xl border border-white/10 transition hover:border-white/30 hover:-translate-y-0.5"
+            className="group relative overflow-hidden rounded-lg border border-iron/10 transition hover:border-iron/30 hover:-translate-y-0.5"
           >
             {/* 3:4 portrait poster — same shape as the Member Home strip cards
                 so the visual language stays consistent across the app. */}
-            <div className="relative aspect-[3/4] w-full bg-black/40">
+            <div className="relative aspect-[3/4] w-full bg-parchment/40">
               {a.heroImage ? (
                 <>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -135,14 +135,14 @@ export default async function BrandsIndexPage({ searchParams }: { searchParams?:
 
               {/* Top-left genre chip */}
               {a.genres.length > 0 && (
-                <p className="absolute left-5 top-5 rounded-full border border-white/15 bg-black/45 px-3 py-1 text-xs uppercase tracking-[0.3em] text-white/85 backdrop-blur">
+                <p className="absolute left-5 top-5 rounded-full border border-iron/15 bg-parchment/45 px-3 py-1 text-xs uppercase tracking-[0.3em] text-iron/85 backdrop-blur">
                   {a.genres.slice(0, 2).join(" · ")}{a.genres.length > 2 ? " +" + (a.genres.length - 2) : ""}
                 </p>
               )}
 
               {/* Top-right member count chip (M-14) */}
               {(memberCounts[a.slug] ?? 0) > 0 && (
-                <p className="absolute right-5 top-5 rounded-full border border-white/15 bg-black/45 px-3 py-1 text-xs uppercase tracking-[0.3em] text-white/85 backdrop-blur">
+                <p className="absolute right-5 top-5 rounded-full border border-iron/15 bg-parchment/45 px-3 py-1 text-xs uppercase tracking-[0.3em] text-iron/85 backdrop-blur">
                   {memberCounts[a.slug].toLocaleString()} {memberCounts[a.slug] === 1 ? "member" : "members"}
                 </p>
               )}
@@ -150,17 +150,17 @@ export default async function BrandsIndexPage({ searchParams }: { searchParams?:
               {/* Bottom-left content: name + tagline + CTA arrow */}
               <div className="absolute inset-x-0 bottom-0 p-5">
                 <h2
-                  className="truncate text-2xl font-semibold text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]"
+                  className="truncate text-2xl font-semibold text-iron drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]"
                   style={{ fontFamily: "var(--font-display)" }}
                 >
                   {a.name}
                 </h2>
                 {a.tagline && (
-                  <p className="mt-1 line-clamp-2 text-sm text-white/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.5)]">
+                  <p className="mt-1 line-clamp-2 text-sm text-iron/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.5)]">
                     {a.tagline}
                   </p>
                 )}
-                <span className="mt-3 inline-flex text-sm text-white/90 transition group-hover:text-white">
+                <span className="mt-3 inline-flex text-sm text-iron/90 transition group-hover:text-iron">
                   Enter member club →
                 </span>
               </div>

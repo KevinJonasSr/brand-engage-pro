@@ -50,7 +50,7 @@ export default function PremiumPaywall({
   if (compact) {
     return (
       <div
-        className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm"
+        className="flex items-center gap-3 rounded-lg border border-iron/10 bg-parchment/40 px-4 py-3 text-sm"
         style={{ borderColor: `${from}33` }}
       >
         <span
@@ -60,15 +60,15 @@ export default function PremiumPaywall({
           {reason === "needs-founder" ? "👑" : "🔒"}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="truncate font-medium text-white">{featureCopy}</p>
+          <p className="truncate font-medium text-iron">{featureCopy}</p>
           {description && (
-            <p className="truncate text-xs text-white/55">{description}</p>
+            <p className="truncate text-xs text-iron/55">{description}</p>
           )}
         </div>
         {ctaHref && (
           <Link
             href={ctaHref}
-            className="flex-none rounded-full px-3 py-1.5 text-xs font-semibold text-white shadow-glass transition hover:brightness-110"
+            className="flex-none rounded-full px-3 py-1.5 text-xs font-semibold text-iron shadow-glass transition hover:brightness-110"
             style={{ backgroundImage: `linear-gradient(90deg, ${from}, ${to})` }}
           >
             Join
@@ -80,20 +80,20 @@ export default function PremiumPaywall({
 
   return (
     <section
-      className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/40 p-6"
+      className="relative overflow-hidden rounded-lg border border-iron/10 bg-parchment/40 p-6"
       style={{ borderColor: `${from}33`, backgroundImage: `linear-gradient(135deg, ${from}08, ${to}08)` }}
     >
       <div className="relative z-10 space-y-4">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold text-white/90">
+            <p className="text-sm font-semibold text-iron/90">
               {reason === "needs-founder"
                 ? "Founders only — the free first 100 who join"
                 : "Members only"}
             </p>
-            <h3 className="mt-2 text-lg font-bold text-white">{featureCopy}</h3>
+            <h3 className="mt-2 text-lg font-bold text-iron">{featureCopy}</h3>
             {description && (
-              <p className="mt-2 text-sm text-white/75">{description}</p>
+              <p className="mt-2 text-sm text-iron/75">{description}</p>
             )}
           </div>
           <span className="text-3xl flex-none">
@@ -104,10 +104,10 @@ export default function PremiumPaywall({
         <div className="space-y-2">
           {reason === "needs-founder" ? (
             <>
-              <p className="text-xs text-white/60">
+              <p className="text-xs text-iron/60">
                 Founding is a free first-100 badge. Founders get:
               </p>
-              <ul className="space-y-1 text-xs text-white/70">
+              <ul className="space-y-1 text-xs text-iron/70">
                 <li>✓ Exclusive founder-only posts & events</li>
                 <li>✓ Direct support of your favorite brand</li>
                 <li>✓ Lifetime founder status & badge</li>
@@ -115,7 +115,7 @@ export default function PremiumPaywall({
             </>
           ) : (
             <>
-              <p className="text-xs text-white/60">
+              <p className="text-xs text-iron/60">
                 Brands pay, guests join free. Join to earn points toward every reward.
               </p>
             </>
@@ -125,7 +125,7 @@ export default function PremiumPaywall({
         {ctaHref && (
           <Link
             href={ctaHref}
-            className="inline-block rounded-full px-5 py-2 text-sm font-semibold text-white shadow-glass transition hover:brightness-110"
+            className="inline-block rounded-full px-5 py-2 text-sm font-semibold text-iron shadow-glass transition hover:brightness-110"
             style={{ backgroundImage: `linear-gradient(90deg, ${from}, ${to})` }}
           >
             {ctaLabel}

@@ -67,7 +67,7 @@ export default function UserMenu({ member, isAdmin, unreadCount = 0 }: UserMenuP
       <button
         ref={triggerRef}
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 rounded-full border border-white/15 bg-black/30 px-2 py-1 text-xs text-white/80 hover:bg-white/10 transition"
+        className="flex items-center gap-2 rounded-full border border-iron/15 bg-parchment/30 px-2 py-1 text-xs text-iron/80 hover:bg-iron/10 transition"
         aria-haspopup="menu"
         aria-expanded={isOpen}
         title={member.email ?? undefined}
@@ -86,7 +86,7 @@ export default function UserMenu({ member, isAdmin, unreadCount = 0 }: UserMenuP
         )}
         <span>{displayName}</span>
         <span
-          className="text-white/60 transition"
+          className="text-iron/60 transition"
           style={{
             transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
           }}
@@ -99,14 +99,14 @@ export default function UserMenu({ member, isAdmin, unreadCount = 0 }: UserMenuP
       {isOpen && (
         <div
           ref={menuRef}
-          className="absolute right-0 mt-2 w-48 rounded-lg border border-white/15 bg-midnight/95 shadow-lg backdrop-blur"
+          className="absolute right-0 mt-2 w-48 rounded-lg border border-iron/15 bg-linen/95 shadow-lg backdrop-blur"
           role="menu"
         >
           <nav className="py-1">
             {/* Member Home */}
             <Link
               href="/"
-              className="block px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition"
+              className="block px-4 py-2 text-sm text-iron/80 hover:bg-iron/10 transition"
               role="menuitem"
               onClick={() => setIsOpen(false)}
             >
@@ -117,7 +117,7 @@ export default function UserMenu({ member, isAdmin, unreadCount = 0 }: UserMenuP
             {member.profileSlug && (
               <Link
                 href={`/members/${member.profileSlug}`}
-                className="block px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition"
+                className="block px-4 py-2 text-sm text-iron/80 hover:bg-iron/10 transition"
                 role="menuitem"
                 onClick={() => setIsOpen(false)}
               >
@@ -128,7 +128,7 @@ export default function UserMenu({ member, isAdmin, unreadCount = 0 }: UserMenuP
             {/* My Rewards */}
             <Link
               href="/rewards"
-              className="block px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition"
+              className="block px-4 py-2 text-sm text-iron/80 hover:bg-iron/10 transition"
               role="menuitem"
               onClick={() => setIsOpen(false)}
             >
@@ -138,13 +138,13 @@ export default function UserMenu({ member, isAdmin, unreadCount = 0 }: UserMenuP
             {/* Inbox */}
             <Link
               href="/inbox"
-              className="block px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition"
+              className="block px-4 py-2 text-sm text-iron/80 hover:bg-iron/10 transition"
               role="menuitem"
               onClick={() => setIsOpen(false)}
             >
               Inbox
               {unreadCount > 0 && (
-                <span className="ml-2 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-gradient-to-r from-aurora to-ember px-1 text-xs font-semibold text-white">
+                <span className="ml-2 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-ember px-1 text-xs font-semibold text-linen">
                   {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
               )}
@@ -153,10 +153,10 @@ export default function UserMenu({ member, isAdmin, unreadCount = 0 }: UserMenuP
             {/* Admin (conditional) */}
             {isAdmin && (
               <>
-                <div className="my-1 border-t border-white/10" />
+                <div className="my-1 border-t border-iron/10" />
                 <Link
                   href="/admin"
-                  className="block px-4 py-2 text-sm text-amber-300 hover:bg-white/10 transition"
+                  className="block px-4 py-2 text-sm text-aurora-ink hover:bg-iron/10 transition"
                   role="menuitem"
                   onClick={() => setIsOpen(false)}
                 >
@@ -166,13 +166,13 @@ export default function UserMenu({ member, isAdmin, unreadCount = 0 }: UserMenuP
             )}
 
             {/* Divider before Sign out */}
-            <div className="my-1 border-t border-white/10" />
+            <div className="my-1 border-t border-iron/10" />
 
             {/* Sign out — wipe sb-* stores then GET /logout. Do not close
                 the menu first (that unmounted the old POST form). */}
             <button
               type="button"
-              className="w-full px-4 py-2 text-left text-sm text-white/80 hover:bg-white/10 transition"
+              className="w-full px-4 py-2 text-left text-sm text-iron/80 hover:bg-iron/10 transition"
               role="menuitem"
               onClick={() => {
                 void hardSignOut();

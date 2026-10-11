@@ -113,7 +113,7 @@ export default async function ResolvePredictionPage({
     <div className="space-y-6">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-white/55">
+          <p className="text-xs font-medium uppercase tracking-wider text-iron/55">
             {post.brand_slug} · {post.prediction_type ?? "—"}
           </p>
           <h1
@@ -123,25 +123,25 @@ export default async function ResolvePredictionPage({
             {post.title}
           </h1>
           {post.body && (
-            <p className="mt-2 max-w-prose text-sm text-white/75">{post.body}</p>
+            <p className="mt-2 max-w-prose text-sm text-iron/75">{post.body}</p>
           )}
           <div className="mt-2 flex flex-wrap gap-2 text-xs">
             <PhaseChip phase={phase} secsLeft={secsLeft} />
-            <span className="rounded-full bg-white/5 px-2 py-1 text-white/65">
+            <span className="rounded-full bg-iron/5 px-2 py-1 text-iron/65">
               {post.points_for_correct ?? 0} pts
             </span>
             {post.visibility !== "public" && (
-              <span className="rounded-full bg-white/5 px-2 py-1 text-white/65">
+              <span className="rounded-full bg-iron/5 px-2 py-1 text-iron/65">
                 {post.visibility}
               </span>
             )}
             {post.allow_vote_changes && (
-              <span className="rounded-full bg-white/5 px-2 py-1 text-white/55">
+              <span className="rounded-full bg-iron/5 px-2 py-1 text-iron/55">
                 vote changes allowed
               </span>
             )}
             {!post.show_live_tally && (
-              <span className="rounded-full bg-white/5 px-2 py-1 text-white/55">
+              <span className="rounded-full bg-iron/5 px-2 py-1 text-iron/55">
                 tally hidden
               </span>
             )}
@@ -149,7 +149,7 @@ export default async function ResolvePredictionPage({
         </div>
         <Link
           href="/admin/predictions"
-          className="rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/75 hover:bg-white/5"
+          className="rounded-lg border border-iron/15 px-3 py-1.5 text-xs text-iron/75 hover:bg-iron/5"
         >
           ← Back to queue
         </Link>
@@ -157,8 +157,8 @@ export default async function ResolvePredictionPage({
 
       {/* Live tally summary */}
       {tally && tally.total_votes > 0 && (
-        <section className="glass-card rounded-2xl p-5">
-          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-white/55">
+        <section className="glass-card rounded-lg p-5">
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-iron/55">
             Tally · {tally.total_votes} vote{tally.total_votes === 1 ? "" : "s"}
           </h2>
           {post.prediction_type === "multi" && tally.by_option.length > 0 && (
@@ -166,12 +166,12 @@ export default async function ResolvePredictionPage({
               {tally.by_option.map((row) => (
                 <li key={row.option_id}>
                   <div className="mb-1 flex items-center justify-between text-sm">
-                    <span className="text-white/85">{row.label}</span>
-                    <span className="text-white/65">
+                    <span className="text-iron/85">{row.label}</span>
+                    <span className="text-iron/65">
                       {row.count} · {row.pct}%
                     </span>
                   </div>
-                  <div className="h-2 overflow-hidden rounded-full bg-white/5">
+                  <div className="h-2 overflow-hidden rounded-full bg-iron/5">
                     <div
                       className="h-full bg-aurora"
                       style={{ width: `${row.pct}%` }}
@@ -194,10 +194,10 @@ export default async function ResolvePredictionPage({
               {tally.date_buckets.map((b) => (
                 <li
                   key={b.date}
-                  className="flex items-center justify-between text-white/80"
+                  className="flex items-center justify-between text-iron/80"
                 >
                   <span>{b.date}</span>
-                  <span className="text-white/55">×{b.count}</span>
+                  <span className="text-iron/55">×{b.count}</span>
                 </li>
               ))}
             </ul>
@@ -207,29 +207,29 @@ export default async function ResolvePredictionPage({
 
       {/* Resolve form OR resolved summary */}
       {post.resolved_at ? (
-        <section className="glass-card rounded-2xl p-5">
-          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-emerald-300">
+        <section className="glass-card rounded-lg p-5">
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-sage-ink">
             Resolved
           </h2>
-          <p className="text-sm text-white/75">
-            <span className="font-medium text-white">Correct answer:</span>{" "}
+          <p className="text-sm text-iron/75">
+            <span className="font-medium text-iron">Correct answer:</span>{" "}
             <ResolvedAnswer post={post} options={options} />
           </p>
           {post.resolution_note && (
-            <p className="mt-2 text-sm text-white/65">
-              <span className="font-medium text-white/80">Note:</span>{" "}
+            <p className="mt-2 text-sm text-iron/65">
+              <span className="font-medium text-iron/80">Note:</span>{" "}
               {post.resolution_note}
             </p>
           )}
-          <p className="mt-3 text-xs text-white/55">
+          <p className="mt-3 text-xs text-iron/55">
             {awards.length} winner{awards.length === 1 ? "" : "s"} ·{" "}
             {awards.reduce((sum, a) => sum + (a.points ?? 0), 0)} pts awarded
           </p>
         </section>
       ) : phase === "open" ? (
-        <section className="glass-card rounded-2xl p-5">
-          <h2 className="mb-1 text-sm font-semibold text-white">Not yet closeable</h2>
-          <p className="text-xs text-white/65">
+        <section className="glass-card rounded-lg p-5">
+          <h2 className="mb-1 text-sm font-semibold text-iron">Not yet closeable</h2>
+          <p className="text-xs text-iron/65">
             Voting is still open
             {secsLeft !== null
               ? ` — closes in ${formatPredictionCountdown(secsLeft)}.`
@@ -246,11 +246,11 @@ export default async function ResolvePredictionPage({
           </div>
         </section>
       ) : (
-        <section className="glass-card rounded-2xl p-5">
-          <h2 className="mb-1 text-sm font-semibold text-amber-300">
+        <section className="glass-card rounded-lg p-5">
+          <h2 className="mb-1 text-sm font-semibold text-aurora-ink">
             Awaiting your verdict
           </h2>
-          <p className="text-xs text-white/65">
+          <p className="text-xs text-iron/65">
             Voting closed. Provide the correct answer to award points.
           </p>
           <div className="mt-4">
@@ -276,7 +276,7 @@ function PhaseChip({
 }) {
   if (phase === "open") {
     return (
-      <span className="rounded-full bg-emerald-500/15 px-2 py-1 text-emerald-300">
+      <span className="rounded-full bg-emerald-500/15 px-2 py-1 text-sage-ink">
         Open
         {secsLeft !== null ? ` · closes in ${formatPredictionCountdown(secsLeft)}` : ""}
       </span>
@@ -284,13 +284,13 @@ function PhaseChip({
   }
   if (phase === "closed") {
     return (
-      <span className="rounded-full bg-amber-500/15 px-2 py-1 text-amber-300">
+      <span className="rounded-full bg-amber-500/15 px-2 py-1 text-aurora-ink">
         Awaiting resolution
       </span>
     );
   }
   return (
-    <span className="rounded-full bg-white/10 px-2 py-1 text-white/60">
+    <span className="rounded-full bg-iron/10 px-2 py-1 text-iron/60">
       Resolved
     </span>
   );
@@ -299,10 +299,10 @@ function PhaseChip({
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-xs uppercase tracking-wider text-white/45">
+      <dt className="text-xs uppercase tracking-wider text-iron/45">
         {label}
       </dt>
-      <dd className="text-base font-semibold text-white">{value}</dd>
+      <dd className="text-base font-semibold text-iron">{value}</dd>
     </div>
   );
 }

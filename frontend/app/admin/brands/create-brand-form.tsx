@@ -39,24 +39,24 @@ export default function CreateBrandForm() {
         name="slug"
         required
         placeholder="slug (e.g. kacey)"
-        className="flex-1 min-w-[160px] rounded-full border border-white/15 bg-black/40 px-3 py-2 text-sm"
+        className="flex-1 min-w-[160px] rounded-full border border-iron/15 bg-parchment/40 px-3 py-2 text-sm"
       />
       <input
         name="name"
         required
         placeholder="Display name"
-        className="flex-1 min-w-[160px] rounded-full border border-white/15 bg-black/40 px-3 py-2 text-sm"
+        className="flex-1 min-w-[160px] rounded-full border border-iron/15 bg-parchment/40 px-3 py-2 text-sm"
       />
       <button
         type="submit"
         disabled={submitting}
-        className="rounded-full bg-gradient-to-r from-aurora to-ember px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
+        className="rounded-full bg-ember px-5 py-2 text-sm font-semibold text-linen disabled:opacity-50"
       >
         {submitting ? "Creating…" : "Create"}
       </button>
       <SaveStatusIndicator status={status} />
       {businessError && (
-        <span className="text-xs text-rose-300" title={businessError}>
+        <span className="text-xs text-ember" title={businessError}>
           ✗ {businessError}
         </span>
       )}

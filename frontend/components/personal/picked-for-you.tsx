@@ -25,11 +25,11 @@ export default async function PickedForYou({
   return (
     <section
       aria-label={headerLabel}
-      className="space-y-3 rounded-2xl border border-aurora/20 bg-gradient-to-br from-aurora/10 via-black/30 to-ember/5 p-4"
+      className="space-y-3 rounded-lg border border-aurora/20 bg-gradient-to-br from-aurora/10 via-parchment/30 to-ember/5 p-4"
     >
       <div className="flex items-center gap-2">
         <span aria-hidden className="text-base">✨</span>
-        <h2 className="text-sm font-semibold text-white">{headerLabel}</h2>
+        <h2 className="text-sm font-semibold text-iron">{headerLabel}</h2>
       </div>
       <div className="grid gap-3 sm:grid-cols-3">
         {posts.map((p) => (
@@ -45,7 +45,7 @@ function PickedCard({ post }: { post: PickedPost }) {
   return (
     <Link
       href={`#post-${post.id}`}
-      className="block rounded-xl border border-white/10 bg-black/40 p-3 transition hover:border-white/30 hover:bg-black/60"
+      className="block rounded-xl border border-iron/10 bg-parchment/40 p-3 transition hover:border-iron/30 hover:bg-parchment/60"
     >
       {post.image_url && (
         // eslint-disable-next-line @next/next/no-img-element
@@ -57,17 +57,17 @@ function PickedCard({ post }: { post: PickedPost }) {
         />
       )}
       {post.title && (
-        <p className="line-clamp-1 text-xs font-semibold text-white">
+        <p className="line-clamp-1 text-xs font-semibold text-iron">
           {post.title}
         </p>
       )}
-      <p className="line-clamp-3 text-xs text-white/70">{preview}</p>
+      <p className="line-clamp-3 text-xs text-iron/70">{preview}</p>
       {post.tags && post.tags.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-1">
           {post.tags.slice(0, 2).map((t) => (
             <span
               key={t}
-              className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[9px] uppercase tracking-wide text-white/60"
+              className="rounded-full border border-iron/10 bg-iron/5 px-2 py-0.5 text-[9px] uppercase tracking-wide text-iron/60"
             >
               {t}
             </span>

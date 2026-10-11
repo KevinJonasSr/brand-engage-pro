@@ -25,7 +25,7 @@ export default function EditableEventRow({
   const [editing, setEditing] = useState(false);
 
   return (
-    <div className="rounded-2xl bg-black/40 p-3">
+    <div className="rounded-lg bg-parchment/40 p-3">
       {children}
 
       {/* Edit affordance — sits at the bottom of the read-only row, parallel
@@ -35,7 +35,7 @@ export default function EditableEventRow({
         <button
           type="button"
           onClick={() => setEditing(true)}
-          className="mt-2 inline-flex text-xs text-white/60 hover:text-white"
+          className="mt-2 inline-flex text-xs text-iron/60 hover:text-iron"
         >
           ✏️ Edit
         </button>

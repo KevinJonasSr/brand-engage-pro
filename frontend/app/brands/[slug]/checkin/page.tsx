@@ -96,15 +96,15 @@ export default function CheckinPage() {
     <main className="flex min-h-screen flex-col items-center justify-center px-6 py-16 text-center">
       {state.status === "resolving" && (
         <div className="space-y-4">
-          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-white/10 border-t-aurora" />
-          <p className="text-sm text-white/50">One moment…</p>
+          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-iron/10 border-t-aurora" />
+          <p className="text-sm text-iron/50">One moment…</p>
         </div>
       )}
 
       {state.status === "checking_in" && (
         <div className="space-y-4">
-          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-white/10 border-t-aurora" />
-          <p className="text-sm text-white/60">Checking you in at {brandName}…</p>
+          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-iron/10 border-t-aurora" />
+          <p className="text-sm text-iron/60">Checking you in at {brandName}…</p>
         </div>
       )}
 
@@ -112,20 +112,20 @@ export default function CheckinPage() {
         <div className="space-y-6">
           <div className="text-5xl">🔑</div>
           <h1 className="text-2xl font-semibold">Sign in to check in</h1>
-          <p className="max-w-sm text-sm text-white/60">
+          <p className="max-w-sm text-sm text-iron/60">
             Create a free account or sign in to earn visit points at{" "}
-            <span className="text-white/80">{brandName}</span>.
+            <span className="text-iron/80">{brandName}</span>.
           </p>
           <div className="flex flex-col gap-3">
             <Link
               href={`/login?next=${encodeURIComponent(checkinPath)}`}
-              className="rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white"
+              className="rounded-full bg-ember px-6 py-3 text-sm font-semibold text-linen"
             >
               Sign in to check in →
             </Link>
             <Link
               href={`/signup?ref=${encodeURIComponent(brandSlug ?? "")}&next=${encodeURIComponent(checkinPath)}`}
-              className="text-sm text-white/60 hover:text-white"
+              className="text-sm text-iron/60 hover:text-iron"
             >
               New here? Create a free account
             </Link>
@@ -137,16 +137,16 @@ export default function CheckinPage() {
         <div className="space-y-6">
           <div className="text-6xl">🎉</div>
           <h1 className="text-3xl font-semibold">You&apos;re checked in!</h1>
-          <p className="text-xl font-semibold text-emerald-300">
+          <p className="text-xl font-semibold text-sage-ink">
             +{state.pointsAwarded} points earned
           </p>
-          <p className="max-w-xs text-sm text-white/60">
+          <p className="max-w-xs text-sm text-iron/60">
             Your visit to {brandName} has been recorded. Come back tomorrow for another{" "}
             {state.pointsAwarded} pts.
           </p>
           <Link
             href={`/brands/${brandSlug}`}
-            className="inline-block rounded-full bg-gradient-to-r from-aurora to-ember px-6 py-3 text-sm font-semibold text-white"
+            className="inline-block rounded-full bg-ember px-6 py-3 text-sm font-semibold text-linen"
           >
             Back to {brandName} →
           </Link>
@@ -157,12 +157,12 @@ export default function CheckinPage() {
         <div className="space-y-6">
           <div className="text-6xl">✅</div>
           <h1 className="text-2xl font-semibold">Already checked in today</h1>
-          <p className="max-w-xs text-sm text-white/60">
+          <p className="max-w-xs text-sm text-iron/60">
             You&apos;ve already earned your visit points at {brandName} today. See you tomorrow!
           </p>
           <Link
             href={`/brands/${brandSlug}`}
-            className="inline-block rounded-full border border-white/20 px-6 py-3 text-sm font-medium text-white/80 hover:bg-white/10"
+            className="inline-block rounded-full border border-iron/20 px-6 py-3 text-sm font-medium text-iron/80 hover:bg-iron/10"
           >
             Back to {brandName}
           </Link>
@@ -173,12 +173,12 @@ export default function CheckinPage() {
         <div className="space-y-6">
           <div className="text-5xl">⚠️</div>
           <h1 className="text-2xl font-semibold">Check-in failed</h1>
-          <p className="max-w-xs text-sm text-white/60">{state.message}</p>
+          <p className="max-w-xs text-sm text-iron/60">{state.message}</p>
           <button
             onClick={() => {
               void runCheckin();
             }}
-            className="rounded-full border border-white/20 px-6 py-3 text-sm font-medium text-white/80 hover:bg-white/10"
+            className="rounded-full border border-iron/20 px-6 py-3 text-sm font-medium text-iron/80 hover:bg-iron/10"
           >
             Try again
           </button>

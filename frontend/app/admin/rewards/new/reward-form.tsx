@@ -32,7 +32,7 @@ export default function NewRewardForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="glass-card space-y-4 rounded-2xl p-6"
+      className="glass-card space-y-4 rounded-lg p-6"
     >
       <div>
         <label className="block text-sm font-medium">Title *</label>
@@ -40,7 +40,7 @@ export default function NewRewardForm() {
           type="text"
           name="title"
           required
-          className="mt-2 w-full rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+          className="mt-2 w-full rounded-lg border border-iron/10 bg-parchment/50 px-3 py-2 text-iron placeholder-iron/40 focus:border-iron/30 focus:outline-none"
           placeholder="E.g., Personalized Voice Note"
         />
       </div>
@@ -49,7 +49,7 @@ export default function NewRewardForm() {
         <label className="block text-sm font-medium">Description</label>
         <textarea
           name="description"
-          className="mt-2 w-full rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+          className="mt-2 w-full rounded-lg border border-iron/10 bg-parchment/50 px-3 py-2 text-iron placeholder-iron/40 focus:border-iron/30 focus:outline-none"
           placeholder="E.g., A personalized 30-second voice note"
           rows={3}
         />
@@ -60,7 +60,7 @@ export default function NewRewardForm() {
         <input
           type="url"
           name="image_url"
-          className="mt-2 w-full rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-white placeholder-white/40 focus:border-white/30 focus:outline-none"
+          className="mt-2 w-full rounded-lg border border-iron/10 bg-parchment/50 px-3 py-2 text-iron placeholder-iron/40 focus:border-iron/30 focus:outline-none"
           placeholder="https://..."
         />
       </div>
@@ -73,7 +73,7 @@ export default function NewRewardForm() {
             name="point_cost"
             required
             min="1"
-            className="mt-2 w-full rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-white focus:border-white/30 focus:outline-none"
+            className="mt-2 w-full rounded-lg border border-iron/10 bg-parchment/50 px-3 py-2 text-iron focus:border-iron/30 focus:outline-none"
             placeholder="5000"
           />
         </div>
@@ -83,7 +83,7 @@ export default function NewRewardForm() {
           <select
             name="kind"
             required
-            className="mt-2 w-full rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-white focus:border-white/30 focus:outline-none"
+            className="mt-2 w-full rounded-lg border border-iron/10 bg-parchment/50 px-3 py-2 text-iron focus:border-iron/30 focus:outline-none"
           >
             <option value="">Select kind</option>
             <option value="voice_note">Voice Note</option>
@@ -105,7 +105,7 @@ export default function NewRewardForm() {
             type="number"
             name="stock"
             min="0"
-            className="mt-2 w-full rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-white focus:border-white/30 focus:outline-none"
+            className="mt-2 w-full rounded-lg border border-iron/10 bg-parchment/50 px-3 py-2 text-iron focus:border-iron/30 focus:outline-none"
             placeholder="10"
           />
         </div>
@@ -114,7 +114,7 @@ export default function NewRewardForm() {
           <label className="block text-sm font-medium">Requires Tier</label>
           <select
             name="requires_tier"
-            className="mt-2 w-full rounded-lg border border-white/10 bg-black/50 px-3 py-2 text-white focus:border-white/30 focus:outline-none"
+            className="mt-2 w-full rounded-lg border border-iron/10 bg-parchment/50 px-3 py-2 text-iron focus:border-iron/30 focus:outline-none"
           >
             <option value="">None</option>
             <option value="premium">Premium</option>
@@ -127,13 +127,13 @@ export default function NewRewardForm() {
         <button
           type="submit"
           disabled={submitting}
-          className="flex-1 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 px-4 py-2 font-medium text-white hover:opacity-90 disabled:opacity-50"
+          className="flex-1 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 px-4 py-2 font-medium text-iron hover:opacity-90 disabled:opacity-50"
         >
           {submitting ? "Creating…" : "Create Reward"}
         </button>
         <SaveStatusIndicator status={status} />
         {businessError && (
-          <span className="text-xs text-rose-300" title={businessError}>
+          <span className="text-xs text-ember" title={businessError}>
             ✗ {businessError}
           </span>
         )}
