@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { Brand } from "@/lib/brands";
 import { featuredBrandsForGuestHome } from "@/lib/guest-home-featured-brands";
@@ -195,6 +196,24 @@ export default function SignedOutLanding({
             </div>
           </div>
         </div>
+      </section>
+
+      {/* ─── Nellie's photo band (real photo, not AI) ─────────────────────── */}
+      <section className="mx-auto max-w-6xl px-6 pt-16">
+        <figure className="group overflow-hidden rounded-lg border border-white/10">
+          <div className="relative aspect-[16/10] sm:aspect-[21/9]">
+            <Image
+              src="/brands/nellies/dining-room.jpg"
+              alt="The dining room at Nellie's Southern Kitchen"
+              fill
+              sizes="(min-width: 1152px) 1104px, 100vw"
+              className="bep-photo-zoom object-cover"
+            />
+          </div>
+          <figcaption className="bg-black/30 px-5 py-3 text-sm text-white/70">
+            The dining room at Nellie&apos;s Southern Kitchen in Belmont, NC.
+          </figcaption>
+        </figure>
       </section>
 
       {/* ─── How it works ─────────────────────────────────────────────────── */}
