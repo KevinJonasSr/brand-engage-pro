@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isAiFeatureOn } from "@/lib/ai-features";
 import { canAccessBrand, getAdminContext } from "@/lib/admin";
 import { suggestPredictions } from "@/lib/ai/prediction-suggestions";
 import type { PredictionType } from "@/lib/predictions/types";
@@ -18,6 +19,9 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function POST(req: Request) {
+  if (!isAiFeatureOn("predictionIdeas")) {
+    return NextResponse.json({ error: "not_found" }, { status: 404 });
+  }
   const ctx = await getAdminContext();
   if (!ctx) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 

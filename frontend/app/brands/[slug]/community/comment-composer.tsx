@@ -27,6 +27,7 @@
 import { useState, useRef, type FormEvent } from "react";
 import { useFormStatus } from "react-dom";
 import { addCommentAction } from "./actions";
+import { isAiFeatureOn } from "@/lib/ai-features";
 
 interface Props {
   postId: string;
@@ -162,16 +163,18 @@ export default function CommentComposer({ postId, brandSlug }: Props) {
         />
 
         {/* ✨ trigger — left of the textarea, low-key chip styling. */}
-        <button
-          type="button"
-          onClick={handleDraftClick}
-          disabled={loadingDrafts}
-          className="rounded-full border border-white/15 bg-black/30 px-3 py-2 text-xs text-white/70 hover:border-white/30 hover:bg-black/40 disabled:opacity-50"
-          aria-label="Draft a reply with AI"
-          title="Draft a reply with AI"
-        >
-          {loadingDrafts ? "…" : "✨"}
-        </button>
+        {isAiFeatureOn("draftReply") && (
+          <button
+            type="button"
+            onClick={handleDraftClick}
+            disabled={loadingDrafts}
+            className="rounded-full border border-white/15 bg-black/30 px-3 py-2 text-xs text-white/70 hover:border-white/30 hover:bg-black/40 disabled:opacity-50"
+            aria-label="Draft a reply with AI"
+            title="Draft a reply with AI"
+          >
+            {loadingDrafts ? "…" : "✨"}
+          </button>
+        )}
 
         <textarea
           ref={textareaRef}

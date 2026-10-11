@@ -3,6 +3,7 @@
  */
 
 import { notFound, redirect } from "next/navigation";
+import { isAiFeatureOn } from "@/lib/ai-features";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAdminContext } from "@/lib/admin";
 import { dismissFraudSignalAction, confirmFraudSignalAction } from "./actions";
@@ -35,6 +36,7 @@ interface EvidenceShape {
 }
 
 export default async function FraudSignalsPage() {
+  if (!isAiFeatureOn("fraudScan")) notFound();
   const ctx = await getAdminContext();
   if (!ctx) redirect("/login");
   // fraud_signals has no brand column, so this queue is owners only.

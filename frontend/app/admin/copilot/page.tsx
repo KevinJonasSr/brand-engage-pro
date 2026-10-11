@@ -1,4 +1,5 @@
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { isAiFeatureOn } from "@/lib/ai-features";
 import { getAdminContext, getAdminCommunityId, roleAtLeast } from "@/lib/admin";
 import { getLatestBrief, generateBrief } from "@/lib/copilot/generate";
 import { refreshBriefAction } from "./actions";
@@ -6,6 +7,7 @@ import { refreshBriefAction } from "./actions";
 export const dynamic = "force-dynamic";
 
 export default async function CopilotPage() {
+  if (!isAiFeatureOn("copilot")) notFound();
   const ctx = await getAdminContext();
   if (!ctx) redirect("/login?next=/admin/copilot");
 

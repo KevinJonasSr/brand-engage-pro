@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isAiFeatureOn } from "@/lib/ai-features";
 import { createClient } from "@/lib/supabase/server";
 import { suggestCaptions, CaptionError } from "@/lib/captions";
 import { apiRateLimiter } from "@/lib/rate-limit";
@@ -22,6 +23,9 @@ export const dynamic = "force-dynamic";
  *   500 — anything else (logged for debugging)
  */
 export async function POST(request: Request) {
+  if (!isAiFeatureOn("captionSuggester")) {
+    return NextResponse.json({ error: "not_found" }, { status: 404 });
+  }
   const supabase = await createClient();
   const {
     data: { user },
@@ -49,7 +53,7 @@ export async function POST(request: Request) {
   }
 
   const imageUrl = (body?.imageUrl ?? "").trim();
-  if (!imageUrl || !/^https?\/\//i.test(imageUrl)) {
+  if (!imageUrl || !/^https?:\/\//i.test(imageUrl)) {
     return NextResponse.json(
       { error: "imageUrl is required and must be http(s)." },
       { status: 400 },

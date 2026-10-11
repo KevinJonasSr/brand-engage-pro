@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { isAiFeatureOn } from "@/lib/ai-features";
 import { createPredictionAction } from "@/app/brands/[slug]/community/predictions-actions";
 import type {
   AwardStrategy,
@@ -193,6 +194,7 @@ export function CreatePredictionForm({ brands }: Props) {
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       {/* AI Suggest panel */}
+      {isAiFeatureOn("predictionIdeas") && (
       <section className="glass-card rounded-2xl p-5">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -256,6 +258,7 @@ export function CreatePredictionForm({ brands }: Props) {
           </ul>
         )}
       </section>
+      )}
 
       {/* Main form */}
       <section className="glass-card space-y-4 rounded-2xl p-5">

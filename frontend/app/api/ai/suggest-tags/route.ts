@@ -11,6 +11,7 @@
  */
 
 import { NextResponse } from "next/server";
+import { isAiFeatureOn } from "@/lib/ai-features";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { suggestTagsFromBody } from "@/lib/tagging/suggest";
@@ -28,6 +29,9 @@ interface RequestBody {
 }
 
 export async function POST(req: Request) {
+  if (!isAiFeatureOn("tagSuggester")) {
+    return NextResponse.json({ error: "not_found" }, { status: 404 });
+  }
   const supabase = await createServerClient();
   const { data: userRes } = await supabase.auth.getUser();
   if (!userRes?.user) {

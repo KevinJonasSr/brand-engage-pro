@@ -6,6 +6,7 @@ import VideoUploader from "@/components/video-uploader";
 import { useFormSave, SaveStatusIndicator } from "@/lib/use-form-save";
 import AltTextSuggester from "@/components/community/alt-text-suggester";
 import TagSuggester from "@/components/community/tag-suggester";
+import { isAiFeatureOn } from "@/lib/ai-features";
 import {
   createAnnouncementAction,
   createChallengeAction,
@@ -199,7 +200,9 @@ export default function NewPostForm({
       />
 
       {/* AI #5 — TagSuggester (lights M-2 filter chips on submit) */}
-      <TagSuggester partialBody={body} brandSlug={brandSlug} />
+      {isAiFeatureOn("tagSuggester") && (
+        <TagSuggester partialBody={body} brandSlug={brandSlug} />
+      )}
 
       {kind === "poll" && (
         <div className="space-y-2">
