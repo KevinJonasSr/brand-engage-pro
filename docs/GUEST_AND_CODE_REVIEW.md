@@ -34,7 +34,7 @@ Fork leftovers from Fan Engage (copy, CTAs, campaign kinds, marketplace music of
 | Gate | Status on `main` @ `c232393` / live |
 |---|---|
 | Unauthenticated `/api/debug-supabase` | **Shipped** — route removed in PR #7; prod **404** |
-| Admin email broadcast unscoped | **Shipped** — UI SMS-only; server rejects email/`both` unless `MAILCHIMP_BROADCAST_ENABLED=1` (PR #7) |
+| Admin email broadcast unscoped | **Closed** — PR #7 turned it off; item 10 (2026-10-11) brought email back brand-scoped through Mandrill, per member, with unsubscribe links |
 | Cron auth fail-closed | **Shipped** — all 14 crons use `verifyCronAuth` (PR #7) |
 | Guest path = restaurant loyalty (not music fan club) | **Shipped for Nellie's walk** — PR #9 + migrations 0049/0050 (music SKUs purged; apron+hot sauce active) |
 | Probe Auth pollution | **Cleared** — `bep-probe+*@example-debug.invalid` Auth users deleted on `enfpviapxvqyoarwwsuf` |
@@ -78,7 +78,7 @@ Use these scripts — do **not** invent routes or stock.
 | **Was** | Email path blasted full Mailchimp audience; tier IDs unused |
 | **Fix** | UI SMS-only; server rejects `email`/`both`; `broadcastEmail` errors unless `MAILCHIMP_BROADCAST_ENABLED=1` |
 | **Residual** | SMS tier filter still label-only (does not narrow Twilio recipients) — P1 ops risk, not whole-audience blast |
-| **Ops** | Never set `MAILCHIMP_BROADCAST_ENABLED=1` in prod until segments exist |
+| **Ops** | Item 10 (2026-10-11) replaced the unscoped path with `broadcastBrandEmail` (one Mandrill message per opted-in brand follower). `MAILCHIMP_BROADCAST_ENABLED` is no longer read. |
 
 ### P0-3. Cron auth fail-closed — **SHIPPED (PR #7)**
 | | |
@@ -193,7 +193,7 @@ Surgical slice from #6: `safeRelativePath` on auth callback / login / signup `ne
 
 **Core:** `NEXT_PUBLIC_SUPABASE_*`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_APP_URL`, `CRON_SECRET`, Stripe, Twilio, Anthropic/OpenAI, Mailchimp.
 
-**Used but under-documented:** Turnstile pair, `MAILCHIMP_TRANSACTIONAL_API_KEY`, `ADMIN_EMAILS`, `ADMIN_BASIC_*`, `STRIPE_SEED_SECRET`, VAPID keys, Network hub keys, `NEXT_PUBLIC_SITE_URL`. Never set `MAILCHIMP_BROADCAST_ENABLED=1` in prod until segments exist.
+**Used but under-documented:** Turnstile pair, `MAILCHIMP_TRANSACTIONAL_API_KEY`, `ADMIN_EMAILS`, `ADMIN_BASIC_*`, `STRIPE_SEED_SECRET`, VAPID keys, Network hub keys, `NEXT_PUBLIC_SITE_URL`. Email campaigns also use `BEP_EMAIL_FROM` and `BEP_EMAIL_REPLY_TO` (defaults hello@ and support@brandengagepro.com).
 
 **Migrations in repo** include **0049** / **0050** (soft-launch redeemables + music SKU purge) — **applied** on `enfpviapxvqyoarwwsuf`. Still verify profile columns when needed:
 
@@ -271,7 +271,7 @@ select count(*) filter (where profile_slug is null), count(*) from public.member
 
 ## Recommended sequence (from here)
 
-1. Keep soft-launch ops: **SMS-only** broadcast; do not set `MAILCHIMP_BROADCAST_ENABLED`.  
+1. Broadcast is text, email or both. Email needs the Mandrill key and a verified brandengagepro.com sending domain.  
 2. Apply **0051** on `enfpviapxvqyoarwwsuf` before marketing points.  
 3. Admin community scope before second brand/admin.
 4. Soft-launch continue: magic-link + password, OAuth gated, one admin — **brand loyalty framing only**.

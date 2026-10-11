@@ -96,7 +96,7 @@ Full detail: [`GUEST_AND_CODE_REVIEW.md`](./GUEST_AND_CODE_REVIEW.md).
 
 ## Recommended sequence
 
-1. Keep SMS-only broadcast; never enable unscoped Mailchimp broadcast in prod.  
+1. Email campaigns are brand-scoped as of item 10 (2026-10-11): one Mandrill message per opted-in follower of that brand. The old unscoped Mailchimp list blast is gone, so `MAILCHIMP_BROADCAST_ENABLED` does nothing now. Email needs `MAILCHIMP_TRANSACTIONAL_API_KEY` plus a verified sending domain.  
 2. Apply migration **0051** on live before marketing points.  
 3. Admin community scope before second brand/admin.  
 4. Continue Nellie's soft launch: one admin, brand-loyalty framing only.

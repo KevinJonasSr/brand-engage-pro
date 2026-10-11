@@ -1,4 +1,18 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  MANDRILL_BATCH_SIZE,
+  buildCampaignEmail,
+  buildMandrillMessage,
+  chunk,
+  countMandrillResults,
+  unsubscribeUrl,
+  validateEmailCampaign,
+} from "@/lib/email-campaign";
+
+const MANDRILL_SEND_URL = "https://mandrillapp.com/api/1.0/messages/send";
+const DEFAULT_APP_URL = "https://www.brandengagepro.com";
+const DEFAULT_FROM_EMAIL = "hello@brandengagepro.com";
+const DEFAULT_REPLY_TO = "support@brandengagepro.com";
 
 /**
  * Campaign broadcast helpers — send a single email or SMS blast to every member
@@ -48,7 +62,7 @@ async function loadRecipients(opts: {
 
   let query = admin
     .from("members")
-    .select("id, first_name, email, phone, sms_opted_in, email_opted_in, suspended")
+    .select("id, first_name, email, phone, unsubscribe_token, sms_opted_in, email_opted_in, suspended")
     .eq(optColumn, true)
     .eq("suspended", false)
     .not(contactColumn, "is", null);
@@ -83,6 +97,7 @@ async function loadRecipients(opts: {
     first_name: string | null;
     email: string | null;
     phone: string | null;
+    unsubscribe_token: string | null;
   }>;
 }
 
@@ -145,116 +160,89 @@ export async function broadcastSms(params: {
 }
 
 /**
- * Send an email blast via Mailchimp Campaigns API — creates a one-off
- * regular campaign against the configured audience, sets plain-text + html
- * content, and fires it immediately.
- *
- * DISABLED until brand/tier-scoped Mailchimp segments exist.
- * Current implementation always targets the full MAILCHIMP_AUDIENCE_ID list
- * (no brandSlug filter), which is launch-blocking for multi-brand / Nellie's
- * soft launch. Re-enable only after segment/tag targeting is wired.
- *
- * Opt-in escape hatch for explicit ops use: MAILCHIMP_BROADCAST_ENABLED=1
- * (never set in production until scoping lands).
+ * Send a brand-scoped email campaign through Mailchimp Transactional
+ * (Mandrill). Only members who follow this brand (or RSVPed to the event)
+ * and opted in to email get it, one message each, with their own
+ * unsubscribe link. Replaces the old unscoped Mailchimp list broadcast.
  */
-export async function broadcastEmail(params: {
+export async function broadcastBrandEmail(params: {
   subject: string;
   body: string;
-  fromName?: string;
-  replyTo?: string;
+  brandSlug: string;
+  eventId?: string | null;
+  memberIds?: string[] | null;
 }): Promise<BroadcastResult> {
   const result: BroadcastResult = { attempted: 0, sent: 0, failed: 0, recipients: 0 };
 
-  if (process.env.MAILCHIMP_BROADCAST_ENABLED !== "1") {
-    return {
-      ...result,
-      error:
-        "Email broadcast disabled until brand-scoped Mailchimp segments are implemented. Use SMS.",
-    };
+  const invalid = validateEmailCampaign(params);
+  if (invalid) return { ...result, error: invalid };
+  if (!params.brandSlug) return { ...result, error: "Email campaigns need a brand." };
+
+  const apiKey = process.env.MAILCHIMP_TRANSACTIONAL_API_KEY;
+  if (!apiKey) return { ...result, error: "Email sending not configured (MAILCHIMP_TRANSACTIONAL_API_KEY missing)" };
+
+  const recipients = await loadRecipients({
+    brandSlug: params.brandSlug,
+    eventId: params.eventId,
+    memberIds: params.memberIds,
+    channel: "email",
+  });
+  result.recipients = recipients.length;
+  if (recipients.length === 0) return result;
+
+  const admin = createAdminClient();
+  const { data: brand } = await admin
+    .from("brands")
+    .select("name")
+    .eq("slug", params.brandSlug)
+    .maybeSingle();
+  const brandName = (brand?.name as string | undefined) ?? "Brand Engage Pro";
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? DEFAULT_APP_URL;
+  const { html, text } = buildCampaignEmail({ subject: params.subject, body: params.body, brandName });
+
+  const withEmail = recipients.filter(
+    (r): r is typeof r & { email: string; unsubscribe_token: string } =>
+      Boolean(r.email && r.unsubscribe_token),
+  );
+
+  for (const batch of chunk(withEmail, MANDRILL_BATCH_SIZE)) {
+    result.attempted += batch.length;
+    const message = buildMandrillMessage({
+      subject: params.subject,
+      html,
+      text,
+      fromEmail: process.env.BEP_EMAIL_FROM ?? DEFAULT_FROM_EMAIL,
+      fromName: brandName,
+      replyTo: process.env.BEP_EMAIL_REPLY_TO ?? DEFAULT_REPLY_TO,
+      recipients: batch.map((r) => ({
+        email: r.email,
+        unsubUrl: unsubscribeUrl(appUrl, r.unsubscribe_token),
+      })),
+      tags: ["campaign", params.brandSlug],
+    });
+    try {
+      const res = await fetch(MANDRILL_SEND_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: apiKey, message }),
+      });
+      if (!res.ok) {
+        const detail = (await res.text().catch(() => "")).slice(0, 200);
+        console.error("broadcastBrandEmail: Mandrill error", res.status, detail);
+        result.failed += batch.length;
+        result.error = `Mandrill send failed: ${res.status}`;
+        continue;
+      }
+      const counts = countMandrillResults(await res.json());
+      result.sent += counts.sent;
+      result.failed += batch.length - counts.sent;
+    } catch (err) {
+      console.error("broadcastBrandEmail: fetch failed", err);
+      result.failed += batch.length;
+      result.error = err instanceof Error ? err.message : String(err);
+    }
   }
 
-  const apiKey = process.env.MAILCHIMP_API_KEY;
-  const server = process.env.MAILCHIMP_SERVER_PREFIX;
-  const listId = process.env.MAILCHIMP_AUDIENCE_ID;
-  if (!apiKey || !server || !listId) {
-    return { ...result, error: "Mailchimp not configured" };
-  }
-
-  const authHeader = `Basic ${Buffer.from(`anystring:${apiKey}`).toString("base64")}`;
-  const base = `https://${server}.api.mailchimp.com/3.0`;
-
-  try {
-    // 1) Create campaign
-    const createRes = await fetch(`${base}/campaigns`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: authHeader },
-      body: JSON.stringify({
-        type: "regular",
-        recipients: { list_id: listId },
-        settings: {
-          subject_line: params.subject,
-          title: `Brand Engage Pro — ${params.subject}`.slice(0, 100),
-          from_name: params.fromName ?? "Brand Engage Pro",
-          reply_to: params.replyTo ?? "no-reply@memberengage.app",
-          preview_text: params.subject,
-        },
-      }),
-    });
-    if (!createRes.ok) {
-      const detail = await createRes.json().catch(() => ({}));
-      return { ...result, error: `Mailchimp create failed: ${createRes.status} ${JSON.stringify(detail).slice(0, 200)}` };
-    }
-    const { id: campaignId, emails_sent, recipients } = await createRes.json();
-    const memberCount =
-      (recipients?.segment_opts?.saved_segment_id ? 0 : recipients?.recipient_count) ??
-      0;
-    result.recipients = memberCount;
-    result.attempted = emails_sent ?? memberCount;
-
-    // 2) Set content (plain text + simple HTML wrapper)
-    const contentRes = await fetch(`${base}/campaigns/${campaignId}/content`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", Authorization: authHeader },
-      body: JSON.stringify({
-        plain_text: params.body,
-        html: `<!DOCTYPE html><html><body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;line-height:1.5;color:#0f172a">
-<h2 style="margin:0 0 16px;font-size:22px">${escapeHtml(params.subject)}</h2>
-<div style="white-space:pre-wrap">${escapeHtml(params.body)}</div>
-<p style="margin-top:32px;font-size:12px;color:#64748b">
-  Sent via Brand Engage Pro ·
-  <a href="*|UNSUB|*" style="color:#64748b">Unsubscribe from Mailchimp</a> ·
-  <a href="${process.env.NEXT_PUBLIC_APP_URL ?? "https://brand-engage-pro.vercel.app"}/unsubscribe?token=*|MERGE:UNSUB_TOKEN|*" style="color:#64748b">Unsubscribe from Brand Engage Pro</a>
-</p>
-</body></html>`,
-      }),
-    });
-    if (!contentRes.ok) {
-      const detail = await contentRes.json().catch(() => ({}));
-      return { ...result, error: `Mailchimp content failed: ${contentRes.status} ${JSON.stringify(detail).slice(0, 200)}` };
-    }
-
-    // 3) Send immediately
-    const sendRes = await fetch(`${base}/campaigns/${campaignId}/actions/send`, {
-      method: "POST",
-      headers: { Authorization: authHeader },
-    });
-    if (!sendRes.ok) {
-      const detail = await sendRes.json().catch(() => ({}));
-      return { ...result, error: `Mailchimp send failed: ${sendRes.status} ${JSON.stringify(detail).slice(0, 200)}` };
-    }
-    result.sent = result.attempted;
-    return result;
-  } catch (err) {
-    console.error("broadcastEmail error:", err);
-    return { ...result, error: err instanceof Error ? err.message : String(err) };
-  }
-}
-
-function escapeHtml(s: string): string {
-  return s
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
+  return result;
 }

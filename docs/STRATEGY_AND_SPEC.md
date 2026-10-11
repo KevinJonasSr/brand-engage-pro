@@ -146,7 +146,7 @@ Three surfaces:
 - **Community composer** — post / announcement / poll / challenge, with photo and optional video (we already have video support from migration 0022).
 - **Members list** — every customer who joined, sortable by tier, points, last activity. Click into each for their profile, history, redemption log.
 - **Rewards catalog** — define what members can redeem points for (free coffee = 50 pts, swag = 200 pts, "name on the wall" = 1000 pts, etc.). Same as Member Engage's rewards system.
-- **Broadcast** — send a message to a segment (all members, gold+, opted-in for SMS, etc.). V1 supports email; SMS and per-segment in V2.
+- **Broadcast** — send a message to a segment (all members, gold+, opted-in for SMS, etc.). Shipped: text, email or both, by tier. Email goes per member through Mailchimp Transactional (Mandrill), only to that brand's followers who said yes to email, each with their own unsubscribe link (item 10, 2026-10-11).
 - **Analytics** — basic engagement dashboard: member growth, points earned/redeemed, top specials, most active members.
 
 ### 6c. Brand onboarding self-serve

@@ -9,7 +9,7 @@ import {
   requireAdminContext,
   requireBrandAccess,
 } from "@/lib/admin";
-import { broadcastEmail, broadcastSms } from "@/lib/broadcast";
+import { broadcastBrandEmail, broadcastSms } from "@/lib/broadcast";
 import { createNotification } from "@/lib/data/notifications";
 
 /**
@@ -244,19 +244,26 @@ export async function createAndPublishCampaign(formData: FormData) {
     String(formData.get("target_event_rsvpers") ?? "false") === "true" &&
     attachedEventId !== null;
 
-  // 8) Email blast — create + send a Mailchimp regular campaign.
-  //    broadcastEmail targets the whole Mailchimp audience (every brand), so
-  //    only super-admins may trigger it. It is also switched off by default
-  //    (MAILCHIMP_BROADCAST_ENABLED).
+  // 8) Email blast. One message per member through Mailchimp Transactional,
+  //    limited to this brand's followers who opted in to email (or the
+  //    event's RSVPers when targetEventRsvpers is on). Each member gets their
+  //    own unsubscribe link.
   const emailSubject = String(formData.get("email_subject") ?? "").trim();
   const emailBody = String(formData.get("email_body") ?? "").trim();
-  if (emailSubject && emailBody && ctx.isSuperAdmin) {
-    const result = await broadcastEmail({ subject: emailSubject, body: emailBody });
+  if (emailSubject && emailBody) {
+    const result = await broadcastBrandEmail({
+      subject: emailSubject,
+      body: emailBody,
+      brandSlug,
+      eventId: targetEventRsvpers ? attachedEventId : null,
+    });
     await recordItem("email", null, {
       subject: emailSubject,
       body: emailBody,
       sent: result.sent,
+      failed: result.failed,
       recipients: result.recipients,
+      targeted_event_id: targetEventRsvpers ? attachedEventId : null,
       error: result.error ?? null,
     });
   }
