@@ -3,9 +3,10 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getBrandFromDb } from "@/lib/data/brands";
 import ShareButton from "@/components/share-button";
+import { brandWashBackground, resolveBrandAccent } from "@/lib/brand-accent";
 
 // ─── Public founder share page ──────────────────────────────────────────
-// Anyone with the URL can see the badge — founder counts are public,
+// Anyone with the URL can see the badge. Founder counts are public;
 // member identity is not exposed (we only encode brand + number, not the
 // member_id). The matching opengraph-image.tsx renders the certificate
 // preview when this URL is shared.
@@ -53,9 +54,7 @@ export default async function FounderSharePage({
   const founderNumber = parseInt(number, 10);
   if (!Number.isFinite(founderNumber) || founderNumber < 1) notFound();
 
-  const accentStyle = {
-    backgroundImage: `linear-gradient(135deg, ${brand.accentFrom}, ${brand.accentTo})`,
-  };
+  const palette = resolveBrandAccent(brand.accentFrom, brand.accentTo);
 
   const shareUrl =
     typeof process.env.NEXT_PUBLIC_APP_URL === "string"
@@ -69,22 +68,20 @@ export default async function FounderSharePage({
     <main className="mx-auto max-w-3xl px-6 py-16">
       <section
         className="relative overflow-hidden rounded-lg border border-iron/15 p-10 shadow-glass md:p-14"
-        style={{
-          background: `radial-gradient(circle at 15% 10%, ${brand.accentFrom}66, transparent 55%), radial-gradient(circle at 85% 95%, ${brand.accentTo}66, transparent 60%), #050b1f`,
-        }}
+        style={{ background: brandWashBackground(palette) }}
       >
         <div className="relative flex flex-col items-center gap-6 text-center">
           <p className="text-xs font-medium uppercase tracking-[0.3em] text-iron/70">
             Founding Member
           </p>
           <p
-            className="bg-clip-text text-[120px] font-extrabold leading-none tracking-tight text-transparent md:text-[180px]"
-            style={accentStyle}
+            className="text-[120px] font-extrabold leading-none tracking-tight md:text-[180px]"
+            style={{ color: palette.accentInk }}
           >
             #{founderNumber}
           </p>
           <p
-            className="text-3xl font-semibold leading-tight md:text-4xl"
+            className="text-3xl font-normal leading-tight md:text-4xl"
             style={{ fontFamily: "var(--font-display)" }}
           >
             of {brand.name}

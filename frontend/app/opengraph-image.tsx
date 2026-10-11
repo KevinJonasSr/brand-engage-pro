@@ -1,117 +1,38 @@
 import { ImageResponse } from "next/og";
+import { ShareCard } from "@/components/og/share-card";
+import { sharePalette } from "@/lib/brand-accent";
 
 // ─── OG card for every page that doesn't override it ──────────────────────
 // 1200x630 is the canonical Twitter/LinkedIn/Slack preview size. Generated at
 // request time via Next's ImageResponse so we don't have to ship a binary.
 
 export const runtime = "edge";
-export const alt = "Brand Engage Pro — the member-loyalty platform";
+export const alt = "Brand Engage Pro, the member-loyalty platform";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+const HEADLINE = {
+  fontSize: 84,
+  fontWeight: 700,
+  lineHeight: 1.02,
+  letterSpacing: "-0.035em",
+  maxWidth: 980,
+} as const;
+
 export default async function OpengraphImage() {
+  const palette = sharePalette(null, null);
+
   return new ImageResponse(
     (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          width: "100%",
-          height: "100%",
-          padding: "80px",
-          // Radial aurora + midnight base
-          background:
-            "radial-gradient(circle at 15% 10%, rgba(212,160,23,0.35), transparent 50%), " +
-            "radial-gradient(circle at 85% 90%, rgba(251,146,60,0.25), transparent 55%), " +
-            "#050b1f",
-          color: "white",
-          fontFamily: "sans-serif",
-        }}
+      <ShareCard
+        palette={palette}
+        align="start"
+        caption="The member-loyalty platform: rewards, community, drops."
+        cta="Join free →"
       >
-        {/* Brand mark */}
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <div
-            style={{
-              display: "flex",
-              width: 64,
-              height: 64,
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: 999,
-              background: "linear-gradient(135deg, #D4A017, #9B2335)",
-              fontSize: 28,
-              fontWeight: 700,
-              color: "white",
-            }}
-          >
-            FE
-          </div>
-          <div
-            style={{
-              fontSize: 32,
-              fontWeight: 600,
-              letterSpacing: "-0.02em",
-            }}
-          >
-            Brand Engage Pro
-          </div>
-        </div>
-
-        {/* Headline */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          <div
-            style={{
-              fontSize: 84,
-              fontWeight: 700,
-              lineHeight: 1.02,
-              letterSpacing: "-0.035em",
-              maxWidth: 980,
-            }}
-          >
-            Your favorite brands.
-          </div>
-          <div
-            style={{
-              fontSize: 84,
-              fontWeight: 700,
-              lineHeight: 1.02,
-              letterSpacing: "-0.035em",
-              background:
-                "linear-gradient(90deg, #a78bfa, #f0abfc, #9B2335)",
-              backgroundClip: "text",
-              color: "transparent",
-            }}
-          >
-            Your member&apos;s table.
-          </div>
-        </div>
-
-        {/* Footer row */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            fontSize: 24,
-            color: "rgba(255,255,255,0.7)",
-          }}
-        >
-          <div>The member-loyalty platform — rewards, community, drops.</div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "10px 20px",
-              borderRadius: 999,
-              border: "1px solid rgba(255,255,255,0.2)",
-            }}
-          >
-            Join free →
-          </div>
-        </div>
-      </div>
+        <div style={{ ...HEADLINE, color: palette.text }}>Your favorite brands.</div>
+        <div style={{ ...HEADLINE, color: palette.accentInk }}>Your member&apos;s table.</div>
+      </ShareCard>
     ),
     { ...size },
   );
