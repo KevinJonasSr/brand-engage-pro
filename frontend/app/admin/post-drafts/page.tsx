@@ -4,7 +4,8 @@
  * AI #18: AI-drafted brand community posts queued for admin review.
  */
 
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { isAiFeatureOn } from "@/lib/ai-features";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { canAccessBrand, getAdminContext } from "@/lib/admin";
 import {
@@ -27,6 +28,7 @@ interface DraftRow {
 }
 
 export default async function AdminPostDraftsPage() {
+  if (!isAiFeatureOn("postDrafts")) notFound();
   const ctx = await getAdminContext();
   if (!ctx) redirect("/login");
   const brandSlug = ctx.currentCommunityId ?? "";

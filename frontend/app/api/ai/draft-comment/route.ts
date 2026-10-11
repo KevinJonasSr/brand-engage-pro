@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isAiFeatureOn } from "@/lib/ai-features";
 import { createClient } from "@/lib/supabase/server";
 import { draftComment } from "@/lib/drafts";
 import { apiRateLimiter } from "@/lib/rate-limit";
@@ -21,6 +22,9 @@ export const dynamic = "force-dynamic";
  *   500 — anything else (logged for debugging)
  */
 export async function POST(request: Request) {
+  if (!isAiFeatureOn("draftReply")) {
+    return NextResponse.json({ error: "not_found" }, { status: 404 });
+  }
   const supabase = await createClient();
   const {
     data: { user },

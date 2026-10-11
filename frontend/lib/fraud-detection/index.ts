@@ -70,10 +70,11 @@ export async function gatherCandidates(admin: {
     triggersByMember.get(memberId)!.add(trigger);
   };
 
-  const { data: burstPosts } = await admin
+  const { data: burstPosts, error: burstPostsErr } = await admin
     .from("community_posts")
     .select("author_id")
     .gte("created_at", dayAgoIso);
+  if (burstPostsErr) throw new Error(`community_posts query failed: ${burstPostsErr.message}`);
   if (burstPosts) {
     const counts = new Map<string, number>();
     for (const row of burstPosts) {
@@ -86,10 +87,11 @@ export async function gatherCandidates(admin: {
     }
   }
 
-  const { data: burstComments } = await admin
+  const { data: burstComments, error: burstCommentsErr } = await admin
     .from("community_comments")
     .select("author_id")
     .gte("created_at", dayAgoIso);
+  if (burstCommentsErr) throw new Error(`community_comments query failed: ${burstCommentsErr.message}`);
   if (burstComments) {
     const counts = new Map<string, number>();
     for (const row of burstComments) {
@@ -102,11 +104,12 @@ export async function gatherCandidates(admin: {
     }
   }
 
-  const { data: rapidMembers } = await admin
+  const { data: rapidMembers, error: rapidMembersErr } = await admin
     .from("members")
     .select("id")
     .gte("total_points", 200)
     .gte("created_at", sevenDaysAgoIso);
+  if (rapidMembersErr) throw new Error(`members query failed: ${rapidMembersErr.message}`);
   if (rapidMembers) {
     for (const row of rapidMembers) {
       const id = (row as { id?: string }).id;
@@ -119,6 +122,11 @@ export async function gatherCandidates(admin: {
     .map(([member_id, triggers]) => ({ member_id, triggers: Array.from(triggers) }));
 }
 
+/**
+ * Ask the model about one candidate. Returns null only when the member no
+ * longer exists. Every failure (query, missing key, network, bad reply)
+ * throws, so the cron counts it as an error instead of hiding it.
+ */
 export async function evaluateCandidate(
   admin: { from: (table: string) => any },
   candidate: { member_id: string; triggers: string[] },
@@ -145,6 +153,10 @@ export async function evaluateCandidate(
       .order("created_at", { ascending: false })
       .limit(30),
   ]);
+
+  for (const res of [memberRes, postsRes, commentsRes]) {
+    if (res.error) throw new Error(`candidate query failed: ${res.error.message}`);
+  }
 
   const member = memberRes.data as MemberRow | null;
   if (!member) return null;
@@ -186,61 +198,30 @@ export async function evaluateCandidate(
   };
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    return {
-      member_id: memberId,
-      triggers: candidate.triggers,
-      verdict: "unclear",
-      confidence: 0.3,
-      reasons: ["ANTHROPIC_API_KEY not set; cannot evaluate"],
-      evidence,
-    };
-  }
+  if (!apiKey) throw new Error("ANTHROPIC_API_KEY not set");
 
   const userPrompt = buildPrompt(candidate.triggers, evidence);
-  let response: Response;
-  try {
-    response = await fetch(ANTHROPIC_API_URL, {
-      method: "POST",
-      headers: {
-        "x-api-key": apiKey,
-        "anthropic-version": ANTHROPIC_API_VERSION,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 400,
-        system: SYSTEM_PROMPT,
-        messages: [{ role: "user", content: userPrompt }],
-        temperature: 0.1,
-      }),
-    });
-  } catch {
-    return null;
-  }
-  if (!response.ok) return null;
+  const response = await fetch(ANTHROPIC_API_URL, {
+    method: "POST",
+    headers: {
+      "x-api-key": apiKey,
+      "anthropic-version": ANTHROPIC_API_VERSION,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      max_tokens: 400,
+      system: SYSTEM_PROMPT,
+      messages: [{ role: "user", content: userPrompt }],
+      temperature: 0.1,
+    }),
+  });
+  if (!response.ok) throw new Error(`model call failed: ${response.status}`);
 
-  let json: AnthropicMessageResponse;
-  try {
-    json = (await response.json()) as AnthropicMessageResponse;
-  } catch {
-    return null;
-  }
-
-  const text = (json.content.find((c) => c.type === "text")?.text ?? "").trim();
-  const stripped = text
-    .replace(/^```(?:json)?\s*/i, "")
-    .replace(/\s*```\s*$/i, "");
-
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(stripped);
-  } catch {
-    return null;
-  }
-
-  const validated = validateVerdict(parsed);
-  if (!validated) return null;
+  const json = (await response.json()) as AnthropicMessageResponse;
+  const text = json.content?.find((c) => c.type === "text")?.text ?? "";
+  const validated = parseVerdictText(text);
+  if (!validated) throw new Error("model reply was not a valid verdict");
 
   return {
     member_id: memberId,
@@ -252,15 +233,30 @@ export async function evaluateCandidate(
   };
 }
 
-function validateVerdict(
-  raw: unknown,
+const VERDICTS: ReadonlySet<string> = new Set(["legitimate", "suspicious", "unclear"]);
+
+/**
+ * Read the model's JSON reply (code fences allowed). Returns null when the
+ * reply is not JSON or has no known verdict, so a garbled reply is never
+ * read as "legitimate".
+ */
+export function parseVerdictText(
+  text: string,
 ): { verdict: Verdict; confidence: number; reasons: string[] } | null {
+  const stripped = text
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```\s*$/i, "");
+  let raw: unknown;
+  try {
+    raw = JSON.parse(stripped);
+  } catch {
+    return null;
+  }
   if (typeof raw !== "object" || raw === null) return null;
   const r = raw as Record<string, unknown>;
-  const verdict =
-    r.verdict === "suspicious" || r.verdict === "unclear"
-      ? r.verdict
-      : "legitimate";
+  if (typeof r.verdict !== "string" || !VERDICTS.has(r.verdict)) return null;
+  const verdict = r.verdict;
   const confidence =
     typeof r.confidence === "number" && r.confidence >= 0 && r.confidence <= 1
       ? Math.round(r.confidence * 100) / 100
@@ -349,14 +345,29 @@ Confidence calibration:
 
 Output JSON only — no commentary, no markdown fences.`;
 
+export interface ScanResult {
+  flags: FraudFlag[];
+  /** Candidates that could not be evaluated (one entry per candidate). */
+  errors: { member_id: string; message: string }[];
+}
+
+/** Gather candidates and evaluate each. Throws only if gathering fails. */
 export async function scanForFraud(admin: {
   from: (table: string) => any;
-}): Promise<FraudFlag[]> {
+}): Promise<ScanResult> {
   const candidates = await gatherCandidates(admin);
-  const results: FraudFlag[] = [];
+  const flags: FraudFlag[] = [];
+  const errors: ScanResult["errors"] = [];
   for (const c of candidates) {
-    const r = await evaluateCandidate(admin, c);
-    if (r) results.push(r);
+    try {
+      const r = await evaluateCandidate(admin, c);
+      if (r) flags.push(r);
+    } catch (err) {
+      errors.push({
+        member_id: c.member_id,
+        message: err instanceof Error ? err.message : String(err),
+      });
+    }
   }
-  return results;
+  return { flags, errors };
 }

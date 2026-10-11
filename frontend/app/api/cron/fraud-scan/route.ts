@@ -7,6 +7,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { scanForFraud } from "@/lib/fraud-detection";
 import { verifyCronAuth } from "@/lib/cron-auth";
+import { disabledCronBody, isAiFeatureOn } from "@/lib/ai-features";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -26,6 +27,7 @@ interface RunResult {
 export async function GET(req: Request) {
   const authErr = verifyCronAuth(req);
   if (authErr) return authErr;
+  if (!isAiFeatureOn("fraudScan")) return NextResponse.json(disabledCronBody("fraudScan"));
 
   const admin = createAdminClient();
   const result: RunResult = {
@@ -37,9 +39,9 @@ export async function GET(req: Request) {
     errors: 0,
   };
 
-  let flags;
+  let scan;
   try {
-    flags = await scanForFraud(admin);
+    scan = await scanForFraud(admin);
   } catch (err) {
     return NextResponse.json(
       { ok: false, error: "scan_failed", detail: String(err) },
@@ -47,7 +49,12 @@ export async function GET(req: Request) {
     );
   }
 
-  result.scanned = flags.length;
+  const { flags, errors } = scan;
+  result.scanned = flags.length + errors.length;
+  result.errors = errors.length;
+  for (const e of errors) {
+    console.warn("[cron fraud-scan] could not evaluate", e.member_id, e.message);
+  }
 
   for (const flag of flags) {
     if (flag.verdict === "legitimate") {
@@ -77,5 +84,6 @@ export async function GET(req: Request) {
     }
   }
 
+  result.ok = result.errors === 0;
   return NextResponse.json(result);
 }

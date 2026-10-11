@@ -19,6 +19,7 @@ import {
   type DraftContext,
 } from "@/lib/post-drafts";
 import { verifyCronAuth } from "@/lib/cron-auth";
+import { disabledCronBody, isAiFeatureOn } from "@/lib/ai-features";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -50,6 +51,7 @@ interface RunResult {
 export async function GET(req: Request) {
   const authErr = verifyCronAuth(req);
   if (authErr) return authErr;
+  if (!isAiFeatureOn("postDrafts")) return NextResponse.json(disabledCronBody("postDrafts"));
 
   const admin = createAdminClient();
 

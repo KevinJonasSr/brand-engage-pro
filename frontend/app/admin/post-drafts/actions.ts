@@ -1,7 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { isAiFeatureOn } from "@/lib/ai-features";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { canAccessBrand, getAdminContext } from "@/lib/admin";
 import {
@@ -13,6 +14,7 @@ async function requireAdminBrand(): Promise<{
   brandSlug: string;
   userId: string;
 }> {
+  if (!isAiFeatureOn("postDrafts")) notFound();
   const ctx = await getAdminContext();
   if (!ctx) redirect("/login");
   // The admin's current brand, validated against their grants. Super-admins

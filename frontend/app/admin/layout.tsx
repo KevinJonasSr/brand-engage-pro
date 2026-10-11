@@ -8,6 +8,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { readBrandBilling } from "@/lib/brand-billing-server";
 import { billingBanner, type BillingBanner } from "@/lib/brand-billing";
 import { BillingBannerNotice } from "./billing/billing-banner";
+import { visibleAdminNav } from "@/lib/ai-features";
 
 const adminNav = [
   { href: "/admin", label: "Overview" },
@@ -135,7 +136,7 @@ export default async function AdminLayout({
         </div>
 
         <nav className="mb-8 flex flex-wrap gap-2">
-          {adminNav.map((item) => (
+          {visibleAdminNav(adminNav).map((item) => (
             <Link
               key={item.href}
               href={item.href}
