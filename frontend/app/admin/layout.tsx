@@ -4,6 +4,10 @@ import { redirect } from "next/navigation";
 import { getAdminContext } from "@/lib/admin";
 import { getCommunity } from "@/lib/community";
 import { countPendingRedemptions } from "@/lib/data/rewards";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { readBrandBilling } from "@/lib/brand-billing-server";
+import { billingBanner, type BillingBanner } from "@/lib/brand-billing";
+import { BillingBannerNotice } from "./billing/billing-banner";
 
 const adminNav = [
   { href: "/admin", label: "Overview" },
@@ -23,7 +27,19 @@ const adminNav = [
   { href: "/admin/policies", label: "Policies" },
   { href: "/admin/team", label: "Team" },
   { href: "/admin/launch", label: "Launch" },
+  { href: "/admin/billing", label: "Billing" },
 ];
+
+/** Billing banner for the current brand. Never breaks the admin shell. */
+async function loadBillingBanner(communityId: string): Promise<BillingBanner | null> {
+  try {
+    return billingBanner(await readBrandBilling(createAdminClient(), communityId));
+  } catch (err) {
+    // Most likely migration 0073 is not applied yet.
+    console.warn("admin layout: billing banner unavailable", err);
+    return null;
+  }
+}
 
 export default async function AdminLayout({
   children,
@@ -63,6 +79,12 @@ export default async function AdminLayout({
   if (ctx.currentCommunityId) {
     pendingCount = await countPendingRedemptions(ctx.currentCommunityId);
   }
+
+  // The billing page shows its own banner.
+  const banner =
+    ctx.currentCommunityId && !pathname.includes("/admin/billing")
+      ? await loadBillingBanner(ctx.currentCommunityId)
+      : null;
 
   return (
     <div className="min-h-screen bg-midnight">
@@ -128,6 +150,12 @@ export default async function AdminLayout({
             </Link>
           ))}
         </nav>
+
+        {banner && (
+          <div className="mb-6">
+            <BillingBannerNotice banner={banner} />
+          </div>
+        )}
 
         <main>{children}</main>
       </div>

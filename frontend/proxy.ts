@@ -12,6 +12,7 @@ import {
   shouldSkipSessionRefresh,
   stampSignedOutCookie,
 } from "@/lib/auth-cookies";
+import { isLockedAdminWritePath } from "@/lib/brand-billing";
 import { isBrandSlugAlias, resolveBrandSlug } from "@/lib/brand-aliases";
 import { resolveCommunityFromHost } from "@/lib/community";
 import { resolvePinnedCanonicalLocation } from "@/lib/site-url";
@@ -187,6 +188,30 @@ export default async function proxy(request: NextRequest) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);
+  }
+
+  // Brand billing read-only gate (item 8). Admin edits are server actions,
+  // which arrive as POSTs with a Next-Action header. When the admin's
+  // current brand is locked for non-payment, refuse them. Billing and the
+  // brand switcher stay writable so the brand can fix it. Fails open: a
+  // lookup error must never lock out a paying brand.
+  if (
+    user &&
+    request.method === "POST" &&
+    request.headers.has("next-action") &&
+    isLockedAdminWritePath(pathname)
+  ) {
+    const { data: locked, error } = await supabase.rpc("admin_write_locked", {
+      p_cookie_brand: request.cookies.get("fe_admin_community")?.value ?? null,
+    });
+    if (error) {
+      console.warn("proxy: admin_write_locked failed", error.message);
+    } else if (locked === true) {
+      return new NextResponse(
+        "Billing needs attention. Admin tools are read-only until the plan is active again. Visit /admin/billing.",
+        { status: 403 },
+      );
+    }
   }
 
   return response;

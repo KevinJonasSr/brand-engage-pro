@@ -8,6 +8,10 @@ import {
   subscriptionPeriodEndIso,
 } from "@/lib/stripe-moved-fields";
 import {
+  handleBrandInvoiceEvent,
+  handleBrandSubscriptionEvent,
+} from "@/lib/brand-billing-server";
+import {
   isStripeEventReplay,
   stripeEventCompletionPatch,
 } from "@/lib/stripe-webhook-processed";
@@ -33,9 +37,15 @@ export const dynamic = "force-dynamic";
  *                                    $5 monthly credit if Premium
  *   invoice.payment_failed         → tier → 'past_due' (retry grace)
  *
+ * Brand billing (metadata billing_scope = "brand") is routed first to
+ * lib/brand-billing-server.ts and writes brand_billing instead.
+ * customer.subscription.trial_will_end is logged only; Stripe emails the
+ * reminder itself.
+ *
  * Configure the endpoint in Stripe dashboard:
  *   URL:      https://<host>/api/stripe/webhook
- *   Events:   customer.subscription.*, invoice.paid, invoice.payment_failed
+ *   Events:   customer.subscription.* (incl. trial_will_end), invoice.paid,
+ *             invoice.payment_failed
  *   Secret:   copy into STRIPE_WEBHOOK_SECRET in Vercel env vars.
  */
 export async function POST(request: Request) {
@@ -104,25 +114,26 @@ export async function POST(request: Request) {
   let processError: string | null = null;
   try {
     switch (event.type) {
-      case "customer.subscription.created":
-        await handleSubscriptionCreated(
-          event.data.object as Stripe.Subscription,
-          admin,
-        );
+      case "customer.subscription.created": {
+        const sub = event.data.object as Stripe.Subscription;
+        if (await handleBrandSubscriptionEvent(sub, admin)) break;
+        await handleSubscriptionCreated(sub, admin);
         break;
-      case "customer.subscription.updated":
-        await handleSubscriptionUpdated(
-          event.data.object as Stripe.Subscription,
-          admin,
-        );
+      }
+      case "customer.subscription.updated": {
+        const sub = event.data.object as Stripe.Subscription;
+        if (await handleBrandSubscriptionEvent(sub, admin)) break;
+        await handleSubscriptionUpdated(sub, admin);
         break;
-      case "customer.subscription.deleted":
-        await handleSubscriptionDeleted(
-          event.data.object as Stripe.Subscription,
-          admin,
-        );
+      }
+      case "customer.subscription.deleted": {
+        const sub = event.data.object as Stripe.Subscription;
+        if (await handleBrandSubscriptionEvent(sub, admin)) break;
+        await handleSubscriptionDeleted(sub, admin);
         break;
+      }
       case "invoice.paid":
+        if (await brandInvoice(event.data.object as Stripe.Invoice, "paid", admin)) break;
         await handleInvoicePaid(
           event.data.object as Stripe.Invoice,
           event.id,
@@ -130,6 +141,7 @@ export async function POST(request: Request) {
         );
         break;
       case "invoice.payment_failed":
+        if (await brandInvoice(event.data.object as Stripe.Invoice, "failed", admin)) break;
         await handleInvoicePaymentFailed(
           event.data.object as Stripe.Invoice,
           admin,
@@ -162,6 +174,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: processError }, { status: 500 });
   }
   return NextResponse.json({ ok: true });
+}
+
+// ─── Brand billing routing ────────────────────────────────────────────────
+
+async function brandInvoice(
+  invoice: Stripe.Invoice,
+  outcome: "paid" | "failed",
+  admin: SupabaseClient,
+): Promise<boolean> {
+  const subId = invoiceSubscriptionId(invoice);
+  if (!subId) return false;
+  return handleBrandInvoiceEvent(subId, outcome, admin);
 }
 
 // ─── Metadata extractors ──────────────────────────────────────────────────
