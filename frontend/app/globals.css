@@ -87,6 +87,43 @@ h3 {
   }
 }
 
+/*
+ * .bep-message      homepage hero texts (components/message-stack-hero.tsx)
+ *                   land one after another: 24px rise, 560ms, delay from
+ *                   --message-delay. .bep-delivered fades the tick in
+ *                   after each lands (--tick-delay). Pure CSS, so it plays
+ *                   without JavaScript and ends visible.
+ */
+@keyframes bep-message-land {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes bep-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.bep-message {
+  animation: bep-message-land 560ms var(--ease-porch) both;
+  animation-delay: var(--message-delay, 0ms);
+}
+
+.bep-delivered {
+  animation: bep-fade-in 400ms var(--ease-porch) both;
+  animation-delay: var(--tick-delay, 0ms);
+}
+
 .bep-photo-zoom {
   transition: transform 900ms var(--ease-porch);
 }
@@ -135,5 +172,13 @@ h3 {
   .bep-press:active {
     transform: none !important;
     transition-delay: 0ms !important;
+  }
+
+  /* Hero texts: no autoplay. All three sit at rest, ticks showing. */
+  .bep-message,
+  .bep-delivered {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
