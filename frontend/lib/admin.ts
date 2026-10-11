@@ -60,7 +60,11 @@ export async function getAdminContext(): Promise<AdminContext | null> {
   const { data: rows, error } = await admin
     .from("admin_users")
     .select("community_id, role")
-    .eq("user_id", user.id);
+    .eq("user_id", user.id)
+    // Same order as admin_write_locked() in 0073 so both pick the same
+    // default brand for multi-brand admins.
+    .order("created_at", { ascending: true, nullsFirst: false })
+    .order("community_id", { ascending: true });
 
   if (error) {
     console.warn("getAdminContext: admin_users lookup failed", error.message);
