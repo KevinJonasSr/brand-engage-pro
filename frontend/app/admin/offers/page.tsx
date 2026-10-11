@@ -25,7 +25,11 @@ async function listAllOffers(): Promise<Offer[]> {
 }
 
 export default async function AdminOffersPage() {
+  const access = await getAdminPageScope();
   const offers = await listAllOffers();
+  // Brand admins upload into their own brand. Super-admins use the brand
+  // selected in the switcher. Each existing offer also carries its brand.
+  const uploadBrand = access?.scope ?? access?.ctx.currentCommunityId ?? undefined;
 
   return (
     <div className="space-y-6">
@@ -107,6 +111,7 @@ export default async function AdminOffersPage() {
               bucket="community-uploads"
               name="image_url"
               label="Add image or ad mat"
+              brand={uploadBrand}
             />
             <p className="mt-1 text-xs text-iron/70">
               Recommended: landscape, 1200×800 or larger. JPEG, PNG, WebP, or GIF.
@@ -146,7 +151,14 @@ export default async function AdminOffersPage() {
               <tr key={o.id} className="border-t border-iron/5 align-top">
                 <td className="px-4 py-3">
                   <div className="w-32">
-                    <OfferImageEditor offerId={o.id} initialUrl={o.image_url ?? null} />
+                    <OfferImageEditor
+                      offerId={o.id}
+                      initialUrl={o.image_url ?? null}
+                      brandSlug={
+                        (o as Offer & { community_id?: string | null }).community_id ??
+                        uploadBrand
+                      }
+                    />
                   </div>
                 </td>
                 <td className="px-4 py-3">{o.title}</td>

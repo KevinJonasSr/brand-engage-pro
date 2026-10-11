@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAdminContext, requireSuperAdmin } from "@/lib/admin";
+import { getAdminContext, requireSuperAdmin, requireWritableBrand } from "@/lib/admin";
 
 /**
  * fraud_signals has no brand column, so a brand admin cannot be limited to
@@ -13,6 +13,7 @@ async function requireAdmin(): Promise<string> {
   const ctx = await getAdminContext();
   if (!ctx) redirect("/login");
   requireSuperAdmin(ctx);
+  await requireWritableBrand(ctx, ctx.currentCommunityId);
   return ctx.user.id;
 }
 

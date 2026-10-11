@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getAdminContext, requireWritableBrand } from "@/lib/admin";
+import { BrandWriteError } from "@/lib/brand-billing";
+import { canAccessBrand } from "@/lib/admin-scope";
+import { uploadIsBrandScoped } from "@/lib/upload-scope";
 
 /**
  * POST /api/upload
@@ -12,6 +16,11 @@ import { createAdminClient } from "@/lib/supabase/admin";
  *
  * Uploads go to `{bucket}/{member_id}/{timestamp}-{safe_filename}` so the member's
  * auth.uid() prefix satisfies the storage RLS policy.
+ *
+ * Member uploads (no `brand` field, or bucket "avatars") are any signed-in
+ * member: avatars, post photos, challenge entries, video posters.
+ * Brand uploads send `brand` and require an admin of that brand plus an
+ * unlocked brand. See lib/upload-scope.ts for the caller list.
  */
 const ALLOWED_BUCKETS = new Set(["community-uploads", "avatars"]);
 const MAX_BYTES = 8 * 1024 * 1024; // 8 MB
@@ -40,6 +49,25 @@ export async function POST(req: NextRequest) {
   const form = await req.formData();
   const file = form.get("file");
   const bucket = String(form.get("bucket") ?? "");
+  const brand = String(form.get("brand") ?? "");
+
+  if (uploadIsBrandScoped(bucket, brand)) {
+    const adminCtx = await getAdminContext();
+    if (!canAccessBrand(adminCtx, brand)) {
+      return NextResponse.json(
+        { error: "You can only upload for a brand you manage." },
+        { status: 403 },
+      );
+    }
+    try {
+      await requireWritableBrand(adminCtx, brand);
+    } catch (err) {
+      if (err instanceof BrandWriteError) {
+        return NextResponse.json({ error: err.message }, { status: err.status });
+      }
+      throw err;
+    }
+  }
 
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "Missing file" }, { status: 400 });

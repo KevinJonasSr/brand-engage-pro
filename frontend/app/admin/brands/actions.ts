@@ -7,6 +7,8 @@ import {
   requireAdminContext,
   requireBrandAccess,
   requireSuperAdmin,
+  requireWritableBrand,
+  writableBrandError,
 } from "@/lib/admin";
 import { parseEarlyRsvpHours } from "@/lib/founder-perks";
 import { sendEventReminder, type ReminderWindowEvent } from "@/lib/reminders";
@@ -18,13 +20,16 @@ const EARLY_RSVP_HOURS_ERROR =
 /** Throws unless the caller is an admin with access to `brandSlug`. */
 async function requireBrandAdmin(brandSlug: string) {
   const ctx = await requireAdminContext();
-  return requireBrandAccess(ctx, brandSlug);
+  requireBrandAccess(ctx, brandSlug);
+  await requireWritableBrand(ctx, brandSlug);
+  return brandSlug;
 }
 
 /** Same check for actions that report errors instead of throwing. */
 async function brandAccessError(brandSlug: string): Promise<string | null> {
   const ctx = await requireAdminContext();
-  return canAccessBrand(ctx, brandSlug) ? null : "You can only manage your own brand.";
+  if (!canAccessBrand(ctx, brandSlug)) return "You can only manage your own brand.";
+  return writableBrandError(ctx, brandSlug);
 }
 
 /**
@@ -35,7 +40,9 @@ async function brandAccessError(brandSlug: string): Promise<string | null> {
  */
 export async function createBrandAction(formData: FormData) {
   // New brands are an owner decision, not a brand admin one.
-  requireSuperAdmin(await requireAdminContext());
+  const ctx = await requireAdminContext();
+  requireSuperAdmin(ctx);
+  await requireWritableBrand(ctx, null);
   const slug = String(formData.get("slug") ?? "")
     .toLowerCase()
     .trim()
@@ -58,7 +65,8 @@ export async function createBrandAction(formData: FormData) {
 export async function updateBrandAction(formData: FormData) {
   const slug = String(formData.get("slug") ?? "").trim();
   if (!slug) return;
-  await requireBrandAdmin(slug);
+  const denied = await brandAccessError(slug);
+  if (denied) return { error: denied };
   const name = String(formData.get("name") ?? "").trim();
   const tagline = String(formData.get("tagline") ?? "").trim();
   const bio = String(formData.get("bio") ?? "").trim();

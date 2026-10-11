@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { isAiFeatureOn } from "@/lib/ai-features";
-import { getAdminContext, getAdminCommunityId, roleAtLeast } from "@/lib/admin";
+import { getAdminContext, getAdminCommunityId, requireWritableBrand, roleAtLeast } from "@/lib/admin";
 import { generateBrief } from "@/lib/copilot/generate";
 
 export async function refreshBriefAction() {
@@ -16,6 +16,7 @@ export async function refreshBriefAction() {
   }
 
   const communityId = await getAdminCommunityId();
+  await requireWritableBrand(ctx, communityId);
   await generateBrief(communityId, { force: true });
   revalidatePath("/admin/copilot");
   return;

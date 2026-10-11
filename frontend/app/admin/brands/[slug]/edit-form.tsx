@@ -93,6 +93,7 @@ export default function BrandEditForm({
           name="hero_image_unused"
           initialUrl={heroImage}
           label={heroImage ? "Replace hero" : "Upload hero image"}
+          brand={slug}
           onUploaded={setHeroImage}
         />
       </Field>

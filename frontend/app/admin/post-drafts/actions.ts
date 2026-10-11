@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { isAiFeatureOn } from "@/lib/ai-features";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { canAccessBrand, getAdminContext } from "@/lib/admin";
+import { canAccessBrand, getAdminContext, requireWritableBrand } from "@/lib/admin";
 import {
   generateBrandPostDraft,
   type DraftContext,
@@ -21,6 +21,7 @@ async function requireAdminBrand(): Promise<{
   // pick a brand in the community switcher first.
   const brandSlug = ctx.currentCommunityId ?? "";
   if (!brandSlug || !canAccessBrand(ctx, brandSlug)) redirect("/admin");
+  await requireWritableBrand(ctx, brandSlug);
   return { brandSlug, userId: ctx.user.id };
 }
 

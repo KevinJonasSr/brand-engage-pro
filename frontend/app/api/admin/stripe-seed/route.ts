@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripe } from "@/lib/stripe";
 import type { Community } from "@/lib/community";
+import { bearerSecretMatches } from "@/lib/bearer-auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -20,16 +21,11 @@ export const dynamic = "force-dynamic";
  * returns the existing IDs without creating duplicates.
  */
 export async function POST(request: Request) {
-  const expected = process.env.STRIPE_SEED_SECRET;
-  if (!expected) {
-    return NextResponse.json(
-      { ok: false, error: "STRIPE_SEED_SECRET not configured" },
-      { status: 500 },
-    );
-  }
-
-  const auth = request.headers.get("authorization") ?? "";
-  if (auth !== `Bearer ${expected}`) {
+  const expected = process.env.STRIPE_SEED_SECRET?.trim() || null;
+  // 401 when the secret is unset, and when the bearer does not match.
+  // Compared in constant time so the check does not leak the secret length
+  // through an early string compare. A missing secret never falls through.
+  if (!bearerSecretMatches(request.headers.get("authorization"), expected)) {
     return NextResponse.json(
       { ok: false, error: "Unauthorized" },
       { status: 401 },

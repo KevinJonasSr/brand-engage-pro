@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAdminContext, getAdminCommunityId, roleAtLeast } from "@/lib/admin";
+import { getAdminContext, getAdminCommunityId, requireWritableBrand, roleAtLeast } from "@/lib/admin";
 
 const METRICS = ["ledger_count", "member_count", "points_sum"] as const;
 
@@ -16,9 +16,15 @@ async function requireEditor() {
   return ctx;
 }
 
-export async function createGoalAction(formData: FormData) {
-  await requireEditor();
+async function writableCommunity(): Promise<string> {
+  const ctx = await requireEditor();
   const communityId = await getAdminCommunityId();
+  await requireWritableBrand(ctx, communityId);
+  return communityId;
+}
+
+export async function createGoalAction(formData: FormData) {
+  const communityId = await writableCommunity();
 
   const title = String(formData.get("title") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim() || null;
@@ -54,8 +60,7 @@ export async function createGoalAction(formData: FormData) {
 }
 
 export async function toggleGoalActiveAction(formData: FormData) {
-  await requireEditor();
-  const communityId = await getAdminCommunityId();
+  const communityId = await writableCommunity();
 
   const id = String(formData.get("id") ?? "");
   const active = String(formData.get("active") ?? "") === "true";

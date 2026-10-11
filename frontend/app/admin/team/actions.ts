@@ -6,6 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import {
   getAdminContext,
   getAdminCommunityId,
+  requireWritableBrand,
   roleAtLeast,
   type AdminRole,
 } from "@/lib/admin";
@@ -16,7 +17,9 @@ async function requireOwner() {
   const ctx = await getAdminContext();
   if (!ctx) redirect("/login?next=/admin/team");
   if (!ctx.isSuperAdmin && !roleAtLeast(ctx.role, "owner")) redirect("/admin");
-  return ctx;
+  const communityId = await getAdminCommunityId();
+  await requireWritableBrand(ctx, communityId);
+  return { ctx, communityId };
 }
 
 /**
@@ -25,8 +28,7 @@ async function requireOwner() {
  * account — they sign up like any member; the owner then grants a role.
  */
 export async function addTeamMemberAction(formData: FormData) {
-  await requireOwner();
-  const communityId = await getAdminCommunityId();
+  const { communityId } = await requireOwner();
 
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const role = String(formData.get("role") ?? "") as AdminRole;
@@ -68,8 +70,7 @@ export async function addTeamMemberAction(formData: FormData) {
 }
 
 export async function removeTeamMemberAction(formData: FormData) {
-  const ctx = await requireOwner();
-  const communityId = await getAdminCommunityId();
+  const { ctx, communityId } = await requireOwner();
 
   const userId = String(formData.get("user_id") ?? "");
   if (!userId) { console.warn("action error:", "Missing user."); return; }

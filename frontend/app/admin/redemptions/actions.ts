@@ -1,7 +1,7 @@
 "use server";
 
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAdminContext } from "@/lib/admin";
+import { getAdminContext, requireWritableBrand } from "@/lib/admin";
 import { redirect } from "next/navigation";
 import { cancelRedemption } from "@/lib/rewards/cancel";
 import { markRedemptionFulfilled } from "@/lib/rewards/fulfill";
@@ -16,6 +16,7 @@ export async function markFulfilledAction(redemptionId: string, fulfillmentNote:
   if (!ctx.isSuperAdmin && !scope) {
     return { error: "Unauthorized" };
   }
+  await requireWritableBrand(ctx, scope);
 
   const supabase = createAdminClient();
   const result = await markRedemptionFulfilled(supabase, redemptionId, fulfillmentNote, scope);
@@ -56,6 +57,7 @@ export async function cancelRedemptionAction(redemptionId: string) {
   if (!ctx.isSuperAdmin && !scope) {
     return { error: "Unauthorized" };
   }
+  await requireWritableBrand(ctx, scope);
 
   return cancelRedemption(createAdminClient(), redemptionId, scope);
 }

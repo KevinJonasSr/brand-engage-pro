@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { requireAdminContext, requireSuperAdmin } from "@/lib/admin";
+import { requireAdminContext, requireSuperAdmin, requireWritableBrand } from "@/lib/admin";
 
 /**
  * Policy pages (terms, privacy, cookie policy) are platform-wide legal text,
@@ -12,6 +12,7 @@ import { requireAdminContext, requireSuperAdmin } from "@/lib/admin";
 async function requireAdmin() {
   const ctx = await requireAdminContext();
   requireSuperAdmin(ctx);
+  await requireWritableBrand(ctx, ctx.currentCommunityId);
   return ctx.user;
 }
 
