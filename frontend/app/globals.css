@@ -40,3 +40,26 @@ body {
   box-shadow: var(--shadow-glass);
   backdrop-filter: blur(24px);
 }
+
+/*
+ * Reduce Motion (iPhone Settings > Accessibility > Motion, and the desktop
+ * equivalents). Looping animations stop after one near-instant pass,
+ * Tailwind animate-* utilities (spin, pulse) are switched off so spinners
+ * and skeletons sit still, transitions are cut to a short 120ms fade, and
+ * CSS smooth scrolling becomes an instant jump. Scripted smooth scrolls
+ * are handled separately by lib/motion.ts.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 120ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  *[class*="animate-"] {
+    animation: none !important;
+  }
+}
