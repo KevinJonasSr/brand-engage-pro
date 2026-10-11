@@ -5,6 +5,7 @@ import MemberHomeDashboard from "@/components/member-home-dashboard";
 import InviteQRCode from "@/components/invite-qr";
 import SignedOutLanding from "@/components/signed-out-landing";
 import { listBrandsFromDb } from "@/lib/data/brands";
+import { getGuestResults } from "@/lib/data/guest-results";
 import { getCurrentMember, getCurrentMemberKpis } from "@/lib/data/member";
 import { getMemberHomeData } from "@/lib/data/member-home";
 import { getFirstSessionFacts } from "@/lib/data/first-session";
@@ -50,8 +51,11 @@ export default async function Home({
   const isSignedIn = member !== null;
 
   if (!isSignedIn) {
-    const brands = await listBrandsFromDb();
-    return <SignedOutLanding brands={brands} />;
+    const [brands, results] = await Promise.all([
+      listBrandsFromDb(),
+      getGuestResults(),
+    ]);
+    return <SignedOutLanding brands={brands} results={results} />;
   }
 
   // Signed-in path — parallel-fetch everything the dashboard needs. Each
