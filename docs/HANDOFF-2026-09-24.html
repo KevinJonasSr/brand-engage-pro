@@ -58,9 +58,9 @@ footer{border-top:1px solid var(--line);padding-top:1.2rem;font-size:.8rem;color
 <p class="kicker">Jonas Group Entertainment · Operations Handoff</p>
 <h1>Brand Engage Pro: what landed from 2026-09-24 to 2026-10-11, and what remains</h1>
 <ul class="meta">
-<li><b>Date</b> 2026-09-24, updated 2026-10-11 (after worklist items 8 and 9, brand billing and founder perks, PRs #84 to #86)</li>
+<li><b>Date</b> 2026-09-24, updated 2026-10-11 (after worklist items 10 to 17, PRs #88 to #94)</li>
 <li><b>Prepared for</b> Kevin Jonas Sr. and the next agent session</li>
-<li><b>Status</b> <span class="status-good">Live on www.brandengagepro.com</span>, main at f1322db (PR #86), migrations through 0074 applied</li>
+<li><b>Status</b> <span class="status-good">Live on www.brandengagepro.com</span>, main at e0701ea (PR #94), migrations through 0074 applied, next 0075</li>
 <li><b>Supersedes</b> the 2026-09-14 handoff. Its product overview (stack, key paths, features) still applies; its orientation and open items do not.</li>
 </ul>
 </header>
@@ -71,7 +71,7 @@ footer{border-top:1px solid var(--line);padding-top:1.2rem;font-size:.8rem;color
 <div class="tablewrap"><table>
 <tr><th>Item</th><th>Value</th></tr>
 <tr><td>Live site</td><td><a href="https://www.brandengagepro.com">https://www.brandengagepro.com</a> (checked live on 2026-10-08). The old <code>brand-engage-pro.vercel.app</code> address redirects there with a 308.</td></tr>
-<tr><td>GitHub</td><td>KevinJonasSr/brand-engage-pro. Main is at <code>f1322db</code> (PR #86, 2026-10-11). No open pull requests. The only other remote branch is <code>cursor/signup-consent-review-9e7c</code>, kept on purpose as a terms review idea. Main has no branch protection.</td></tr>
+<tr><td>GitHub</td><td>KevinJonasSr/brand-engage-pro. Main is at <code>e0701ea</code> (PR #94, 2026-10-11). No open pull requests. The only other remote branch is <code>cursor/signup-consent-review-9e7c</code>, kept on purpose as a terms review idea. Main has no branch protection.</td></tr>
 <tr><td>Vercel</td><td>Team jonas-group, project brand-engage-pro, root <code>frontend</code>. <code>frontend/vercel.json</code> holds 13 cron schedules. Production deploys on merge to main.</td></tr>
 <tr><td>Supabase</td><td>Project ref <code>enfpviapxvqyoarwwsuf</code>. It shares an org with Fan Engage Pro (<code>uhovonrljcauaoctypbg</code>), so confirm the ref before any SQL.</td></tr>
 <tr><td>Local working copy</td><td><code>~/Developer/brand-engage-pro</code>, on <code>main</code>, clean. The old <code>~/Downloads</code> path in the 2026-09-14 handoff is out of date.</td></tr>
@@ -235,6 +235,218 @@ footer{border-top:1px solid var(--line);padding-top:1.2rem;font-size:.8rem;color
 
 <section>
 <p class="eyebrow">Workflow</p>
+<h2>What landed on 2026-10-11 (items 10 to 17)</h2>
+<p>Kevin finished Raymond's pre-launch worklist. Every item from 10 to 17 is either merged or handed off. None of these PRs added a migration, so the next number is still 0075.</p>
+<div class="tablewrap"><table class="items">
+<tr><th>PR</th><th>What it did</th></tr>
+<tr><td>#94 (e0701ea)</td><td>Item 17, a homepage results section for Nellie's, built hidden. Files: <code>lib/guest-results.ts</code> (pure math and the minimums), <code>lib/data/guest-results.ts</code> (pages through <code>checkins</code> 1,000 rows at a time, up to 50 pages, returns null on any error), <code>components/guest-results-section.tsx</code>, <code>signed-out-landing.tsx</code> and <code>app/page.tsx</code>. It shows only once Nellie's has 50 or more real visits and 10 or more repeat guests. Accounts on jonasgroup.com and example.com are not counted. Nellie's has 0 real visits today, so the section is hidden.</td></tr>
+<tr><td>#93 (da88ed7)</td><td>Recovery-link sign-in fix.</td></tr>
+<tr><td>#92 (3e3ac38)</td><td>Tokenless check-in links removed, so only signed QR codes work. <code>CHECKIN_SIGNING_SECRET</code> is set in Vercel for Production and Preview. Old QR codes now fail. New QR codes were printed and posted on 2026-10-11. Never rotate the secret without reprinting every code.</td></tr>
+<tr><td>#91 (a2ecf8d)</td><td>Item 15, signed QR check-ins. QR sign-ups now go through onboarding.</td></tr>
+<tr><td>#90 (e5ca751)</td><td>Item 12, AI helper switches in <code>lib/ai-features.ts</code>. On: brief, moderation, embeddings, alt text, thread summary. Off until proven: copilot, fraud scan, post drafts, draft reply, tag suggester, prediction ideas, caption suggester. Fraud check errors are now visible instead of silent.</td></tr>
+<tr><td>#89 (3daf022)</td><td>Item 11, texting compliance. No migration. The Twilio opt-out and HELP replies need to match the app copy, and Raymond is moving BEP texting to Mailchimp SMS, so check with him before more Twilio work.</td></tr>
+<tr><td>#88 (44ea2d1)</td><td>Item 10, email campaigns through Mandrill (Mailchimp Transactional). Go-live needs <code>MAILCHIMP_TRANSACTIONAL_API_KEY</code>, SPF and DKIM on the sending domain, and <code>BEP_EMAIL_FROM</code>. A draft to Raymond exists and was not sent by Claude.</td></tr>
+</table></div>
+<h3>Items with no code</h3>
+<ul>
+<li>Item 13: the FEP superfan path was checked and is intact. No change.</li>
+<li>Item 14: FEP Google Cloud closed out. Kevin says it is OK and no code uses it.</li>
+<li>Item 16: imports, domains and admin handed to Raymond. BEP uses Stripe, not Square or Toast. Do not build it here. Kevin's note to Raymond is in his Go4it drafts.</li>
+</ul>
+<h3>Test rows</h3>
+<ul>
+<li>Keep BEP member <code>0b6536f3</code> and its check-in test rows.</li>
+</ul>
+</section>
+
+<section>
+<p class="eyebrow">Workflow</p>
+<h2>What landed on 2026-10-11</h2>
+<p>Kevin worked through BEP items 1 to 9 of Raymond's pre-launch worklist. Items 1 to 7 came in #83. Item 8 (brand billing) came in #85 and item 9 (founder perks) in #86, each with its migration applied to prod before merge and all checks green.</p>
+<div class="tablewrap"><table class="items">
+<tr><th>PR</th><th>What it did</th></tr>
+<tr><td>#86 (f1322db)</td><td>Item 9, founder perks. Founders earn 1.5x points for life, and it stacks with Premium to 2x, through <code>points_multiplier</code>, which every point trigger already calls. New column <code>brand_events.rsvp_opens_at</code>, default now() plus 48 hours; existing events were backfilled to <code>created_at</code>, so they are open. Trigger <code>event_rsvps_founders_first</code> raises "Founders RSVP first" for non-founders before that time; it skips founder-only events and events already open. Pure helpers and tests in <code>lib/founder-perks.ts</code>. The founders and share pages list both perks. Migration 0074, applied. Known gaps: the early RSVP block has not been tested live because no event is in its window yet, and the ledger label may say "premium 1.5x" for a founder (cosmetic).</td></tr>
+<tr><td>#85 (b20a981)</td><td>Item 8, brand billing with Stripe. The first 10 brands are free (Nellie's has slot 1, Jonas Group Entertainment slot 2). Every other brand pays $50 per brand per month after a 30-day trial. Migration 0073, applied. Billing stays off until Raymond sets <code>STRIPE_SECRET_KEY</code>, <code>STRIPE_WEBHOOK_SECRET</code> and <code>STRIPE_BRAND_PRICE_ID</code> in Vercel. Known gap: the billing lock does not cover <code>/api/upload</code>, <code>/api/upload/video</code> or <code>/api/admin/stripe-seed</code>.</td></tr>
+<tr><td>#84 (1795590)</td><td>Handoff docs synced with Artifact v23.</td></tr>
+<tr><td>#83 (5ae68e5)</td><td>Premium sales closed: new <code>lib/premium-sales.ts</code> with <code>PREMIUM_SALES_OPEN=false</code>, so <code>/premium</code> and its checkout return a 307 to <code>/brands</code>. "Brands pay, guests join free" copy across the brand, rewards, founders, community, marketplace, billing and landing pages. The paywall offers free signup only. Points-per-post claims removed. Share copy now reads "Members got first access". The Nellie's page shows "Join free".</td></tr>
+<tr><td>#82 (1b66b38)</td><td>Handoff docs synced with Artifact v22.</td></tr>
+</table></div>
+<h3>Database changes (prod, no migration)</h3>
+<ul>
+<li>Nellie's rewards turned on: Free Dessert w/ Entree (1 point), Birthday Entree up to $30 (1 point), Nellie's Apron + Recipe Card (1,500), House Hot Sauce 3-Pack (2,200). Staff must check the entree and birthday conditions themselves.</li>
+<li>Left off: "1,500 Bonus Points ($15 Value)" (id <code>064a11f6-7508-4104-beb5-25cef405e9f7</code>; it cost 1 point with no 3-visit check, 0 redemptions) and the "Exclusive Digital Reward Pack" placeholder.</li>
+<li>Privacy page (<code>policy_pages</code>, slug <code>privacy</code>): the intro now names "Fan Engage Pro LLC, a Colorado limited liability company". Effective date 2026-10-11. Checked live on brandengagepro.com/privacy.</li>
+<li>JGE special "Songwriter Round at the Nashville HQ" (id <code>2349224b-5786-444d-afde-9ffa022253ba</code>) set inactive. Checked gone from <code>/brands/jonas-group-ent</code>.</li>
+</ul>
+<h3>Checks</h3>
+<ul>
+<li>Stripe: no paid memberships and no Stripe subscription ids in the DB, so no refunds are expected. Kevin confirms in Stripe.</li>
+<li>Google Analytics is not running on BEP.</li>
+<li>Migrations 0073 (brand billing) and 0074 (founder perks) added and applied to prod. The next one is 0075.</li>
+</ul>
+<h3>Raymond's worklist</h3>
+<ul>
+<li>All 17 items are closed or handed off. See "What landed on 2026-10-11 (items 10 to 17)" above.</li>
+</ul>
+<h3>Housekeeping</h3>
+<ul>
+<li>The three feature branches were deleted on GitHub and locally.</li>
+</ul>
+</section>
+
+<section>
+<p class="eyebrow">Update</p>
+<h2>What landed on 2026-09-27</h2>
+<p>A second Jev-routed review of Fan Engage Pro and Brand Engage Pro (Artifact 49gUST6zCFi4rPWEb2t1qk) found points and rewards integrity gaps in Brand Engage. Five pull requests fixed them, merged in order with checks green, and the Production deploy for 09e5c83 succeeded.</p>
+
+<h3>Pull requests merged</h3>
+<div class="tablewrap"><table class="items">
+<tr><th>PR</th><th>What it did</th></tr>
+<tr><td>#37 (2df35e2)</td><td>Migration 0059, points integrity. One ledger row per member, community, source, and source_ref, so the same award cannot land twice. One referral row per referred member. Members can no longer insert their own referral or check-in rows. Check-ins now need a real brand slug.</td></tr>
+<tr><td>#38 (1ed627f)</td><td>Migration 0060, <code>cancel_redemption</code>. Before it, admins cancelled by flipping the status and refunding a point cost the browser sent, so a redemption could be refunded more than once and for the wrong amount. Now one transaction refunds the stored cost once and restocks limited rewards, backed by a unique index on refund rows.</td></tr>
+<tr><td>#39 (e8e3f2e)</td><td>Mark fulfilled (<code>lib/rewards/fulfill.ts</code>) now checks that the redemption belongs to the admin's brand.</td></tr>
+<tr><td>#40 (9c1de3d)</td><td>Migration 0061, <code>add_member_points</code>, service_role only. Awards, the signup bonus, the referral bonus, and the challenge winner bonus used to read the total, add in code, and write it back, so two awards at once could lose points. They now add in one database update. Picking a challenge winner also checks the admin's brand.</td></tr>
+<tr><td>#41 (09e5c83)</td><td>Migration 0062. <code>redeem_reward</code> wrote its spend row with no community, so every spend was filed under the default brand. It now records the reward's brand.</td></tr>
+</table></div>
+
+<h3>Production database</h3>
+<ul>
+<li>0059 to 0062 were applied to <code>enfpviapxvqyoarwwsuf</code> on 2026-09-27 and checked with selects. No existing rows broke the new constraints.</li>
+</ul>
+
+<h3>Later on 2026-09-27: PRs #43 to #45</h3>
+<p>The medium and low findings from the same review went out as three more pull requests. Kevin merged them himself.</p>
+<div class="tablewrap"><table class="items">
+<tr><th>PR</th><th>What it did</th></tr>
+<tr><td>#43 (9173dc9)</td><td>Stripe webhook and billing. A failed database write now returns an error so Stripe retries instead of dropping the event, and replays of finished events stay no-ops. The webhook reads the Stripe fields that moved in the newer API, so renewals and invoice events are not ignored. The monthly credit is keyed on the Stripe event id, which fixes a ledger insert that always failed quietly. A new <code>/me/billing</code> page opens the Stripe customer portal so members can cancel Premium or fix a card. The $5 credit copy now says spending it is coming soon. No migrations.</td></tr>
+<tr><td>#44 (680fc14)</td><td>Sign-in, consent, and copy. The sign-in redirect guard rejects control characters, backslashes, and encoded tricks. SMS consent is recorded only when the member ticks the box, stamped on the server, with consent version <code>2026-08-17.v1</code>. <code>/for-brands/apply</code> validates every field, allows 5 applications per IP per hour, and checks an optional Cloudflare Turnstile token. Member copy is plain English for diners and shoppers, and the referral page now promises only the inviter's 150 points, which is what the app pays. No migrations.</td></tr>
+<tr><td>#45 (d1c93e1)</td><td>Admin brand scoping. Brand admins now see and change only their own brand in the admin area. Superadmins keep the all-brands view. Migration 0063 drops the <code>raelynn</code> default on <code>offers.community_id</code>, so a new offer must name its brand.</td></tr>
+</table></div>
+
+<h3>Production database, later on 2026-09-27</h3>
+<ul>
+<li>0063 applied to <code>enfpviapxvqyoarwwsuf</code> before #45 merged. Checked: <code>offers.community_id</code> has no default.</li>
+<li>Five posts had been filed under RaeLynn by the old default. Four moved to <code>nellies</code> and one to <code>jonas-group-ent</code>, matched by exact id. No child tables carry their own brand, so nothing else needed moving.</li>
+<li>One offer, the Nellie's Bourbon and Cigar event (active, no purchases), was also filed under RaeLynn. It moved to <code>nellies</code>. Offer counts now: 22 for jonas-group-ent, 32 for nellies.</li>
+</ul>
+
+<h3>2026-09-28: PR #55 and migration 0065, RaeLynn removed from BEP</h3>
+<p>RaeLynn is a Fan Engage Pro community and was never a BEP brand. The fork had left 13 BEP tables defaulting <code>community_id</code> to <code>raelynn</code>, with no raelynn row in <code>communities</code>, and 124 prod rows tagged raelynn. PR #55 (merged at dd07e34) added migration 0065, applied to <code>enfpviapxvqyoarwwsuf</code> the same day with Kevin's yes.</p>
+<ul>
+<li>New <code>member_home_community(member)</code>: the member's earliest-joined brand, else <code>jonas-group</code> (Kevin's default). Service role only.</li>
+<li>New <code>aa_fill_community_id</code> BEFORE INSERT trigger on all 13 tables fills a missing brand from the row's own brand, its event, action or offer, or the member's home brand. The raelynn defaults are gone and each table now has a <code>&lt;table&gt;_community_id_fkey</code> to <code>communities(slug)</code>, on delete cascade.</li>
+<li><code>upsert_notification</code> takes an 8th argument, <code>p_community_id</code>. The old 7-argument version is dropped. The badge, challenge, poll and member action point functions now write the brand on the ledger row and bump the brand membership total. <code>redeem_reward</code> refuses a reward with no brand and its copy now reads "The brand will fulfill it soon."</li>
+<li>The 124 rows moved: event rows follow their event, the Nellie's check-in points went to <code>nellies</code>, the April 2026 challenge points for member 75e4096e went to <code>jonas-group</code>, and the rest went to each member's home brand. Duplicate badge rows were deleted before the move.</li>
+<li>Checked after apply: 0 raelynn rows, 0 column defaults, 13 foreign keys, 13 triggers, no function mentions raelynn, one <code>upsert_notification</code>, and all 11 function bodies match the merged file byte for byte. Rows now: brand_events 13 nellies, 3 jonas-group-ent; event_reminders 12 nellies, 6 jonas-group-ent; event_rsvps 2 nellies; member_badges 23 jonas-group, 8 nellies; notifications 23 jonas-group, 10 nellies; points_ledger 23 jonas-group, 20 nellies, 1 jonas-group-ent.</li>
+</ul>
+
+<h3>2026-09-28: PR #61 and migration 0066, moved points credited</h3>
+<p>0065 moved 34 <code>points_ledger</code> rows off raelynn (13 to <code>nellies</code>, 21 to <code>jonas-group</code>) without adding them to any brand membership total. A prod check showed only 8 of those rows sit in a membership that exists: 4 Nellie's members, each with a welcome badge (25) and a signup bonus (100) written just before they joined, so <code>bump_membership_points</code> found no membership row. Their Nellie's check-ins were already counted.</p>
+<ul>
+<li>Kevin's call: credit those 4 only. The other 26 rows belong to 9 members with no membership in that brand (nobody has a <code>jonas-group</code> membership), and stay uncounted rather than enrolling people in brands they never joined.</li>
+<li>0066 raises each Nellie's membership that is below its ledger sum up to that sum and recomputes the tier. It stops if more than 4 memberships are short, and running it again changes nothing. <code>members.total_points</code> already included these points and is untouched.</li>
+<li>PR #61 merged at 07fa0c4 and 0066 was applied to <code>enfpviapxvqyoarwwsuf</code> the same day with Kevin's yes. Checked after apply: the 4 memberships are 125, 150, 150 and 150 points, all Bronze, and no membership in BEP is below its ledger sum. 347 frontend tests pass.</li>
+</ul>
+
+<h3>2026-09-28: PR #63 and migration 0067, pre-join points follow the first brand</h3>
+<p>A signup bonus or badge earned before a member joins any brand was parked on <code>jonas-group</code>, and nobody has a <code>jonas-group</code> membership, so members never saw those points. Kevin's call: they belong to the first brand the member joins.</p>
+<ul>
+<li>New <code>move_pre_join_points(member, brand)</code> moves the member's <code>jonas-group</code> points_ledger, member_badges and notifications rows to the brand, then credits the moved points to that membership with <code>bump_membership_points</code> and recomputes its tier. <code>members.total_points</code> already counted these points and is untouched.</li>
+<li>A ledger row whose source and source_ref already exist on the brand stays put, so the unique index never trips. A badge the member already holds on the brand is dropped, since the brand copy was already paid. If the first brand is <code>jonas-group</code> itself, nothing moves and the parked points are credited in place.</li>
+<li>An AFTER INSERT trigger <code>pre_join_points_on_first_membership</code> on member_community_memberships runs it on a member's first membership only. The welcome badge moves before the app awards the brand's own, so the welcome bonus is not paid twice.</li>
+<li>Both functions are SECURITY DEFINER and revoked from PUBLIC, anon and authenticated; <code>move_pre_join_points</code> is granted to service_role only.</li>
+<li>PR #63 merged at 1d9fefc and 0067 was applied to <code>enfpviapxvqyoarwwsuf</code> the same day with Kevin's yes (recorded as version 20260928155449). The backfill was a no-op. Checked after apply: <code>jonas-group</code> still holds 23 ledger rows worth 1,133 points across 9 members, none of whom has joined a brand yet, so they move when each one joins. Membership totals (575) and member totals (1,918) are unchanged. 356 frontend tests pass.</li>
+</ul>
+
+<h3>2026-09-28: live database tests and migration 0070</h3>
+<p>PR #74 added three live test scripts in <code>supabase/tests/live/</code> (see the README there). They found three bugs, and PR #75 (merged at aaa2747) fixed them in migration 0070, applied to <code>enfpviapxvqyoarwwsuf</code> on 2026-09-28 with Kevin's yes (version 20260928173848).</p>
+<ul>
+<li><b>Point awards were failing.</b> Since 0046, <code>bump_membership_points</code> kept the tier in a <code>text</code> variable, so any non-zero award for a member who already belonged to the brand failed with <code>42883 tier_slug = text</code>. That hit award triggers, <code>cancel_redemption</code> refunds and the 0067 pre-join move. 0070 declares it as <code>tier_slug</code>.</li>
+<li><b>Two redemptions at once could overdraw a member.</b> <code>redeem_reward</code> now locks the member row and the brand membership row before checking the balance, and both tables have <code>CHECK (total_points &gt;= 0)</code>. No rows were negative before the change.</li>
+<li><b>Brand admins could read every fraud signal.</b> <code>fraud_signals_super_admin_all</code> let any <code>admin_users</code> row through. It now requires a <code>*</code> admin.</li>
+<li>Test 02 (parallel awards, duplicate ledger row, overdraft race) <b>passed on a throwaway Supabase branch</b> on 2026-09-28 with the 0070 schema: 12 parallel awards added exactly 60, the duplicate ledger race left 1 row, and the overdraft race gave 1 redemption with balances 0 / 0. The branch was deleted afterwards. Branches cap the session pooler at 15 clients, so 20 workers failed with <code>EMAXCONNSESSION</code>; the worker count is now set by <code>WORKERS</code>, default 12. 02 has not been run on prod.</li>
+<li>Building that branch showed the migrations folder did not replay on a fresh database: index parens in 0035 and 0056, wrong seed columns in 0048, <code>notification_preferences</code> and <code>fraud_signals</code> missing before 0064 and 0070, the <code>jonas-group</code> community missing, 0006 placeholder events tripping the 0065 guard, and ten tables that only exist on prod. PR #77 fixes all of it in the migrations folder only; prod is untouched. A full replay of the #77 branch has not been run yet.</li>
+<li>After 0070, test 01 (redeem, cancel, refund) passed 24 of 24 and test 03 (brand admin scoping) passed 13 of 13 on prod, both inside a transaction that was rolled back. A leftover check found 0 test users, rewards or specials, 0 orphan admins and 0 negative balances.</li>
+<li>Test 02 (parallel awards and the overdraft race) has not run on prod. It commits its fixtures and sends hub events, so it needs its own yes. Prefer a Supabase branch.</li>
+</ul>
+
+<h3>Lesson: stacked pull requests</h3>
+<ul>
+<li>#39 and #40 were stacked on #37 and #38. Deleting a base branch on merge closed them. They were recovered by recreating the branch refs, reopening, and pointing them at main. Nothing was lost. Next time, retarget child PRs to main before merging their base.</li>
+</ul>
+</section>
+
+<section>
+<p class="eyebrow">Update</p>
+<h2>What landed on 2026-09-28</h2>
+<p>Fan Engage Pro fixed its notification settings on 2026-09-28. The same problems existed in Brand Engage, so they were ported over. Kevin merged all three pull requests himself. None of them has a migration, and no production data was changed.</p>
+<div class="tablewrap"><table class="items">
+<tr><th>PR</th><th>What it did</th></tr>
+<tr><td>#47 (4dc6940)</td><td>Docs only. The 2026-09-27 update to this handoff.</td></tr>
+<tr><td>#48 (473fb7b)</td><td>Notification settings. <code>/me/notifications</code> is now the one preferences page, and <code>/settings/notifications</code> redirects to it. The server only lets Gold members and up turn SMS on, whatever the browser sends. Turning SMS on or off now keeps <code>members.sms_opted_in</code> in step, since the senders check both (<code>lib/sms-send-gate.ts</code>, tested in <code>lib/sms-opt-in-sync.test.ts</code>). The page shows how many points a member needs to reach Gold, read from <code>getTiers()</code>. The old <code>app/settings/notifications/actions.ts</code> and <code>components/notification-preferences-form.tsx</code> were deleted.</td></tr>
+<tr><td>#49 (4561044)</td><td>Tier fallback. <code>lib/data/tiers.ts</code> falls back to built-in tiers when Supabase cannot be reached, and those still had the old thresholds. They now match 0047: bronze 0, silver 750, gold 3500, platinum 8000. A new test, <code>lib/data/tiers.test.ts</code>, reads both files and fails if they drift apart again. 326 tests pass.</td></tr>
+</table></div>
+<h3>Housekeeping</h3>
+<ul>
+<li>The #47, #48 and #49 branches were deleted on GitHub and locally.</li>
+</ul>
+</section>
+
+<section>
+<p class="eyebrow">Update</p>
+<h2>What landed on 2026-09-29 and 2026-10-08</h2>
+<p>Raymond sent a list of Fan Engage Pro and Brand Engage Pro items. Kevin approved four of them on 2026-10-08. Kevin merged both pull requests himself, and the Production deploy for 1f78f84 succeeded.</p>
+<div class="tablewrap"><table class="items">
+<tr><th>PR</th><th>What it did</th></tr>
+<tr><td>#77 and #78 (97124a9, 2026-09-28)</td><td>#77 fixed the migration drift found while building the test 02 branch and added 0071, the baseline of prod-only tables. #78 set test 02 to 12 workers by default and updated the live test docs.</td></tr>
+<tr><td>#79 (057381b, 2026-09-29)</td><td>Migration 0072. Nellie's Trunk or Treat went live with a tentative date of Saturday, October 24 and the time to be announced, so <code>starts_at</code> stays null.</td></tr>
+<tr><td>#80 (7cbd22c)</td><td>New <code>/terms</code> and <code>/cookie-policy</code> pages, adapted from Fan Engage. Fan Engage Pro LLC (Colorado) is named as the operator, confirmed by Kevin on 2026-10-08. The Google Analytics section was dropped from the Terms, since BEP does not run it.</td></tr>
+<tr><td>#81 (1f78f84)</td><td>New <code>/cancellation-refund</code> page. Brand subscription fees are stated as up to $100 per month. <code>/premium</code> no longer promises a full refund within 7 days; it links to the refund policy instead. <code>lib/legal/published-policies.ts</code> now holds the Terms, Cookie and Cancellation records. 423 of 423 tests passed.</td></tr>
+</table></div>
+<h3>Outside this repo</h3>
+<ul>
+<li>Fan Engage Pro privacy page (<code>policy_pages</code>, slug <code>privacy</code>, project <code>uhovonrljcauaoctypbg</code>): "FEP, Inc." changed to "Fan Engage Pro LLC". Live.</li>
+</ul>
+<h3>Live check on 2026-10-08</h3>
+<ul>
+<li><code>/premium</code>: no 7-day line, links to the refund policy.</li>
+<li><code>/terms</code>: no Google Analytics, names Fan Engage Pro LLC.</li>
+<li><code>/cancellation-refund</code>: loads and names Fan Engage Pro LLC.</li>
+</ul>
+<h3>Housekeeping</h3>
+<ul>
+<li>The #80 and #81 branches were deleted on GitHub and locally. Remote now has <code>main</code> plus <code>cursor/signup-consent-review-9e7c</code> only.</li>
+</ul>
+</section>
+
+<section>
+<p class="eyebrow">Workflow</p>
+<h2>What landed on 2026-10-11 (items 10 to 17)</h2>
+<p>Kevin finished Raymond's pre-launch worklist. Every item from 10 to 17 is either merged or handed off. None of these PRs added a migration, so the next number is still 0075.</p>
+<div class="tablewrap"><table class="items">
+<tr><th>PR</th><th>What it did</th></tr>
+<tr><td>#94 (e0701ea)</td><td>Item 17, a homepage results section for Nellie's, built hidden. Files: <code>lib/guest-results.ts</code> (pure math and the minimums), <code>lib/data/guest-results.ts</code> (pages through <code>checkins</code> 1,000 rows at a time, up to 50 pages, returns null on any error), <code>components/guest-results-section.tsx</code>, <code>signed-out-landing.tsx</code> and <code>app/page.tsx</code>. It shows only once Nellie's has 50 or more real visits and 10 or more repeat guests. Accounts on jonasgroup.com and example.com are not counted. Nellie's has 0 real visits today, so the section is hidden.</td></tr>
+<tr><td>#93 (da88ed7)</td><td>Recovery-link sign-in fix.</td></tr>
+<tr><td>#92 (3e3ac38)</td><td>Tokenless check-in links removed, so only signed QR codes work. <code>CHECKIN_SIGNING_SECRET</code> is set in Vercel for Production and Preview. Old QR codes now fail. New QR codes were printed and posted on 2026-10-11. Never rotate the secret without reprinting every code.</td></tr>
+<tr><td>#91 (a2ecf8d)</td><td>Item 15, signed QR check-ins. QR sign-ups now go through onboarding.</td></tr>
+<tr><td>#90 (e5ca751)</td><td>Item 12, AI helper switches in <code>lib/ai-features.ts</code>. On: brief, moderation, embeddings, alt text, thread summary. Off until proven: copilot, fraud scan, post drafts, draft reply, tag suggester, prediction ideas, caption suggester. Fraud check errors are now visible instead of silent.</td></tr>
+<tr><td>#89 (3daf022)</td><td>Item 11, texting compliance. No migration. The Twilio opt-out and HELP replies need to match the app copy, and Raymond is moving BEP texting to Mailchimp SMS, so check with him before more Twilio work.</td></tr>
+<tr><td>#88 (44ea2d1)</td><td>Item 10, email campaigns through Mandrill (Mailchimp Transactional). Go-live needs <code>MAILCHIMP_TRANSACTIONAL_API_KEY</code>, SPF and DKIM on the sending domain, and <code>BEP_EMAIL_FROM</code>. A draft to Raymond exists and was not sent by Claude.</td></tr>
+</table></div>
+<h3>Items with no code</h3>
+<ul>
+<li>Item 13: the FEP superfan path was checked and is intact. No change.</li>
+<li>Item 14: FEP Google Cloud closed out. Kevin says it is OK and no code uses it.</li>
+<li>Item 16: imports, domains and admin handed to Raymond. BEP uses Stripe, not Square or Toast. Do not build it here. Kevin's note to Raymond is in his Go4it drafts.</li>
+</ul>
+<h3>Test rows</h3>
+<ul>
+<li>Keep BEP member <code>0b6536f3</code> and its check-in test rows.</li>
+</ul>
+</section>
+
+<section>
+<p class="eyebrow">Workflow</p>
 <h2>What landed on 2026-10-11</h2>
 <p>Kevin worked through BEP items 1 to 9 of Raymond's pre-launch worklist. Items 1 to 7 came in #83. Item 8 (brand billing) came in #85 and item 9 (founder perks) in #86, each with its migration applied to prod before merge and all checks green.</p>
 <div class="tablewrap"><table class="items">
@@ -301,7 +513,7 @@ git checkout main && git pull</code></pre>
 <li>New admin actions go through <code>getAdminContext</code> in <code>lib/admin.ts</code>. No new inline admin checks.</li>
 <li>New cron routes need an entry in <code>frontend/vercel.json</code> and the crons table, behind <code>verifyCronAuth</code>.</li>
 <li>Member-editable columns must be added to the allowlist in <code>members_reject_integrity_column_updates()</code>, the way 0058 added <code>birthday_month</code>.</li>
-<li>Env var names only, never values. Set in Vercel as of 2026-09-28: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, NEXT_PUBLIC_TURNSTILE_SITE_KEY, TURNSTILE_SECRET_KEY, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_DEFAULT_FROM, ANTHROPIC_API_KEY, OPENAI_API_KEY, CRON_SECRET, NEXT_PUBLIC_VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT (all Production and Preview); ADMIN_EMAILS and NEXT_PUBLIC_SITE_URL (Production only); NETWORK_HUB_ANON_KEY and NETWORK_PUBLISHER_KEY (Production and Development). Used by code but not set anywhere: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, STRIPE_BRAND_PRICE_ID (these three pending Raymond for brand billing), STRIPE_SEED_SECRET, MAILCHIMP_API_KEY, MAILCHIMP_AUDIENCE_ID, MAILCHIMP_SERVER_PREFIX, MAILCHIMP_TRANSACTIONAL_API_KEY, MANDRILL_API_KEY, TWILIO_MESSAGING_SERVICE_SID, SLACK_ADMIN_WEBHOOK_URL, NEXT_PUBLIC_APP_URL, so Stripe billing and Mailchimp sync are off in production. Optional flags also unset: MAILCHIMP_BROADCAST_ENABLED, ADMIN_BASIC_USER, ADMIN_BASIC_PASS, TURNSTILE_ALLOW_BYPASS, TURNSTILE_FAIL_OPEN.</li>
+<li>Env var names only, never values. Set in Vercel as of 2026-09-28: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, NEXT_PUBLIC_TURNSTILE_SITE_KEY, TURNSTILE_SECRET_KEY, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_DEFAULT_FROM, ANTHROPIC_API_KEY, OPENAI_API_KEY, CRON_SECRET, NEXT_PUBLIC_VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT (all Production and Preview); ADMIN_EMAILS and NEXT_PUBLIC_SITE_URL (Production only); NETWORK_HUB_ANON_KEY and NETWORK_PUBLISHER_KEY (Production and Development); CHECKIN_SIGNING_SECRET (Production and Preview, added 2026-10-11). Used by code but not set anywhere: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, STRIPE_BRAND_PRICE_ID (these three pending Raymond for brand billing), STRIPE_SEED_SECRET, MAILCHIMP_API_KEY, MAILCHIMP_AUDIENCE_ID, MAILCHIMP_SERVER_PREFIX, MAILCHIMP_TRANSACTIONAL_API_KEY, MANDRILL_API_KEY, TWILIO_MESSAGING_SERVICE_SID, SLACK_ADMIN_WEBHOOK_URL, NEXT_PUBLIC_APP_URL, so Stripe billing and Mailchimp sync are off in production. Optional flags also unset: MAILCHIMP_BROADCAST_ENABLED, ADMIN_BASIC_USER, ADMIN_BASIC_PASS, TURNSTILE_ALLOW_BYPASS, TURNSTILE_FAIL_OPEN.</li>
 <li>Brand hero images are 1920 by 1080 with the focal point 32 percent from the top.</li>
 <li>Jev runs in shadow mode for non-trivial work. Report its action and reason in one line, then use judgment.</li>
 </ul>
@@ -335,6 +547,11 @@ git checkout main && git pull</code></pre>
 <tr><td>Branch protection</td><td>Main has none. Consider requiring the Frontend tests and Secret Scan checks, the way Fan Engage does.</td><td><span class="owner kevin">Kevin</span></td></tr>
 <tr><td>Test the 2026-09-27 fixes signed in</td><td>Cancel, refund and restock: <b>done 2026-09-28</b> by live test 01 on prod (rolled back). Parallel awards and the overdraft race: live test 02 <b>passed on a Supabase branch 2026-09-28</b>; not run on prod yet, needs Kevin's yes. A signed-in run through the app has still not been done.</td><td><span class="owner kevin">Kevin</span> / <span class="owner">Next session</span></td></tr>
 <tr><td>Stripe checks</td><td>Replay test events with the Stripe CLI against the new webhook, and turn on the Stripe customer portal with cancellation, in both test and live mode. The billing portal link from #43 needs the portal enabled to work. Brand billing (#85) also needs <code>STRIPE_SECRET_KEY</code>, <code>STRIPE_WEBHOOK_SECRET</code> and <code>STRIPE_BRAND_PRICE_ID</code> set in Vercel.</td><td><span class="owner kevin">Kevin</span> / <span class="owner">Raymond</span></td></tr>
+<tr><td>Email go-live</td><td>Email campaigns (#88) stay off until Raymond sets <code>MAILCHIMP_TRANSACTIONAL_API_KEY</code> and <code>BEP_EMAIL_FROM</code> in Vercel and SPF and DKIM are in place for the sending domain. Never set <code>MAILCHIMP_BROADCAST_ENABLED=1</code> in prod.</td><td><span class="owner">Raymond</span></td></tr>
+<tr><td>Texting replies and the Mailchimp SMS switch</td><td>The Twilio opt-out and HELP replies must match the app copy from #89. Raymond is moving BEP texting to Mailchimp SMS, so confirm with him before more Twilio work.</td><td><span class="owner">Raymond</span></td></tr>
+<tr><td>Item 16, imports, domains and admin</td><td>Handed to Raymond. BEP uses Stripe, not Square or Toast. Do not build it here.</td><td><span class="owner">Raymond</span></td></tr>
+<tr><td>Check-in signing secret</td><td><code>CHECKIN_SIGNING_SECRET</code> signs every printed QR code. Rotating it breaks all codes in the wild, so only rotate it together with a full reprint.</td><td><span class="owner kevin">Kevin</span></td></tr>
+<tr><td>Homepage results section</td><td>Hidden until Nellie's reaches 50 real visits and 10 repeat guests (#94). No action needed; it turns on by itself. Check the numbers look right the first time it shows.</td><td><span class="owner">Next session</span></td></tr>
 <tr><td>Billing lock gaps</td><td>The brand billing lock from #85 does not cover <code>/api/upload</code>, <code>/api/upload/video</code> or <code>/api/admin/stripe-seed</code>. Close these before any brand is past its trial.</td><td><span class="owner">Next session</span></td></tr>
 <tr><td>Founder perks follow-ups</td><td>Test the 48-hour early RSVP block live once a new public event is in its window. Fix the ledger label that may say "premium 1.5x" for a founder (cosmetic).</td><td><span class="owner">Next session</span></td></tr>
 <tr><td>Turnstile keys</td><td>Add <code>NEXT_PUBLIC_TURNSTILE_SITE_KEY</code> and <code>TURNSTILE_SECRET_KEY</code> in Vercel. Until both are set, the apply form runs without the challenge, though the rate limit and validation still apply.</td><td><span class="owner kevin">Kevin</span></td></tr>
@@ -351,7 +568,7 @@ git checkout main && git pull</code></pre>
 </div>
 </section>
 
-<footer>Verified last on 2026-10-11: PR #86 merged (main f1322db) with gitleaks, unit tests, typecheck and Vercel green; 0074 applied (0 of 19 events with a null <code>rsvp_opens_at</code>, founder multiplier 1.5, the trigger present, default now() plus 48 hours); <code>/brands/nellies</code> returned 200 and <code>/brands/nellies/founders</code> shows both perks; PR #85 merged (main b20a981) and 0073 applied; migration filenames through 0074. Not verified: the early RSVP block live, Stripe billing with real keys. Verified earlier on 2026-10-11: PR #83 merged with all checks green (main 5ae68e5), PR #82 merged (main 1b66b38), both branches deleted, no open pull requests, migration filenames through 0072; 4 Nellie's rewards active and the bonus points reward off; the privacy page names Fan Engage Pro LLC live; the Songwriter Round special gone from the JGE page. Not verified: Stripe dashboard (Kevin), a signed-in redeem. Verified earlier on 2026-10-08: PRs #80 and #81 merged, main at 1f78f84, 423 frontend tests passing with all checks green on #81, Production deploy succeeded, and the live <code>/premium</code>, <code>/terms</code> and <code>/cancellation-refund</code> pages checked on www.brandengagepro.com; the FEP privacy page entity fixed; the #80 and #81 branches deleted, no open pull requests, migration filenames through 0072. Verified earlier on 2026-09-28: live test 02 passed on a throwaway Supabase branch (12 workers, awards 60/60, 1 ledger row, 1 redemption, balances 0/0), the branch deleted; PR #77 (migration drift fix plus 0071) opened, prod untouched. Not verified: a full replay of the #77 branch, 02 on prod. Verified earlier on 2026-09-28: PR #75 merged, main at aaa2747, its branch and <code>test/live-test-scripts</code> deleted, no open pull requests; migration 0070 applied to enfpviapxvqyoarwwsuf as version 20260928173848; live test 01 passed 24/24 and 03 passed 13/13 on prod with a forced rollback, and a leftover check found no test rows and no negative balances. Not verified: live test 02, a signed-in redeem through the app. Verified earlier on 2026-09-28: PR #71 merged, main at 9a43cfb; migration 0069 applied to enfpviapxvqyoarwwsuf as version 20260928165038, <code>rate_limits</code> has RLS on, 0 policies and table grants only for postgres and service_role, <code>rate_limit_hit</code> is not a definer, has search_path=public and anon and authenticated cannot execute it, and a smoke test returned 1 then 2 with the test rows deleted. Not verified: the shared limiter through the live app. Verified earlier on 2026-09-28: the shared rate limit branch passes 409 frontend tests, <code>tsc --noEmit</code> and eslint. Vercel env names read with the Vercel CLI (no values), Supabase security advisors read for enfpviapxvqyoarwwsuf. Not verified: auth redirect URLs, SMTP. Verified earlier on 2026-09-28: PR #69 merged, main at bb4724b, its branch deleted; the admin check audit found no inline admin checks left, and 394 frontend tests pass with the new guard test on the test/admin-action-guard branch. Verified earlier on 2026-09-28: PR #68 merged, main at 6b19a25, its branch deleted, 373 frontend tests passing on the #68 branch, migration 0068 applied to enfpviapxvqyoarwwsuf with the trigger enabled, the function not a definer and not executable by anon or authenticated, and 0 members with a month set. A rolled-back test as a member set a month once, then was blocked from changing or clearing it; service role could still change it. Verified earlier on 2026-09-28: PRs #65 and #66 merged, main at 668cfc9, both branches deleted, no open pull requests, 369 frontend tests passing on the #66 branch. Not verified: the birthday page signed in. Verified earlier on 2026-09-28: PR #64 merged, main at 0e06f3b, its branch deleted, no open pull requests; the birthday month write paths traced in code (onboarding only). Verified earlier on 2026-09-28: PR #63 merged, main at 1d9fefc, its branch deleted, no open pull requests, 356 frontend tests passing, migration 0067 applied to enfpviapxvqyoarwwsuf with both functions and the trigger present, the backfill a no-op, 23 <code>jonas-group</code> ledger rows (1,133 points, 9 members with no membership) waiting to move, and membership and member totals unchanged. Verified earlier on 2026-09-28: PR #61 merged, main at 07fa0c4, its branch deleted, no open pull requests, 347 frontend tests passing, migration 0066 applied to enfpviapxvqyoarwwsuf, the 4 Nellie's memberships at 125, 150, 150 and 150 points (all Bronze) and 0 memberships below their ledger sum. Verified earlier on 2026-09-28: PR #59 merged, main at 7272714, its branch deleted, 343 frontend tests passing and <code>tsc --noEmit</code> clean on the branch, and no brands or communities rows for bailee, blake, konnor or dan in enfpviapxvqyoarwwsuf. Verified earlier on 2026-09-28: PR #57 merged, main at e422779, its branch deleted, 341 frontend tests passing and <code>tsc --noEmit</code> clean on the branch. Verified earlier on 2026-09-28: PR #55 merged, main at dd07e34 with Frontend tests and Secret Scan green, its branch deleted, migration 0065 applied to enfpviapxvqyoarwwsuf and checked as listed in the 0065 section. Verified earlier on 2026-09-28: PRs #51, #52 and #53 merged, main at f255d16, no open pull requests, their branches deleted, Frontend tests and Secret Scan green on 0e40b64 (PR #52), 330 frontend tests passing, migration 0064 applied to enfpviapxvqyoarwwsuf and <code>pg_policies</code> shows one policy on <code>notification_preferences</code> with RLS on. Verified later on 2026-09-28: PR #50 merged, main at b258938 with Frontend tests and Secret Scan green, no open pull requests, its branch deleted, the notification page closed as code-confirmed with the prod grant and policy checks listed above. Verified on 2026-09-28: PRs #47, #48 and #49 merged, main at 4561044 with CI green, no open pull requests, their branches deleted, 326 frontend tests passing, migration filenames still end at 0063. Not verified on 2026-09-28: the notification page signed in. Verified after PR #46 on 2026-09-27: PR #46 merged, main at ce61bdb, Frontend tests and Secret Scan green, Production deploy succeeded. Verified later on 2026-09-27: PRs #43 to #45 merged, no open pull requests, migration filenames through 0063, 0063 applied to enfpviapxvqyoarwwsuf with no default on offers.community_id, the five posts and one offer moved to their right brands. Not verified: a live Stripe event replay, the billing portal, the Turnstile challenge, a real brand admin session. Verified earlier on 2026-09-27: PRs #37 to #41 merged, main at 09e5c83, no open pull requests, Production deploy succeeded, migration filenames through 0062, 0059 to 0062 applied to enfpviapxvqyoarwwsuf. Not verified on 2026-09-27: a signed-in cancel, fulfill, or winner pick. Verified on 2026-09-24: PRs #32, #33, #34 merged, main at cc33356, no open pull requests, Frontend tests and Secret Scan green on cc33356, Production deploy succeeded and www.brandengagepro.com returned 200, migration filenames through 0058, 0057 and 0058 applied to enfpviapxvqyoarwwsuf, Nellie's offer, event, and welcome dessert counts in production, 13 cron schedules in frontend/vercel.json, no branch protection on main. Not verified: signed-in rendering, a real birthday entree redeem, Vercel env vars, the carried items from 2026-09-14.</footer>
+<footer>Verified last on 2026-10-11: PR #94 merged (main e0701ea) with unit tests, typecheck, gitleaks and Vercel green; the prod homepage returned 200 with the results section hidden; 557 frontend tests; no open pull requests; migration filenames through 0074, next 0075. Verified earlier on 2026-10-11: PR #86 merged (main f1322db) with gitleaks, unit tests, typecheck and Vercel green; 0074 applied (0 of 19 events with a null <code>rsvp_opens_at</code>, founder multiplier 1.5, the trigger present, default now() plus 48 hours); <code>/brands/nellies</code> returned 200 and <code>/brands/nellies/founders</code> shows both perks; PR #85 merged (main b20a981) and 0073 applied; migration filenames through 0074. Not verified: the early RSVP block live, Stripe billing with real keys. Verified earlier on 2026-10-11: PR #83 merged with all checks green (main 5ae68e5), PR #82 merged (main 1b66b38), both branches deleted, no open pull requests, migration filenames through 0072; 4 Nellie's rewards active and the bonus points reward off; the privacy page names Fan Engage Pro LLC live; the Songwriter Round special gone from the JGE page. Not verified: Stripe dashboard (Kevin), a signed-in redeem. Verified earlier on 2026-10-08: PRs #80 and #81 merged, main at 1f78f84, 423 frontend tests passing with all checks green on #81, Production deploy succeeded, and the live <code>/premium</code>, <code>/terms</code> and <code>/cancellation-refund</code> pages checked on www.brandengagepro.com; the FEP privacy page entity fixed; the #80 and #81 branches deleted, no open pull requests, migration filenames through 0072. Verified earlier on 2026-09-28: live test 02 passed on a throwaway Supabase branch (12 workers, awards 60/60, 1 ledger row, 1 redemption, balances 0/0), the branch deleted; PR #77 (migration drift fix plus 0071) opened, prod untouched. Not verified: a full replay of the #77 branch, 02 on prod. Verified earlier on 2026-09-28: PR #75 merged, main at aaa2747, its branch and <code>test/live-test-scripts</code> deleted, no open pull requests; migration 0070 applied to enfpviapxvqyoarwwsuf as version 20260928173848; live test 01 passed 24/24 and 03 passed 13/13 on prod with a forced rollback, and a leftover check found no test rows and no negative balances. Not verified: live test 02, a signed-in redeem through the app. Verified earlier on 2026-09-28: PR #71 merged, main at 9a43cfb; migration 0069 applied to enfpviapxvqyoarwwsuf as version 20260928165038, <code>rate_limits</code> has RLS on, 0 policies and table grants only for postgres and service_role, <code>rate_limit_hit</code> is not a definer, has search_path=public and anon and authenticated cannot execute it, and a smoke test returned 1 then 2 with the test rows deleted. Not verified: the shared limiter through the live app. Verified earlier on 2026-09-28: the shared rate limit branch passes 409 frontend tests, <code>tsc --noEmit</code> and eslint. Vercel env names read with the Vercel CLI (no values), Supabase security advisors read for enfpviapxvqyoarwwsuf. Not verified: auth redirect URLs, SMTP. Verified earlier on 2026-09-28: PR #69 merged, main at bb4724b, its branch deleted; the admin check audit found no inline admin checks left, and 394 frontend tests pass with the new guard test on the test/admin-action-guard branch. Verified earlier on 2026-09-28: PR #68 merged, main at 6b19a25, its branch deleted, 373 frontend tests passing on the #68 branch, migration 0068 applied to enfpviapxvqyoarwwsuf with the trigger enabled, the function not a definer and not executable by anon or authenticated, and 0 members with a month set. A rolled-back test as a member set a month once, then was blocked from changing or clearing it; service role could still change it. Verified earlier on 2026-09-28: PRs #65 and #66 merged, main at 668cfc9, both branches deleted, no open pull requests, 369 frontend tests passing on the #66 branch. Not verified: the birthday page signed in. Verified earlier on 2026-09-28: PR #64 merged, main at 0e06f3b, its branch deleted, no open pull requests; the birthday month write paths traced in code (onboarding only). Verified earlier on 2026-09-28: PR #63 merged, main at 1d9fefc, its branch deleted, no open pull requests, 356 frontend tests passing, migration 0067 applied to enfpviapxvqyoarwwsuf with both functions and the trigger present, the backfill a no-op, 23 <code>jonas-group</code> ledger rows (1,133 points, 9 members with no membership) waiting to move, and membership and member totals unchanged. Verified earlier on 2026-09-28: PR #61 merged, main at 07fa0c4, its branch deleted, no open pull requests, 347 frontend tests passing, migration 0066 applied to enfpviapxvqyoarwwsuf, the 4 Nellie's memberships at 125, 150, 150 and 150 points (all Bronze) and 0 memberships below their ledger sum. Verified earlier on 2026-09-28: PR #59 merged, main at 7272714, its branch deleted, 343 frontend tests passing and <code>tsc --noEmit</code> clean on the branch, and no brands or communities rows for bailee, blake, konnor or dan in enfpviapxvqyoarwwsuf. Verified earlier on 2026-09-28: PR #57 merged, main at e422779, its branch deleted, 341 frontend tests passing and <code>tsc --noEmit</code> clean on the branch. Verified earlier on 2026-09-28: PR #55 merged, main at dd07e34 with Frontend tests and Secret Scan green, its branch deleted, migration 0065 applied to enfpviapxvqyoarwwsuf and checked as listed in the 0065 section. Verified earlier on 2026-09-28: PRs #51, #52 and #53 merged, main at f255d16, no open pull requests, their branches deleted, Frontend tests and Secret Scan green on 0e40b64 (PR #52), 330 frontend tests passing, migration 0064 applied to enfpviapxvqyoarwwsuf and <code>pg_policies</code> shows one policy on <code>notification_preferences</code> with RLS on. Verified later on 2026-09-28: PR #50 merged, main at b258938 with Frontend tests and Secret Scan green, no open pull requests, its branch deleted, the notification page closed as code-confirmed with the prod grant and policy checks listed above. Verified on 2026-09-28: PRs #47, #48 and #49 merged, main at 4561044 with CI green, no open pull requests, their branches deleted, 326 frontend tests passing, migration filenames still end at 0063. Not verified on 2026-09-28: the notification page signed in. Verified after PR #46 on 2026-09-27: PR #46 merged, main at ce61bdb, Frontend tests and Secret Scan green, Production deploy succeeded. Verified later on 2026-09-27: PRs #43 to #45 merged, no open pull requests, migration filenames through 0063, 0063 applied to enfpviapxvqyoarwwsuf with no default on offers.community_id, the five posts and one offer moved to their right brands. Not verified: a live Stripe event replay, the billing portal, the Turnstile challenge, a real brand admin session. Verified earlier on 2026-09-27: PRs #37 to #41 merged, main at 09e5c83, no open pull requests, Production deploy succeeded, migration filenames through 0062, 0059 to 0062 applied to enfpviapxvqyoarwwsuf. Not verified on 2026-09-27: a signed-in cancel, fulfill, or winner pick. Verified on 2026-09-24: PRs #32, #33, #34 merged, main at cc33356, no open pull requests, Frontend tests and Secret Scan green on cc33356, Production deploy succeeded and www.brandengagepro.com returned 200, migration filenames through 0058, 0057 and 0058 applied to enfpviapxvqyoarwwsuf, Nellie's offer, event, and welcome dessert counts in production, 13 cron schedules in frontend/vercel.json, no branch protection on main. Not verified: signed-in rendering, a real birthday entree redeem, Vercel env vars, the carried items from 2026-09-14.</footer>
 </div>
 
 </body>
