@@ -46,16 +46,25 @@ function ResetPasswordFields({
 
   useEffect(() => {
     let cancelled = false;
-    const wasSignedOut = hasBrowserSignedOutMarker();
-    if (wasSignedOut) clearBrowserSignedOut();
-    const supabase = createClient();
     const code = searchParams.get("code");
     const tokenHash = searchParams.get("token_hash");
     const type = searchParams.get("type");
+    const hash = parseRecoveryHash(window.location.hash);
+    const hasProof = Boolean(
+      code || (tokenHash && isAuthEmailOtpType(type)) || hash?.kind === "tokens",
+    );
+    const wasSignedOut = hasBrowserSignedOutMarker();
+    // A sticky Sign out must not let a leftover session become "set a new
+    // password" unless this navigation actually carries a recovery proof.
+    if (!hasProof && wasSignedOut) {
+      setPhase("missing");
+      return;
+    }
+    if (wasSignedOut) clearBrowserSignedOut();
+    const supabase = createClient();
 
     async function establish() {
       try {
-        const hash = parseRecoveryHash(window.location.hash);
         if (hash?.kind === "error") throw new Error(hash.message);
         if (tokenHash && isAuthEmailOtpType(type)) {
           const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type });
@@ -74,7 +83,7 @@ function ResetPasswordFields({
           data: { session },
         } = await supabase.auth.getSession();
         if (cancelled) return;
-        if (session && (code || tokenHash || hash?.kind === "tokens")) {
+        if (session && hasProof) {
           window.history.replaceState(null, "", "/reset-password");
         }
         if (!session) {
