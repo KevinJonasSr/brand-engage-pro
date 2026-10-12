@@ -82,10 +82,13 @@ function LoginForm({
 
   const turnstileRequired = isTurnstileRequired();
   const turnstileConfigured = isTurnstileConfigured();
+  const callbackError = searchParams.get("error");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "error" | "magic-sent">("idle");
-  const [message, setMessage] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "error" | "magic-sent">(
+    callbackError ? "error" : "idle",
+  );
+  const [message, setMessage] = useState(callbackError ?? "");
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [turnstileError, setTurnstileError] = useState(false);
   const [turnstileLoadState, setTurnstileLoadState] =

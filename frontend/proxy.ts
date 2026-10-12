@@ -16,6 +16,7 @@ import { isLockedAdminWritePath } from "@/lib/brand-billing";
 import { isBrandSlugAlias, resolveBrandSlug } from "@/lib/brand-aliases";
 import { resolveCommunityFromHost } from "@/lib/community";
 import { resolvePinnedCanonicalLocation } from "@/lib/site-url";
+import { isPasswordRecoveryEntry } from "@/lib/password-reset";
 import { safeRelativePath } from "@/lib/safe-redirect";
 import { onboardingDoneHref } from "@/lib/onboarding-next";
 
@@ -129,6 +130,12 @@ export default async function proxy(request: NextRequest) {
     request.cookies.get(ONBOARDED_COOKIE)?.value,
   );
   const pathname = request.nextUrl.pathname;
+
+  // Password recovery must be able to store the new session. The sticky
+  // signed-out marker otherwise expires sb-* on the way through.
+  if (isPasswordRecoveryEntry(pathname, request.nextUrl.search)) {
+    return NextResponse.next({ request: { headers: requestHeaders } });
+  }
 
   if (shouldRedirectOnboardingHome(pathname, onboarded, signedOut)) {
     const done = onboardingDoneHref(

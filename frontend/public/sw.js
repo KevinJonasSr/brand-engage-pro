@@ -27,6 +27,7 @@ const AUTH_NETWORK_ONLY = new Set([
   "/onboarding",
   "/join",
   "/forgot-password",
+  "/reset-password",
 ]);
 
 self.addEventListener("fetch", (event) => {
