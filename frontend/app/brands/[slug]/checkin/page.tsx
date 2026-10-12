@@ -25,12 +25,14 @@ type State =
 export default function CheckinPage() {
   const params = useParams<{ slug: string }>();
   const brandSlug = params.slug;
-  // Proof-of-presence token from the printed QR code (?t=...). The sign-in
-  // links only render after the first client effect, so reading
-  // window.location here cannot cause a hydration mismatch.
-  const token = readCheckinToken();
+  // Proof-of-presence token from the printed QR code (?t=...). Read it after
+  // mount so the first paint matches the server (no window during SSR).
+  const [returnToken, setReturnToken] = useState<string | null>(null);
+  useEffect(() => {
+    setReturnToken(readCheckinToken());
+  }, []);
   const checkinPath = brandSlug
-    ? `/brands/${brandSlug}/checkin${token ? `?t=${encodeURIComponent(token)}` : ""}`
+    ? `/brands/${brandSlug}/checkin${returnToken ? `?t=${encodeURIComponent(returnToken)}` : ""}`
     : "/";
 
   const brandName = useMemo(() => {
