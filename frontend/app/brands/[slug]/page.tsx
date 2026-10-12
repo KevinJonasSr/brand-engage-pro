@@ -183,12 +183,12 @@ export default async function BrandPage({
         )}
 
         {/* Content layer — sits above image + overlay */}
-        <div className="relative p-10">
+        <div className="relative p-6 sm:p-10">
           <p className="text-xs uppercase tracking-[0.3em] text-linen/70">
             {brand.genres.slice(0, 2).join(" · ")}{brand.genres.length > 2 ? " +" + (brand.genres.length - 2) : ""}
           </p>
           <h1
-            className="mt-3 text-5xl font-semibold text-linen leading-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]"
+            className="mt-3 text-4xl font-semibold text-linen leading-tight break-words sm:text-5xl drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]"
             style={{ fontFamily: "var(--font-display)" }}
           >
             {brand.name}
