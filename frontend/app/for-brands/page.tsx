@@ -84,6 +84,12 @@ export default async function ForBrandsPage() {
           >
             See active brands
           </Link>
+          <Link
+            href="/pricing"
+            className="rounded-full border border-iron/30 px-6 py-3 text-sm font-medium text-iron/80 hover:bg-iron/10"
+          >
+            Pricing
+          </Link>
         </div>
         <p className="pt-2 text-xs text-iron/70">
           No payment or contract required to apply. We respond within 48 hours.
@@ -194,7 +200,7 @@ export default async function ForBrandsPage() {
             },
             {
               title: "AI-drafted replies",
-              body: "Members comment, your team replies at scale. Claude drafts your tone-perfect response — keep it, edit it, send it.",
+              body: "Members comment, your team replies at scale. AI drafts your tone-perfect response — keep it, edit it, send it.",
             },
             {
               title: "Rewards & redemptions",
@@ -210,7 +216,7 @@ export default async function ForBrandsPage() {
             },
             {
               title: "Weekly admin brief",
-              body: "Every Monday morning: top members, redemption velocity, anomaly flags. Lands in Slack and at /admin/briefs.",
+              body: "Every Monday morning: top members, redemption velocity, anomaly flags. Read it at /admin/briefs.",
             },
           ].map((card) => (
             <div key={card.title} className="glass-card rounded-lg p-6">
@@ -316,7 +322,19 @@ export default async function ForBrandsPage() {
             },
             {
               q: "What does it cost?",
-              a: "Pricing is reviewed with the brand team during onboarding so it can be matched to your member base size and goals. There's no payment or contract required to apply.",
+              a: (
+                <>
+                  $50 per brand per month after a 30-day free trial. Our first
+                  10 founding brands join free.{" "}
+                  <Link
+                    href="/pricing"
+                    className="text-iron underline-offset-4 hover:underline"
+                  >
+                    See pricing
+                  </Link>
+                  . No payment or contract is required to apply.
+                </>
+              ),
             },
             {
               q: "Can managers, agencies, or brand teams apply?",

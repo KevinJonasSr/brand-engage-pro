@@ -18,7 +18,9 @@ type State =
  *
  * Landing page after a member scans the QR code at a brand location.
  * Auth resolves first — logged-out guests never see “Checking you in…”
- * theater; they get Sign in / Create account immediately after session check.
+ * theater. While the session check is in flight, and when it finds no
+ * session, they see Sign in and Join. The check-in request itself still
+ * runs only after a session exists.
  */
 export default function CheckinPage() {
   const params = useParams<{ slug: string }>();
@@ -94,42 +96,18 @@ export default function CheckinPage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-6 py-16 text-center">
-      {state.status === "resolving" && (
-        <div className="space-y-4">
-          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-iron/10 border-t-aurora" />
-          <p className="text-sm text-iron/70">One moment…</p>
-        </div>
+      {(state.status === "resolving" || state.status === "unauthenticated") && (
+        <SignedOutCheckin
+          brandName={brandName}
+          brandSlug={brandSlug}
+          checkinPath={checkinPath}
+        />
       )}
 
       {state.status === "checking_in" && (
         <div className="space-y-4">
           <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-iron/10 border-t-aurora" />
           <p className="text-sm text-iron/70">Checking you in at {brandName}…</p>
-        </div>
-      )}
-
-      {state.status === "unauthenticated" && (
-        <div className="space-y-6">
-          <div className="text-5xl">🔑</div>
-          <h1 className="text-2xl font-semibold">Sign in to check in</h1>
-          <p className="max-w-sm text-sm text-iron/70">
-            Create a free account or sign in to earn visit points at{" "}
-            <span className="text-iron/80">{brandName}</span>.
-          </p>
-          <div className="flex flex-col gap-3">
-            <Link
-              href={`/login?next=${encodeURIComponent(checkinPath)}`}
-              className="rounded-full bg-ember px-6 py-3 text-sm font-semibold text-linen"
-            >
-              Sign in to check in →
-            </Link>
-            <Link
-              href={`/signup?ref=${encodeURIComponent(brandSlug ?? "")}&next=${encodeURIComponent(checkinPath)}`}
-              className="text-sm text-iron/70 hover:text-iron"
-            >
-              New here? Create a free account
-            </Link>
-          </div>
         </div>
       )}
 
@@ -185,6 +163,43 @@ export default function CheckinPage() {
         </div>
       )}
     </main>
+  );
+}
+
+function SignedOutCheckin({
+  brandName,
+  brandSlug,
+  checkinPath,
+}: {
+  brandName: string;
+  brandSlug: string | undefined;
+  checkinPath: string;
+}) {
+  const loginHref = `/login?next=${encodeURIComponent(checkinPath)}`;
+  const joinHref = `/signup?ref=${encodeURIComponent(brandSlug ?? "")}&next=${encodeURIComponent(checkinPath)}`;
+
+  return (
+    <div className="space-y-6">
+      <h1 className="text-2xl font-semibold">Sign in or join to check in</h1>
+      <p className="max-w-sm text-sm text-iron/70">
+        Create a free account or sign in to earn visit points at{" "}
+        <span className="text-iron/80">{brandName}</span>.
+      </p>
+      <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+        <Link
+          href={loginHref}
+          className="rounded-full bg-ember px-6 py-3 text-sm font-semibold text-linen"
+        >
+          Sign in
+        </Link>
+        <Link
+          href={joinHref}
+          className="rounded-full border border-iron/20 px-6 py-3 text-sm font-semibold text-iron/80 hover:bg-iron/10"
+        >
+          Join
+        </Link>
+      </div>
+    </div>
   );
 }
 
