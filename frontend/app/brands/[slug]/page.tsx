@@ -21,6 +21,7 @@ import FollowButton from "./follow-button";
 import ShareButton from "@/components/share-button";
 import RsvpButton from "./rsvp-button";
 import { focalPointStyle } from "@/lib/images/focal-point";
+import { MOBILE_HERO_MEDIA, mobileHeroFor } from "@/lib/images/mobile-hero";
 
 import { BrandPredictionsSection } from "@/components/predictions/brand-predictions-section";
 import ActivityPulseStrip from "@/components/activity-pulse";
@@ -144,6 +145,7 @@ export default async function BrandPage({
       : { label: "View rewards", href: `/brands/${brand.slug}/rewards` };
 
   const showFounderLink = founderData && founderData.cap > 0;
+  const mobileHero = mobileHeroFor(brand.heroImage);
 
   return (
     <main className="mx-auto max-w-6xl space-y-10 px-6 py-12">
@@ -154,17 +156,20 @@ export default async function BrandPage({
       >
         {brand.heroImage && (
           <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={brand.heroImage}
-              alt=""
-              // Focal point comes from brands.hero_focal_x / .hero_focal_y.
-              // Default 50/50 (centered) when not set. Tweak via Supabase
-              // SQL editor or (Phase 2) the admin focal-point picker.
-              style={focalPointStyle(brand)}
-              className="absolute inset-0 h-full w-full object-cover bep-photo-zoom"
-              aria-hidden
-            />
+            {/* Phones get a plain version when the hero has a painted-in wordmark. */}
+            <picture>
+              {mobileHero && <source media={MOBILE_HERO_MEDIA} srcSet={mobileHero} />}
+              <img
+                src={brand.heroImage}
+                alt=""
+                // Focal point comes from brands.hero_focal_x / .hero_focal_y.
+                // Default 50/50 (centered) when not set. Tweak via Supabase
+                // SQL editor or (Phase 2) the admin focal-point picker.
+                style={focalPointStyle(brand)}
+                className="absolute inset-0 h-full w-full object-cover bep-photo-zoom"
+                aria-hidden
+              />
+            </picture>
             {/* Dark gradient overlay so the title/CTAs stay legible regardless of the photo */}
             <div
               className="absolute inset-0"
