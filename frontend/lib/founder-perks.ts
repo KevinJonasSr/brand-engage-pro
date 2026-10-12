@@ -5,19 +5,20 @@
  *   - Founders earn a flat 1.5x points. Premium also earns 1.5x, and the
  *     two do not stack: a founder on Premium still earns 1.5x.
  *   - New events can be founders-first for a configurable number of hours
- *     (brand default 24, per event override, 0 turns it off). Founder-only
+ *     (brand default 48, per event override, 0 turns it off). Founder-only
  *     events are founders-only anyway.
  *
  * Mirrored in SQL by public.points_multiplier, the award-function ledger
  * notes, and apply_founder_early_rsvp_window
  * (supabase/migrations/0076_founder_early_rsvp_window.sql and
- * 0077_founder_points_flat.sql). Change both together.
+ * 0077_founder_points_flat.sql; default raised to 48 in
+ * 0079_founder_early_rsvp_default_48.sql). Change both together.
  */
 
 export const FOUNDER_POINTS_BONUS = 0.5;
 export const PREMIUM_POINTS_BONUS = 0.5;
 /** Default early window for a brand that has not set its own. */
-export const FOUNDER_EARLY_RSVP_HOURS = 24;
+export const FOUNDER_EARLY_RSVP_HOURS = 48;
 /** Longest window an admin can save. Matches the SQL check constraints. */
 export const MAX_FOUNDER_EARLY_RSVP_HOURS = 168;
 /** Ledger suffix for a founder bonus. Premium-only rows keep their own label. */
@@ -77,7 +78,7 @@ export function parseEarlyRsvpHours(
 
 /**
  * Hours that apply to a new event. A per-event number wins, including 0.
- * Otherwise the brand setting, otherwise the 24-hour default.
+ * Otherwise the brand setting, otherwise the 48-hour default.
  */
 export function resolveEarlyRsvpHours(
   eventHours: number | null | undefined,
@@ -92,7 +93,7 @@ export function resolveEarlyRsvpHours(
 
 /**
  * When RSVPs open to everyone. Null means open immediately (0 hours).
- * `hours` defaults to the brand default of 24.
+ * `hours` defaults to the brand default of 48.
  */
 export function publicRsvpOpensAt(
   createdAt: Date,
