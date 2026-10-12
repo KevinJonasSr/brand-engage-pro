@@ -15,6 +15,8 @@ export default function Footer() {
           <Link href="/terms" className="text-linen/85 underline underline-offset-4 hover:text-linen">Terms</Link>
           <Link href="/privacy" className="text-linen/85 underline underline-offset-4 hover:text-linen">Privacy</Link>
           <Link href="/cookie-policy" className="text-linen/85 underline underline-offset-4 hover:text-linen">Cookies</Link>
+          <Link href="/pricing" className="hover:text-linen">Pricing</Link>
+          <Link href="/help" className="hover:text-linen">Help</Link>
           <Link href="/unsubscribe" className="hover:text-linen">Unsubscribe</Link>
           <a href={`mailto:${BEP_SUPPORT_EMAIL}`} className="hover:text-linen">Contact</a>
           <Link href="/for-brands" className="text-linen/50 hover:text-linen/80">
