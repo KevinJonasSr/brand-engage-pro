@@ -12,6 +12,9 @@ const pricing = read("../app/pricing/page.tsx");
 const help = read("../app/help/page.tsx");
 const footer = read("../components/footer.tsx");
 const checkin = read("../app/brands/[slug]/checkin/page.tsx");
+const onboardingChat = read("../app/onboarding/chat/page.tsx");
+const adminSegments = read("../app/admin/segments/page.tsx");
+const adminFraud = read("../app/admin/fraud-signals/page.tsx");
 
 describe("public pricing and help pages", () => {
   it("states founding-brand pricing and links it from for-brands and the footer", () => {
@@ -38,6 +41,16 @@ describe("public pricing and help pages", () => {
     assert.match(forBrands, /AI drafts/);
     assert.doesNotMatch(forBrands, /Claude/);
     assert.doesNotMatch(forBrands, /Slack/);
+  });
+
+  it("does not name Claude in other user-facing AI copy", () => {
+    assert.match(onboardingChat, /Chat with our AI assistant/);
+    assert.match(adminSegments, /Our AI assistant translates it into/);
+    assert.match(adminFraud, /our AI assistant reviews each candidate/);
+    assert.match(adminFraud, /The assistant's reasons/);
+    for (const source of [help, onboardingChat, adminSegments, adminFraud]) {
+      assert.doesNotMatch(source, /Claude/);
+    }
   });
 
   it("lists support@brandengagepro.com on /help", () => {

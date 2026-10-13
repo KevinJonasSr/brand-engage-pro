@@ -107,7 +107,7 @@ export default async function FraudSignalsPage() {
         </h1>
         <p className="max-w-2xl text-sm text-iron/70">
           A daily cron scans for unusual activity (burst posting, rapid points
-          gain, robotic content patterns) and Claude reviews each candidate.
+          gain, robotic content patterns) and our AI assistant reviews each candidate.
           Flags appear here for your review.{" "}
           <span className="text-iron/90">No automatic action is taken.</span>
         </p>
@@ -246,7 +246,7 @@ function PendingFlagCard({
         {signal.reasons.length > 0 && (
           <div>
             <p className="text-xs uppercase tracking-wide text-iron/70">
-              Claude's reasons
+              The assistant's reasons
             </p>
             <ul className="mt-1 list-disc space-y-1 pl-5 text-xs text-iron/80">
               {signal.reasons.map((r, i) => (
