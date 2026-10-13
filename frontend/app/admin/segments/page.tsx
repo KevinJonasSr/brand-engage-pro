@@ -54,7 +54,7 @@ export default async function AdminSegmentsPage() {
           Audience segments
         </h1>
         <p className="max-w-2xl text-sm text-iron/70">
-          Describe a member group in plain English. Claude translates it into
+          Describe a member group in plain English. Our AI assistant translates it into
           a structured filter and the system saves a named segment with the
           matching members cached. Use these for targeted notifications,
           email exports, and reports.

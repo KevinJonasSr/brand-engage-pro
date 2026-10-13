@@ -41,7 +41,7 @@ export default async function OnboardingChatPage() {
           A few quick things
         </h1>
         <p className="max-w-xl text-sm text-iron/70">
-          Chat with Claude for a minute so we know who you are — city,
+          Chat with our AI assistant for a minute so we know who you are — city,
           favorite brand, why you're here. You can skip and finish later
           from your profile.
         </p>
