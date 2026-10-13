@@ -97,8 +97,9 @@ export default async function BillingPage({
         <h1 className="text-2xl font-bold text-iron">Billing</h1>
         <p className="mt-1 text-sm text-iron/70">
           ${BRAND_MONTHLY_PRICE_USD} per business per month after a {BRAND_TRIAL_DAYS}-day
-          free trial. The first {BRAND_FREE_SLOT_LIMIT} businesses are free. Your
-          guests never pay and are never affected by billing.
+          free trial. The first {BRAND_FREE_SLOT_LIMIT} founding brands are free
+          for 12 months, then ${BRAND_MONTHLY_PRICE_USD} per month. Your guests
+          never pay and are never affected by billing.
         </p>
       </header>
 

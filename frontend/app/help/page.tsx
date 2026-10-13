@@ -48,7 +48,8 @@ const faqs: { q: string; a: ReactNode }[] = [
     a: (
       <>
         $50 per brand per month after a 30-day free trial. Our first 10 founding
-        brands join free. The plan includes check-in rewards, points, and member
+        brands are free for 12 months, then $50 per month. The plan includes
+        check-in rewards, points, and member
         messaging by email, and it works with any POS.{" "}
         <Link href="/pricing" className="text-iron underline-offset-4 hover:underline">
           See pricing
