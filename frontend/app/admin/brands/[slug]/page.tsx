@@ -49,6 +49,14 @@ export default async function AdminBrandEditPage({
   const earlyHours = withHours.error
     ? FOUNDER_EARLY_RSVP_HOURS
     : ((withHours.data?.founder_early_rsvp_hours as number | null) ?? FOUNDER_EARLY_RSVP_HOURS);
+  const rotatingResult = await admin
+    .from("brands")
+    .select("require_rotating_checkin")
+    .eq("slug", slug)
+    .maybeSingle();
+  const requireRotatingCheckin = rotatingResult.error
+    ? false
+    : rotatingResult.data?.require_rotating_checkin === true;
 
   if (!brand) notFound();
 
@@ -116,6 +124,7 @@ export default async function AdminBrandEditPage({
           active: (brand.active as boolean) ?? true,
           sortOrder: (brand.sort_order as number) ?? 99,
           founderEarlyRsvpHours: earlyHours,
+          requireRotatingCheckin,
         }}
       />
 
@@ -247,11 +256,24 @@ export default async function AdminBrandEditPage({
         <CreateEventForm slug={slug} brandEarlyHours={earlyHours} />
       </section>
 
-      {/* Check-in QR — print or display at the register / entrance */}
+      {/* Printed poster QR. This stays the static token so codes already
+          on the wall keep working. The host-stand screen is separate. */}
       <CheckinQrCard
         brandName={brand.name as string}
         checkinPath={signedCheckinPath(brand.slug as string)}
+        awardsPoints={!requireRotatingCheckin}
       />
+      <p className="text-sm text-iron/70">
+        <Link
+          href={`/admin/checkin-display?brand=${encodeURIComponent(brand.slug as string)}`}
+          className="font-semibold text-iron underline"
+        >
+          Open the host-stand screen
+        </Link>
+        {requireRotatingCheckin
+          ? ". Visit points come from that screen. This printed code still lets a first-time guest sign up."
+          : ". Printed posters still award visit points. Put a tablet on this screen before you turn rotating check-in on."}
+      </p>
     </div>
   );
 }

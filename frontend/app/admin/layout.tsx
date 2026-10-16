@@ -17,6 +17,7 @@ const adminNav = [
   { href: "/admin/goals", label: "Goals" },
   { href: "/admin/applications", label: "Applications" },
   { href: "/admin/brands", label: "Brands" },
+  { href: "/admin/checkin-display", label: "Check-in" },
   { href: "/admin/campaigns", label: "Campaigns" },
   { href: "/admin/broadcast", label: "Broadcast" },
   { href: "/admin/analytics", label: "Analytics" },
