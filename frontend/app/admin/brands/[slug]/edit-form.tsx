@@ -178,8 +178,8 @@ export default function BrandEditForm({
           className="w-full max-w-xs rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
         />
         <p className="mt-1 text-xs text-iron/70">
-          How long founders can RSVP before everyone else. This applies to new
-          events. Use 0 to turn the early window off. Change one event to
+          How long founders can RSVP before everyone else. The default is 48
+          hours. This applies to new events. Use 0 to turn the early window off. Change one event to
           override it. Events that already exist keep their current open time
           until you edit that event.
         </p>

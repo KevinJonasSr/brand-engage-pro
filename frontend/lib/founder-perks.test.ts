@@ -62,11 +62,11 @@ describe("scaledPoints / ledgerNote", () => {
 });
 
 describe("early RSVP hours", () => {
-  it("defaults new events to 24 hours and can turn the window off", () => {
-    assert.equal(FOUNDER_EARLY_RSVP_HOURS, 24);
+  it("defaults new events to 48 hours and can turn the window off", () => {
+    assert.equal(FOUNDER_EARLY_RSVP_HOURS, 48);
     const opens = publicRsvpOpensAt(NOW);
     assert.ok(opens);
-    assert.equal(opens.toISOString(), hoursFromNow(24));
+    assert.equal(opens.toISOString(), hoursFromNow(48));
     assert.equal(publicRsvpOpensAt(NOW, 0), null);
     const fourHours = publicRsvpOpensAt(NOW, 4);
     assert.ok(fourHours);
@@ -75,7 +75,9 @@ describe("early RSVP hours", () => {
 
   it("lets a per-event number override the brand, including 0", () => {
     assert.equal(resolveEarlyRsvpHours(null, 24), 24);
-    assert.equal(resolveEarlyRsvpHours(undefined, null), 24);
+    assert.equal(resolveEarlyRsvpHours(undefined, null), 48);
+    assert.equal(resolveEarlyRsvpHours(null, null), FOUNDER_EARLY_RSVP_HOURS);
+    assert.equal(resolveEarlyRsvpHours(null, 999), 48);
     assert.equal(resolveEarlyRsvpHours(0, 24), 0);
     assert.equal(resolveEarlyRsvpHours(6, 24), 6);
   });
@@ -139,6 +141,10 @@ describe("founder SQL", () => {
     fileURLToPath(new URL("../../supabase/migrations/0077_founder_points_flat.sql", import.meta.url)),
     "utf8",
   );
+  const default48Sql = readFileSync(
+    fileURLToPath(new URL("../../supabase/migrations/0079_founder_early_rsvp_default_48.sql", import.meta.url)),
+    "utf8",
+  );
   const checkins = readFileSync(
     fileURLToPath(new URL("./data/checkins.ts", import.meta.url)),
     "utf8",
@@ -149,6 +155,16 @@ describe("founder SQL", () => {
     assert.match(windowSql, /return new;/);
     assert.doesNotMatch(windowSql, /update public\.brand_events/i);
     assert.match(windowSql, /default 24/);
+  });
+
+  it("raises the brand default and trigger fallback to 48 without touching events", () => {
+    assert.match(default48Sql, /alter column founder_early_rsvp_hours set default 48/);
+    assert.match(default48Sql, /coalesce\(new\.founder_early_rsvp_hours, v_brand_hours, 48\)/);
+    assert.match(default48Sql, /founder_early_rsvp_hours is not distinct from old\.founder_early_rsvp_hours/);
+    assert.doesNotMatch(default48Sql, /update public\.brand_events/i);
+    assert.doesNotMatch(default48Sql, /set default 24/);
+    // Backfill only moves brands still on the old 24 default.
+    assert.match(default48Sql, /update public\.brands\s+set founder_early_rsvp_hours = 48\s+where founder_early_rsvp_hours = 24/);
   });
 
   it("gives founders a flat 1.5x labeled Founder 1.5x", () => {
