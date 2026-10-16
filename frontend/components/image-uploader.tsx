@@ -23,6 +23,7 @@ export default function ImageUploader({
   name = "image_url",
   initialUrl = null,
   label = "Add photo",
+  brand,
   onUploaded,
 }: {
   bucket: Bucket;
@@ -30,6 +31,12 @@ export default function ImageUploader({
   name?: string;
   initialUrl?: string | null;
   label?: string;
+  /**
+   * Set on admin/brand uploads (hero, offer image). The server then requires
+   * an admin role on this brand and an unlocked brand. Leave unset for
+   * member avatars, posts, and challenge photos.
+   */
+  brand?: string;
   onUploaded?: (url: string) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -68,6 +75,7 @@ export default function ImageUploader({
         blob === file ? file.name : `${stripExt(file.name)}.jpg`,
       );
       fd.append("bucket", bucket);
+      if (brand?.trim()) fd.append("brand", brand.trim());
 
       const res = await fetch("/api/upload", { method: "POST", body: fd });
 

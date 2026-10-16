@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAdminContext } from "@/lib/admin";
+import { getAdminContext, requireWritableBrand } from "@/lib/admin";
 import { getStripe } from "@/lib/stripe";
 import type { Community } from "@/lib/community";
 
@@ -25,6 +25,7 @@ export async function seedStripeProductsAction(formData: FormData): Promise<void
   if (!ctx?.isSuperAdmin) {
     throw new Error("Super-admin only");
   }
+  await requireWritableBrand(ctx, String(formData.get("community_id") ?? ""));
 
   const communityId = String(formData.get("community_id") ?? "").trim();
   if (!communityId) {

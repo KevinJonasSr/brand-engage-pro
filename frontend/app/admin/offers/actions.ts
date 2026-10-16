@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import {
   adminScope,
   requireAdminContext,
+  requireWritableBrand,
   resolveWriteBrand,
 } from "@/lib/admin";
 import type { OfferCategory, TierSlug } from "@/lib/data/types";
@@ -20,6 +21,7 @@ export async function createOfferAction(formData: FormData) {
     ctx,
     String(formData.get("community_id") ?? ""),
   );
+  await requireWritableBrand(ctx, communityId);
 
   const title = String(formData.get("title") ?? "").trim();
   const slug = String(formData.get("slug") ?? "").trim();
@@ -64,7 +66,9 @@ export async function createOfferAction(formData: FormData) {
  * once the upload completes.
  */
 export async function updateOfferImageAction(formData: FormData) {
-  const scope = adminScope(await requireAdminContext());
+  const ctx = await requireAdminContext();
+  const scope = adminScope(ctx);
+  await requireWritableBrand(ctx, scope);
   const id = String(formData.get("id") ?? "");
   const imageUrl = String(formData.get("image_url") ?? "").trim();
   if (!id) return;
@@ -83,7 +87,9 @@ export async function updateOfferImageAction(formData: FormData) {
 }
 
 export async function toggleOfferActiveAction(formData: FormData) {
-  const scope = adminScope(await requireAdminContext());
+  const ctx = await requireAdminContext();
+  const scope = adminScope(ctx);
+  await requireWritableBrand(ctx, scope);
   const id = String(formData.get("id") ?? "");
   const active = String(formData.get("active") ?? "true") === "true";
   if (!id) return;

@@ -1,8 +1,11 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
+  BRAND_WRITE_LOCKED_MESSAGE,
+  BRAND_WRITE_TRY_AGAIN_MESSAGE,
   billingBanner,
   brandSubscriptionPatch,
+  brandWriteDecision,
   invoiceOutcomeStatus,
   brandIdFromMetadata,
   graceDaysLeft,
@@ -13,6 +16,7 @@ import {
   nextFreeSlot,
   nextPastDueSince,
   shouldOfferTrial,
+  stripeBrandBillingConfigured,
   type BrandBillingRow,
 } from "./brand-billing.ts";
 
@@ -162,6 +166,94 @@ describe("billingBanner", () => {
     const banner = billingBanner(row({ status: "trialing", trial_ends_at: "2026-11-10T00:00:00.000Z" }), NOW);
     assert.equal(banner?.tone, "info");
     assert.match(banner?.message ?? "", /November 10, 2026/);
+  });
+});
+
+describe("brandWriteDecision", () => {
+  const locked = row({ community_id: "acme", plan: "standard", free_slot: null, status: "canceled" });
+
+  it("never locks Nellie's free slot 1 or jonas-group-ent free slot 2", () => {
+    for (const brand of [
+      { community_id: "nellies", free_slot: 1 as number | null },
+      { community_id: "jonas-group-ent", free_slot: 2 as number | null },
+    ]) {
+      const decision = brandWriteDecision({
+        row: row({
+          ...brand,
+          plan: "free",
+          status: "canceled",
+        }),
+        lookupFailed: false,
+        stripeConfigured: true,
+        now: NOW,
+      });
+      assert.equal(decision.allow, true, brand.community_id);
+    }
+  });
+
+  it("does not lock a brand with no billing row when Stripe is unset", () => {
+    assert.deepEqual(
+      brandWriteDecision({ row: null, lookupFailed: false, stripeConfigured: false, now: NOW }),
+      { allow: true },
+    );
+  });
+
+  it("does not lock a brand with no billing row when Stripe is set", () => {
+    assert.deepEqual(
+      brandWriteDecision({ row: null, lookupFailed: false, stripeConfigured: true, now: NOW }),
+      { allow: true },
+    );
+  });
+
+  it("fails closed with try-again when the lookup errors and Stripe is configured", () => {
+    assert.deepEqual(
+      brandWriteDecision({ row: null, lookupFailed: true, stripeConfigured: true, now: NOW }),
+      { allow: false, status: 503, message: BRAND_WRITE_TRY_AGAIN_MESSAGE },
+    );
+  });
+
+  it("does not lock on a lookup error when Stripe brand billing is not configured", () => {
+    assert.deepEqual(
+      brandWriteDecision({ row: null, lookupFailed: true, stripeConfigured: false, now: NOW }),
+      { allow: true },
+    );
+  });
+
+  it("locks a canceled paid brand", () => {
+    assert.deepEqual(
+      brandWriteDecision({ row: locked, lookupFailed: false, stripeConfigured: true, now: NOW }),
+      { allow: false, status: 403, message: BRAND_WRITE_LOCKED_MESSAGE },
+    );
+  });
+
+  it("blocks a locked brand even on paths the proxy would allow", () => {
+    // Next.js invokes a server action by id. Posting it to /admin/billing
+    // or to a non-admin page skips isLockedAdminWritePath. The write
+    // decision does not take a path, so those requests still fail.
+    const bypassPaths = ["/admin/billing", "/admin/billing/portal", "/brands/acme/community", "/"];
+    for (const path of bypassPaths) {
+      assert.equal(isLockedAdminWritePath(path), false, path);
+      const decision = brandWriteDecision({
+        row: locked,
+        lookupFailed: false,
+        stripeConfigured: true,
+        now: NOW,
+      });
+      assert.equal(decision.allow, false, path);
+      assert.equal(decision.status, 403, path);
+    }
+  });
+});
+
+describe("stripeBrandBillingConfigured", () => {
+  it("requires both the secret key and the brand price", () => {
+    assert.equal(stripeBrandBillingConfigured({}), false);
+    assert.equal(stripeBrandBillingConfigured({ STRIPE_SECRET_KEY: "sk" }), false);
+    assert.equal(stripeBrandBillingConfigured({ STRIPE_BRAND_PRICE_ID: "price" }), false);
+    assert.equal(
+      stripeBrandBillingConfigured({ STRIPE_SECRET_KEY: " sk ", STRIPE_BRAND_PRICE_ID: " price " }),
+      true,
+    );
   });
 });
 

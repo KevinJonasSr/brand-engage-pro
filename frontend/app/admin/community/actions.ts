@@ -6,6 +6,7 @@ import {
   adminScope,
   inScope,
   requireAdminContext,
+  requireWritableBrand,
   AdminScopeError,
 } from "@/lib/admin";
 
@@ -44,8 +45,15 @@ async function assertChildInScope(
   await assertPostInScope(supa, row.post_id as string, scope);
 }
 
+async function writableAdminScope(): Promise<string | null> {
+  const ctx = await requireAdminContext();
+  const scope = adminScope(ctx);
+  await requireWritableBrand(ctx, scope);
+  return scope;
+}
+
 export async function adminDeletePostAction(formData: FormData) {
-  const scope = adminScope(await requireAdminContext());
+  const scope = await writableAdminScope();
   const postId = String(formData.get("post_id") ?? "");
   if (!postId) return;
   const admin = createAdminClient();
@@ -55,7 +63,7 @@ export async function adminDeletePostAction(formData: FormData) {
 }
 
 export async function adminTogglePinAction(formData: FormData) {
-  const scope = adminScope(await requireAdminContext());
+  const scope = await writableAdminScope();
   const postId = String(formData.get("post_id") ?? "");
   const currentlyPinned =
     String(formData.get("currently_pinned") ?? "false") === "true";
@@ -70,7 +78,7 @@ export async function adminTogglePinAction(formData: FormData) {
 }
 
 export async function adminDeleteCommentAction(formData: FormData) {
-  const scope = adminScope(await requireAdminContext());
+  const scope = await writableAdminScope();
   const commentId = String(formData.get("comment_id") ?? "");
   if (!commentId) return;
   const admin = createAdminClient();
@@ -80,7 +88,7 @@ export async function adminDeleteCommentAction(formData: FormData) {
 }
 
 export async function adminDeleteEntryAction(formData: FormData) {
-  const scope = adminScope(await requireAdminContext());
+  const scope = await writableAdminScope();
   const entryId = String(formData.get("entry_id") ?? "");
   if (!entryId) return;
   const admin = createAdminClient();
@@ -106,6 +114,7 @@ export async function adminDeleteEntryAction(formData: FormData) {
 export async function adminSuspendMemberAction(formData: FormData) {
   const ctx = await requireAdminContext();
   const scope = adminScope(ctx);
+  await requireWritableBrand(ctx, scope);
   const memberId = String(formData.get("member_id") ?? "");
   const suspend = String(formData.get("suspend") ?? "true") === "true";
   if (!memberId) return;

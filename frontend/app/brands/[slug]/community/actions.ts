@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { canAccessBrand, getAdminContext } from "@/lib/admin";
+import { canAccessBrand, getAdminContext, requireWritableBrand, writableBrandError } from "@/lib/admin";
 
 import { findNearestPost } from "@/lib/dedup/check";
 import { moderateRowAsync } from "@/lib/moderation";
@@ -179,8 +179,12 @@ export async function deletePostAction(formData: FormData) {
 
   // Author can delete own. An admin can delete any post in a brand they
   // manage (via service-role client); the brand check uses the stored row,
-  // not the form value.
-  if (ctx && (await adminCanActOnPost(ctx, postId))) {
+  // not the form value. A billing lock blocks the admin path only. The
+  // author can still delete their own post, and this action lives outside
+  // /admin so the proxy lock does not see it.
+  const actingAsAdmin = Boolean(ctx && (await adminCanActOnPost(ctx, postId)));
+  const adminBlocked = actingAsAdmin ? await writableBrandError(ctx, brandSlug) : null;
+  if (actingAsAdmin && !adminBlocked) {
     const admin = createAdminClient();
     await admin.from("community_posts").delete().eq("id", postId);
   } else {
@@ -213,6 +217,7 @@ export async function createPollAction(formData: FormData) {
 
   // Brand admins may only post into their own brand.
   if (!canAccessBrand(ctx, brandSlug)) return;
+  await requireWritableBrand(ctx, brandSlug);
 
   const admin = createAdminClient();
   const { data: post } = await admin
@@ -279,6 +284,7 @@ export async function createChallengeAction(formData: FormData) {
 
   // Brand admins may only post into their own brand.
   if (!canAccessBrand(ctx, brandSlug)) return;
+  await requireWritableBrand(ctx, brandSlug);
 
   const admin = createAdminClient();
   await admin.from("community_posts").insert({
@@ -336,6 +342,7 @@ export async function createAnnouncementAction(formData: FormData) {
 
   // Brand admins may only post into their own brand.
   if (!canAccessBrand(ctx, brandSlug)) return;
+  await requireWritableBrand(ctx, brandSlug);
 
   const admin = createAdminClient();
   await admin.from("community_posts").insert({
@@ -365,6 +372,7 @@ export async function togglePinAction(formData: FormData) {
   const ctx = await getAdminContext();
   if (!ctx) return;
   if (!(await adminCanActOnPost(ctx, postId))) return;
+  await requireWritableBrand(ctx, brandSlug);
 
   const admin = createAdminClient();
   await admin

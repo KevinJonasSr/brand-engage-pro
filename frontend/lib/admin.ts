@@ -4,6 +4,12 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentCommunityId } from "@/lib/community";
 import { AdminScopeError, adminScope } from "@/lib/admin-scope";
+import {
+  BrandWriteError,
+  brandWriteDecision,
+  stripeBrandBillingConfigured,
+} from "@/lib/brand-billing";
+import { readBrandBilling } from "@/lib/brand-billing-server";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────
@@ -208,6 +214,76 @@ export async function requireAdminContext(): Promise<AdminContext> {
   const ctx = await getAdminContext();
   if (!ctx) throw new AdminScopeError();
   return ctx;
+}
+
+export { BrandWriteError };
+
+/**
+ * Refuse a write to brand data when that brand is billing-locked.
+ *
+ * Call this from every admin server action that mutates brand data,
+ * including actions that live outside /admin. The request URL is ignored
+ * on purpose: Next.js runs a server action by id, so posting it to
+ * /admin/billing or a public page must still be refused.
+ *
+ * Do not call this from billing actions or the community switcher. A
+ * locked brand has to be able to pay and to change which brand is current.
+ *
+ * Super-admins are not locked. That matches admin_write_locked in
+ * migration 0073, so the platform owner can still help a brand.
+ *
+ * Free-slot brands (Nellie's slot 1, jonas-group-ent slot 2, and any
+ * later free slot) are never locked. A brand with no billing row stays
+ * writable when the Stripe brand env vars are unset. If the lookup
+ * itself fails and Stripe is configured, this throws 503.
+ */
+export async function requireWritableBrand(
+  ctx: AdminContext | null | undefined,
+  brandSlug: string | null | undefined,
+): Promise<void> {
+  if (!ctx) throw new AdminScopeError();
+  if (ctx.isSuperAdmin) return;
+
+  const brand = (brandSlug ?? "").trim() || (ctx.currentCommunityId ?? "").trim();
+  if (!brand || !ctx.communities.includes(brand)) throw new AdminScopeError();
+
+  let row = null;
+  let lookupFailed = false;
+  try {
+    row = await readBrandBilling(createAdminClient(), brand);
+  } catch (err) {
+    lookupFailed = true;
+    console.warn(
+      "requireWritableBrand: billing lookup failed",
+      err instanceof Error ? err.message : err,
+    );
+  }
+
+  const decision = brandWriteDecision({
+    row,
+    lookupFailed,
+    stripeConfigured: stripeBrandBillingConfigured(),
+  });
+  if (!decision.allow) {
+    throw new BrandWriteError(decision.status, decision.message);
+  }
+}
+
+/**
+ * Same check as requireWritableBrand, for actions that return `{ error }`
+ * instead of throwing. Re-throws anything that is not a billing block.
+ */
+export async function writableBrandError(
+  ctx: AdminContext | null | undefined,
+  brandSlug: string | null | undefined,
+): Promise<string | null> {
+  try {
+    await requireWritableBrand(ctx, brandSlug);
+    return null;
+  } catch (err) {
+    if (err instanceof BrandWriteError) return err.message;
+    throw err;
+  }
 }
 
 /**

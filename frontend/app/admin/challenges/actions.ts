@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAdminContext } from "@/lib/admin";
+import { getAdminContext, requireWritableBrand } from "@/lib/admin";
 import { awardPoints } from "@/lib/points/award";
 import { createNotification } from "@/lib/data/notifications";
 
@@ -30,6 +30,7 @@ export async function pickWinnerAction(formData: FormData) {
   if (!post) return;
   const brandSlug = (post.brand_slug as string | null) ?? "";
   if (scope && brandSlug !== scope) return;
+  await requireWritableBrand(ctx, brandSlug || scope);
 
   // The winner must have actually entered this challenge.
   const { data: entry } = await supa

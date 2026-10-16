@@ -12,7 +12,10 @@ import {
   shouldSkipSessionRefresh,
   stampSignedOutCookie,
 } from "@/lib/auth-cookies";
-import { isLockedAdminWritePath } from "@/lib/brand-billing";
+import {
+  BRAND_WRITE_TRY_AGAIN_MESSAGE,
+  isLockedAdminWritePath,
+} from "@/lib/brand-billing";
 import { isBrandSlugAlias, resolveBrandSlug } from "@/lib/brand-aliases";
 import { resolveCommunityFromHost } from "@/lib/community";
 import { resolvePinnedCanonicalLocation } from "@/lib/site-url";
@@ -195,11 +198,12 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Brand billing read-only gate (item 8). Admin edits are server actions,
-  // which arrive as POSTs with a Next-Action header. When the admin's
-  // current brand is locked for non-payment, refuse them. Billing and the
-  // brand switcher stay writable so the brand can fix it. Fails open: a
-  // lookup error must never lock out a paying brand.
+  // Brand billing read-only gate (item 8). This is a backstop. The real
+  // check lives in requireWritableBrand, because Next.js runs a server
+  // action by id and a locked admin can post it to /admin/billing or to a
+  // page outside /admin. Billing and the brand switcher stay writable so
+  // the brand can pay. A lookup error fails closed (503). Free-slot brands
+  // are not locked: admin_write_locked returns false for plan = 'free'.
   if (
     user &&
     request.method === "POST" &&
@@ -211,7 +215,9 @@ export default async function proxy(request: NextRequest) {
     });
     if (error) {
       console.warn("proxy: admin_write_locked failed", error.message);
-    } else if (locked === true) {
+      return new NextResponse(BRAND_WRITE_TRY_AGAIN_MESSAGE, { status: 503 });
+    }
+    if (locked === true) {
       return new NextResponse(
         "Billing needs attention. Admin tools are read-only until the plan is active again. Visit /admin/billing.",
         { status: 403 },

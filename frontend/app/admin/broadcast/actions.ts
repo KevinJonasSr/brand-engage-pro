@@ -1,7 +1,7 @@
 "use server";
 
 import { createAdminClient } from "@/lib/supabase/admin";
-import { canAccessBrand, getAdminContext, requireAdminContext, requireBrandAccess } from "@/lib/admin";
+import { canAccessBrand, getAdminContext, requireAdminContext, requireBrandAccess, writableBrandError } from "@/lib/admin";
 import { canSendBlasts } from "@/lib/blast-permissions";
 import { broadcastBrandEmail, broadcastSms, type BroadcastResult } from "@/lib/broadcast";
 import { validateEmailCampaign } from "@/lib/email-campaign";
@@ -69,6 +69,8 @@ export async function sendBroadcast(
   if (!canAccessBrand(ctx, brandSlug)) {
     return { ok: false, error: "You can only broadcast to your own brand." };
   }
+  const blocked = await writableBrandError(ctx, brandSlug);
+  if (blocked) return { ok: false, error: blocked };
 
   // Apply tier filter — narrow the member list before handing to broadcastSms
   let allowedMemberIds: string[] | null = null;

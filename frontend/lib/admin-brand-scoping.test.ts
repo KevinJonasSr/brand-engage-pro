@@ -40,7 +40,8 @@ describe("offers are always brand-scoped", () => {
   it("image and active updates are filtered to the admin's brand", () => {
     for (const name of ["updateOfferImageAction", "toggleOfferActiveAction"]) {
       const body = fnBody(offers, name);
-      assert.match(body, /adminScope\(await requireAdminContext\(\)\)/, name);
+      assert.match(body, /const scope = adminScope\(ctx\)/, name);
+      assert.match(body, /requireWritableBrand\(ctx, scope\)/, name);
       assert.match(
         body,
         /if \(scope\) query = query\.eq\("community_id", scope\);/,

@@ -14,9 +14,11 @@ import { updateOfferImageAction } from "./actions";
 export default function OfferImageEditor({
   offerId,
   initialUrl,
+  brandSlug,
 }: {
   offerId: string;
   initialUrl: string | null;
+  brandSlug?: string | null;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -32,6 +34,7 @@ export default function OfferImageEditor({
         name="image_url"
         initialUrl={initialUrl}
         label={initialUrl ? "Replace image" : "Add image"}
+        brand={brandSlug ?? undefined}
         onUploaded={() => formRef.current?.requestSubmit()}
       />
     </form>

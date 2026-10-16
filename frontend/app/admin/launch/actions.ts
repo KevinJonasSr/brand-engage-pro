@@ -3,12 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAdminContext } from "@/lib/admin";
+import { getAdminContext, requireWritableBrand } from "@/lib/admin";
 
 async function requireSuperAdmin() {
   const ctx = await getAdminContext();
   if (!ctx) redirect("/login?next=/admin/launch");
   if (!ctx.isSuperAdmin) redirect("/admin");
+  await requireWritableBrand(ctx, ctx.currentCommunityId);
   return ctx;
 }
 

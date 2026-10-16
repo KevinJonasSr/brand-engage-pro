@@ -201,6 +201,74 @@ export function billingBanner(
   return null;
 }
 
+/** Shown when a brand-data write is refused because the brand is locked. */
+export const BRAND_WRITE_LOCKED_MESSAGE =
+  "Billing needs attention. Admin tools are read-only until the plan is active again. Visit /admin/billing.";
+
+/** Shown when the billing row could not be read. Fail closed: try again. */
+export const BRAND_WRITE_TRY_AGAIN_MESSAGE =
+  "We couldn't confirm billing just now. Please try again.";
+
+export class BrandWriteError extends Error {
+  readonly status: 403 | 503;
+  constructor(status: 403 | 503, message: string) {
+    super(message);
+    this.name = "BrandWriteError";
+    this.status = status;
+  }
+}
+
+/**
+ * True when Stripe brand billing is configured. Both the secret key and the
+ * $50 price must be set. When they are not, a brand with no billing row
+ * stays writable (billing is not live).
+ */
+export function stripeBrandBillingConfigured(
+  env: Record<string, string | undefined> = process.env,
+): boolean {
+  return Boolean(env.STRIPE_SECRET_KEY?.trim() && env.STRIPE_BRAND_PRICE_ID?.trim());
+}
+
+export type BrandWriteDecision =
+  | { allow: true }
+  | { allow: false; status: 403 | 503; message: string };
+
+/**
+ * Whether a brand-data write may proceed. This does not look at the request
+ * path. Posting an admin action to /admin/billing or to a public page still
+ * has to pass this check.
+ *
+ * Free-slot brands are never locked. A brand with no billing row stays
+ * writable when Stripe brand billing is not configured. A failed lookup
+ * fails closed (503) once Stripe is configured, because we can no longer
+ * tell a free slot from a locked plan.
+ */
+export function brandWriteDecision(input: {
+  row: Pick<BrandBillingRow, "plan" | "status" | "past_due_since" | "free_slot"> | null;
+  lookupFailed: boolean;
+  stripeConfigured: boolean;
+  now?: Date;
+}): BrandWriteDecision {
+  if (input.row && (input.row.plan === "free" || input.row.free_slot != null)) {
+    return { allow: true };
+  }
+  // Billing is not live. Do not lock a brand we could not find a row for.
+  if (!input.stripeConfigured && (input.lookupFailed || input.row == null)) {
+    return { allow: true };
+  }
+  if (input.lookupFailed) {
+    return { allow: false, status: 503, message: BRAND_WRITE_TRY_AGAIN_MESSAGE };
+  }
+  if (isBrandBillingLocked(input.row, input.now)) {
+    return {
+      allow: false,
+      status: 403,
+      message: BRAND_WRITE_LOCKED_MESSAGE,
+    };
+  }
+  return { allow: true };
+}
+
 /** Admin paths that stay writable while a brand is locked. */
 export const BILLING_UNLOCKED_ADMIN_PATHS = ["/admin/billing", "/admin/communities"];
 

@@ -8,6 +8,7 @@ import {
   adminScope,
   requireAdminContext,
   requireBrandAccess,
+  requireWritableBrand,
 } from "@/lib/admin";
 import { canSendBlasts } from "@/lib/blast-permissions";
 import { broadcastBrandEmail, broadcastSms } from "@/lib/broadcast";
@@ -40,6 +41,7 @@ export async function createAndPublishCampaign(formData: FormData) {
   // Brand admins publish only to their own brand. Every row below carries
   // community_id; the column has no default and inserts without one fail.
   requireBrandAccess(ctx, brandSlug);
+  await requireWritableBrand(ctx, brandSlug);
 
   const blastEmailSubject = String(formData.get("email_subject") ?? "").trim();
   const blastEmailBody = String(formData.get("email_body") ?? "").trim();
@@ -344,7 +346,9 @@ export async function createAndPublishCampaign(formData: FormData) {
 }
 
 export async function deactivateCampaignAction(formData: FormData) {
-  const scope = adminScope(await requireAdminContext());
+  const ctx = await requireAdminContext();
+  const scope = adminScope(ctx);
+  await requireWritableBrand(ctx, scope);
   const campaignId = String(formData.get("campaign_id") ?? "");
   if (!campaignId) return;
   const supa = createAdminClient();

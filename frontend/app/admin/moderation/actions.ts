@@ -3,13 +3,15 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { AdminScopeError, adminScope, getAdminContext, inScope } from "@/lib/admin";
+import { AdminScopeError, adminScope, getAdminContext, inScope, requireWritableBrand } from "@/lib/admin";
 import { applyAdminOverride, type ModerateSourceTable } from "@/lib/moderation";
 
 async function requireAdminUserId(): Promise<{ id: string; scope: string | null }> {
   const ctx = await getAdminContext();
   if (!ctx) redirect("/login");
-  return { id: ctx.user.id, scope: adminScope(ctx) };
+  const scope = adminScope(ctx);
+  await requireWritableBrand(ctx, scope);
+  return { id: ctx.user.id, scope };
 }
 
 /**

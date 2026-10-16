@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { canAccessBrand, getAdminContext } from "@/lib/admin";
+import { canAccessBrand, getAdminContext, requireWritableBrand } from "@/lib/admin";
 import { resolveAndAwardPrediction } from "@/lib/predictions/resolve";
 import type {
   AwardStrategy,
@@ -52,6 +52,7 @@ export async function createPredictionAction(
   if (brandSlug && !canAccessBrand(ctx, brandSlug)) {
     return { ok: false, error: "forbidden" };
   }
+  if (brandSlug) await requireWritableBrand(ctx, brandSlug);
   const prediction_type = String(formData.get("prediction_type") ?? "") as PredictionType;
   const title = String(formData.get("title") ?? "").trim();
   const body = String(formData.get("body") ?? "").trim() || null;
@@ -289,6 +290,7 @@ export async function resolvePredictionAction(
   if (!scopePost || !canAccessBrand(ctx, scopeBrand)) {
     return { ok: false, error: "forbidden" };
   }
+  await requireWritableBrand(ctx, scopeBrand);
 
   const correct_option_id =
     String(formData.get("correct_option_id") ?? "").trim() || undefined;

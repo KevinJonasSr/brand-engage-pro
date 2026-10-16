@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAdminContext } from "@/lib/admin";
+import { getAdminContext, requireWritableBrand } from "@/lib/admin";
+import { BRAND_WRITE_TRY_AGAIN_MESSAGE, BrandWriteError } from "@/lib/brand-billing";
+import { canAccessBrand } from "@/lib/admin-scope";
 
 /**
  * POST /api/upload/video
@@ -11,6 +12,11 @@ import { getAdminContext } from "@/lib/admin";
  * Response: { url: string, path: string }
  *
  * Admin-only endpoint. Uploads go to `community-videos/{admin_user_id}/{timestamp}-{safe_filename}`.
+ *
+ * The only caller is components/video-uploader.tsx (member post form).
+ * The caller must be an admin. When `brand` is sent, they must admin that
+ * brand. Otherwise the admin's current brand is checked. A locked brand
+ * cannot upload. A lookup error returns 503.
  */
 const MAX_BYTES = 50 * 1024 * 1024; // 50 MB
 const ALLOWED_TYPES = new Set([
@@ -38,6 +44,31 @@ export async function POST(req: NextRequest) {
 
   const form = await req.formData();
   const file = form.get("file");
+  const requestedBrand = String(form.get("brand") ?? "").trim();
+  const brand = requestedBrand || (adminCtx.currentCommunityId ?? "").trim();
+
+  if (requestedBrand && !canAccessBrand(adminCtx, requestedBrand)) {
+    return NextResponse.json(
+      { error: "You can only upload for a brand you manage." },
+      { status: 403 },
+    );
+  }
+  if (!brand && !adminCtx.isSuperAdmin) {
+    return NextResponse.json(
+      { error: BRAND_WRITE_TRY_AGAIN_MESSAGE },
+      { status: 503 },
+    );
+  }
+  if (brand) {
+    try {
+      await requireWritableBrand(adminCtx, brand);
+    } catch (err) {
+      if (err instanceof BrandWriteError) {
+        return NextResponse.json({ error: err.message }, { status: err.status });
+      }
+      throw err;
+    }
+  }
 
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "Missing file" }, { status: 400 });

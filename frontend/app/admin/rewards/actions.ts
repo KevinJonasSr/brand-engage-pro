@@ -1,14 +1,21 @@
 "use server";
 
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAdminContext } from "@/lib/admin";
+import { getAdminContext, requireWritableBrand } from "@/lib/admin";
 import { redirect } from "next/navigation";
 import { cancelRedemption } from "@/lib/rewards/cancel";
 import { markRedemptionFulfilled } from "@/lib/rewards/fulfill";
 
-export async function createRewardAction(formData: FormData) {
+async function requireRewardWriter() {
   const ctx = await getAdminContext();
   if (!ctx) redirect("/login");
+  if (!ctx.isSuperAdmin && !ctx.currentCommunityId) redirect("/admin");
+  await requireWritableBrand(ctx, ctx.currentCommunityId);
+  return ctx;
+}
+
+export async function createRewardAction(formData: FormData) {
+  const ctx = await requireRewardWriter();
 
   const supabase = createAdminClient();
   const title = formData.get("title") as string;
@@ -53,8 +60,7 @@ export async function createRewardAction(formData: FormData) {
 }
 
 export async function updateRewardAction(formData: FormData) {
-  const ctx = await getAdminContext();
-  if (!ctx) redirect("/login");
+  await requireRewardWriter();
 
   const rewardId = formData.get("id") as string;
   const title = formData.get("title") as string;
@@ -102,8 +108,7 @@ export async function updateRewardAction(formData: FormData) {
 }
 
 export async function toggleRewardActiveAction(rewardId: string, active: boolean) {
-  const ctx = await getAdminContext();
-  if (!ctx) redirect("/login");
+  await requireRewardWriter();
 
   const supabase = createAdminClient();
   const { error } = await supabase
@@ -119,8 +124,7 @@ export async function toggleRewardActiveAction(rewardId: string, active: boolean
 }
 
 export async function markFulfilledAction(redemptionId: string, fulfillmentNote: string) {
-  const ctx = await getAdminContext();
-  if (!ctx) redirect("/login");
+  const ctx = await requireRewardWriter();
 
   // Super admins may fulfill in any brand; everyone else only in their own.
   const scope = ctx.isSuperAdmin ? null : ctx.currentCommunityId;
@@ -139,8 +143,7 @@ export async function markFulfilledAction(redemptionId: string, fulfillmentNote:
 }
 
 export async function cancelRedemptionAction(redemptionId: string) {
-  const ctx = await getAdminContext();
-  if (!ctx) redirect("/login");
+  const ctx = await requireRewardWriter();
 
   // Super admins may cancel in any brand; everyone else only in their own.
   const scope = ctx.isSuperAdmin ? null : ctx.currentCommunityId;
