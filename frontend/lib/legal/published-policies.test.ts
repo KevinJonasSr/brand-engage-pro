@@ -119,9 +119,12 @@ describe("published terms and cookie policy", () => {
     assert.match(COOKIE_POLICY_MD, /local storage/);
   });
 
-  it("renders terms and cookies through the shared policy layout and leaves privacy alone", () => {
-    assert.match(privacyPage, /PolicyPage slug="privacy"/);
-    assert.doesNotMatch(privacyPage, /published-policies|TERMS_POLICY|COOKIE_POLICY/);
+  it("renders terms, cookies, and privacy through the shared policy layout", () => {
+    assert.match(privacyPage, /StaticPolicyPage/);
+    assert.match(privacyPage, /slug="privacy"/);
+    assert.match(privacyPage, /PRIVACY_POLICY/);
+    assert.match(privacyPage, /PRIVACY_REPLACES_DB_UPDATED_BEFORE/);
+    assert.doesNotMatch(privacyPage, /TERMS_POLICY|COOKIE_POLICY/);
     assert.match(termsPage, /slug="terms"/);
     assert.match(termsPage, /TERMS_POLICY/);
     assert.match(cookiePage, /slug="cookie_policy"/);

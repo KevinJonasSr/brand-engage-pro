@@ -6,7 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { SIGNED_OUT_COOKIE, isSignedOutMarkerValue } from "@/lib/auth-cookies";
 import { safeRelativePath } from "@/lib/safe-redirect";
 import { getPolicy } from "@/lib/data/policies";
-import { policyForDisplay, TERMS_POLICY } from "@/lib/legal/published-policies";
+import { policyForDisplay, privacyForDisplay, TERMS_POLICY } from "@/lib/legal/published-policies";
 import SignupClient, { type ReferrerBrand } from "./signup-client";
 
 export const metadata = { title: "Sign up" };
@@ -80,7 +80,8 @@ export default async function SignupPage({
     getPolicy("privacy"),
   ]);
   const termsForConsent = policyForDisplay(terms, TERMS_POLICY);
-  const consentDocs = [termsForConsent, privacy]
+  const privacyForConsent = privacyForDisplay(privacy);
+  const consentDocs = [termsForConsent, privacyForConsent]
     .filter((p): p is NonNullable<typeof p> => !!p && !p.is_draft)
     .map((p) => ({ slug: p.slug, title: p.title, content_md: p.content_md }));
   return (

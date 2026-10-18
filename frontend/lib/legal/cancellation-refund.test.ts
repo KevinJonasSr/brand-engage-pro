@@ -143,7 +143,9 @@ describe("published cancellation and refund policy", () => {
   });
 
   it("renders cancellation through the shared policy layout and leaves the other policies alone", () => {
-    assert.match(privacyPage, /PolicyPage slug="privacy"/);
+    assert.match(privacyPage, /StaticPolicyPage/);
+    assert.match(privacyPage, /slug="privacy"/);
+    assert.match(privacyPage, /PRIVACY_POLICY/);
     assert.match(termsPage, /slug="terms"/);
     assert.match(cookiePage, /slug="cookie_policy"/);
     assert.doesNotMatch(privacyPage, /CANCELLATION_POLICY|cancellation-refund/);

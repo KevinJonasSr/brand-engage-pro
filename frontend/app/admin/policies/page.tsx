@@ -18,8 +18,11 @@ export default async function AdminPoliciesPage() {
           Policies
         </h1>
         <p className="mt-1 text-sm text-iron/70">
-          Edit Terms of Service, Privacy Policy, and Cookie Policy. Once counsel delivers
-          the final text, paste it here and flip the DRAFT banner off — no code deploy needed.
+          Edit Terms of Service, Privacy Policy, and Cookie Policy. Saving here publishes
+          the text. No SQL. Once counsel delivers the final text, paste it here and turn the
+          DRAFT banner off. Privacy shows the repo copy when the database row was last
+          updated before October 18, 2026. A save after that is what /privacy and signup
+          consent show.
         </p>
       </div>
 

@@ -53,6 +53,8 @@ describe("signup consent review step", () => {
   it("loads non-draft terms and privacy on the signup page", () => {
     assert.match(signupPage, /getPolicy\("terms"\)/);
     assert.match(signupPage, /getPolicy\("privacy"\)/);
+    assert.match(signupPage, /privacyForDisplay\(privacy\)/);
+    assert.match(signupPage, /privacyForConsent/);
     assert.match(signupPage, /!p\.is_draft/);
     assert.match(signupPage, /consentDocs/);
   });

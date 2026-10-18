@@ -4,17 +4,22 @@ import { getPolicy, type PolicyPage } from "@/lib/data/policies";
 import { policyForDisplay } from "@/lib/legal/published-policies";
 
 /**
- * Same layout as the privacy policy page, for Terms, Cookies and Cancellation.
- * Privacy stays on PolicyPage and is not rendered here.
+ * Shared layout for Terms, Privacy, Cookies, and Cancellation.
+ * Pass replaceDbUpdatedBefore only for Privacy, so the pre-scrub database
+ * row yields to the repo copy until a newer admin save.
  */
 export default async function StaticPolicyPage({
   slug,
   fallback,
+  replaceDbUpdatedBefore,
 }: {
   slug: string;
   fallback: PolicyPage;
+  replaceDbUpdatedBefore?: string;
 }) {
-  const policy = policyForDisplay(await getPolicy(slug), fallback);
+  const policy = policyForDisplay(await getPolicy(slug), fallback, {
+    replaceDbUpdatedBefore,
+  });
 
   return (
     <main className="mx-auto max-w-3xl space-y-6 px-6 py-12">
