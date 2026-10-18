@@ -10,6 +10,7 @@ type State =
   | { status: "resolving" }
   | { status: "checking_in" }
   | { status: "success"; pointsAwarded: number; alreadyCheckedIn: boolean }
+  | { status: "host_stand"; message: string }
   | { status: "error"; message: string }
   | { status: "unauthenticated" };
 
@@ -82,6 +83,16 @@ export default function CheckinPage() {
         return;
       }
 
+      if (data.hostStandRequired) {
+        setState({
+          status: "host_stand",
+          message:
+            data.message ??
+            "You're signed up. To earn today's visit points, scan the code at the host stand.",
+        });
+        return;
+      }
+
       setState({
         status: "success",
         pointsAwarded: data.pointsAwarded,
@@ -129,6 +140,20 @@ export default function CheckinPage() {
             className="inline-block rounded-full bg-ember px-6 py-3 text-sm font-semibold text-linen"
           >
             Back to {brandName} →
+          </Link>
+        </div>
+      )}
+
+      {state.status === "host_stand" && (
+        <div className="space-y-6">
+          <div className="text-6xl">📍</div>
+          <h1 className="text-2xl font-semibold">Scan the host stand</h1>
+          <p className="max-w-xs text-sm text-iron/70">{state.message}</p>
+          <Link
+            href={`/brands/${brandSlug}`}
+            className="inline-block rounded-full border border-iron/20 px-6 py-3 text-sm font-medium text-iron/80 hover:bg-iron/10"
+          >
+            Back to {brandName}
           </Link>
         </div>
       )}

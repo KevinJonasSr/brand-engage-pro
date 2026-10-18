@@ -314,6 +314,50 @@ export function brandSubscriptionPatch(
   };
 }
 
+/**
+ * Whether the host-stand screen may show a rotating check-in QR.
+ *
+ * Super-admins are never blocked (they set the tablet up).
+ * A free plan or a free slot stays open, including Nellie's slot 1 and
+ * jonas-group-ent slot 2. A failed lookup only blocks when Stripe billing
+ * is actually configured, and then it asks the caller to try again.
+ */
+export const HOST_STAND_TRY_AGAIN_MESSAGE =
+  "We couldn't confirm billing just now. Please try again.";
+
+export const HOST_STAND_LOCKED_MESSAGE =
+  "Billing needs attention. The host-stand screen stays off until the plan is active again. Visit /admin/billing.";
+
+export type HostStandDisplayDecision =
+  | { allow: true }
+  | { allow: false; status: 403 | 503; message: string };
+
+/** True when both Stripe env vars the billing page requires are set. */
+export function stripeBrandBillingConfigured(
+  env: Record<string, string | undefined> = process.env,
+): boolean {
+  return Boolean(env.STRIPE_SECRET_KEY?.trim() && env.STRIPE_BRAND_PRICE_ID?.trim());
+}
+
+export function hostStandDisplayDecision(input: {
+  isSuperAdmin: boolean;
+  lookupFailed: boolean;
+  stripeConfigured: boolean;
+  row: Pick<BrandBillingRow, "plan" | "status" | "past_due_since" | "free_slot"> | null;
+  now?: Date;
+}): HostStandDisplayDecision {
+  if (input.isSuperAdmin) return { allow: true };
+  if (input.row?.plan === "free" || input.row?.free_slot != null) return { allow: true };
+  if (input.lookupFailed) {
+    if (!input.stripeConfigured) return { allow: true };
+    return { allow: false, status: 503, message: HOST_STAND_TRY_AGAIN_MESSAGE };
+  }
+  if (isBrandBillingLocked(input.row, input.now)) {
+    return { allow: false, status: 403, message: HOST_STAND_LOCKED_MESSAGE };
+  }
+  return { allow: true };
+}
+
 /** Status after an invoice event. Only recovers or starts past due. */
 export function invoiceOutcomeStatus(
   current: BrandBillingStatus,
