@@ -6,9 +6,13 @@ import {
   buildMandrillMessage,
   chunk,
   countMandrillResults,
+  emailOnAllowlist,
+  fromAddress,
   mailingAddress,
   marketingEmailBlockReason,
   oneClickUnsubscribeUrl,
+  parseEmailAllowlist,
+  replyToAddress,
   unsubscribeUrl,
   validateEmailCampaign,
 } from "@/lib/email-campaign";
@@ -17,8 +21,6 @@ import type { NotificationPreferences } from "@/lib/notifications/types";
 import { isSmsQuietTime, withStopFooter } from "@/lib/sms-compliance";
 
 const MANDRILL_SEND_URL = "https://mandrillapp.com/api/1.0/messages/send";
-const DEFAULT_FROM_EMAIL = "hello@brandengagepro.com";
-const DEFAULT_REPLY_TO = "support@brandengagepro.com";
 
 /**
  * Campaign broadcast helpers — send a single email or SMS blast to every member
@@ -221,6 +223,8 @@ export async function broadcastBrandEmail(params: {
   if (blocked) return { ...result, error: blocked };
   const apiKey = process.env.MAILCHIMP_TRANSACTIONAL_API_KEY as string;
   const postalAddress = mailingAddress() as string;
+  const allow = parseEmailAllowlist();
+  const allowEmails = allow.ok ? allow.emails : null;
 
   const recipients = await loadRecipients({
     brandSlug: params.brandSlug,
@@ -228,8 +232,18 @@ export async function broadcastBrandEmail(params: {
     memberIds: params.memberIds,
     channel: "email",
   });
-  result.recipients = recipients.length;
-  if (recipients.length === 0) return result;
+  const allowedRecipients = allowEmails
+    ? recipients.filter((r) => r.email && emailOnAllowlist(r.email, allowEmails))
+    : recipients;
+  result.recipients = allowedRecipients.length;
+  if (recipients.length > 0 && allowedRecipients.length === 0) {
+    return {
+      ...result,
+      recipients: recipients.length,
+      error: "BEP_EMAIL_ALLOWLIST matched no opted-in members for this send. Nothing was sent.",
+    };
+  }
+  if (allowedRecipients.length === 0) return result;
 
   const admin = createAdminClient();
   const { data: brand } = await admin
@@ -247,10 +261,17 @@ export async function broadcastBrandEmail(params: {
     postalAddress,
   });
 
-  const withEmail = recipients.filter(
-    (r): r is typeof r & { email: string; unsubscribe_token: string } =>
-      Boolean(r.email && r.unsubscribe_token),
-  );
+  const withEmail = allowedRecipients
+    .map((r) => ({ ...r, email: r.email?.trim() ?? "" }))
+    .filter(
+      (r): r is typeof r & { email: string; unsubscribe_token: string } =>
+        Boolean(r.email && r.unsubscribe_token),
+    );
+  const missingUnsubscribe = allowedRecipients.length - withEmail.length;
+  if (missingUnsubscribe > 0) {
+    result.error = `${missingUnsubscribe} opted-in member(s) skipped because they have no unsubscribe link.`;
+  }
+  if (withEmail.length === 0) return result;
 
   for (const batch of chunk(withEmail, MANDRILL_BATCH_SIZE)) {
     result.attempted += batch.length;
@@ -258,9 +279,9 @@ export async function broadcastBrandEmail(params: {
       subject: params.subject,
       html,
       text,
-      fromEmail: process.env.BEP_EMAIL_FROM ?? DEFAULT_FROM_EMAIL,
+      fromEmail: fromAddress(),
       fromName: brandName,
-      replyTo: process.env.BEP_EMAIL_REPLY_TO ?? DEFAULT_REPLY_TO,
+      replyTo: replyToAddress(),
       recipients: batch.map((r) => ({
         email: r.email,
         unsubUrl: unsubscribeUrl(appUrl, r.unsubscribe_token),
@@ -289,6 +310,11 @@ export async function broadcastBrandEmail(params: {
       result.failed += batch.length;
       result.error = err instanceof Error ? err.message : String(err);
     }
+  }
+
+  if (result.attempted > 0 && result.sent === 0 && !result.error?.includes("Mandrill")) {
+    const delivery = "Mandrill returned no delivered messages.";
+    result.error = result.error ? `${result.error} ${delivery}` : delivery;
   }
 
   return result;

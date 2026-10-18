@@ -3,49 +3,109 @@ import { verifyCronAuth } from "@/lib/cron-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   appBaseUrl,
-  escapeHtml,
+  countMandrillResults,
+  fromAddress,
   listUnsubscribeHeaders,
   mailingAddress,
   marketingEmailBlockReason,
   oneClickUnsubscribeUrl,
+  parseEmailAllowlist,
+  replyToAddress,
   unsubscribeUrl,
 } from "@/lib/email-campaign";
 import { gatherWeeklyRecap } from "@/lib/personal-recap/gather";
+import {
+  buildDigestContent,
+  digestHasWeeklyActions,
+  parseTestEmailParam,
+} from "@/lib/member-digest";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+export const maxDuration = 300;
 
 /**
  * GET /api/cron/weekly-member-digest
  *
- * Weekly cron (Sundays at 6 PM ET). For every email-opted-in member who had
- * activity in the past 7 days, computes their personal recap and sends a
- * summary email via Mailchimp transactional (Mandrill).
+ * Weekly cron (Sundays 23:00 UTC). For every email-opted-in member who did
+ * something in the past 7 days, sends a summary through Mailchimp
+ * Transactional (Mandrill).
  *
  * Sends only when EMAIL_SENDING_ENABLED=1, BEP_MAILING_ADDRESS is set, and
  * MAILCHIMP_TRANSACTIONAL_API_KEY is set. The key alone does not send.
+ * A stored visit streak is not enough: it stays frozen until the next visit.
+ *
+ * Safe test: set BEP_EMAIL_ALLOWLIST to an internal member address, then
+ * GET this route with ?testEmail=that-address. Scheduled sends also stay
+ * inside the allowlist until it is removed.
  */
 export async function GET(req: Request) {
   const authErr = verifyCronAuth(req);
   if (authErr) return authErr;
 
+  const testEmail = parseTestEmailParam(new URL(req.url).searchParams.get("testEmail"));
+  if (testEmail === "invalid") {
+    return NextResponse.json(
+      { ok: false, error: "testEmail must be one email address. Nothing was sent." },
+      { status: 400 },
+    );
+  }
+
+  const allow = parseEmailAllowlist();
+  if (testEmail) {
+    if (!allow.ok) {
+      return NextResponse.json({ ok: false, error: allow.reason }, { status: 400 });
+    }
+    const listed = allow.emails?.has(testEmail);
+    if (!listed) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            "A test send requires BEP_EMAIL_ALLOWLIST to include that address. Nothing was sent.",
+        },
+        { status: 400 },
+      );
+    }
+  }
+
   const blocked = marketingEmailBlockReason();
-  const mandrillKey = process.env.MAILCHIMP_TRANSACTIONAL_API_KEY?.trim() ?? "";
-  const address = mailingAddress();
   if (blocked) {
     console.warn(`[weekly-digest] not sending: ${blocked}`);
+    return NextResponse.json({
+      ok: true,
+      sent: 0,
+      skipped: 0,
+      failed: 0,
+      blocked,
+      testSend: Boolean(testEmail),
+      ranAt: new Date().toISOString(),
+    });
+  }
+
+  const mandrillKey = process.env.MAILCHIMP_TRANSACTIONAL_API_KEY?.trim() ?? "";
+  const address = mailingAddress();
+  if (!mandrillKey || !address) {
+    return NextResponse.json({
+      ok: true,
+      sent: 0,
+      skipped: 0,
+      failed: 0,
+      blocked: "Email sending is not configured.",
+      ranAt: new Date().toISOString(),
+    });
   }
 
   const admin = createAdminClient();
-
-  // Fetch all email-opted-in, non-suspended members with an email address
-  const { data: members, error } = await admin
+  let query = admin
     .from("members")
-    .select("id, first_name, email, current_streak_days, unsubscribe_token")
+    .select("id, first_name, email, current_streak_days, unsubscribe_token, last_active_date")
     .eq("email_opted_in", true)
     .eq("suspended", false)
     .not("email", "is", null);
+  if (testEmail) query = query.eq("email", testEmail);
 
+  const { data: members, error } = await query;
   if (error) {
     console.error("[weekly-digest] Failed to fetch members:", error.message);
     return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
@@ -56,36 +116,37 @@ export async function GET(req: Request) {
   let failed = 0;
 
   for (const member of members ?? []) {
+    const memberEmail = String(member.email ?? "");
+    if (allow.ok && allow.emails && !allow.emails.has(memberEmail.trim().toLowerCase())) {
+      skipped++;
+      continue;
+    }
     try {
       const recap = await gatherWeeklyRecap(member.id as string);
-
-      // Skip members with no activity this week (don't email inactive members)
-      if (!recap.hasActivity) {
+      if (!digestHasWeeklyActions(recap)) {
         skipped++;
         continue;
       }
 
       const token = (member.unsubscribe_token as string | null) ?? "";
-      if (!blocked && mandrillKey && address && token) {
-        const ok = await sendDigestEmail({
-          apiKey: mandrillKey,
-          toEmail: member.email as string,
-          firstName: (member.first_name as string | null) ?? "there",
-          recap,
-          streakDays: (member.current_streak_days as number | null) ?? 0,
-          unsubscribeToken: token,
-          postalAddress: address,
-        });
-        if (ok) sent++;
-        else failed++;
-      } else {
-        console.log(
-          `[weekly-digest] would send to ${member.email} — ` +
-            `${recap.pointsEarned} pts, ${recap.commentsAdded} comments, ` +
-            `${recap.rsvpsAdded} RSVPs`,
-        );
+      if (!token) {
+        console.warn(`[weekly-digest] skipped member ${member.id}: no unsubscribe link`);
         skipped++;
+        continue;
       }
+
+      const ok = await sendDigestEmail({
+        apiKey: mandrillKey,
+        toEmail: memberEmail.trim(),
+        firstName: (member.first_name as string | null) ?? "there",
+        recap,
+        streakDays: (member.current_streak_days as number | null) ?? 0,
+        lastActiveDate: (member.last_active_date as string | null) ?? null,
+        unsubscribeToken: token,
+        postalAddress: address,
+      });
+      if (ok) sent++;
+      else failed++;
     } catch (err) {
       console.error("[weekly-digest] Error processing member", member.id, err);
       failed++;
@@ -93,15 +154,14 @@ export async function GET(req: Request) {
   }
 
   return NextResponse.json({
-    ok: true,
+    ok: failed === 0,
     sent,
     skipped,
     failed,
+    testSend: Boolean(testEmail),
     ranAt: new Date().toISOString(),
   });
 }
-
-// ── Email builder ───────────────────────────────────────────────────────────
 
 type Recap = Awaited<ReturnType<typeof gatherWeeklyRecap>>;
 
@@ -111,18 +171,31 @@ async function sendDigestEmail(params: {
   firstName: string;
   recap: Recap;
   streakDays: number;
+  lastActiveDate: string | null;
   unsubscribeToken: string;
   postalAddress: string;
 }): Promise<boolean> {
-  const { apiKey, toEmail, firstName, recap, streakDays, unsubscribeToken, postalAddress } = params;
+  if (marketingEmailBlockReason()) return false;
+
+  const {
+    apiKey,
+    toEmail,
+    firstName,
+    recap,
+    streakDays,
+    lastActiveDate,
+    unsubscribeToken,
+    postalAddress,
+  } = params;
   const base = appBaseUrl();
-  const html = buildEmailHtml({
+  const content = buildDigestContent({
     firstName,
     recap,
     streakDays,
     postalAddress,
     unsubscribeHref: unsubscribeUrl(base, unsubscribeToken),
     homeHref: base,
+    lastActiveDate,
   });
 
   try {
@@ -132,12 +205,16 @@ async function sendDigestEmail(params: {
       body: JSON.stringify({
         key: apiKey,
         message: {
-          html,
-          subject: `Your week at ${recap.topBrandName ?? "Brand Engage Pro"} ✨`,
-          from_email: process.env.BEP_EMAIL_FROM ?? "hello@brandengagepro.com",
+          html: content.html,
+          text: content.text,
+          subject: content.subject,
+          from_email: fromAddress(),
           from_name: "Brand Engage Pro",
+          headers: {
+            ...listUnsubscribeHeaders(oneClickUnsubscribeUrl(base, unsubscribeToken)),
+            "Reply-To": replyToAddress(),
+          },
           to: [{ email: toEmail, type: "to" }],
-          headers: listUnsubscribeHeaders(oneClickUnsubscribeUrl(base, unsubscribeToken)),
           track_opens: true,
           track_clicks: false,
           tags: ["weekly-digest"],
@@ -147,81 +224,14 @@ async function sendDigestEmail(params: {
 
     if (!res.ok) {
       const body = await res.text();
-      console.error("[weekly-digest] Mandrill error:", body);
+      console.error("[weekly-digest] Mandrill error:", res.status, body.slice(0, 200));
       return false;
     }
 
-    const data = (await res.json()) as Array<{ status: string }>;
-    return data[0]?.status === "sent" || data[0]?.status === "queued";
+    const counts = countMandrillResults(await res.json());
+    return counts.sent > 0;
   } catch (err) {
     console.error("[weekly-digest] fetch failed:", err);
     return false;
   }
-}
-
-function buildEmailHtml(params: {
-  firstName: string;
-  recap: Recap;
-  streakDays: number;
-  postalAddress: string;
-  unsubscribeHref: string;
-  homeHref: string;
-}): string {
-  const { firstName, recap, streakDays, postalAddress, unsubscribeHref, homeHref } = params;
-  const safeName = escapeHtml(firstName);
-
-  const stats = [
-    recap.pointsEarned > 0
-      ? `<b>${recap.pointsEarned}</b> points earned`
-      : null,
-    recap.rsvpsAdded > 0
-      ? `<b>${recap.rsvpsAdded}</b> event RSVP${recap.rsvpsAdded > 1 ? "s" : ""}`
-      : null,
-    recap.commentsAdded > 0
-      ? `<b>${recap.commentsAdded}</b> comment${recap.commentsAdded > 1 ? "s" : ""}`
-      : null,
-    recap.reactionsGiven > 0
-      ? `<b>${recap.reactionsGiven}</b> reaction${recap.reactionsGiven > 1 ? "s" : ""} given`
-      : null,
-    streakDays > 0 ? `<b>${streakDays}-day</b> visit streak` : null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
-
-  const brandLine = recap.topBrandName
-    ? `<p style="color:#5a5650;font-size:13px;">Your most active brand this week: <b style="color:#1e1b17;">${escapeHtml(recap.topBrandName)}</b></p>`
-    : "";
-
-  return `<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#eadfcb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#1e1b17;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#eadfcb;padding:40px 20px;">
-    <tr><td>
-      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:#f5efe4;border:1px solid rgba(30,27,23,0.14);border-radius:8px;overflow:hidden;">
-        <!-- Header -->
-        <tr><td style="padding:32px 32px 0;border-bottom:1px solid rgba(30,27,23,0.14);">
-          <p style="margin:0 0 4px;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#7a5a06;">Brand Engage Pro</p>
-          <h1 style="margin:0 0 24px;font-family:'Young Serif',Georgia,serif;font-size:26px;font-weight:400;line-height:1.2;color:#1e1b17;">Hey ${safeName}, here&rsquo;s your week 👋</h1>
-        </td></tr>
-        <!-- Stats -->
-        <tr><td style="padding:24px 32px;">
-          <p style="margin:0 0 8px;font-size:15px;line-height:1.6;color:#1e1b17;">${stats}</p>
-          ${brandLine}
-        </td></tr>
-        <!-- CTA -->
-        <tr><td style="padding:0 32px 32px;">
-          <a href="${escapeHtml(homeHref)}" style="display:inline-block;background:#9b2335;color:#f5efe4;font-size:14px;font-weight:600;text-decoration:none;padding:12px 28px;border-radius:999px;">
-            See your dashboard →
-          </a>
-        </td></tr>
-        <!-- Footer -->
-        <tr><td style="padding:20px 32px;border-top:1px solid rgba(30,27,23,0.14);">
-          <p style="margin:0;font-size:11px;color:#5a5650;">You're getting this because you opted in to Brand Engage Pro member emails. ${escapeHtml(postalAddress)} <a href="${escapeHtml(unsubscribeHref)}" style="color:#9b2335;">Unsubscribe</a></p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
 }
