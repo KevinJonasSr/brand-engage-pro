@@ -1,3 +1,5 @@
+import { resolveAppUrl } from "./site-url.ts";
+
 /**
  * Brand-scoped email campaigns (item 10). Pure functions only, so they can
  * be unit tested and shared by the campaign builder, the broadcast page and
@@ -18,7 +20,10 @@ export const MANDRILL_BATCH_SIZE = 100;
 export const UNSUB_MERGE_TAG = "*|UNSUB_URL|*";
 /** Merge tag for the RFC 8058 one-click unsubscribe URL. */
 export const ONECLICK_MERGE_TAG = "*|UNSUB_ONECLICK|*";
+export const DEFAULT_FROM_EMAIL = "hello@brandengagepro.com";
+export const DEFAULT_REPLY_TO = "support@brandengagepro.com";
 const DEFAULT_APP_URL = "https://www.brandengagepro.com";
+const EMAIL_ADDRESS_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type EnvLike = Record<string, string | undefined>;
 
@@ -37,9 +42,65 @@ export function mailingAddress(env: EnvLike = process.env): string | null {
   return value.length > 0 ? value : null;
 }
 
+/**
+ * Public origin used in unsubscribe links and digest buttons.
+ * Forbidden hosts (apex, vercel.app, $VERCEL_URL) fall back to www so a
+ * mis-set env cannot put a preview URL in a member email.
+ */
 export function appBaseUrl(env: EnvLike = process.env): string {
-  const raw = env.NEXT_PUBLIC_APP_URL?.trim() || DEFAULT_APP_URL;
-  return raw.replace(/\/+$/, "");
+  return resolveAppUrl(env).replace(/\/+$/, "") || DEFAULT_APP_URL;
+}
+
+export function normalizeEmailAddress(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+export function isEmailAddress(value: string): boolean {
+  return EMAIL_ADDRESS_RE.test(value.trim());
+}
+
+/** Sender address. Blank falls back to hello@brandengagepro.com. */
+export function fromAddress(env: EnvLike = process.env): string {
+  const raw = (env.BEP_EMAIL_FROM ?? "").replace(/[\r\n]/g, "").trim();
+  return raw || DEFAULT_FROM_EMAIL;
+}
+
+/** Reply-To. Blank falls back to support@brandengagepro.com. */
+export function replyToAddress(env: EnvLike = process.env): string {
+  const raw = (env.BEP_EMAIL_REPLY_TO ?? "").replace(/[\r\n]/g, "").trim();
+  return raw || DEFAULT_REPLY_TO;
+}
+
+function senderDomainOk(email: string): boolean {
+  const domain = email.split("@")[1]?.toLowerCase() ?? "";
+  return domain === "brandengagepro.com" || domain.endsWith(".brandengagepro.com");
+}
+
+/**
+ * Optional test rail. null means every opted-in member is eligible.
+ * An invalid list fails closed so a typo cannot widen the audience.
+ */
+export function parseEmailAllowlist(
+  env: EnvLike = process.env,
+): { ok: true; emails: ReadonlySet<string> | null } | { ok: false; reason: string } {
+  const raw = env.BEP_EMAIL_ALLOWLIST;
+  if (raw == null || raw.trim() === "") return { ok: true, emails: null };
+  const parts = raw.split(/[,;\n]+/).map((part) => part.trim()).filter(Boolean);
+  if (parts.length === 0) return { ok: true, emails: null };
+  if (parts.some((part) => !isEmailAddress(part))) {
+    return {
+      ok: false,
+      reason:
+        "BEP_EMAIL_ALLOWLIST has an invalid address. No marketing email was sent.",
+    };
+  }
+  return { ok: true, emails: new Set(parts.map(normalizeEmailAddress)) };
+}
+
+/** True when this address may receive marketing email under the allowlist. */
+export function emailOnAllowlist(email: string, allow: ReadonlySet<string> | null): boolean {
+  if (!allow) return true;
+  return allow.has(normalizeEmailAddress(email));
 }
 
 /**
@@ -56,6 +117,11 @@ export function marketingEmailBlockReason(env: EnvLike = process.env): string | 
   if (!env.MAILCHIMP_TRANSACTIONAL_API_KEY?.trim()) {
     return "Email sending not configured (MAILCHIMP_TRANSACTIONAL_API_KEY missing)";
   }
+  if (!senderDomainOk(fromAddress(env))) {
+    return "BEP_EMAIL_FROM must be an @brandengagepro.com address so Mandrill can sign the message.";
+  }
+  const allow = parseEmailAllowlist(env);
+  if (!allow.ok) return allow.reason;
   return null;
 }
 
@@ -80,6 +146,11 @@ export function escapeHtml(s: string): string {
  */
 export function stripMergeTags(s: string): string {
   return s.replaceAll("*|", "* |").replaceAll("|*", "| *");
+}
+
+/** Collapse header-breaking whitespace. Subjects and From names stay one line. */
+export function oneLine(value: string): string {
+  return value.replace(/[\r\n]+/g, " ").replace(/\s+/g, " ").trim();
 }
 
 /** Returns an error message, or null when the subject and body are fine. */
@@ -163,7 +234,7 @@ export function buildCampaignEmail({
 <p style="margin-top:32px;font-size:12px;color:#64748b">
 ${escapeHtml(footerText)}<br>
 ${addressHtml}
-<a href="${UNSUB_MERGE_TAG}" style="color:#64748b">Unsubscribe from ${escapeHtml(safeBrand)} emails</a> ·
+<a href="${UNSUB_MERGE_TAG}" mc:disable-tracking style="color:#64748b">Unsubscribe from ${escapeHtml(safeBrand)} emails</a> ·
 Questions? <a href="mailto:support@brandengagepro.com" style="color:#64748b">support@brandengagepro.com</a>
 </p>
 </div>
@@ -206,11 +277,11 @@ export function buildMandrillMessage({
   tags: readonly string[];
 }) {
   return {
-    subject: stripMergeTags(subject.trim()),
+    subject: oneLine(stripMergeTags(subject)),
     html,
     text,
     from_email: fromEmail,
-    from_name: fromName,
+    from_name: oneLine(fromName).slice(0, 100) || "Brand Engage Pro",
     headers: {
       "Reply-To": replyTo,
       // Per-recipient URL via the merge tag. List-Unsubscribe-Post is the
