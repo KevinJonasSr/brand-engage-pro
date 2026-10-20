@@ -11,7 +11,7 @@ import { messageTimeline } from "@/lib/message-stack";
 const MESSAGES = [
   { body: "Your table's ready.", time: "6:42 PM", tilt: "-rotate-2", offset: "ml-0" },
   { body: "Sunday biscuits are back.", time: "Sat 10:05 AM", tilt: "rotate-1", offset: "ml-6 sm:ml-10" },
-  { body: "Thanks for coming in, Kevin.", time: "Sun 1:18 PM", tilt: "-rotate-1", offset: "ml-2 sm:ml-4" },
+  { body: "Thanks for coming in, Sam.", time: "Sun 1:18 PM", tilt: "-rotate-1", offset: "ml-2 sm:ml-4" },
 ] as const;
 
 const TIMELINE = messageTimeline(MESSAGES.length);
