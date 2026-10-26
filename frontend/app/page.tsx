@@ -36,14 +36,19 @@ function formatPts(n: number | null | undefined) {
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ code?: string }>;
+  searchParams: Promise<{ code?: string; type?: string }>;
 }) {
   // Supabase's default email templates point the confirmation link at
   // `{SITE_URL}?code=...` — i.e., the root — instead of `/auth/callback`.
   // Forward any code to the real callback route so sessions actually complete.
+  // Recovery codes go to the password reset page; other codes still onboard.
   const params = await searchParams;
   if (params.code) {
-    redirect(`/auth/callback?code=${encodeURIComponent(params.code)}&next=/onboarding`);
+    const recovery = params.type === "recovery";
+    const next = recovery ? "/reset-password" : "/onboarding";
+    const destination = new URLSearchParams({ code: params.code, next });
+    if (recovery) destination.set("type", "recovery");
+    redirect(`/auth/callback?${destination.toString()}`);
   }
 
   // First pass: just fetch the member. If signed-out, render the marketing
