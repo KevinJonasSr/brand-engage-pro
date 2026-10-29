@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { verifyCronAuth } from "@/lib/cron-auth";
+import { getAdminContext } from "@/lib/admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   appBaseUrl,
@@ -62,16 +63,23 @@ export const maxDuration = 300;
  * and who have not had a nudge in 30 days. Each send is recorded as a
  * notifications row (kind "lapsed_nudge") so the next run skips them.
  *
- * ?dryRun=1 (still cron-authed) sends nothing and records nothing: it skips
+ * ?dryRun=1 (cron-authed, or a signed-in super-admin) sends nothing and records nothing: it skips
  * the active digest, runs the lapsed selection and returns the counts plus
  * the first rendered email. It works even while sending is switched off.
  */
 export async function GET(req: Request) {
-  const authErr = verifyCronAuth(req);
-  if (authErr) return authErr;
-
   const params = new URL(req.url).searchParams;
   const dryRun = params.get("dryRun") === "1";
+
+  // Cron auth as always; a signed-in super-admin may also run the DRY RUN
+  // (it sends and records nothing) so the lapsed pass can be checked from
+  // a browser without handling CRON_SECRET. Real sends stay cron-only.
+  const authErr = verifyCronAuth(req);
+  if (authErr) {
+    if (!dryRun) return authErr;
+    const ctx = await getAdminContext();
+    if (!ctx?.isSuperAdmin) return authErr;
+  }
   const testEmail = parseTestEmailParam(params.get("testEmail"));
   if (testEmail === "invalid") {
     return NextResponse.json(
