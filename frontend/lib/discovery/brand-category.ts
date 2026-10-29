@@ -15,7 +15,7 @@ export const FAVORITE_BRAND_TO_CATEGORIES: Record<string, BrandCategory[]> = {
   "Beauty & Personal Care": ["retail"],
   "Tech & Gadgets": ["retail"],
   "Travel & Hospitality": ["hotel", "restaurant"],
-  "Entertainment & Media": ["sports"],
+  "Entertainment & Media": ["entertainment", "sports"],
   "Fitness & Wellness": ["sports"],
   Other: [],
 };

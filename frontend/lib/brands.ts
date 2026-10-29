@@ -63,8 +63,8 @@ export type Brand = {
   lng?: number;
 };
 
-/** Mirrors the `brand_category` enum in migration 0024. */
-export const BRAND_CATEGORIES = ["restaurant", "retail", "sports", "hotel"] as const;
+/** Mirrors the `brand_category` enum: 0024 plus `entertainment` from 0028. */
+export const BRAND_CATEGORIES = ["restaurant", "retail", "sports", "hotel", "entertainment"] as const;
 export type BrandCategory = (typeof BRAND_CATEGORIES)[number];
 
 /** Display labels for the brand page eyebrow and admin select. */
@@ -73,6 +73,7 @@ export const BRAND_CATEGORY_LABELS: Record<BrandCategory, string> = {
   retail: "Retail",
   sports: "Sports",
   hotel: "Hotel",
+  entertainment: "Entertainment",
 };
 
 export function isBrandCategory(value: string): value is BrandCategory {

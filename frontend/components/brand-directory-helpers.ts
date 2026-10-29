@@ -91,7 +91,7 @@ export function upcomingEmptyCopy(
 // ---------------------------------------------------------------------------
 
 /** `brands.category` enum (migration 0024). */
-export type BrandCategory = "restaurant" | "retail" | "sports" | "hotel";
+export type BrandCategory = "restaurant" | "retail" | "sports" | "hotel" | "entertainment";
 
 /** Canonical chip order + plural labels for the category chip row. */
 export const BRAND_CATEGORY_ORDER: BrandCategory[] = [
@@ -99,6 +99,7 @@ export const BRAND_CATEGORY_ORDER: BrandCategory[] = [
   "retail",
   "sports",
   "hotel",
+  "entertainment",
 ];
 
 export const BRAND_CATEGORY_LABELS: Record<BrandCategory, string> = {
@@ -106,6 +107,7 @@ export const BRAND_CATEGORY_LABELS: Record<BrandCategory, string> = {
   retail: "Retail",
   sports: "Sports",
   hotel: "Hotels",
+  entertainment: "Entertainment",
 };
 
 export function isBrandCategory(value: unknown): value is BrandCategory {

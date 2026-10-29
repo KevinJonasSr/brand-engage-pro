@@ -20,7 +20,7 @@ describe("favorite brand → brand category mapping", () => {
     assert.deepEqual(categoriesForFavoriteBrand("Beauty & Personal Care"), ["retail"]);
     assert.deepEqual(categoriesForFavoriteBrand("Tech & Gadgets"), ["retail"]);
     assert.deepEqual(categoriesForFavoriteBrand("Travel & Hospitality"), ["hotel", "restaurant"]);
-    assert.deepEqual(categoriesForFavoriteBrand("Entertainment & Media"), ["sports"]);
+    assert.deepEqual(categoriesForFavoriteBrand("Entertainment & Media"), ["entertainment", "sports"]);
     assert.deepEqual(categoriesForFavoriteBrand("Fitness & Wellness"), ["sports"]);
     assert.deepEqual(categoriesForFavoriteBrand("Other"), []);
   });
