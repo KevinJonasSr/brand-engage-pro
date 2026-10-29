@@ -15,7 +15,13 @@ export const revalidate = 0;
 
 export const metadata: Metadata = { title: "My Member Card" };
 
-/** Progress from the brand's current tier toward the next rung of the ladder. */
+/**
+ * Progress from the member's tier toward the next rung of the ladder.
+ * The card shows the member-level tier (members.current_tier, the same one
+ * Member Home and /rewards show) so a member is never "Silver" on one page
+ * and "Bronze" on their card; the per-brand row only contributes "points
+ * earned here".
+ */
 function brandProgress(tiers: Tier[], current: TierSlug, lifetime: number) {
   const ladder = [...tiers].sort((a, b) => a.sort_order - b.sort_order);
   const i = ladder.findIndex((t) => t.slug === current);
@@ -63,18 +69,21 @@ export default async function MemberCardPage() {
             communityId: "",
             brandName: "Brand Engage Pro",
             currentTier: (member.current_tier ?? "bronze") as TierSlug,
+            brandLifetimePoints: 0,
             isFounder: false,
             joinedAt: "",
           },
         ]
   ).map((m) => {
-    const p = brandProgress(tiers, m.currentTier, lifetimePoints);
+    const memberTier = (member.current_tier ?? "bronze") as TierSlug;
+    const p = brandProgress(tiers, memberTier, lifetimePoints);
     return {
       communityId: m.communityId,
       brandName: m.brandName,
-      tierSlug: m.currentTier,
+      tierSlug: memberTier,
       tierName: p.tierName,
-      tierIcon: tierIcon(m.currentTier),
+      tierIcon: tierIcon(memberTier),
+      brandLifetimePoints: m.communityId ? m.brandLifetimePoints : null,
       isFounder: m.isFounder,
       nextTierName: p.nextTierName,
       pointsToNext: p.pointsToNext,

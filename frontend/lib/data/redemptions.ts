@@ -199,36 +199,53 @@ export interface CardMembership {
   communityId: string;
   brandName: string;
   currentTier: TierSlug;
+  /** Lifetime points earned at this brand (memberships.lifetime_points). */
+  brandLifetimePoints: number;
   isFounder: boolean;
   joinedAt: string;
 }
 
-/** Active memberships for the card, one per brand, oldest join first. */
+/**
+ * Active memberships for the card, one per ACTIVE brand, oldest join first.
+ * Memberships of retired brand slugs (brands.active = false) are skipped so
+ * the card never shows a tab for a brand the member cannot visit.
+ */
 export async function listCardMemberships(memberId: string): Promise<CardMembership[]> {
   if (!memberId) return [];
   try {
     const admin = createAdminClient();
     const { data, error } = await admin
       .from("member_community_memberships")
-      .select("community_id, current_tier, is_founder, joined_at, status")
+      .select("community_id, current_tier, lifetime_points, is_founder, joined_at, status")
       .eq("member_id", memberId)
       .order("joined_at", { ascending: true });
     if (error) {
       console.warn("listCardMemberships: supabase error", error.message);
       return [];
     }
-    const rows = ((data ?? []) as Array<{
+    const allRows = ((data ?? []) as Array<{
       community_id: string;
       current_tier: TierSlug | null;
+      lifetime_points: number | null;
       is_founder: boolean | null;
       joined_at: string;
       status: string | null;
     }>).filter((r) => (r.status ?? "active") === "active");
+    const { data: activeBrands } = await admin
+      .from("brands")
+      .select("slug")
+      .eq("active", true)
+      .in("slug", allRows.map((r) => r.community_id));
+    const activeSlugs = new Set(
+      ((activeBrands ?? []) as Array<{ slug: string }>).map((b) => b.slug),
+    );
+    const rows = allRows.filter((r) => activeSlugs.has(r.community_id));
     const names = await brandNamesFor(rows.map((r) => r.community_id));
     return rows.map((r) => ({
       communityId: r.community_id,
       brandName: names.get(r.community_id) ?? r.community_id,
       currentTier: r.current_tier ?? "bronze",
+      brandLifetimePoints: Math.max(0, r.lifetime_points ?? 0),
       isFounder: !!r.is_founder,
       joinedAt: r.joined_at,
     }));

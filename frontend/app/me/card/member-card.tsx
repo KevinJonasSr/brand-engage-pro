@@ -10,7 +10,9 @@ export interface CardBrand {
   tierName: string;
   tierIcon: string;
   isFounder: boolean;
-  /** Points to the next tier within this brand, null at the top. */
+  /** Lifetime points earned at this brand; null when there is no brand row. */
+  brandLifetimePoints: number | null;
+  /** Points to the next tier, null at the top. */
   nextTierName: string | null;
   pointsToNext: number | null;
   /** 0–100 progress toward the next tier, null at the top. */
@@ -127,6 +129,11 @@ export default function MemberCard({
                   {lifetimePoints.toLocaleString()}
                 </p>
                 <p className="mt-1 text-xs text-iron/70">lifetime points</p>
+                {brand.brandLifetimePoints != null && (
+                  <p className="mt-1 text-xs text-iron/60">
+                    {brand.brandLifetimePoints.toLocaleString()} earned at {brand.brandName}
+                  </p>
+                )}
               </div>
             </div>
             <div className="shrink-0 text-center">
