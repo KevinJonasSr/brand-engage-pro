@@ -419,6 +419,7 @@ export function applyNelliesLaunchEvents<
     id?: string;
     starts_at?: string | null;
     event_starts_at?: string | null;
+    ends_at?: string | null;
     capacity?: number | null;
     url?: string | null;
     tier?: string | null;
@@ -444,7 +445,12 @@ export function applyNelliesLaunchEvents<
     .filter((row) => !isBourbonCigarTitle(row.title))
     .filter((row) => !isNelliesHiddenTitle(row.title))
     .filter((row) => {
+      // An event is over once its end passes, or its start when it has no
+      // end. With neither (date still tentative) it stays listed — set
+      // starts_at or deactivate it once the date is final (see 0072/0080).
       const start = row.starts_at ?? row.event_starts_at;
+      const end = row.ends_at ?? null;
+      if (end) return new Date(end).getTime() >= nowMs;
       return !start || new Date(start).getTime() >= nowMs;
     })
     .map(

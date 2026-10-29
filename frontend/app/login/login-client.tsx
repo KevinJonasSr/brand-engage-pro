@@ -74,8 +74,10 @@ function LoginForm({
   const searchParams = useSearchParams();
   const next = safeRelativePath(searchParams.get("next"), "/");
   const ref = searchParams.get("ref");
+  const brand = searchParams.get("brand");
   const signupParams = new URLSearchParams();
   if (next !== "/") signupParams.set("next", next);
+  if (brand) signupParams.set("brand", brand);
   if (ref) signupParams.set("ref", ref);
   const signupHref = `/signup${signupParams.size ? `?${signupParams.toString()}` : ""}`;
   const forgotHref = `/forgot-password${next !== "/" ? `?next=${encodeURIComponent(next)}` : ""}`;

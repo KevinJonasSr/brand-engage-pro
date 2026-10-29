@@ -53,7 +53,7 @@ export async function createCheckoutSessionAction(formData: FormData) {
   } = await supabase.auth.getUser();
   if (!user?.email) {
     redirect(
-      `/signup?ref=${encodeURIComponent(communityId)}&next=${encodeURIComponent(premiumPath)}`,
+      `/signup?brand=${encodeURIComponent(communityId)}&next=${encodeURIComponent(premiumPath)}`,
     );
   }
 

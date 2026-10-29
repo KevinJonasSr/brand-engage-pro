@@ -100,7 +100,7 @@ export default async function RewardsPage({
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <Link
-                href={`/signup?ref=${encodeURIComponent(slug)}&next=${encodeURIComponent(loginNext)}`}
+                href={`/signup?brand=${encodeURIComponent(slug)}&next=${encodeURIComponent(loginNext)}`}
                 className="rounded-full bg-ember px-4 py-2 text-xs font-semibold text-linen"
               >
                 Create free account →

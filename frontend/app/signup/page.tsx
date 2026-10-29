@@ -62,7 +62,7 @@ async function getReferrerBrand(slug: string | undefined): Promise<ReferrerBrand
 export default async function SignupPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ ref?: string; next?: string }>;
+  searchParams?: Promise<{ ref?: string; brand?: string; next?: string }>;
 }) {
   const cookieStore = await cookies();
   const signedOut = isSignedOutMarkerValue(
@@ -75,7 +75,7 @@ export default async function SignupPage({
   if (user && !signedOut) redirect(safeRelativePath(sp.next, "/"));
   const [referrerName, referrerBrand, terms, privacy] = await Promise.all([
     getReferrerName(),
-    getReferrerBrand(sp.ref),
+    getReferrerBrand(sp.brand ?? sp.ref),
     getPolicy("terms"),
     getPolicy("privacy"),
   ]);

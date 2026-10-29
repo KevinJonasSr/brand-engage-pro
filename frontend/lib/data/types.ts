@@ -46,10 +46,21 @@ export interface MemberProfile {
 export type BadgeCategory = "welcome" | "referral" | "community" | "tier";
 
 export interface MemberKpis {
+  /** Spendable (wallet) points: SUM(points_ledger.delta). Same as spendable_points. */
   total_points: number;
+  /** Alias of total_points, named for what it is. */
+  spendable_points: number;
+  /**
+   * Lifetime points earned: SUM(delta) WHERE delta > 0 (or the backfilled
+   * members.lifetime_points, whichever is higher). Tier progress uses this,
+   * so spending never shows a member sliding back toward a lower tier.
+   */
+  lifetime_points: number;
   referral_count: number;
   badge_count: number;
+  /** Next tier above lifetime_points; null at the top of the ladder. */
   next_tier: Tier | null;
+  /** lifetime points still needed to reach next_tier. */
   points_to_next_tier: number | null;
 }
 

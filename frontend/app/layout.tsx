@@ -5,6 +5,7 @@ import "./globals.css";
 import CookieBanner from "@/components/cookie-banner";
 import Footer from "@/components/footer";
 import InstallPrompt from "@/components/install-prompt";
+import RegisterSW from "@/components/register-sw";
 import RecoveryRedirect from "@/components/recovery-redirect";
 import PremiumBadge from "@/components/premium-badge";
 import AdminPill from "@/components/admin-pill";
@@ -86,7 +87,8 @@ export const viewport: Viewport = {
 const navItems = [
   { href: "/", label: "Member Home" },
   { href: "/rewards", label: "Rewards" },
-  { href: "/marketplace", label: "Marketplace" },
+  // /marketplace stays reachable but is off the nav until it is the
+  // cross-brand catalog the spec describes (today it is two sentences).
   { href: "/referrals", label: "Referrals" },
   { href: "/brands", label: "Brands" },
 ];
@@ -248,6 +250,7 @@ export default async function RootLayout({
         {children}
         <Footer />
         <CookieBanner />
+        <RegisterSW />
         <InstallPrompt />
         <RecoveryRedirect />
       </body>

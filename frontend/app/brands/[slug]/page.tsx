@@ -135,13 +135,13 @@ export default async function BrandPage({
   };
 
   // Primary CTA adapts to the viewer's state:
-  // - anonymous  → "Join the member club" → /signup?ref=<slug>
-  // - signed in, no profile → "Complete profile" → /onboarding?ref=<slug>
+  // - anonymous  → "Join the member club" → /signup?brand=<slug>
+  // - signed in, no profile → "Complete profile" → /onboarding?brand=<slug>
   // - signed in, profile done → brand rewards (restaurant loyalty, not marketplace drops)
   const primaryCta = !isSignedIn
-    ? { label: "Join the member club", href: `/signup?ref=${brand.slug}` }
+    ? { label: "Join the member club", href: `/signup?brand=${brand.slug}` }
     : needsProfile
-      ? { label: "Complete your profile", href: `/onboarding?ref=${brand.slug}` }
+      ? { label: "Complete your profile", href: `/onboarding?brand=${brand.slug}` }
       : { label: "View rewards", href: `/brands/${brand.slug}/rewards` };
 
   const showFounderLink = founderData && founderData.cap > 0;
@@ -459,7 +459,7 @@ export default async function BrandPage({
                           <p className="mt-3 text-xs text-iron/70">
                             Member code unlocked after{" "}
                             <Link
-                              href={`/signup?ref=${brand.slug}`}
+                              href={`/signup?brand=${brand.slug}`}
                               className="text-aurora-ink underline underline-offset-2 hover:text-iron"
                             >
                               sign-in
@@ -559,7 +559,7 @@ export default async function BrandPage({
                         Sign in to RSVP
                       </Link>
                       <Link
-                        href={`/signup?ref=${encodeURIComponent(brand.slug)}&next=${encodeURIComponent(`/brands/${brand.slug}#upcoming`)}`}
+                        href={`/signup?brand=${encodeURIComponent(brand.slug)}&next=${encodeURIComponent(`/brands/${brand.slug}#upcoming`)}`}
                         className="text-xs text-iron/70 underline-offset-2 hover:text-iron hover:underline"
                       >
                         Join to RSVP

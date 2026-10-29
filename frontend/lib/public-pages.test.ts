@@ -65,7 +65,7 @@ describe("signed-out check-in prompt", () => {
     assert.match(checkin, />\s*Sign in\s*<\/Link>/);
     assert.match(checkin, />\s*Join\s*<\/Link>/);
     assert.match(checkin, /\/login\?next=/);
-    assert.match(checkin, /\/signup\?ref=/);
+    assert.match(checkin, /\/signup\?brand=/);
     assert.match(checkin, /next=\$\{encodeURIComponent\(checkinPath\)\}/);
     assert.doesNotMatch(checkin, /One moment/);
     assert.match(checkin, /fetch\("\/api\/checkin"/);

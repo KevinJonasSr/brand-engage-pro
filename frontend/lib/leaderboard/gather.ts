@@ -193,8 +193,21 @@ export async function gatherBrandLeaderboard(opts: {
     const memberIds = sorted.map(([memberId]) => memberId);
     const { data: memberRows } = await admin
       .from("members")
-      .select("id, first_name, last_name, avatar_url, current_tier")
+      .select("id, first_name, last_name, avatar_url, current_tier, is_test")
       .in("id", memberIds);
+    // Staff / QA accounts (members.is_test, migration 0080) never appear on
+    // a public leaderboard.
+    const testMemberIds = new Set(
+      (memberRows ?? [])
+        .filter((f) => f.is_test === true)
+        .map((f) => f.id as string),
+    );
+    if (testMemberIds.size > 0) {
+      for (const id of testMemberIds) scores.delete(id);
+      if (scores.size === 0) {
+        return { ...empty, brandName };
+      }
+    }
     const memberInfoById = new Map<
       string,
       {
@@ -231,13 +244,15 @@ export async function gatherBrandLeaderboard(opts: {
       };
     }
 
-    const top: LeaderboardEntry[] = sorted
+    const ranked = sorted.filter(([id]) => !testMemberIds.has(id));
+
+    const top: LeaderboardEntry[] = ranked
       .slice(0, topN)
       .map(([memberId], idx) => buildEntry(idx + 1, memberId));
 
     let viewerEntry: LeaderboardEntry | null = null;
     if (opts.viewerMemberId) {
-      const viewerIdx = sorted.findIndex(([id]) => id === opts.viewerMemberId);
+      const viewerIdx = ranked.findIndex(([id]) => id === opts.viewerMemberId);
       if (viewerIdx !== -1) {
         viewerEntry = buildEntry(viewerIdx + 1, opts.viewerMemberId);
       }
@@ -250,7 +265,7 @@ export async function gatherBrandLeaderboard(opts: {
       brandName,
       top,
       viewerEntry,
-      totalMembers: sorted.length,
+      totalMembers: ranked.length,
     };
   } catch (err) {
     console.warn("gatherBrandLeaderboard failed (non-blocking):", err);

@@ -32,7 +32,7 @@ export const dynamic = "force-dynamic";
 export default async function OnboardingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ ref?: string; next?: string }>;
+  searchParams: Promise<{ ref?: string; brand?: string; next?: string }>;
 }) {
   const supabase = await createClient();
   const {
@@ -46,6 +46,7 @@ export default async function OnboardingPage({
     const params = new URLSearchParams();
     // Signup always routes through onboarding and carries `next` along.
     params.set("next", nextTarget ?? "/onboarding");
+    if (sp.brand) params.set("brand", sp.brand);
     if (sp.ref) params.set("ref", sp.ref);
     redirect(`/signup?${params.toString()}`);
   }

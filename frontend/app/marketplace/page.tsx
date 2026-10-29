@@ -34,7 +34,7 @@ export default async function MarketplacePage() {
           <PreviewSignupBanner
             eyebrow="🛍️ Brand rewards"
             headline="Join to unlock brand rewards"
-            body={`Earn points after you join, then use them on each brand’s rewards page. At Nellie's: ${nelliesSummary}. Bourbon & Cigar Night is September 23 at 7:00 PM ET in the Private Dining Room.`}
+            body={`Earn points after you join, then use them on each brand’s rewards page. At Nellie's: ${nelliesSummary}.`}
             bullets={[
               "Move up from Bronze to Platinum as you earn points",
               "The first 100 members of each brand join as Founders for free. Brands pay, guests join free.",

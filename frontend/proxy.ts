@@ -230,7 +230,9 @@ export default async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Run on everything except static assets / image optimization / favicon.
-    "/((?!_next/static|_next/image|favicon.ico|api/member-engage).*)",
+    // Run on everything except static assets / image optimization / favicon
+    // and the PWA + SEO files (manifest, service worker, icons, robots,
+    // sitemap, OG images) — none of those need a Supabase auth round-trip.
+    "/((?!_next/static|_next/image|favicon\\.ico|api/member-engage|manifest\\.json|sw\\.js|robots\\.txt|sitemap\\.xml|icons/|icon-[^/]*\\.png|badge-[^/]*\\.png|apple-icon|opengraph-image|icon$|icon\\.png).*)",
   ],
 };

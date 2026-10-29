@@ -19,8 +19,11 @@ export async function notifyRsvpConfirmation(opts: {
   try {
     const admin = createAdminClient();
     const { data: event } = await admin
-      .from("artist_events")
-      .select("title, starts_at, venue, city, state")
+      // brand_events (not the Member Engage artist_events table this file
+      // was forked from — that table does not exist here, so this push
+      // never fired).
+      .from("brand_events")
+      .select("title, starts_at, event_date, location")
       .eq("id", opts.eventId)
       .maybeSingle();
     if (!event) return;
@@ -31,8 +34,8 @@ export async function notifyRsvpConfirmation(opts: {
           month: "short",
           day: "numeric",
         })
-      : "Soon";
-    const venueStr = [event.venue, event.city].filter(Boolean).join(", ");
+      : ((event.event_date as string | null) || "Soon");
+    const venueStr = ((event.location as string | null) ?? "").trim();
 
     await sendNotification({
       memberId: opts.memberId,

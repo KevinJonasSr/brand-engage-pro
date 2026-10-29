@@ -33,6 +33,26 @@ describe("public.checkins + /profile door", () => {
     assert.match(firstSessionSrc, /from\("checkins"\)/);
   });
 
+  it("awards visit points only through awardPoints with a deterministic source_ref", () => {
+    assert.match(checkinsSrc, /import \{ awardPoints \} from "@\/lib\/points\/award"/);
+    assert.match(checkinsSrc, /awardPoints\(admin, \{/);
+    assert.match(checkinsSrc, /source: "daily_checkin"/);
+    assert.match(checkinsSrc, /sourceRef: checkinSourceRef\(brandSlug, memberId, todayET\)/);
+    assert.match(checkinsSrc, /communityId: brandSlug/);
+    // The source_ref shape already in production is kept so retries collide.
+    assert.match(checkinsSrc, /return `checkin:\$\{brandSlug\}:\$\{memberId\}:\$\{dateET\}`/);
+    // No read-then-write on either denormalised total, and no direct ledger insert.
+    assert.doesNotMatch(checkinsSrc, /select\("total_points"\)/);
+    assert.doesNotMatch(checkinsSrc, /update\(\{ total_points/);
+    assert.doesNotMatch(checkinsSrc, /from\("points_ledger"\)/);
+    // Network event + founder multiplier only when the ledger row was written.
+    assert.match(checkinsSrc, /const \{ awarded \} = await awardPoints/);
+    assert.match(checkinsSrc, /if \(awarded\) \{/);
+    assert.match(checkinsSrc, /scaledPoints\(CHECKIN_POINTS, multiplier\)/);
+    // The checkins insert (which fires the Nellie's 3-visit trigger) stays.
+    assert.match(checkinsSrc, /from\("checkins"\)\.insert\(/);
+  });
+
   it("maps /profile to the member slug or /me instead of 404", () => {
     assert.match(profilePage, /redirect\("\/login\?next=\/profile"\)/);
     assert.match(profilePage, /getMemberProfileSlug/);

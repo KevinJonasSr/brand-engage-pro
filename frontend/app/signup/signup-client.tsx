@@ -57,16 +57,19 @@ export default function SignupPage({
   const searchParams = useSearchParams();
   const community = searchParams.get("community");
   const ref = searchParams.get("ref");
+  // `?brand=` is the brand being joined; older links put the slug in `ref`.
+  const brand = searchParams.get("brand") ?? ref;
   const rawNext = safeRelativePath(searchParams.get("next"), "");
   const next = rawNext || null;
   // Every new account goes through onboarding first (welcome bonus, home
   // brand auto-join, SMS consent). Keep any ?ref=<brand-slug> attribution
   // and carry `next` (for example a QR check-in page) so onboarding can
   // send the member there when it is done.
-  const postSignupHref = buildOnboardingHref(ref, next);
+  const postSignupHref = buildOnboardingHref(ref, next, brand);
   const loginParams = new URLSearchParams();
   if (next) loginParams.set("next", next);
-  if (ref) loginParams.set("ref", ref);
+  if (brand) loginParams.set("brand", brand);
+  if (ref && ref !== brand) loginParams.set("ref", ref);
   const loginHref = `/login${loginParams.size ? `?${loginParams.toString()}` : ""}`;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -169,7 +172,7 @@ export default function SignupPage({
   const canSubmitSignup = signupAllowsSubmit(turnstileGate);
   const signupHelper = signupTurnstileHelper(turnstileGate);
   const reviewTitle = consentReviewTitle({
-    brandSlug: referrerBrand?.slug ?? ref,
+    brandSlug: referrerBrand?.slug ?? brand,
     brandName: referrerBrand?.name,
   });
 
@@ -295,7 +298,7 @@ export default function SignupPage({
     }
   }
 
-  // Contextual hero: when a visitor arrives via /signup?ref=<brand-slug>
+  // Contextual hero: when a visitor arrives via /signup?brand=<brand-slug> (older links: ?ref=)
   // and we successfully resolved that brand server-side, lead with the
   // brand's name + accent gradient + 2-3 perks instead of generic "Join
   // the inner circle" copy. Falls through to the generic header below
