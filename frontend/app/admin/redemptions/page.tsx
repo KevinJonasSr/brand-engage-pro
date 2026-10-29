@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import Image from "next/image";
 import RedemptionAction from "./redemption-action";
 import { listPendingRedemptions } from "@/lib/data/rewards";
+import CodeSearch from "./[code]/code-search";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +32,15 @@ export default async function AdminRedemptionsPage() {
           {pending.length} pending
         </div>
       </div>
+
+      {/* Counter lookup: type or paste a member's code to jump straight to
+          /admin/redemptions/[code] without scrolling the queue. */}
+      <section className="glass-card rounded-lg p-4">
+        <p className="text-xs uppercase tracking-wide text-iron/70">Look up a code</p>
+        <div className="mt-2">
+          <CodeSearch />
+        </div>
+      </section>
 
       {pending.length > 0 ? (
         <div className="glass-card divide-y divide-iron/5 rounded-lg overflow-hidden">

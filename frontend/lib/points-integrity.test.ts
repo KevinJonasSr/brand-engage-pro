@@ -63,7 +63,10 @@ describe("onboard referral payout", () => {
 
   it("moves the total only when the ledger row was written", () => {
     const fn = onboard.slice(onboard.indexOf("async function claimReferral"));
-    assert.match(fn, /if \(!ledgerErr\) \{\s+await addMemberPoints\(admin, referrerId, REFERRAL_POINTS\);/);
+    // Sprint 3: signup pays the friend's welcome bonus; the referrer's 150
+    // is paid on first visit (lib/referrals/first-visit.ts), never here.
+    assert.match(fn, /if \(!ledgerErr\) \{\s+await addMemberPoints\(admin, referredId, REFERRAL_WELCOME_POINTS\);/);
+    assert.doesNotMatch(fn, /addMemberPoints\(admin, referrerId/);
   });
 });
 

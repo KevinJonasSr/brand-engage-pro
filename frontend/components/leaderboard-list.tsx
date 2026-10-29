@@ -82,7 +82,8 @@ export default function LeaderboardList({
               </p>
               {showBreakdown && (
                 <p className="mt-0.5 text-xs text-iron/70">
-                  {entry.reactions > 0 && `${entry.reactions} reactions`}
+                  {entry.visits > 0 && `${entry.visits} visits`}
+                  {entry.reactions > 0 && `${entry.visits > 0 ? " · " : ""}${entry.reactions} reactions`}
                   {entry.comments > 0 && ` · ${entry.comments} comments`}
                   {entry.rsvps > 0 && ` · ${entry.rsvps} RSVPs`}
                   {entry.redemptions > 0 && ` · ${entry.redemptions} redemptions`}

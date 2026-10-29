@@ -13,14 +13,18 @@ import {
   FIRST_SESSION_EYEBROW,
 } from "@/lib/first-session";
 
-// Only list what the app pays today: 150 points to the inviter for each
-// friend who finishes signup (REFERRAL_POINTS in the onboard route). There
-// are no badges or boosts for referral counts yet, so don't promise them.
+// Only list what the app pays today: the friend gets 50 pts at signup, and
+// the inviter gets 150 pts once that friend makes their first check-in
+// (lib/referrals/first-visit.ts). There are no boosts for referral counts
+// beyond that, so don't promise them.
+const REFERRAL_VALUE_COPY =
+  "Your friend gets 50 pts to start. You get 150 pts after their first visit.";
+
 const ladder = [
-  { level: "1 referral", reward: "+150 pts" },
-  { level: "3 referrals", reward: "+450 pts total" },
-  { level: "5 referrals", reward: "+750 pts total" },
-  { level: "10 referrals", reward: "+1,500 pts total" },
+  { level: "1 first visit", reward: "+150 pts" },
+  { level: "3 first visits", reward: "+450 pts total" },
+  { level: "5 first visits", reward: "+750 pts total" },
+  { level: "10 first visits", reward: "+1,500 pts total" },
 ];
 
 async function buildInviteUrl(code: string | null | undefined): Promise<string> {
@@ -47,6 +51,9 @@ export default async function ReferralsPage() {
   const isSignedIn = member !== null;
   const inviteUrl = await buildInviteUrl(member?.referral_code);
   const myCount = myReferrals.length;
+  // Ladder progress counts paid referrals: friends who have made a first visit.
+  const qualifiedCount = myReferrals.filter((r) => r.status === "verified").length;
+  const pendingCount = myCount - qualifiedCount;
 
   const leaderboardRows = isSignedIn
     ? leaderboard.map((row) => ({
@@ -62,16 +69,16 @@ export default async function ReferralsPage() {
           {!isSignedIn && (
             <PreviewSignupBanner
               eyebrow="🎟️ Referrals"
-              headline="Invite friends and earn +150 pts per signup"
-              body="Create a free account to get your personal invite link. You earn +150 points for each friend who joins with it. Every account starts at 0 points."
+              headline="Invite friends. Both of you earn."
+              body={`Create a free account to get your personal invite link. ${REFERRAL_VALUE_COPY} Every account starts at 0 points.`}
               bullets={[
-                "+150 pts every verified signup",
-                "Your points add up with every friend who joins",
+                "Your friend gets +50 pts the moment they join with your link",
+                "You get +150 pts after their first check-in",
                 "Share Nellie's or Jonas Group Entertainment with people you actually know",
               ]}
               primaryCta="Sign up to get my link →"
               nextPath="/referrals"
-              firstRewardLine="🎁 Earn +150 pts the first time someone uses your link."
+              firstRewardLine="🎁 Earn +150 pts the first time an invited friend checks in."
             />
           )}
 
@@ -82,9 +89,14 @@ export default async function ReferralsPage() {
             </h1>
             <p className="mt-4 text-sm text-iron/70">
               {isSignedIn
-                ? `You've invited ${myCount} member${myCount === 1 ? "" : "s"} so far. Keep sharing to climb the ladder.`
+                ? `You've invited ${myCount} member${myCount === 1 ? "" : "s"} so far${
+                    pendingCount > 0
+                      ? ` — ${pendingCount} still ${pendingCount === 1 ? "has" : "have"} a first visit to make`
+                      : ""
+                  }. Keep sharing to climb the ladder.`
                 : "Create an account to get a personal invite link. Your referral count starts at 0."}
             </p>
+            <p className="mt-2 text-sm font-medium text-iron">{REFERRAL_VALUE_COPY}</p>
             <div className="mt-6 flex flex-wrap items-center gap-3">
               {isSignedIn ? (
                 <>
@@ -120,7 +132,7 @@ export default async function ReferralsPage() {
               <div className="mt-4 space-y-4">
                 {ladder.map((step, i) => {
                   const threshold = [1, 3, 5, 10][i];
-                  const unlocked = isSignedIn && myCount >= threshold;
+                  const unlocked = isSignedIn && qualifiedCount >= threshold;
                   return (
                     <div
                       key={step.level}
@@ -186,7 +198,12 @@ export default async function ReferralsPage() {
                 <ul className="mt-4 space-y-3 text-sm text-iron/70">
                   {myReferrals.slice(0, 5).map((r) => (
                     <li key={r.id}>
-                      • {r.referred_email ?? "Invite"} — {r.status}
+                      • {r.referred_email ?? "Invite"} —{" "}
+                      {r.status === "verified"
+                        ? "first visit made"
+                        : r.status === "pending"
+                          ? "joined, first visit pending"
+                          : r.status}
                       {r.points_awarded ? ` (+${r.points_awarded} pts)` : ""}
                     </li>
                   ))}

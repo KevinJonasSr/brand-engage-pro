@@ -8,6 +8,11 @@ import { claimFreeFoundingOnJoin } from "@/lib/founding";
 import { CURRENT_CONSENT_VERSION } from "@/lib/consent-version";
 import { parseBirthdayMonth } from "@/lib/birthday-month";
 import {
+  REFERRAL_QUALIFIED_POINTS,
+  REFERRAL_WELCOME_POINTS,
+  referralWelcomeSourceRef,
+} from "@/lib/referrals/first-visit";
+import {
   buildMemberProfileUpdates,
   isOnboardDraft,
   isOnboardingComplete,
@@ -19,8 +24,11 @@ import {
 
 export const runtime = "nodejs";
 
-/** Points the referrer earns, once, per new member they bring in. */
-const REFERRAL_POINTS = 150;
+/**
+ * Points the referrer earns, once, per new member they bring in — paid on
+ * the friend's first check-in (lib/referrals/first-visit.ts), not here.
+ */
+const REFERRAL_POINTS = REFERRAL_QUALIFIED_POINTS;
 const SIGNUP_BONUS_POINTS = 100;
 /** Launch default when a signup carries no brand context. */
 const NELLIES_HOME_BRAND = "nellies";
@@ -426,11 +434,15 @@ async function addMemberPoints(
 }
 
 /**
- * Record a referral and pay the referrer once. The referral row is the
- * one-time claim: referrals_referred_unique (0059) rejects a second row
- * for the same new member, so a replayed onboard POST pays nothing. The
- * ledger unique index (0059) is a second guard, and the running total only
- * moves when the ledger row was actually written.
+ * Record a referral and pay the *friend* a welcome bonus once. The referral
+ * row is the one-time claim: referrals_referred_unique (0059) rejects a
+ * second row for the same new member, so a replayed onboard POST pays
+ * nothing. The ledger unique index (0059) is a second guard, and the running
+ * total only moves when the ledger row was actually written.
+ *
+ * The referrer is NOT paid here. The row starts 'pending' and flips to
+ * 'verified' (+REFERRAL_POINTS to the referrer) on the friend's first
+ * check-in — see qualifyReferralOnFirstVisit in lib/referrals/first-visit.ts.
  */
 async function claimReferral(
   admin: ReturnType<typeof createAdminClient>,
@@ -450,9 +462,9 @@ async function claimReferral(
     referrer_id: referrerId,
     referred_id: referredId,
     referred_email: referredEmail,
-    status: "verified",
-    points_awarded: REFERRAL_POINTS,
-    verified_at: new Date().toISOString(),
+    status: "pending",
+    points_awarded: 0,
+    referee_bonus_awarded_at: new Date().toISOString(),
   });
   if (referralErr) {
     if (referralErr.code !== "23505") {
@@ -461,17 +473,19 @@ async function claimReferral(
     return;
   }
 
+  // Welcome bonus for the friend who used the link (0059 unique index on
+  // source_ref makes a replay a no-op; totals move only on a fresh row).
   const { error: ledgerErr } = await admin.from("points_ledger").insert({
-    member_id: referrerId,
-    delta: REFERRAL_POINTS,
-    source: "referral",
-    source_ref: referredId,
-    note: `Referred by ${referredEmail}`,
+    member_id: referredId,
+    delta: REFERRAL_WELCOME_POINTS,
+    source: "referral_welcome",
+    source_ref: referralWelcomeSourceRef(referredId),
+    note: "Welcome bonus for joining through a friend's invite",
   });
   if (!ledgerErr) {
-    await addMemberPoints(admin, referrerId, REFERRAL_POINTS);
+    await addMemberPoints(admin, referredId, REFERRAL_WELCOME_POINTS);
   } else if (ledgerErr.code !== "23505") {
-    console.warn("onboard: referral ledger insert failed", ledgerErr);
+    console.warn("onboard: referral welcome ledger insert failed", ledgerErr);
   }
 
   await admin
@@ -480,7 +494,8 @@ async function claimReferral(
     .eq("id", referredId);
 
   // Jonas Network: the referrer converted a new member. One event per
-  // referred member (the referral insert above is the claim).
+  // referred member (the referral insert above is the claim). The referrer
+  // payout happens later, on the friend's first check-in.
   emitNetworkEvent({
     event_type: "referral.converted",
     local_actor_id: referrerId,
@@ -490,7 +505,9 @@ async function claimReferral(
     metadata: {
       referred_member_id: referredId,
       referral_code: referralCode,
-      points_awarded: REFERRAL_POINTS,
+      points_awarded: 0,
+      referee_welcome_points: REFERRAL_WELCOME_POINTS,
+      referrer_points_on_first_visit: REFERRAL_POINTS,
     },
   });
 }

@@ -6,9 +6,16 @@ import { createAdminClient } from "../supabase/admin.ts";
 import { awardPoints } from "../points/award.ts";
 
 /**
- * Daily streak touch — call once per Member Home render.
+ * Streak touch — call once per Member Home render. Two streaks come back:
  *
- * Increments the member's current streak if today is the day after their last
+ *   - Login streak (days, UTC): the daily "showed up" bonus below. Product
+ *     kept the points but the card now demotes this to a footnote.
+ *   - Visit streak (weeks, ET): consecutive Mon–Sun weeks with ≥1 check-in
+ *     at any brand, read from `checkins` each call, with one-time bonuses at
+ *     4 / 8 / 26 / 52 weeks. This is what the card headlines — "streak" to
+ *     a restaurant regular means visits, not page loads.
+ *
+ * Login streak: increments the member's current streak if today is the day after their last
  * active date, resets to 1 if more than a day has passed, and no-ops if
  * we've already counted them today.
  *
@@ -37,6 +44,18 @@ export interface StreakState {
   pointsAwardedThisVisit: number;
   newMilestone: number | null; // 7 / 30 / 100 / 365 — null if no milestone hit
   isNewToday: boolean;          // true if we incremented or reset on this call
+  /**
+   * Visit streak: consecutive calendar weeks (Mon–Sun, America/New_York)
+   * with at least one check-in at any brand. Computed from `checkins` on
+   * every call; the current, still-open week does not break the streak
+   * until it is over. See computeVisitStreak.
+   */
+  visitStreakWeeks: number;
+  longestVisitStreakWeeks: number;
+  /** Next of VISIT_MILESTONE_WEEKS not yet reached; null past 52. */
+  nextVisitMilestone: number | null;
+  /** 4 / 8 / 26 / 52 when this call credited a visit-streak milestone bonus. */
+  newVisitMilestone: number | null;
 }
 
 /**
@@ -72,6 +91,191 @@ export const MILESTONES: Record<number, number> = {
   100: 1000,
   365: 5000,
 };
+
+// ---------------------------------------------------------------------------
+// Visit streak (weekly, from the checkins table)
+// ---------------------------------------------------------------------------
+
+/** Check-ins are day-scoped in ET (lib/data/checkins.ts, 0035 unique index). */
+export const VISIT_STREAK_TIME_ZONE = "America/New_York";
+
+/** Milestone bonuses (one-time) at 4 / 8 / 26 / 52 consecutive visit weeks. */
+export const VISIT_MILESTONES: Record<number, number> = {
+  4: 100,
+  8: 250,
+  26: 1000,
+  52: 2500,
+};
+export const VISIT_MILESTONE_WEEKS = [4, 8, 26, 52] as const;
+
+/** One visit-streak milestone bonus per member per milestone, ever. */
+export function visitStreakMilestoneSourceRef(memberId: string, weeks: number): string {
+  return `visit-streak-milestone:${memberId}:${weeks}`;
+}
+
+/**
+ * Most recent check-in rows we read per touch. One check-in per brand per
+ * day means a 52-week streak at one brand needs 52 rows; the cap only
+ * matters for a member who checks in at several brands every day for
+ * years, and even then it truncates the count far past the top milestone.
+ */
+export const VISIT_STREAK_ROW_CAP = 2000;
+
+/** Civil date (YYYY-MM-DD) of `at` in the brand time zone. */
+export function visitDateET(at: Date): string {
+  return at.toLocaleDateString("en-CA", { timeZone: VISIT_STREAK_TIME_ZONE });
+}
+
+/**
+ * Week bucket of a civil date: whole weeks since the Monday of the epoch
+ * week (1969-12-29). Weeks run Monday–Sunday so a Friday dinner and the
+ * Sunday brunch after it count as the same week — restaurant regulars are
+ * weekend regulars. 1970-01-01 was a Thursday, hence the +3.
+ */
+export function weekIndexOfDate(dateStr: string): number {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const days = Math.floor(Date.UTC(y, m - 1, d) / 86_400_000);
+  return Math.floor((days + 3) / 7);
+}
+
+/** Week bucket of an instant, measured on its ET calendar date. */
+export function weekIndexOf(at: Date): number {
+  return weekIndexOfDate(visitDateET(at));
+}
+
+export interface VisitStreak {
+  currentWeeks: number;
+  longestWeeks: number;
+  /** True when the member has already checked in during the current week. */
+  visitedThisWeek: boolean;
+}
+
+/**
+ * Pure weekly-streak arithmetic. `checkinTimes` are check-in instants (any
+ * order, any brand); `now` fixes the current week.
+ *
+ * Rule: the streak is the run of consecutive weeks with ≥1 check-in that
+ * ends in the current week or, because the current week is still open,
+ * in the week before it. A member who visited last week but not yet this
+ * week keeps their streak; it only breaks once a whole week passes with
+ * no visit. Longest is the longest such run anywhere in the rows given.
+ */
+export function computeVisitStreak(
+  checkinTimes: Array<Date | string>,
+  now: Date,
+): VisitStreak {
+  const weeks = new Set<number>();
+  for (const t of checkinTimes) {
+    const d = t instanceof Date ? t : new Date(t);
+    if (Number.isFinite(d.getTime())) weeks.add(weekIndexOf(d));
+  }
+  if (weeks.size === 0) {
+    return { currentWeeks: 0, longestWeeks: 0, visitedThisWeek: false };
+  }
+
+  const thisWeek = weekIndexOf(now);
+  const visitedThisWeek = weeks.has(thisWeek);
+  let currentWeeks = 0;
+  let cursor = visitedThisWeek ? thisWeek : weeks.has(thisWeek - 1) ? thisWeek - 1 : null;
+  while (cursor !== null && weeks.has(cursor)) {
+    currentWeeks += 1;
+    cursor -= 1;
+  }
+
+  // Longest run: walk the sorted distinct weeks (ignore weeks after `now`,
+  // which can only come from clock skew).
+  let longestWeeks = 0;
+  let run = 0;
+  let prev: number | null = null;
+  for (const w of Array.from(weeks).filter((w) => w <= thisWeek).sort((a, b) => a - b)) {
+    run = prev !== null && w === prev + 1 ? run + 1 : 1;
+    if (run > longestWeeks) longestWeeks = run;
+    prev = w;
+  }
+
+  return { currentWeeks, longestWeeks: Math.max(longestWeeks, currentWeeks), visitedThisWeek };
+}
+
+/** Next visit milestone (in weeks) above `currentWeeks`; null past the top. */
+export function nextVisitMilestone(currentWeeks: number): number | null {
+  for (const m of VISIT_MILESTONE_WEEKS) {
+    if (currentWeeks < m) return m;
+  }
+  return null;
+}
+
+/** Benign zero-state for the visit-streak fields. */
+const NO_VISIT_STREAK = {
+  visitStreakWeeks: 0,
+  longestVisitStreakWeeks: 0,
+  nextVisitMilestone: VISIT_MILESTONE_WEEKS[0] as number | null,
+  newVisitMilestone: null as number | null,
+};
+
+type VisitStreakFields = typeof NO_VISIT_STREAK;
+
+/**
+ * Read the member's check-ins, compute the weekly visit streak and, when
+ * the streak sits exactly on a milestone, credit the one-time bonus. The
+ * bonus goes through awardPoints with a deterministic source_ref, so a
+ * repeat render in the same milestone week is a no-op (awarded: false).
+ *
+ * Own try/catch: a checkins hiccup must not take the login streak down
+ * with it, and vice versa.
+ */
+async function touchVisitStreak(
+  admin: SupabaseClient,
+  memberId: string,
+  now: Date,
+): Promise<VisitStreakFields> {
+  try {
+    const { data: rows, error } = await admin
+      .from("checkins")
+      .select("created_at")
+      .eq("member_id", memberId)
+      .order("created_at", { ascending: false })
+      .limit(VISIT_STREAK_ROW_CAP);
+    if (error) throw error;
+
+    const streak = computeVisitStreak(
+      ((rows ?? []) as Array<{ created_at: string }>).map((r) => r.created_at),
+      now,
+    );
+    const fields: VisitStreakFields = {
+      visitStreakWeeks: streak.currentWeeks,
+      longestVisitStreakWeeks: streak.longestWeeks,
+      nextVisitMilestone: nextVisitMilestone(streak.currentWeeks),
+      newVisitMilestone: null,
+    };
+
+    const milestone = streak.currentWeeks in VISIT_MILESTONES ? streak.currentWeeks : null;
+    if (milestone) {
+      const result = await awardPoints(admin, {
+        memberId,
+        delta: VISIT_MILESTONES[milestone],
+        source: STREAK_LEDGER_SOURCE,
+        sourceRef: visitStreakMilestoneSourceRef(memberId, milestone),
+        note: `${milestone}-week visit streak milestone`,
+      });
+      if (result.awarded) {
+        fields.newVisitMilestone = milestone;
+        await admin.from("streak_log").insert([
+          {
+            member_id: memberId,
+            event_type: "milestone",
+            streak_days: milestone * 7,
+            points_awarded: result.delta,
+            metadata: { kind: "visit_streak_milestone", weeks: milestone },
+          },
+        ]);
+      }
+    }
+    return fields;
+  } catch (err) {
+    console.warn("touchVisitStreak failed (non-blocking):", err);
+    return { ...NO_VISIT_STREAK };
+  }
+}
 
 /** True when `today` is exactly one calendar day after `lastDate` (UTC). */
 function isConsecutiveDay(today: Date, lastDate: Date): boolean {
@@ -183,19 +387,46 @@ export async function touchStreak(
   memberId: string,
   options: TouchStreakOptions = {},
 ): Promise<StreakState> {
-  const benign: StreakState = {
-    currentStreakDays: 0,
-    longestStreakDays: 0,
-    lastActiveDate: null,
-    pointsAwardedThisVisit: 0,
-    newMilestone: null,
-    isNewToday: false,
-  };
-
+  const benign: StreakState = { ...BENIGN_LOGIN_STREAK, ...NO_VISIT_STREAK };
   if (!memberId) return benign;
 
+  let admin: SupabaseClient;
   try {
-    const admin = options.admin ?? createAdminClient();
+    admin = options.admin ?? createAdminClient();
+  } catch (err) {
+    console.warn("touchStreak failed (non-blocking):", err);
+    return benign;
+  }
+  const now = options.now ?? new Date();
+
+  // The two halves read different tables and fail independently.
+  const [login, visit] = await Promise.all([
+    touchLoginStreak(admin, memberId, now),
+    touchVisitStreak(admin, memberId, now),
+  ]);
+  return { ...login, ...visit };
+}
+
+type LoginStreakState = Omit<StreakState, keyof VisitStreakFields>;
+
+const BENIGN_LOGIN_STREAK: LoginStreakState = {
+  currentStreakDays: 0,
+  longestStreakDays: 0,
+  lastActiveDate: null,
+  pointsAwardedThisVisit: 0,
+  newMilestone: null,
+  isNewToday: false,
+};
+
+/** The daily login half of touchStreak (see the doc comment above). */
+async function touchLoginStreak(
+  admin: SupabaseClient,
+  memberId: string,
+  today: Date,
+): Promise<LoginStreakState> {
+  const benign = BENIGN_LOGIN_STREAK;
+
+  try {
     const { data: member, error: fetchError } = await admin
       .from("members")
       .select("id, current_streak_days, longest_streak_days, last_active_date")
@@ -204,7 +435,6 @@ export async function touchStreak(
 
     if (fetchError || !member) return benign;
 
-    const today = options.now ?? new Date();
     const todayDateStr = today.toISOString().slice(0, 10); // YYYY-MM-DD UTC
 
     const t = computeStreakTransition(
@@ -344,7 +574,7 @@ export async function touchStreak(
     };
   } catch (err) {
     // Streak is non-essential — never let it crash Member Home.
-    console.warn("touchStreak failed (non-blocking):", err);
+    console.warn("touchLoginStreak failed (non-blocking):", err);
     return benign;
   }
 }

@@ -7,6 +7,8 @@ import {
 } from "@/lib/data/checkins";
 import { apiRateLimiter } from "@/lib/rate-limit";
 import {
+  CHECKIN_TOKEN_EXPIRED_CODE,
+  CHECKIN_TOKEN_EXPIRED_MESSAGE,
   CHECKIN_TOKEN_REQUIRED_MESSAGE,
   checkinSecretFromEnv,
   checkinTokenDecision,
@@ -23,6 +25,9 @@ let warnedUnconfigured = false;
  * `token` is the HMAC from the in-store QR code (see lib/checkin-token.ts).
  * When CHECKIN_SIGNING_SECRET is set it is required; when it is not set the
  * check-in is allowed and a one-line warning is logged (rollout safety).
+ * Tokens rotate every ROTATION_SECONDS unless CHECKIN_TOKEN_ROTATION=off;
+ * a token that has rotated out gets 403 { error: "expired_code" } so the
+ * landing page can say "scan the live QR again" instead of "scan the QR".
  *
  * Requires a valid member session. Records a visit check-in and awards
  * CHECKIN_POINTS points (idempotent — one per member per brand per day).
@@ -66,6 +71,12 @@ export async function POST(req: Request) {
 
   const decision = checkinTokenDecision(brandSlug, token, checkinSecretFromEnv());
   if (!decision.allow) {
+    if (decision.reason === "expired") {
+      return NextResponse.json(
+        { error: CHECKIN_TOKEN_EXPIRED_CODE, message: CHECKIN_TOKEN_EXPIRED_MESSAGE },
+        { status: 403 },
+      );
+    }
     return NextResponse.json({ error: CHECKIN_TOKEN_REQUIRED_MESSAGE }, { status: 403 });
   }
   if (decision.reason === "unconfigured" && !warnedUnconfigured) {

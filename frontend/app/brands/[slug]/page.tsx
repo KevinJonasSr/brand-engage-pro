@@ -35,6 +35,7 @@ import { getFoundingClaims } from "@/lib/founding";
 import { JGE_BRAND_SLUG } from "@/lib/jge-launch";
 import { NELLIES_BRAND_SLUG } from "@/lib/nellies-launch";
 import Reveal from "@/components/reveal";
+import { describeTodayHours, googleMapsSearchUrl, telHref } from "@/lib/brand-hours";
 
 const NELLIES_PHOTOS = [
   {
@@ -71,6 +72,15 @@ export async function generateMetadata(
     title: `${brand.name}`,
     description: brand.tagline,
   };
+}
+
+/** "https://www.nelliessouthernkitchen.com/" → "nelliessouthernkitchen.com" */
+function websiteLabel(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
 }
 
 async function getFounderCount(communitySlug: string): Promise<{ count: number; cap: number } | null> {
@@ -147,6 +157,7 @@ export default async function BrandPage({
 
   const showFounderLink = founderData && founderData.cap > 0;
   const mobileHero = mobileHeroFor(brand.heroImage);
+  const todayHours = describeTodayHours(brand.hours);
 
   return (
     <main className="mx-auto max-w-6xl space-y-10 px-6 py-12">
@@ -233,6 +244,79 @@ export default async function BrandPage({
           )}
         </div>
       </section>
+
+      {/* Visit essentials — address / hours / phone / website (brands 0024).
+          Only rows that exist render; fallback brands show nothing. */}
+      {(brand.address || todayHours.label || brand.phone || brand.websiteUrl) && (
+        <Reveal>
+        <section
+          aria-label="Visit"
+          className="rounded-lg border border-iron/10 bg-iron/5 backdrop-blur p-4"
+        >
+          <p className="text-xs uppercase tracking-wide text-iron/70">Visit</p>
+          <dl className="mt-2 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+            {brand.address && (
+              <div className="flex items-center gap-2">
+                <dt className="sr-only">Address</dt>
+                <dd>
+                  <a
+                    href={googleMapsSearchUrl(brand.address)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-iron/80 underline-offset-4 transition hover:text-iron hover:underline"
+                  >
+                    📍 {brand.address}
+                  </a>
+                </dd>
+              </div>
+            )}
+            {todayHours.label && (
+              <div className="flex items-center gap-2">
+                <dt className="sr-only">Hours</dt>
+                <dd className="inline-flex items-center gap-2 text-iron/80">
+                  <span
+                    aria-hidden
+                    className={
+                      "inline-block h-2 w-2 rounded-full " +
+                      (todayHours.openNow ? "bg-sage" : "bg-iron/30")
+                    }
+                  />
+                  {todayHours.label}
+                </dd>
+              </div>
+            )}
+            {brand.phone && (
+              <div className="flex items-center gap-2">
+                <dt className="sr-only">Phone</dt>
+                <dd>
+                  <a
+                    href={telHref(brand.phone)}
+                    className="font-medium text-iron/80 underline-offset-4 transition hover:text-iron hover:underline"
+                  >
+                    📞 {brand.phone}
+                  </a>
+                </dd>
+              </div>
+            )}
+            {brand.websiteUrl && (
+              <div className="flex items-center gap-2">
+                <dt className="sr-only">Website</dt>
+                <dd>
+                  <a
+                    href={brand.websiteUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-iron/80 underline-offset-4 transition hover:text-iron hover:underline"
+                  >
+                    {websiteLabel(brand.websiteUrl)} ↗
+                  </a>
+                </dd>
+              </div>
+            )}
+          </dl>
+        </section>
+        </Reveal>
+      )}
 
       {/* Founder wall link */}
       <Reveal>

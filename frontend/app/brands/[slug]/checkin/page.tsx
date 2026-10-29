@@ -22,7 +22,11 @@ type State =
       progress: CheckinProgress | null;
     }
   | { status: "error"; message: string }
+  | { status: "expired" }
   | { status: "unauthenticated" };
+
+/** API error code for a QR token that has rotated out (see lib/checkin-token.ts). */
+const EXPIRED_CODE = "expired_code";
 
 /**
  * /brands/[slug]/checkin
@@ -114,6 +118,34 @@ export default function CheckinPage() {
             You&apos;ve already earned your visit points at {brandName} today. See you tomorrow!
           </p>
           <CheckinLinks brandSlug={brandSlug} brandName={brandName} primary="brand" />
+        </div>
+      )}
+
+      {state.status === "expired" && (
+        <div className="space-y-6">
+          <div className="text-5xl">⌛</div>
+          <h1 className="text-2xl font-semibold">This code has expired</h1>
+          <p className="max-w-xs text-sm text-iron/70">
+            This code has expired — ask for the live QR at the counter, then scan it again
+            to check in at {brandName}.
+          </p>
+          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <button
+              onClick={() => {
+                setState({ status: "resolving" });
+                runCheckin();
+              }}
+              className="rounded-full bg-ember px-6 py-3 text-sm font-semibold text-linen"
+            >
+              Scan again
+            </button>
+            <Link
+              href={`/brands/${brandSlug}`}
+              className="rounded-full border border-iron/20 px-6 py-3 text-sm font-medium text-iron/80 hover:bg-iron/10"
+            >
+              Back to {brandName}
+            </Link>
+          </div>
         </div>
       )}
 
@@ -283,6 +315,10 @@ async function performCheckin(
     }
 
     const data = await res.json();
+    if (res.status === 403 && data?.error === EXPIRED_CODE) {
+      report({ status: "expired" });
+      return;
+    }
     if (!res.ok) {
       report({ status: "error", message: data.error ?? "Something went wrong" });
       return;

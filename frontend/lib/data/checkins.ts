@@ -3,6 +3,7 @@ import { isPremiumTier } from "@/lib/entitlements";
 import { ledgerNote, pointsMultiplier, scaledPoints } from "@/lib/founder-perks";
 import { emitNetworkEvent } from "@/lib/network";
 import { awardPoints } from "@/lib/points/award";
+import { qualifyReferralOnFirstVisit } from "@/lib/referrals/first-visit";
 import { getLifetimePoints, getSpendablePoints } from "@/lib/data/member";
 import { tierProgress } from "@/lib/data/member-points";
 import { getStampCardData } from "@/lib/data/stamp-card";
@@ -112,6 +113,13 @@ export async function recordCheckin(
       metadata: { community_id: brandSlug, points_awarded: pointsAwarded },
     });
   }
+
+  // Referral payout: if this member joined through an invite and this is
+  // their first check-in ever, the referrer is paid now. Fire-and-forget —
+  // the hook never throws and must not slow or fail the check-in.
+  void qualifyReferralOnFirstVisit(memberId, brandSlug).catch((err: unknown) => {
+    console.warn("recordCheckin: referral first-visit hook failed", err);
+  });
 
   return { ok: true, alreadyCheckedIn: false, pointsAwarded };
 }
