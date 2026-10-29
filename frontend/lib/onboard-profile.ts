@@ -14,6 +14,8 @@ export type OnboardProfilePayload = {
   favoriteBrand?: string | null;
   interest?: string | null;
   referralCode?: string;
+  /** Brand the member is joining (`?brand=<slug>`). Joined + followed on finish. */
+  brandSlug?: string | null;
   /** Legacy flag. Ignored unless smsConsent is also true. */
   smsOptedIn?: boolean;
   /** True only when the member ticked the SMS consent box. */

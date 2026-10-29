@@ -86,7 +86,7 @@ export default async function RewardsPage() {
             <PreviewSignupBanner
               eyebrow="🎁 Member rewards"
               headline="Join free and earn from real visits"
-              body={`New members start at 0 points and earn from visits, check-ins, and the community. At Nellie's: ${nelliesSummary}. Bourbon & Cigar Night is September 23 at 7:00 PM ET in the Private Dining Room.`}
+              body={`New members start at 0 points and earn from visits, check-ins, and the community. At Nellie's: ${nelliesSummary}.`}
               bullets={[
                 "+100 welcome points after you finish your profile",
                 "Move up from Bronze to Platinum as you earn points",
@@ -126,8 +126,7 @@ export default async function RewardsPage() {
               Tiers go Bronze, Silver, Gold, then Platinum as you earn points from visits. The first
               100 members of each brand join as Founders for free. Brands pay, guests join free.
               At Nellie&apos;s, you earn from visits and check-ins, and you also get{" "}
-              {nelliesPitch}. Bourbon &amp; Cigar Night is September 23 at 7:00 PM ET in the
-              Private Dining Room.
+              {nelliesPitch}.
             </p>
             <div className="mt-8 space-y-4">
               <div className="flex items-center justify-between text-sm text-iron/70">

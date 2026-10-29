@@ -125,7 +125,7 @@ export default async function BrandCommunityPage({
               Sign in
             </Link>
             <Link
-              href={`/signup?ref=${encodeURIComponent(slug)}&next=${encodeURIComponent(`/brands/${slug}/community`)}`}
+              href={`/signup?brand=${encodeURIComponent(slug)}&next=${encodeURIComponent(`/brands/${slug}/community`)}`}
               className="rounded-full bg-ember px-4 py-2 text-xs font-semibold text-linen shadow-glass"
             >
               Create account

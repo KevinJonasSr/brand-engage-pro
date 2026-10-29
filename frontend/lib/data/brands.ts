@@ -74,7 +74,11 @@ function rowToBrand(row: BrandRow, events: BrandEvent[]): Brand {
         row.slug,
         events.filter((e) => {
           if (!e.active) return false;
-          // Hide past events from the Upcoming strip (guest trust).
+          // Hide past events from the Upcoming strip (guest trust). An
+          // event is over once its end passes, or its start if it has no end.
+          if (e.ends_at) {
+            return new Date(e.ends_at).getTime() >= Date.now();
+          }
           if (e.starts_at) {
             return new Date(e.starts_at).getTime() >= Date.now();
           }

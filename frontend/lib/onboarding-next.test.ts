@@ -26,6 +26,17 @@ describe("buildOnboardingHref", () => {
     assert.equal(params.get("next"), CHECKIN);
   });
 
+  it("carries brand attribution separately from a referral code", () => {
+    assert.equal(buildOnboardingHref(null, null, "nellies"), "/onboarding?brand=nellies");
+    const href = buildOnboardingHref("ABC123", CHECKIN, "nellies");
+    const params = new URL(href, "https://x.invalid").searchParams;
+    assert.equal(params.get("brand"), "nellies");
+    assert.equal(params.get("ref"), "ABC123");
+    assert.equal(params.get("next"), CHECKIN);
+    // Older links put the slug in ref; passing the same value twice emits it once.
+    assert.equal(buildOnboardingHref("nellies", null, "nellies"), "/onboarding?brand=nellies");
+  });
+
   it("does not nest onboarding, signup or login as next", () => {
     assert.equal(buildOnboardingHref(null, "/onboarding"), "/onboarding");
     assert.equal(buildOnboardingHref(null, "/onboarding?ref=x"), "/onboarding");

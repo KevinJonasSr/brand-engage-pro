@@ -96,7 +96,7 @@ export default async function EventsPage() {
             Sign in to RSVP
           </Link>
           <Link
-            href={`/signup?ref=nellies&next=${RSVP_NEXT}`}
+            href={`/signup?brand=nellies&next=${RSVP_NEXT}`}
             className="rounded-full border border-iron/25 px-4 py-2 text-sm font-medium text-iron/85 hover:bg-iron/10"
           >
             Join to RSVP

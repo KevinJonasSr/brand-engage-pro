@@ -35,13 +35,22 @@ export function onboardingNextTarget(
   return next;
 }
 
-/** /onboarding URL that carries `ref` attribution and the `next` target. */
+/**
+ * /onboarding URL that carries attribution and the `next` target.
+ *
+ * `brand` is the brand the member is joining (`?brand=<slug>`); `ref` is a
+ * referral code (`?ref=<code>`). Older links sent the brand slug as `ref`,
+ * so readers treat `brand ?? ref` as the brand and the server falls back to
+ * "is this ref an active brand slug?" when no referrer matches it.
+ */
 export function buildOnboardingHref(
   ref: string | null | undefined,
   next: string | null | undefined,
+  brand?: string | null,
 ): string {
   const params = new URLSearchParams();
-  if (ref) params.set("ref", ref);
+  if (brand) params.set("brand", brand);
+  if (ref && ref !== brand) params.set("ref", ref);
   const target = onboardingNextTarget(next);
   if (target) params.set("next", target);
   const query = params.toString();

@@ -6,9 +6,10 @@ import { hasBrowserSignedOutMarker } from "@/lib/auth-cookies";
 
 /**
  * Tasteful "Install Brand Engage Pro" prompt that appears after a member
- * engages for a bit (not immediately on first visit). Registers the service
- * worker and listens for the browser's `beforeinstallprompt` event so we can
- * offer our own button instead of relying on the browser's mini-infobar.
+ * engages for a bit (not immediately on first visit). Listens for the
+ * browser's `beforeinstallprompt` event so we can offer our own button
+ * instead of relying on the browser's mini-infobar. (The service worker
+ * itself is registered by components/register-sw.tsx.)
  *
  * Gated on the member having at least one brand follow — anonymous visitors
  * and brand-new sign-ups shouldn't see the install banner before they've
@@ -94,13 +95,9 @@ export default function InstallPrompt() {
   useEffect(() => {
     if (dismissed || !hasFollows) return;
 
-    // Register SW — ignored on http: (localhost works because it's treated
-    // as secure).
-    if ("serviceWorker" in navigator && window.location.protocol === "https:") {
-      navigator.serviceWorker.register("/sw.js").catch(() => {
-        /* don't crash — SW is optional */
-      });
-    }
+    // Service worker registration lives in components/register-sw.tsx
+    // (mounted unconditionally from app/layout.tsx), so the banner no
+    // longer gates it.
 
     // Already installed? standalone display-mode detection.
     const isStandalone =

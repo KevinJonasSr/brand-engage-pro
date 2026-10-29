@@ -286,6 +286,12 @@ export default function OnboardingWizard({
               ?.split("=")[1]
           : undefined;
       const refCode = refFromUrl ?? refFromCookie;
+      // The brand the member is joining. Older links sent the slug as `ref`;
+      // the server checks whether `ref` names a brand when no referrer matches.
+      const brandFromUrl =
+        typeof window !== "undefined"
+          ? new URLSearchParams(window.location.search).get("brand") ?? undefined
+          : undefined;
       const onboardRes = await fetch("/api/member-engage/onboard", {
         method: "POST",
         credentials: "same-origin",
@@ -298,6 +304,7 @@ export default function OnboardingWizard({
           favoriteBrand: resolveFavoriteBrand(),
           interest: formState.interest,
           referralCode: refCode,
+          brandSlug: brandFromUrl,
           birthdayMonth: formState.birthdayMonth || undefined,
           smsConsent: formState.phone ? smsConsent : false,
           emailOptedIn: Boolean(formState.email),

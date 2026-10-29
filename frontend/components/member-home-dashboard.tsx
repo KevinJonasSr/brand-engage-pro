@@ -20,6 +20,7 @@ export default function MemberHomeDashboard({ data, streak, recap }: { data: Mem
     badgesInProgress,
     premiumCommunities,
     founderCommunities,
+    spendablePoints,
   } = data;
 
   const primaryCommunity = followedBrands[0]?.slug ?? null;
@@ -74,7 +75,7 @@ export default function MemberHomeDashboard({ data, streak, recap }: { data: Mem
       {/* Spend your points card */}
       <SpendPointsCard
         primaryCommunity={primaryCommunity}
-        points={member.total_points}
+        points={spendablePoints}
       />
     </section>
   );
@@ -187,7 +188,7 @@ function UpcomingEventsList({
   hasFollows: boolean;
 }) {
   // Empty state copy depends on why the list is empty:
-  //   - member follows nobody → nudge to follow an brand
+  //   - member follows nobody → nudge to follow a brand
   //   - member follows brands but none have upcoming public events → say so
   if (events.length === 0) {
     return (
@@ -195,8 +196,8 @@ function UpcomingEventsList({
         <p className="text-xs uppercase tracking-wide text-iron/70">Upcoming</p>
         <p className="mt-3 text-sm text-iron/70">
           {hasFollows
-            ? "No upcoming shows from your brands yet — check back soon."
-            : "Follow an brand to see their upcoming shows here."}
+            ? "No upcoming events from your brands yet — check back soon."
+            : "Follow a brand to see its upcoming events here."}
         </p>
       </div>
     );
@@ -297,7 +298,7 @@ function RecentActivityFeed({
         <p className="mt-3 text-sm text-iron/70">
           {hasFollows
             ? "Nothing new from your brands yet."
-            : "Follow an brand to see their community posts here."}
+            : "Follow a brand to see its community posts here."}
         </p>
       </div>
     );

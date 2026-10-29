@@ -178,7 +178,7 @@ function SignedOutCheckin({
   checkinPath: string;
 }) {
   const loginHref = `/login?next=${encodeURIComponent(checkinPath)}`;
-  const joinHref = `/signup?ref=${encodeURIComponent(brandSlug ?? "")}&next=${encodeURIComponent(checkinPath)}`;
+  const joinHref = `/signup?brand=${encodeURIComponent(brandSlug ?? "")}&next=${encodeURIComponent(checkinPath)}`;
 
   return (
     <div className="space-y-6">

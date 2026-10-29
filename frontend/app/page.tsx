@@ -23,9 +23,9 @@ import { gatherWeeklyRecap } from "@/lib/personal-recap/gather";
 
 const quickActions: { label: string; href: string }[] = [
   { label: "Share referral link", href: "/referrals" },
-  { label: "Browse marketplace", href: "/marketplace" },
+  { label: "Browse brands", href: "/brands" },
   { label: "Check rewards", href: "/rewards" },
-  { label: "Invite a friend", href: "/onboarding" },
+  { label: "My member card", href: "/me/card" },
 ];
 
 function formatPts(n: number | null | undefined) {
@@ -183,15 +183,9 @@ export default async function Home({
             </div>
           </section>
 
-          <section className="grid gap-6 lg:grid-cols-2">
-            <div className="glass-card space-y-4 p-6">
-              <p className="flex items-center gap-2 text-sm uppercase tracking-wide text-iron/70">
-                <span>📅</span> Upcoming Events
-              </p>
-              <div className="rounded-lg border border-dashed border-iron/15 bg-parchment/20 p-6 text-center text-xs text-iron/70">
-                No events scheduled yet. New offers and member events will show here.
-              </div>
-            </div>
+          <section className="grid gap-6">
+            {/* Upcoming events live in MemberHomeDashboard above (real data);
+                the old static placeholder panel contradicted it. */}
             <div className="glass-card space-y-4 p-6">
               <p className="flex items-center gap-2 text-sm uppercase tracking-wide text-iron/70">
                 <span>🎁</span> Recommended Offers

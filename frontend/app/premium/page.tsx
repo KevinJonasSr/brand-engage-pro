@@ -52,7 +52,7 @@ export default async function PremiumPage({
     normalizeCommunitySlug(params.c) ?? normalizeCommunitySlug(params.ref);
   const communityId = requestedCommunityId ?? (await getCurrentCommunityId());
   const premiumPath = `/premium?c=${encodeURIComponent(communityId)}`;
-  const signupHref = `/signup?ref=${encodeURIComponent(communityId)}&next=${encodeURIComponent(premiumPath)}`;
+  const signupHref = `/signup?brand=${encodeURIComponent(communityId)}&next=${encodeURIComponent(premiumPath)}`;
   const loginHref = `/login?next=${encodeURIComponent(premiumPath)}`;
   const admin = createAdminClient();
   const { data: row } = await admin

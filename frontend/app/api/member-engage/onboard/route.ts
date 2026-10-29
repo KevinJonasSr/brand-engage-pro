@@ -22,6 +22,33 @@ export const runtime = "nodejs";
 /** Points the referrer earns, once, per new member they bring in. */
 const REFERRAL_POINTS = 150;
 const SIGNUP_BONUS_POINTS = 100;
+/** Launch default when a signup carries no brand context. */
+const NELLIES_HOME_BRAND = "nellies";
+const BRAND_SLUG_RE = /^[a-z0-9-]{1,64}$/;
+
+/**
+ * Which brand this signup joins: the explicit `brandSlug`, else a `ref`
+ * that names an active brand (older links), else the launch default.
+ */
+async function resolveHomeBrand(
+  admin: ReturnType<typeof createAdminClient>,
+  opts: { brandSlug?: string | null; refCode?: string | null },
+): Promise<string> {
+  const candidates = [opts.brandSlug, opts.refCode]
+    .map((v) => (typeof v === "string" ? v.trim().toLowerCase() : ""))
+    .filter((v) => v && BRAND_SLUG_RE.test(v));
+  for (const slug of candidates) {
+    if (slug === NELLIES_HOME_BRAND) return slug;
+    const { data } = await admin
+      .from("brands")
+      .select("slug")
+      .eq("slug", slug)
+      .eq("active", true)
+      .maybeSingle();
+    if (data?.slug) return data.slug as string;
+  }
+  return NELLIES_HOME_BRAND;
+}
 
 type OnboardPayload = OnboardProfilePayload;
 
@@ -233,6 +260,9 @@ export async function POST(request: Request) {
     }
 
     // 2. Handle referral code — service-role so we can look up the referrer.
+    //    Older brand-page links sent the brand slug as `ref`; when no member
+    //    owns that code, it is treated as brand attribution instead (below).
+    let refLooksLikeBrand = false;
     if (payload.referralCode) {
       try {
         const admin = createAdminClient();
@@ -242,6 +272,7 @@ export async function POST(request: Request) {
           .eq("referral_code", payload.referralCode)
           .maybeSingle();
 
+        if (!referrer) refLooksLikeBrand = true;
         if (referrer && referrer.id !== user.id) {
           await claimReferral(admin, {
             referrerId: referrer.id,
@@ -280,35 +311,45 @@ export async function POST(request: Request) {
       // non-fatal — profile save still succeeded
     }
 
-    // 3b. Nellie's membership + Jackie welcome dessert (join grant, not a 1-pt SKU).
+    // 3b. Join + follow the brand the member came from. Join = Follow
+    //     (migration 0081 keeps the two tables in sync; the explicit
+    //     following upsert here covers environments where it is not applied).
+    //     With no brand context, Nellie's stays the launch default.
     try {
       const admin = createAdminClient();
-      await admin.from("member_community_memberships").upsert(
-        {
-          member_id: user.id,
-          community_id: "nellies",
-          status: "active",
-        },
-        { onConflict: "member_id,community_id" },
-      );
-      await claimFreeFoundingOnJoin(user.id, "nellies");
-      const favorite = typeof payload.favoriteBrand === "string"
-        ? payload.favoriteBrand.trim().toLowerCase()
-        : "";
-      if (favorite && favorite !== "nellies" && /^[a-z0-9-]{1,64}$/.test(favorite)) {
+      const homeBrand = await resolveHomeBrand(admin, {
+        brandSlug: payload.brandSlug,
+        refCode: refLooksLikeBrand ? payload.referralCode : undefined,
+      });
+      const joined = new Set<string>();
+      const joinBrand = async (slug: string) => {
+        if (joined.has(slug)) return;
+        joined.add(slug);
         await admin.from("member_community_memberships").upsert(
           {
             member_id: user.id,
-            community_id: favorite,
+            community_id: slug,
             status: "active",
           },
           { onConflict: "member_id,community_id" },
         );
-        await claimFreeFoundingOnJoin(user.id, favorite);
+        await admin.from("member_brand_following").upsert(
+          { member_id: user.id, brand_slug: slug },
+          { onConflict: "member_id,brand_slug" },
+        );
+        await claimFreeFoundingOnJoin(user.id, slug);
+      };
+      await joinBrand(homeBrand);
+      const favorite = typeof payload.favoriteBrand === "string"
+        ? payload.favoriteBrand.trim().toLowerCase()
+        : "";
+      if (favorite && favorite !== homeBrand && /^[a-z0-9-]{1,64}$/.test(favorite)) {
+        await joinBrand(favorite);
       }
-      const { error: perkErr } = await admin.rpc("grant_nellies_welcome_dessert", {
-        p_member_id: user.id,
-      });
+      // Jackie welcome dessert is a Nellie's join grant (not a 1-pt SKU).
+      const { error: perkErr } = joined.has(NELLIES_HOME_BRAND)
+        ? await admin.rpc("grant_nellies_welcome_dessert", { p_member_id: user.id })
+        : { error: null };
       if (perkErr) {
         await admin.from("member_perks").upsert(
           {

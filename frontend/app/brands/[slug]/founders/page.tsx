@@ -212,7 +212,7 @@ export default async function FounderWallPage({
             not a Premium purchase.
           </p>
           <Link
-            href={`/signup?ref=${encodeURIComponent(slug)}&next=${encodeURIComponent(`/brands/${slug}/founders`)}`}
+            href={`/signup?brand=${encodeURIComponent(slug)}&next=${encodeURIComponent(`/brands/${slug}/founders`)}`}
             className="mt-6 inline-block rounded-full bg-ember px-6 py-3 text-sm font-semibold text-linen shadow-lg hover:brightness-110"
           >
             Join free for a Founding badge →
@@ -287,7 +287,7 @@ export default async function FounderWallPage({
             : "Join free to claim a Founding badge. Brands pay, guests join free."}
         </p>
         <Link
-          href={`/signup?ref=${encodeURIComponent(slug)}`}
+          href={`/signup?brand=${encodeURIComponent(slug)}`}
           className="mt-6 inline-block rounded-full bg-ember px-6 py-3 text-sm font-semibold text-linen shadow-lg hover:brightness-110"
         >
           {isFull ? "Join free →" : "Become a Founding Member →"}

@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Badge, MemberProfile } from "./types";
+import { getSpendablePoints } from "./member";
 import {
   JGE_BRAND_SLUG,
   isJgeHiddenTitle,
@@ -91,6 +92,12 @@ export interface MemberHomeBadgeProgress {
 
 export interface MemberHomeData {
   member: MemberProfile;
+  /**
+   * Spendable points from the ledger (the same figure the KPI strip and
+   * /rewards show). `member.total_points` is the members-table column, which
+   * drifts; never render it as a balance.
+   */
+  spendablePoints: number;
   followedBrands: MemberHomeFollowedBrand[];
   /**
    * Next 3 upcoming public-tier events from any brand the member follows.
@@ -322,6 +329,7 @@ export async function getMemberHomeData(): Promise<MemberHomeData | null> {
     remindersRes,
     premiumCommunitiesRes,
     founderCommunitiesRes,
+    spendablePoints,
   ] = await Promise.all([
     brandsPromise,
     upcomingEventsPromise,
@@ -339,6 +347,7 @@ export async function getMemberHomeData(): Promise<MemberHomeData | null> {
     remindersPromise,
     premiumCommunitiesPromise,
     founderCommunitiesPromise,
+    getSpendablePoints(user.id),
   ]);
 
   const premiumCommunities = ((premiumCommunitiesRes.data ?? []) as Array<{
@@ -373,8 +382,11 @@ export async function getMemberHomeData(): Promise<MemberHomeData | null> {
     url: string | null;
   }>)
     .filter((e) => {
+      // The query already keeps only active, public, future events. Apply
+      // the same hidden-title rules the brand pages use; Nellie's used to be
+      // pinned to Bourbon & Cigar Night only, which hid every later event.
       if (e.brand_slug === NELLIES_BRAND_SLUG) {
-        return isBourbonCigarTitle(e.title);
+        return !isNelliesHiddenTitle(e.title);
       }
       if (e.brand_slug === JGE_BRAND_SLUG) {
         return !isJgeHiddenTitle(e.title);
@@ -518,6 +530,7 @@ export async function getMemberHomeData(): Promise<MemberHomeData | null> {
 
   return {
     member: member as MemberProfile,
+    spendablePoints,
     followedBrands,
     upcomingEvents,
     // Back-compat: the previous dashboard renders the first upcoming event
