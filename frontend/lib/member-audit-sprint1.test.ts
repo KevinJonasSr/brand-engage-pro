@@ -111,3 +111,14 @@ describe("follow = join", () => {
     assert.match(sql, /insert into public\.member_community_memberships[\s\S]*from public\.member_brand_following/);
   });
 });
+
+describe("walk-test follow-ups", () => {
+  it("migration 0088 awards visit badges from check-ins and backfills", () => {
+    const sql = read("../../supabase/migrations/0088_visit_badges_trigger.sql");
+    assert.match(sql, /create table if not exists public\.brand_visit_badges/);
+    assert.match(sql, /\('nellies',\s+1, 'nsk-first-visit'\)/);
+    assert.match(sql, /after insert on public\.checkins/);
+    assert.match(sql, /award_community_badge\(p_member_id, r\.badge_slug, p_brand_slug\)/);
+    assert.match(sql, /select distinct member_id, brand_slug from public\.checkins/);
+  });
+});
