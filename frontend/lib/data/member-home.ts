@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Badge, MemberProfile } from "./types";
 import { getSpendablePoints } from "./member";
+import { suggestBrands } from "@/lib/discovery/recommend";
 import {
   JGE_BRAND_SLUG,
   isJgeHiddenTitle,
@@ -23,6 +24,12 @@ export interface MemberHomeFollowedBrand {
   accent_from: string;
   accent_to: string;
   hero_image: string | null;
+}
+
+/** One "Brands you might like" suggestion (lib/discovery/recommend.ts). */
+export interface MemberHomeSuggestedBrand extends MemberHomeFollowedBrand {
+  category: string | null;
+  city: string | null;
 }
 
 /**
@@ -100,6 +107,12 @@ export interface MemberHomeData {
   spendablePoints: number;
   followedBrands: MemberHomeFollowedBrand[];
   /**
+   * Up to 3 active brands the member does not follow, ranked by same city,
+   * then favorite-brand category match, then directory order. Empty when
+   * there is nothing left to suggest.
+   */
+  suggestedBrands: MemberHomeSuggestedBrand[];
+  /**
    * Next 3 upcoming public-tier events from any brand the member follows.
    * Sorted by `starts_at` ascending. Empty array if the member follows no brands
    * or none of the followed brands have upcoming public events.
@@ -175,6 +188,15 @@ export async function getMemberHomeData(): Promise<MemberHomeData | null> {
         accent_to: string;
         hero_image: string | null;
       }> });
+
+  // Every active brand, for "Brands you might like". Ranked in memory by
+  // lib/discovery/recommend.ts; follower counts are skipped here (one
+  // head-count query per brand is not worth it on the home page).
+  const allBrandsPromise = admin
+    .from("brands")
+    .select("slug, name, tagline, category, city, hero_image, accent_from, accent_to")
+    .eq("active", true)
+    .order("sort_order");
 
   // Upcoming public-tier events from followed brands. Discovery-style:
   // RSVP not required. Limit slightly higher than 3 so we have headroom if
@@ -314,6 +336,7 @@ export async function getMemberHomeData(): Promise<MemberHomeData | null> {
 
   const [
     brandsRes,
+    allBrandsRes,
     upcomingEventsRes,
     myRsvpsRes,
     ctasRes,
@@ -332,6 +355,7 @@ export async function getMemberHomeData(): Promise<MemberHomeData | null> {
     spendablePoints,
   ] = await Promise.all([
     brandsPromise,
+    allBrandsPromise,
     upcomingEventsPromise,
     myRsvpsPromise,
     ctasPromise,
@@ -359,6 +383,23 @@ export async function getMemberHomeData(): Promise<MemberHomeData | null> {
 
   const followedBrands = (brandsRes.data ?? []) as MemberHomeFollowedBrand[];
   const brandNameBySlug = new Map(followedBrands.map((a) => [a.slug, a.name]));
+
+  const memberExtras = member as { city?: string | null; favorite_brand?: string | null };
+  const suggestedBrands: MemberHomeSuggestedBrand[] = suggestBrands({
+    allActiveBrands: (allBrandsRes.data ?? []) as MemberHomeSuggestedBrand[],
+    followedSlugs: followedSlugs,
+    favoriteBrand: memberExtras.favorite_brand ?? null,
+    memberCity: memberExtras.city ?? null,
+  }).map((b) => ({
+    slug: b.slug,
+    name: b.name,
+    tagline: b.tagline ?? null,
+    accent_from: b.accent_from,
+    accent_to: b.accent_to,
+    hero_image: b.hero_image ?? null,
+    category: b.category ?? null,
+    city: b.city ?? null,
+  }));
 
   // Build the upcoming-events list. Limit to top 3 after applying any
   // post-fetch filtering (none today, but headroom is cheap).
@@ -532,6 +573,7 @@ export async function getMemberHomeData(): Promise<MemberHomeData | null> {
     member: member as MemberProfile,
     spendablePoints,
     followedBrands,
+    suggestedBrands,
     upcomingEvents,
     // Back-compat: the previous dashboard renders the first upcoming event
     // as its "Next event" card. Safe to drop once the component rolls out.

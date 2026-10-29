@@ -2,6 +2,7 @@ import Link from "next/link";
 import WeeklyRecapTile from "@/components/weekly-recap-tile";
 import type { WeeklyRecap } from "@/lib/personal-recap/types";
 import PushOptInBanner from "@/components/push-opt-in-banner";
+import BrandDirectoryFollow from "@/components/brand-directory-follow";
 import type { MemberHomeData, MemberHomeUpcomingEvent } from "@/lib/data/member-home";
 import type { StreakState } from "@/lib/streaks/touch";
 
@@ -14,6 +15,7 @@ export default function MemberHomeDashboard({ data, streak, recap }: { data: Mem
   const {
     member,
     followedBrands,
+    suggestedBrands,
     upcomingEvents,
     ctas,
     recentActivity,
@@ -47,6 +49,7 @@ export default function MemberHomeDashboard({ data, streak, recap }: { data: Mem
       {streak && <VisitStreakCard streak={streak} />}
       {recap && <WeeklyRecapTile recap={recap} firstName={data.member?.first_name ?? null} />}
       <FollowedBrandsStrip brands={followedBrands} />
+      {suggestedBrands.length > 0 && <SuggestedBrandsStrip brands={suggestedBrands} />}
 
       {/* Upcoming events — top 3 from any followed brand */}
       <UpcomingEventsList events={upcomingEvents} hasFollows={followedBrands.length > 0} />
@@ -228,6 +231,89 @@ function FollowedBrandsStrip({
               </div>
             </div>
           </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * "Brands you might like" — up to 3 unfollowed brands ranked by the
+ * member's city and favorite-brand answer (lib/discovery/recommend.ts).
+ * Only rendered when there is at least one suggestion.
+ */
+function SuggestedBrandsStrip({
+  brands,
+}: {
+  brands: MemberHomeData["suggestedBrands"];
+}) {
+  return (
+    <div className="glass-card p-4">
+      <div className="mb-3 flex items-center justify-between">
+        <p className="text-xs uppercase tracking-wide text-iron/70">Brands you might like</p>
+        <Link href="/brands" className="text-xs text-iron/70 hover:text-iron">
+          Browse all →
+        </Link>
+      </div>
+      <div className="flex gap-3 overflow-x-auto pb-1">
+        {brands.map((a) => (
+          <div
+            key={a.slug}
+            className="flex w-44 shrink-0 flex-col overflow-hidden rounded-lg border border-iron/10 transition hover:border-iron/30"
+          >
+            <Link
+              href={`/brands/${a.slug}`}
+              className="group relative block aspect-[3/4] w-full overflow-hidden bg-parchment/40"
+              aria-label={`Enter ${a.name} member club`}
+            >
+              {a.hero_image ? (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={a.hero_image}
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-cover object-top transition duration-300 group-hover:scale-[1.04]"
+                    aria-hidden
+                  />
+                </>
+              ) : (
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    backgroundImage: `linear-gradient(to bottom right, ${a.accent_from}, ${a.accent_to})`,
+                  }}
+                  aria-hidden
+                />
+              )}
+              <div
+                className="absolute inset-0"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0) 100%)",
+                }}
+                aria-hidden
+              />
+              <div className="absolute inset-x-0 bottom-0 p-3">
+                <p className="text-sm font-semibold text-linen drop-shadow-[0_1px_8px_rgba(0,0,0,0.7)]">
+                  {a.name}
+                </p>
+                {a.city && (
+                  <p className="mt-0.5 line-clamp-1 text-xs text-linen/80 drop-shadow-[0_1px_6px_rgba(0,0,0,0.6)]">
+                    {a.city}
+                  </p>
+                )}
+              </div>
+            </Link>
+            {/* Follow sits beside the poster link, never nested inside it. */}
+            <div className="flex justify-center bg-iron px-3 py-3">
+              <BrandDirectoryFollow
+                brandSlug={a.slug}
+                isSignedIn
+                isFollowing={false}
+                next="/"
+              />
+            </div>
+          </div>
         ))}
       </div>
     </div>

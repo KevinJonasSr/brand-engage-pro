@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { BRANDS as FALLBACK_BRANDS, type Brand } from "@/lib/brands";
+import { BRANDS as FALLBACK_BRANDS, type Brand, type BrandCategory } from "@/lib/brands";
 import { resolveBrandSlug } from "@/lib/brand-aliases";
 import type { HoursJson } from "@/lib/brand-hours";
 import { applyJgeLaunchBio, filterJgeLaunchEvents } from "@/lib/jge-launch";
@@ -53,7 +53,20 @@ type BrandRow = {
   hours_json: HoursJson | null;
   phone: string | null;
   website_url: string | null;
+  /** Discovery fields (0024, seeded 0087). */
+  category: BrandCategory | null;
+  city: string | null;
+  cuisine: string | null;
+  /** numeric(9,6) — PostgREST returns numerics as number by default. */
+  lat: number | string | null;
+  lng: number | string | null;
 };
+
+function toCoord(value: number | string | null | undefined): number | undefined {
+  if (value === null || value === undefined || value === "") return undefined;
+  const n = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(n) ? n : undefined;
+}
 
 function isUuid(value: string | undefined): value is string {
   return !!value && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
@@ -119,6 +132,11 @@ function rowToBrand(row: BrandRow, events: BrandEvent[]): Brand {
     hours: row.hours_json ?? undefined,
     phone: row.phone ?? undefined,
     websiteUrl: row.website_url ?? undefined,
+    category: row.category ?? undefined,
+    city: row.city ?? undefined,
+    cuisine: row.cuisine ?? undefined,
+    lat: toCoord(row.lat),
+    lng: toCoord(row.lng),
     upcoming,
     // Nellie's Jackie launch is specials + Bourbon — not merch redeemables.
     merch: isNellies ? [] : (fallback?.merch ?? []),
@@ -138,7 +156,7 @@ export async function getBrandFromDb(slug: string): Promise<Brand | null> {
     const [{ data: brand, error: aErr }, { data: events, error: eErr }] = await Promise.all([
       supabase
         .from("brands")
-        .select("slug, name, tagline, bio, hero_image, hero_focal_x, hero_focal_y, accent_from, accent_to, genres, social, active, sort_order, address, hours_json, phone, website_url")
+        .select("slug, name, tagline, bio, hero_image, hero_focal_x, hero_focal_y, accent_from, accent_to, genres, social, active, sort_order, address, hours_json, phone, website_url, category, city, cuisine, lat, lng")
         .eq("slug", normalized)
         .eq("active", true)
         .maybeSingle(),
@@ -166,7 +184,7 @@ export async function listBrandsFromDb(): Promise<Brand[]> {
     const supabase = await createClient();
     const { data: brands, error } = await supabase
       .from("brands")
-      .select("slug, name, tagline, bio, hero_image, hero_focal_x, hero_focal_y, accent_from, accent_to, genres, social, active, sort_order, address, hours_json, phone, website_url")
+      .select("slug, name, tagline, bio, hero_image, hero_focal_x, hero_focal_y, accent_from, accent_to, genres, social, active, sort_order, address, hours_json, phone, website_url, category, city, cuisine, lat, lng")
       .eq("active", true)
       .order("sort_order");
     if (error || !brands || brands.length === 0) {
@@ -208,7 +226,7 @@ export async function listBrandsForAdmin(): Promise<
   const [{ data: brands }, { data: events }, { data: follows }] = await Promise.all([
     admin
       .from("brands")
-      .select("slug, name, tagline, bio, hero_image, hero_focal_x, hero_focal_y, accent_from, accent_to, genres, social, active, sort_order, address, hours_json, phone, website_url")
+      .select("slug, name, tagline, bio, hero_image, hero_focal_x, hero_focal_y, accent_from, accent_to, genres, social, active, sort_order, address, hours_json, phone, website_url, category, city, cuisine, lat, lng")
       .order("sort_order"),
     admin.from("brand_events").select("brand_slug"),
     admin.from("member_brand_following").select("brand_slug"),

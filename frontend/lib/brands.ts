@@ -54,7 +54,30 @@ export type Brand = {
   hours?: HoursJson;
   phone?: string;
   websiteUrl?: string;
+  /** Discovery fields (migration 0024, seeded in 0087). DB-backed brands
+   *  fill these; fallback brands leave them undefined. */
+  category?: BrandCategory;
+  city?: string;
+  cuisine?: string;
+  lat?: number;
+  lng?: number;
 };
+
+/** Mirrors the `brand_category` enum in migration 0024. */
+export const BRAND_CATEGORIES = ["restaurant", "retail", "sports", "hotel"] as const;
+export type BrandCategory = (typeof BRAND_CATEGORIES)[number];
+
+/** Display labels for the brand page eyebrow and admin select. */
+export const BRAND_CATEGORY_LABELS: Record<BrandCategory, string> = {
+  restaurant: "Restaurant",
+  retail: "Retail",
+  sports: "Sports",
+  hotel: "Hotel",
+};
+
+export function isBrandCategory(value: string): value is BrandCategory {
+  return (BRAND_CATEGORIES as readonly string[]).includes(value);
+}
 
 // Placeholder content for each brand — swap when Box assets are delivered.
 // Keep keys stable; marketing can paste final copy here without touching layout.

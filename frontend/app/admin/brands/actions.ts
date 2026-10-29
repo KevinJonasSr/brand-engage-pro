@@ -11,6 +11,7 @@ import {
   writableBrandError,
 } from "@/lib/admin";
 import { parseEarlyRsvpHours } from "@/lib/founder-perks";
+import { parseBrandLocationInput } from "@/lib/data/brand-location";
 import { sendEventReminder, type ReminderWindowEvent } from "@/lib/reminders";
 import { parseSocialLines } from "@/lib/socials/parse";
 
@@ -120,6 +121,45 @@ export async function updateBrandAction(formData: FormData) {
   revalidatePath(`/brands/${slug}`);
   revalidatePath(`/brands`);
   return { success: true as const };
+}
+
+/**
+ * "Location & category" form on the admin brand page: category (enum from
+ * 0024), city, address, cuisine, lat/lng. Validation lives in
+ * lib/data/brand-location.ts. Used as a plain <form action> from a server
+ * component, so outcome is reported by redirecting back to the admin page
+ * with ?location=saved or ?location_error=<message>.
+ */
+export async function updateBrandLocationAction(formData: FormData) {
+  const slug = String(formData.get("slug") ?? "").trim();
+  if (!slug) return;
+  const back = `/admin/brands/${encodeURIComponent(slug)}`;
+  const fail = (message: string): never =>
+    redirect(`${back}?location_error=${encodeURIComponent(message)}#location`);
+
+  const denied = await brandAccessError(slug);
+  if (denied) return fail(denied);
+
+  const field = (name: string) => String(formData.get(name) ?? "");
+  const parsed = parseBrandLocationInput({
+    category: field("category"),
+    city: field("city"),
+    address: field("address"),
+    cuisine: field("cuisine"),
+    lat: field("lat"),
+    lng: field("lng"),
+  });
+  if (!parsed.ok) return fail(parsed.error);
+
+  const supa = createAdminClient();
+  const { error } = await supa.from("brands").update(parsed.update).eq("slug", slug);
+  if (error) return fail(error.message);
+
+  revalidatePath("/admin/brands");
+  revalidatePath(`/admin/brands/${slug}`);
+  revalidatePath("/brands");
+  revalidatePath(`/brands/${slug}`);
+  redirect(`${back}?location=saved#location`);
 }
 
 /**

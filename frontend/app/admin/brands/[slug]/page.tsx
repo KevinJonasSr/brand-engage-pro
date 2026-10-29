@@ -20,7 +20,9 @@ import { canRsvpNow, FOUNDER_EARLY_RSVP_HOURS } from "@/lib/founder-perks";
 import {
   deleteEventAction,
   sendReminderNowAction,
+  updateBrandLocationAction,
 } from "../actions";
+import { BRAND_CATEGORIES, BRAND_CATEGORY_LABELS, isBrandCategory } from "@/lib/brands";
 
 type ReminderRow = {
   event_id: string;
@@ -35,10 +37,16 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminBrandEditPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { slug } = await params;
+  const query = await searchParams;
+  const locationSaved = query.location === "saved";
+  const locationError =
+    typeof query.location_error === "string" ? query.location_error : null;
   const ctx = await getAdminContext();
   if (!canAccessBrand(ctx, slug)) notFound();
   const admin = createAdminClient();
@@ -58,6 +66,25 @@ export default async function AdminBrandEditPage({
     : ((withHours.data?.founder_early_rsvp_hours as number | null) ?? FOUNDER_EARLY_RSVP_HOURS);
 
   if (!brand) notFound();
+
+  // Discovery / location fields (0024, seeded 0087). Queried separately so
+  // the page still renders if the columns are missing in an environment.
+  const { data: locationRow } = await admin
+    .from("brands")
+    .select("category, city, address, cuisine, lat, lng")
+    .eq("slug", slug)
+    .maybeSingle();
+  const location = {
+    category:
+      typeof locationRow?.category === "string" && isBrandCategory(locationRow.category)
+        ? locationRow.category
+        : "restaurant",
+    city: (locationRow?.city as string | null) ?? "",
+    address: (locationRow?.address as string | null) ?? "",
+    cuisine: (locationRow?.cuisine as string | null) ?? "",
+    lat: locationRow?.lat == null ? "" : String(locationRow.lat),
+    lng: locationRow?.lng == null ? "" : String(locationRow.lng),
+  };
 
   const events = await listEventsForAdmin(slug);
 
@@ -125,6 +152,102 @@ export default async function AdminBrandEditPage({
           founderEarlyRsvpHours: earlyHours,
         }}
       />
+
+      {/* Location & category — discovery fields (0024 / 0087). Plain server
+          form; the action redirects back with ?location=saved|location_error. */}
+      <section id="location" className="glass-card p-5 scroll-mt-24">
+        <p className="text-sm font-semibold">Location &amp; category</p>
+        <p className="mt-1 text-xs text-iron/70">
+          Powers the brand directory filters, &ldquo;near me&rdquo; sorting and the
+          &ldquo;{"{Category} · {City}"}&rdquo; line on the public page. Coordinates are
+          optional; leave both blank to skip proximity sorting.
+        </p>
+        <form action={updateBrandLocationAction} className="mt-3 space-y-3">
+          <input type="hidden" name="slug" value={slug} />
+          <div className="grid gap-3 md:grid-cols-3">
+            <AdminField label="Category">
+              <select
+                name="category"
+                defaultValue={location.category}
+                className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
+              >
+                {BRAND_CATEGORIES.map((c) => (
+                  <option key={c} value={c}>
+                    {BRAND_CATEGORY_LABELS[c]}
+                  </option>
+                ))}
+              </select>
+            </AdminField>
+            <AdminField label="City">
+              <input
+                name="city"
+                defaultValue={location.city}
+                placeholder="Belmont, NC"
+                maxLength={120}
+                className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
+              />
+            </AdminField>
+            <AdminField label="Cuisine / subcategory">
+              <input
+                name="cuisine"
+                defaultValue={location.cuisine}
+                placeholder="southern, coffee, lifestyle…"
+                maxLength={60}
+                className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
+              />
+            </AdminField>
+          </div>
+          <AdminField label="Street address">
+            <input
+              name="address"
+              defaultValue={location.address}
+              placeholder="Street, city, state ZIP — shown in the Visit block"
+              maxLength={240}
+              className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
+            />
+          </AdminField>
+          <div className="grid gap-3 md:grid-cols-2">
+            <AdminField label="Latitude">
+              <input
+                name="lat"
+                type="number"
+                step="any"
+                min={-90}
+                max={90}
+                defaultValue={location.lat}
+                placeholder="35.2426"
+                className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
+              />
+            </AdminField>
+            <AdminField label="Longitude">
+              <input
+                name="lng"
+                type="number"
+                step="any"
+                min={-180}
+                max={180}
+                defaultValue={location.lng}
+                placeholder="-81.0380"
+                className="w-full rounded-lg border border-iron/10 bg-parchment/40 px-3 py-2 text-sm"
+              />
+            </AdminField>
+          </div>
+          <div className="flex flex-wrap items-center justify-end gap-3 pt-1">
+            {locationSaved && <span className="text-xs text-sage-ink">✓ Saved</span>}
+            {locationError && (
+              <span className="text-xs text-ember" title={locationError}>
+                ✗ {locationError}
+              </span>
+            )}
+            <button
+              type="submit"
+              className="rounded-full bg-ember px-6 py-2 text-sm font-semibold text-linen"
+            >
+              Save location
+            </button>
+          </div>
+        </form>
+      </section>
 
       {/* Events CRUD */}
       <section className="glass-card p-5">
@@ -314,5 +437,14 @@ function ReminderChip({
     <span className="rounded-full bg-iron/10 px-2 py-0.5 text-xs text-iron/70">
       {label}: scheduled
     </span>
+  );
+}
+
+function AdminField({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <span className="text-xs uppercase tracking-wide text-iron/70">{label}</span>
+      <div className="mt-1">{children}</div>
+    </label>
   );
 }
