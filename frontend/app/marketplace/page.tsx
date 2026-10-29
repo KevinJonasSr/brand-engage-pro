@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getCurrentMember } from "@/lib/data/member";
-import { getCurrentCommunityId } from "@/lib/community";
-import { listRewardsForCommunity } from "@/lib/data/rewards";
+import { getCurrentCommunityIdOrNull } from "@/lib/community";
+import { listRewardsForCommunity, type RewardRow } from "@/lib/data/rewards";
 import { isMarketplaceMusicSku } from "@/lib/marketplace-music-skus";
 import { isNelliesThreeVisitRewardActive } from "@/lib/data/nellies-three-visit-reward";
 import { NELLIES_BRAND_SLUG, nelliesMemberOfferSummary, nelliesOfferPitch } from "@/lib/nellies-launch";
@@ -12,20 +12,26 @@ export const metadata = { title: "Marketplace" };
 /**
  * Soft launch: marketplace is a thin pointer to stocked brand rewards.
  * Do not surface Gold/Platinum offer theater or artist leftovers.
+ *
+ * The page is scoped to the request's community (host subdomain, else the
+ * first active brand). With no resolvable community it renders the
+ * brand-neutral empty state and points at /brands.
  */
 export default async function MarketplacePage() {
-  const communityId = await getCurrentCommunityId();
+  const communityId = await getCurrentCommunityIdOrNull();
   const [member, catalog, threeVisitRewardActive] = await Promise.all([
     getCurrentMember(),
-    listRewardsForCommunity(communityId),
+    communityId ? listRewardsForCommunity(communityId) : Promise.resolve([] as RewardRow[]),
     isNelliesThreeVisitRewardActive(),
   ]);
-  const nelliesSummary = nelliesMemberOfferSummary(threeVisitRewardActive);
-  const nelliesPitch = nelliesOfferPitch(threeVisitRewardActive);
+  const atNellies = communityId === NELLIES_BRAND_SLUG;
   // Purge music SKUs even if a stale active row slipped past migration 0050.
   const rewards = catalog.filter((r) => !isMarketplaceMusicSku(r.title));
   const isSignedIn = member !== null;
-  const brandRewardsHref = `/brands/${communityId}/rewards`;
+  const brandRewardsHref = communityId ? `/brands/${communityId}/rewards` : "/brands";
+  const brandOfferLine = atNellies
+    ? `At Nellie's: ${nelliesMemberOfferSummary(threeVisitRewardActive)}.`
+    : "Each brand page lists its own member offers.";
 
   return (
     <div className="min-h-screen bg-linen">
@@ -34,7 +40,7 @@ export default async function MarketplacePage() {
           <PreviewSignupBanner
             eyebrow="🛍️ Brand rewards"
             headline="Join to unlock brand rewards"
-            body={`Earn points after you join, then use them on each brand’s rewards page. At Nellie's: ${nelliesSummary}.`}
+            body={`Earn points after you join, then use them on each brand’s rewards page. ${brandOfferLine}`}
             bullets={[
               "Move up from Bronze to Platinum as you earn points",
               "The first 100 members of each brand join as Founders for free. Brands pay, guests join free.",
@@ -67,20 +73,18 @@ export default async function MarketplacePage() {
               Live unlocks are on brand pages
             </h2>
             <p className="mt-3 text-sm text-iron/70">
-              {communityId.toLowerCase() === NELLIES_BRAND_SLUG ? (
+              {atNellies ? (
                 <>
-                  Nellie&apos;s member offers ({nelliesPitch}, Bourbon &amp; Cigar Night) are on
-                  the Nellie&apos;s page. Jonas
-                  Group Entertainment lists its member rewards, like signed lyric sheets and
-                  vinyl, on its rewards page.
+                  Nellie&apos;s member offers ({nelliesOfferPitch(threeVisitRewardActive)}, Bourbon
+                  &amp; Cigar Night) are on the Nellie&apos;s page. Other brands list their member
+                  rewards on their own rewards pages.
                 </>
               ) : (
                 <>
-                  Check each brand&apos;s rewards page for rewards you can use points on.
-                  Nellie&apos;s member offers are on the Nellie&apos;s page. Jonas Group
-                  Entertainment lists its member rewards on{" "}
-                  <Link href="/brands/jonas-group-ent/rewards" className="text-aurora-ink underline underline-offset-2">
-                    its rewards page
+                  Check each brand&apos;s rewards page for rewards you can use points on, and its
+                  brand page for member offers.{" "}
+                  <Link href="/brands" className="text-aurora-ink underline underline-offset-2">
+                    Browse brands
                   </Link>
                   .
                 </>
@@ -91,14 +95,16 @@ export default async function MarketplacePage() {
                 href={brandRewardsHref}
                 className="inline-block rounded-full bg-ember px-6 py-3 text-sm font-semibold text-linen"
               >
-                Go to brand rewards →
+                {communityId ? "Go to brand rewards →" : "Browse brands →"}
               </Link>
-              <Link
-                href="/brands/jonas-group-ent/rewards"
-                className="inline-block rounded-full border border-iron/25 px-5 py-3 text-sm font-medium text-iron/85 hover:bg-iron/10"
-              >
-                JGE rewards
-              </Link>
+              {communityId && (
+                <Link
+                  href="/brands"
+                  className="inline-block rounded-full border border-iron/25 px-5 py-3 text-sm font-medium text-iron/85 hover:bg-iron/10"
+                >
+                  All brands
+                </Link>
+              )}
             </div>
           </section>
         ) : (

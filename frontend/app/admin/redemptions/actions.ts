@@ -1,7 +1,7 @@
 "use server";
 
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAdminContext, requireWritableBrand } from "@/lib/admin";
+import { canAccessBrand, getAdminContext, requireWritableBrand } from "@/lib/admin";
 import { redirect } from "next/navigation";
 import { cancelRedemption } from "@/lib/rewards/cancel";
 import { markRedemptionFulfilled } from "@/lib/rewards/fulfill";
@@ -60,4 +60,43 @@ export async function cancelRedemptionAction(redemptionId: string) {
   await requireWritableBrand(ctx, scope);
 
   return cancelRedemption(createAdminClient(), redemptionId, scope);
+}
+
+/**
+ * Mark a member perk (member_perks row: welcome dessert, birthday entrée…)
+ * as used at the counter. Added for /admin/redemptions/[code]; perks have
+ * no point refund so there is no cancel counterpart.
+ */
+export async function markPerkUsedAction(perkId: string) {
+  const ctx = await getAdminContext();
+  if (!ctx) redirect("/login");
+
+  const supabase = createAdminClient();
+  const { data: perk, error } = await supabase
+    .from("member_perks")
+    .select("id, community_id, redeemed_at")
+    .eq("id", perkId)
+    .maybeSingle();
+  if (error || !perk) {
+    return { error: "Perk not found" };
+  }
+  const brand = perk.community_id as string;
+  if (!canAccessBrand(ctx, brand)) {
+    return { error: "Unauthorized" };
+  }
+  await requireWritableBrand(ctx, ctx.isSuperAdmin ? null : brand);
+
+  if (perk.redeemed_at) {
+    return { error: "This perk was already used" };
+  }
+
+  const { error: updateError } = await supabase
+    .from("member_perks")
+    .update({ redeemed_at: new Date().toISOString() })
+    .eq("id", perkId)
+    .is("redeemed_at", null);
+  if (updateError) {
+    return { error: updateError.message };
+  }
+  return { success: true };
 }

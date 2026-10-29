@@ -18,6 +18,7 @@ import PremiumPaywall from "@/components/premium-paywall";
 import DropCountdown from "@/components/drop-countdown";
 import SocialIcon from "@/components/social-icon";
 import FollowButton from "./follow-button";
+import BrandDirectoryUpcomingEmpty from "@/components/brand-directory-upcoming-empty";
 import ShareButton from "@/components/share-button";
 import RsvpButton from "./rsvp-button";
 import { focalPointStyle } from "@/lib/images/focal-point";
@@ -483,6 +484,17 @@ export default async function BrandPage({
         <Reveal>
           <p className="text-sm uppercase tracking-wide text-iron/70">Upcoming</p>
         </Reveal>
+        {brand.upcoming.length === 0 && (
+          <div className="mt-4">
+            <BrandDirectoryUpcomingEmpty
+              brandSlug={brand.slug}
+              brandName={brand.name}
+              isSignedIn={isSignedIn}
+              isFollowing={isFollowing}
+            />
+          </div>
+        )}
+        {brand.upcoming.length > 0 && (
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           {brand.upcoming.map((e, i) => {
             // Phase 5d: gate premium-tier events. Fallback events (no id)
@@ -592,6 +604,7 @@ export default async function BrandPage({
             );
           })}
         </div>
+        )}
       </section>
 
       {brand.merch.length > 0 && (

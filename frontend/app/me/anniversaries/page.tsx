@@ -41,46 +41,35 @@ export default async function AnniversariesPage() {
 
   const entries: Entry[] = [];
 
-  const configs: Array<{ tbl: string; fkCol: string; slugCol: string }> = [
-    { tbl: "fan_anniversary_log", fkCol: "fan_id", slugCol: "artist_slug" },
-    { tbl: "member_anniversary_log", fkCol: "member_id", slugCol: "brand_slug" },
-  ];
-
-  for (const cfg of configs) {
-    const { data, error } = await supabase
-      .from(cfg.tbl)
-      .select(
-        "id, " +
-          cfg.slugCol +
-          ", milestone, celebrated_at, points_awarded, metadata"
-      )
-      .eq(cfg.fkCol, user.id)
-      .order("celebrated_at", { ascending: false });
-    if (!error && data && data.length > 0) {
-      for (const r of data as unknown as Array<{
-        id: string;
-        milestone: string;
-        celebrated_at: string;
-        points_awarded: number;
-        metadata: { brand_name?: string; artist_name?: string; label?: string } | null;
-        [k: string]: unknown;
-      }>) {
-        const slug = String(r[cfg.slugCol] ?? "");
-        const meta = r.metadata ?? {};
-        const scopeName = meta.brand_name ?? meta.artist_name ?? slug;
-        entries.push({
-          id: r.id,
-          scope_slug: slug,
-          scope_name: scopeName,
-          milestone: r.milestone,
-          label:
-            meta.label ??
-            fallbackLabel(r.milestone) + " with " + scopeName,
-          celebrated_at: r.celebrated_at,
-          points_awarded: r.points_awarded,
-        });
-      }
-      break;
+  // member_anniversary_log (migration 0071) is the only anniversary table in
+  // this schema; the legacy Member Engage fan/artist-named table never
+  // existed here.
+  const { data, error } = await supabase
+    .from("member_anniversary_log")
+    .select("id, brand_slug, milestone, celebrated_at, points_awarded, metadata")
+    .eq("member_id", user.id)
+    .order("celebrated_at", { ascending: false });
+  if (!error && data) {
+    for (const r of data as unknown as Array<{
+      id: string;
+      brand_slug: string | null;
+      milestone: string;
+      celebrated_at: string;
+      points_awarded: number;
+      metadata: { brand_name?: string; label?: string } | null;
+    }>) {
+      const slug = r.brand_slug ?? "";
+      const meta = r.metadata ?? {};
+      const scopeName = meta.brand_name ?? slug;
+      entries.push({
+        id: r.id,
+        scope_slug: slug,
+        scope_name: scopeName,
+        milestone: r.milestone,
+        label: meta.label ?? fallbackLabel(r.milestone) + " with " + scopeName,
+        celebrated_at: r.celebrated_at,
+        points_awarded: r.points_awarded,
+      });
     }
   }
 

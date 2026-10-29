@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendNotification } from "../send";
+import { excludeMutedFollowers } from "../brand-prefs";
 
 /**
  * Fan an artist follows just dropped a new post. Notify every follower
@@ -47,9 +48,13 @@ export async function notifyNewPost(opts: {
       .select("member_id")
       .eq("brand_slug", opts.brandSlug);
 
-    const fanIds = (follows ?? [])
-      .map((r) => r.member_id as string)
-      .filter((id) => id !== opts.authorId);
+    // Drop members who muted this brand (one query, see brand-prefs.ts).
+    const fanIds = await excludeMutedFollowers(
+      (follows ?? [])
+        .map((r) => r.member_id as string)
+        .filter((id) => id !== opts.authorId),
+      opts.brandSlug,
+    );
 
     if (fanIds.length === 0) return;
 

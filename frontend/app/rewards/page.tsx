@@ -10,7 +10,38 @@ import {
 import { getTiers, tierIcon } from "@/lib/data/tiers";
 import type { Badge, BadgeCategory, TierSlug } from "@/lib/data/types";
 import { isNelliesThreeVisitRewardActive } from "@/lib/data/nellies-three-visit-reward";
-import { nelliesMemberOfferSummary, nelliesOfferPitch } from "@/lib/nellies-launch";
+import { getCurrentCommunityIdOrNull } from "@/lib/community";
+import { createClient } from "@/lib/supabase/server";
+import {
+  NELLIES_BRAND_SLUG,
+  nelliesMemberOfferSummary,
+  nelliesOfferPitch,
+} from "@/lib/nellies-launch";
+
+/**
+ * Brand the viewer is "at": a signed-in member's followed brands, else the
+ * request's community (host subdomain → first active brand). Brand-specific
+ * copy on this shared page renders only when that set includes the brand.
+ */
+async function viewerFollowsBrand(slug: string): Promise<boolean> {
+  const communityId = await getCurrentCommunityIdOrNull();
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) {
+      const { data } = await supabase
+        .from("member_brand_following")
+        .select("brand_slug")
+        .eq("member_id", user.id);
+      if (data && data.length > 0) return data.some((row) => row.brand_slug === slug);
+    }
+  } catch {
+    /* fall through to the request community */
+  }
+  return communityId === slug;
+}
 
 const CATEGORY_LABELS: Record<BadgeCategory, string> = {
   welcome:   "Getting started",
@@ -40,16 +71,27 @@ function formatPts(n: number | null | undefined) {
 export const metadata = { title: "Rewards" };
 
 export default async function RewardsPage() {
-  const [member, kpis, tiers, dbBadges, breakdown, threeVisitRewardActive] = await Promise.all([
-    getCurrentMember(),
-    getCurrentMemberKpis(),
-    getTiers(),
-    getBadgesWithEarnedStatus(),
-    getPointBreakdown(),
-    isNelliesThreeVisitRewardActive(),
-  ]);
-  const nelliesSummary = nelliesMemberOfferSummary(threeVisitRewardActive);
-  const nelliesPitch = nelliesOfferPitch(threeVisitRewardActive);
+  const [member, kpis, tiers, dbBadges, breakdown, threeVisitRewardActive, atNellies] =
+    await Promise.all([
+      getCurrentMember(),
+      getCurrentMemberKpis(),
+      getTiers(),
+      getBadgesWithEarnedStatus(),
+      getPointBreakdown(),
+      isNelliesThreeVisitRewardActive(),
+      viewerFollowsBrand(NELLIES_BRAND_SLUG),
+    ]);
+  // Brand-specific perk copy only for viewers at Nellie's; everyone else
+  // gets the generic line.
+  const brandOfferLine = atNellies
+    ? `At Nellie's: ${nelliesMemberOfferSummary(threeVisitRewardActive)}.`
+    : "Each brand you follow adds its own member perks.";
+  const brandOfferBullet = atNellies
+    ? `At Nellie's: ${nelliesOfferPitch(threeVisitRewardActive)}`
+    : "Brand perks and offers show up on each brand's page";
+  const brandOfferFootnote = atNellies
+    ? `At Nellie's, you earn from visits and check-ins, and you also get ${nelliesOfferPitch(threeVisitRewardActive)}.`
+    : "Each brand's page lists the perks and offers its members get on top of points.";
 
   const isSignedIn = member !== null;
   // Guests see honest empty state — no fake 8500 pts / pre-earned badges.
@@ -86,11 +128,11 @@ export default async function RewardsPage() {
             <PreviewSignupBanner
               eyebrow="🎁 Member rewards"
               headline="Join free and earn from real visits"
-              body={`New members start at 0 points and earn from visits, check-ins, and the community. At Nellie's: ${nelliesSummary}.`}
+              body={`New members start at 0 points and earn from visits, check-ins, and the community. ${brandOfferLine}`}
               bullets={[
                 "+100 welcome points after you finish your profile",
                 "Move up from Bronze to Platinum as you earn points",
-                `At Nellie's: ${nelliesPitch}`,
+                brandOfferBullet,
               ]}
               primaryCta="Sign up free →"
               nextPath="/rewards"
@@ -124,9 +166,8 @@ export default async function RewardsPage() {
             </p>
             <p className="mt-3 text-xs text-iron/70">
               Tiers go Bronze, Silver, Gold, then Platinum as you earn points from visits. The first
-              100 members of each brand join as Founders for free. Brands pay, guests join free.
-              At Nellie&apos;s, you earn from visits and check-ins, and you also get{" "}
-              {nelliesPitch}.
+              100 members of each brand join as Founders for free. Brands pay, guests join free.{" "}
+              {brandOfferFootnote}
             </p>
             <div className="mt-8 space-y-4">
               <div className="flex items-center justify-between text-sm text-iron/70">

@@ -1,3 +1,6 @@
+import { revalidatePath } from "next/cache";
+import { createClient } from "@/lib/supabase/server";
+
 /**
  * Shape of the /me/notifications form, aligned to the
  * notification_preferences columns (verified in prod 2026-09-28).
@@ -55,3 +58,68 @@ export const DEFAULT_PREFS: Prefs = {
   quiet_start: null,
   quiet_end: null,
 };
+
+/** One followed brand as rendered in the Brands section. */
+export type BrandPref = {
+  slug: string;
+  name: string;
+  muted: boolean;
+};
+
+export type SetBrandMuted = (
+  brandSlug: string,
+  muted: boolean,
+) => Promise<{ ok: true } | { error: string }>;
+
+const SLUG_RE = /^[a-z0-9][a-z0-9-]{0,63}$/;
+
+/**
+ * Mute or unmute one followed brand (member_brand_notification_prefs, 0083).
+ *
+ * Inline Server Function: this module also exports constants, so it cannot
+ * carry a file-level "use server". The page passes it to the client section
+ * as a prop. Runs as the signed-in member through RLS, so a member can only
+ * ever write their own rows; the follow check keeps the table scoped to
+ * brands the member actually follows.
+ */
+export async function setBrandMuted(
+  brandSlug: string,
+  muted: boolean,
+): Promise<{ ok: true } | { error: string }> {
+  "use server";
+  const slug = String(brandSlug ?? "").trim();
+  if (!SLUG_RE.test(slug)) return { error: "Unknown brand." };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not signed in." };
+
+  const { data: follow } = await supabase
+    .from("member_brand_following")
+    .select("brand_slug")
+    .eq("member_id", user.id)
+    .eq("brand_slug", slug)
+    .maybeSingle();
+  if (!follow) return { error: "You don't follow that brand." };
+
+  const { error } = await supabase
+    .from("member_brand_notification_prefs")
+    .upsert(
+      {
+        member_id: user.id,
+        brand_slug: slug,
+        muted: !!muted,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "member_id,brand_slug" },
+    );
+  if (error) {
+    console.error("notifications: failed to set brand mute", error);
+    return { error: "Could not update that brand. Please try again." };
+  }
+
+  revalidatePath("/me/notifications");
+  return { ok: true };
+}

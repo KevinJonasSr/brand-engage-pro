@@ -12,7 +12,13 @@ import RewardCardWithForm from "./reward-card";
 
 export const dynamic = "force-dynamic";
 
-async function MemberPoints({ isSignedIn }: { isSignedIn: boolean }) {
+function MemberPoints({
+  isSignedIn,
+  points,
+}: {
+  isSignedIn: boolean;
+  points: number;
+}) {
   if (!isSignedIn) {
     return (
       <div className="rounded-lg border border-dashed border-iron/15 bg-parchment/30 px-4 py-3">
@@ -24,8 +30,6 @@ async function MemberPoints({ isSignedIn }: { isSignedIn: boolean }) {
       </div>
     );
   }
-
-  const points = await getSpendablePoints();
 
   return (
     <div className="rounded-lg border border-iron/10 bg-parchment/30 px-4 py-2">
@@ -54,12 +58,17 @@ export default async function RewardsPage({
 
   const isSignedIn = user !== null;
   const isNellies = slug.toLowerCase() === NELLIES_BRAND_SLUG;
-  const [rewards, myRedemptions, memberSlug, threeVisitRewardActive] = await Promise.all([
-    listRewardsForCommunity(slug),
-    user ? listMyRedemptions(user.id) : Promise.resolve([]),
-    user ? getMemberProfileSlug(user.id).catch(() => null) : Promise.resolve(null),
-    isNellies ? isNelliesThreeVisitRewardActive() : Promise.resolve(false),
-  ]);
+  // Spendable balance is read once here and shared by the header tile and
+  // every reward card (affordability hint + disabled Redeem). Signed-out
+  // viewers get null so the cards keep their sign-in behaviour.
+  const [rewards, myRedemptions, memberSlug, threeVisitRewardActive, spendablePoints] =
+    await Promise.all([
+      listRewardsForCommunity(slug),
+      user ? listMyRedemptions(user.id) : Promise.resolve([]),
+      user ? getMemberProfileSlug(user.id).catch(() => null) : Promise.resolve(null),
+      isNellies ? isNelliesThreeVisitRewardActive() : Promise.resolve(false),
+      user ? getSpendablePoints(user.id) : Promise.resolve<number | null>(null),
+    ]);
   const nelliesOffers = nelliesMemberOfferSummary(threeVisitRewardActive);
 
   const recentRedemptions = myRedemptions.slice(0, 5);
@@ -116,7 +125,7 @@ export default async function RewardsPage({
         )}
 
         <div className="mb-6">
-          <MemberPoints isSignedIn={isSignedIn} />
+          <MemberPoints isSignedIn={isSignedIn} points={spendablePoints ?? 0} />
         </div>
 
         {rewards.length > 0 ? (
@@ -129,6 +138,7 @@ export default async function RewardsPage({
                 brandName={brand.name}
                 memberSlug={memberSlug}
                 isSignedIn={isSignedIn}
+                spendablePoints={spendablePoints}
               />
             ))}
           </div>

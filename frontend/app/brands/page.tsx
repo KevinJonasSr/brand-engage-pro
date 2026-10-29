@@ -1,6 +1,12 @@
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import { listBrandsFromDb } from "@/lib/data/brands";
+import BrandDirectoryFollow from "@/components/brand-directory-follow";
+import {
+  followedSlugSet,
+  followerCountsFromResults,
+} from "@/components/brand-directory-helpers";
 
 import type { Metadata } from "next";
 
@@ -37,16 +43,35 @@ export default async function BrandsIndexPage({ searchParams }: { searchParams?:
     ? brands.filter((a) => a.genres.includes(genreFilter))
     : brands;
 
+  // Viewer relationship: their own following rows (RLS-scoped) in one query.
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const isSignedIn = user !== null;
+  const { data: myFollows } = isSignedIn
+    ? await supabase
+        .from("member_brand_following")
+        .select("brand_slug")
+        .eq("member_id", user.id)
+    : { data: null };
+  const followed = followedSlugSet(myFollows as Array<{ brand_slug: string }> | null);
 
-  // Member counts per brand for social-proof display (M-14)
+  // Member counts per brand for social-proof display (M-14). One head-only
+  // count per brand (a handful) instead of loading every following row, and
+  // QA accounts (members.is_test, migration 0080) are excluded.
   const admin = createAdminClient();
-  const { data: memberships } = await admin
-    .from("member_brand_following")
-    .select("brand_slug");
-  const memberCounts: Record<string, number> = {};
-  for (const m of (memberships ?? []) as Array<{ brand_slug: string }>) {
-    memberCounts[m.brand_slug] = (memberCounts[m.brand_slug] ?? 0) + 1;
-  }
+  const countResults = await Promise.all(
+    brands.map(async (b) => {
+      const { count } = await admin
+        .from("member_brand_following")
+        .select("brand_slug, members!inner(is_test)", { count: "exact", head: true })
+        .eq("brand_slug", b.slug)
+        .eq("members.is_test", false);
+      return { slug: b.slug, count };
+    }),
+  );
+  const memberCounts = followerCountsFromResults(countResults);
 
   return (
     <main className="mx-auto max-w-6xl space-y-6 px-6 py-12">
@@ -63,7 +88,7 @@ export default async function BrandsIndexPage({ searchParams }: { searchParams?:
       
       {allGenres.length > 0 && (
         <div className="flex flex-wrap gap-2" aria-label="Filter by category">
-          <a
+          <Link
             href="/brands"
             className={
               "inline-flex items-center rounded-full border px-3 py-1 text-xs transition " +
@@ -73,9 +98,9 @@ export default async function BrandsIndexPage({ searchParams }: { searchParams?:
             }
           >
             All
-          </a>
+          </Link>
           {allGenres.map((g) => (
-            <a
+            <Link
               key={g}
               href={`/brands?genre=${encodeURIComponent(g)}`}
               className={
@@ -86,18 +111,18 @@ export default async function BrandsIndexPage({ searchParams }: { searchParams?:
               }
             >
               {g}
-            </a>
+            </Link>
           ))}
         </div>
       )}
 
       <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {filteredBrands.map((a) => (
-          <Link
+          <div
             key={a.slug}
-            href={`/brands/${a.slug}`}
             className="group relative overflow-hidden rounded-lg border border-iron/10 transition hover:border-iron/30 hover:-translate-y-0.5"
           >
+          <Link href={`/brands/${a.slug}`} className="block" aria-label={`Enter ${a.name} member club`}>
             {/* 3:4 portrait poster — same shape as the Member Home strip cards
                 so the visual language stays consistent across the app. */}
             <div className="relative aspect-[3/4] w-full bg-parchment/40">
@@ -140,15 +165,23 @@ export default async function BrandsIndexPage({ searchParams }: { searchParams?:
                 </p>
               )}
 
-              {/* Top-right member count chip (M-14) */}
-              {(memberCounts[a.slug] ?? 0) > 0 && (
-                <p className="absolute right-5 top-5 whitespace-nowrap rounded-full border border-linen/15 bg-iron/45 px-3 py-1 text-xs uppercase tracking-[0.3em] text-linen/85 backdrop-blur">
-                  {memberCounts[a.slug].toLocaleString()} {memberCounts[a.slug] === 1 ? "member" : "members"}
-                </p>
-              )}
+              {/* Top-right chips: member count (M-14) + your relationship */}
+              <div className="absolute right-5 top-5 flex flex-col items-end gap-2">
+                {(memberCounts[a.slug] ?? 0) > 0 && (
+                  <p className="whitespace-nowrap rounded-full border border-linen/15 bg-iron/45 px-3 py-1 text-xs uppercase tracking-[0.3em] text-linen/85 backdrop-blur">
+                    {memberCounts[a.slug].toLocaleString()} {memberCounts[a.slug] === 1 ? "member" : "members"}
+                  </p>
+                )}
+                {followed.has(a.slug) && (
+                  <p className="whitespace-nowrap rounded-full border border-sage/60 bg-sage/40 px-3 py-1 text-xs uppercase tracking-[0.3em] text-linen backdrop-blur">
+                    Following
+                  </p>
+                )}
+              </div>
 
-              {/* Bottom-left content: name + tagline + CTA arrow */}
-              <div className="absolute inset-x-0 bottom-0 p-5">
+              {/* Bottom-left content: name + tagline + CTA arrow. Right
+                  padding leaves room for the follow control overlaid below. */}
+              <div className="absolute inset-x-0 bottom-0 p-5 pr-36">
                 <h2
                   className="truncate text-2xl font-semibold text-linen drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]"
                   style={{ fontFamily: "var(--font-display)" }}
@@ -166,6 +199,16 @@ export default async function BrandsIndexPage({ searchParams }: { searchParams?:
               </div>
             </div>
           </Link>
+          {/* Follow control sits above the poster link so it is not an
+              interactive element nested inside an <a>. */}
+          <div className="absolute bottom-5 right-5 z-10">
+            <BrandDirectoryFollow
+              brandSlug={a.slug}
+              isSignedIn={isSignedIn}
+              isFollowing={followed.has(a.slug)}
+            />
+          </div>
+          </div>
         ))}
       </section>
     </main>

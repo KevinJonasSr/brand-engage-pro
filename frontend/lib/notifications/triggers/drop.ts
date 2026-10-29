@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendNotification } from "../send";
+import { excludeMutedFollowers } from "../brand-prefs";
 
 /**
  * Notify followers of a brand when a limited-time drop goes live. Works
@@ -37,7 +38,11 @@ export async function notifyDropLaunched(opts: {
       .from("member_brand_following")
       .select("member_id")
       .eq("brand_slug", opts.brandSlug);
-    const memberIds = (follows ?? []).map((r) => r.member_id as string);
+    // Drop members who muted this brand (one query, see brand-prefs.ts).
+    const memberIds = await excludeMutedFollowers(
+      (follows ?? []).map((r) => r.member_id as string),
+      opts.brandSlug,
+    );
     if (memberIds.length === 0) return;
 
     const desc = opts.description
@@ -116,7 +121,11 @@ export async function notifyDropExpiring(opts: {
 
     if (!brand) return;
 
-    const followerIds = (follows ?? []).map((r) => r.member_id as string);
+    // Drop members who muted this brand (one query, see brand-prefs.ts).
+    const followerIds = await excludeMutedFollowers(
+      (follows ?? []).map((r) => r.member_id as string),
+      opts.brandSlug,
+    );
     const alreadyRedeemed = new Set<string>(
       (redemptions ?? []).map((r) => r.member_id as string),
     );

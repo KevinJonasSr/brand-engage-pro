@@ -1,6 +1,10 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { listBrandsFromDb } from "@/lib/data/brands";
+import MyBrandsSection from "@/components/my-brands-section";
+import { buildMyBrands } from "@/components/brand-directory-helpers";
 
 export const metadata = { title: "Account" };
 
@@ -14,6 +18,11 @@ export default async function MeIndexPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/me");
 
+  // "My brands": follows (own rows via RLS) + per-community tier. Both
+  // tables are kept in sync by migration 0081, so the union is belt and
+  // braces. Any failure falls back to an empty list rather than a 500.
+  const myBrands = await loadMyBrands(user.id);
+
   return (
     <main className="mx-auto max-w-2xl px-4 py-10 sm:py-14">
       <header className="mb-8">
@@ -25,6 +34,8 @@ export default async function MeIndexPage() {
           Manage your profile, notifications, and history.
         </p>
       </header>
+
+      <MyBrandsSection items={myBrands} />
 
       <ul className="space-y-3">
         <Row
@@ -45,7 +56,7 @@ export default async function MeIndexPage() {
         <Row
           href="/me/birthday"
           title="Birthday"
-          body="Set your birthday month for the Nellie's birthday entrée."
+          body="Set your birthday month to unlock birthday perks from the brands you follow."
         />
         <Row
           href="/me/anniversaries"
@@ -75,6 +86,36 @@ export default async function MeIndexPage() {
       </ul>
     </main>
   );
+}
+
+async function loadMyBrands(userId: string) {
+  try {
+    const supabase = await createClient();
+    const admin = createAdminClient();
+    const [brands, followsRes, membershipsRes] = await Promise.all([
+      listBrandsFromDb(),
+      supabase
+        .from("member_brand_following")
+        .select("brand_slug")
+        .eq("member_id", userId),
+      admin
+        .from("member_community_memberships")
+        .select("community_id, current_tier")
+        .eq("member_id", userId)
+        .eq("status", "active"),
+    ]);
+    return buildMyBrands(
+      brands,
+      (followsRes.data ?? []) as Array<{ brand_slug: string }>,
+      (membershipsRes.data ?? []) as Array<{
+        community_id: string;
+        current_tier: string | null;
+      }>,
+    );
+  } catch (err) {
+    console.warn("/me: loadMyBrands failed", err);
+    return [];
+  }
 }
 
 function Row({
