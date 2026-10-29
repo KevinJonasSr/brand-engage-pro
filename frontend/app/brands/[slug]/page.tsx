@@ -4,7 +4,7 @@ import LeaderboardMiniCard from "@/components/leaderboard-mini-card";
 import { LatestStrip } from "@/components/latest-strip";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { listBrands } from "@/lib/brands";
+import { BRAND_CATEGORY_LABELS, listBrands, type Brand } from "@/lib/brands";
 import { brandHeroBackground, resolveBrandAccent } from "@/lib/brand-accent";
 import {
   doesMemberFollowBrand,
@@ -18,6 +18,7 @@ import PremiumPaywall from "@/components/premium-paywall";
 import DropCountdown from "@/components/drop-countdown";
 import SocialIcon from "@/components/social-icon";
 import FollowButton from "./follow-button";
+import AlsoFollow from "@/components/also-follow";
 import BrandDirectoryUpcomingEmpty from "@/components/brand-directory-upcoming-empty";
 import ShareButton from "@/components/share-button";
 import RsvpButton from "./rsvp-button";
@@ -50,6 +51,28 @@ const NELLIES_PHOTOS = [
   },
 ] as const;
 export const dynamic = "force-dynamic";
+
+/**
+ * Hero eyebrow: up to two genres, then "{Category} · {City}" when the brand
+ * has discovery fields (0024 / 0087). Genres-only brands keep the legacy
+ * "+N" overflow marker; e.g. "Southern · Soul food · Restaurant · Belmont, NC".
+ *
+ * brands.category defaults to 'restaurant' (0024) whether or not anyone set
+ * it, so a bare default with no cuisine is treated as "not set" and the
+ * label is left out — a label/publisher should not read as a restaurant.
+ */
+function brandEyebrow(
+  brand: Pick<Brand, "genres" | "category" | "city" | "cuisine">,
+): string {
+  const parts = brand.genres.slice(0, 2);
+  const extra = brand.genres.length > 2 ? brand.genres.length - 2 : 0;
+  const categorySet =
+    !!brand.category && (brand.category !== "restaurant" || !!brand.cuisine);
+  if (brand.category && categorySet) parts.push(BRAND_CATEGORY_LABELS[brand.category]);
+  if (brand.city) parts.push(brand.city);
+  if (extra > 0 && !brand.category && !brand.city) return `${parts.join(" · ")} +${extra}`;
+  return parts.join(" · ");
+}
 
 // Per-brand hero focal-point now comes from brands.hero_focal_x /
 // .hero_focal_y (migration 0034), exposed on Brand via heroFocalX /
@@ -197,7 +220,7 @@ export default async function BrandPage({
         {/* Content layer — sits above image + overlay */}
         <div className="relative p-6 sm:p-10">
           <p className="text-xs uppercase tracking-[0.3em] text-linen/70">
-            {brand.genres.slice(0, 2).join(" · ")}{brand.genres.length > 2 ? " +" + (brand.genres.length - 2) : ""}
+            {brandEyebrow(brand)}
           </p>
           <h1
             className="mt-3 text-4xl font-semibold text-linen leading-tight break-words sm:text-5xl drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]"
@@ -317,6 +340,14 @@ export default async function BrandPage({
         </section>
         </Reveal>
       )}
+
+      {/* Members who follow this brand also follow — co-follow signal
+          (lib/data/co-follows.ts). Renders nothing without data. */}
+      <AlsoFollow
+        brandSlug={slug}
+        brandName={brand.name}
+        viewerId={member?.id ?? null}
+      />
 
       {/* Founder wall link */}
       <Reveal>
