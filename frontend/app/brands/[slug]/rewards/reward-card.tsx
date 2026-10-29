@@ -5,6 +5,7 @@ import Link from "next/link";
 import DropCountdown from "@/components/drop-countdown";
 import Image from "next/image";
 import { RedeemForm } from "./redeem-form";
+import { affordabilityCopy, rewardAffordability } from "@/components/reward-affordability";
 
 interface RewardCardProps {
   reward: any; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -12,6 +13,12 @@ interface RewardCardProps {
   brandName: string;
   memberSlug?: string | null;
   isSignedIn?: boolean;
+  /**
+   * Viewer's spendable balance, fetched once by the page. null/undefined
+   * (signed out, or unknown) keeps the card's original behaviour and lets
+   * the redeem RPC decide.
+   */
+  spendablePoints?: number | null;
 }
 
 export default function RewardCardWithForm({
@@ -20,9 +27,16 @@ export default function RewardCardWithForm({
   brandName,
   memberSlug,
   isSignedIn = true,
+  spendablePoints = null,
 }: RewardCardProps) {
   const [showForm, setShowForm] = useState(false);
   const rewardsPath = `/brands/${brandSlug}/rewards`;
+  const affordability = rewardAffordability(
+    reward.point_cost,
+    isSignedIn ? spendablePoints : null,
+  );
+  const hint = affordabilityCopy(affordability);
+  const cannotAfford = affordability.known && !affordability.canAfford;
 
   return (
     <>
@@ -50,6 +64,31 @@ export default function RewardCardWithForm({
           <span className="text-xs text-iron/70">pts</span>
         </div>
 
+        {affordability.known && (
+          <div className="mt-2 space-y-1.5">
+            <p
+              className={`text-xs ${affordability.canAfford ? "text-sage-ink" : "text-iron/70"}`}
+            >
+              {hint}
+            </p>
+            {!affordability.canAfford && (
+              <div
+                role="progressbar"
+                aria-label={`${(spendablePoints ?? 0).toLocaleString()} of ${reward.point_cost.toLocaleString()} points toward ${reward.title}`}
+                aria-valuemin={0}
+                aria-valuemax={reward.point_cost}
+                aria-valuenow={Math.max(0, Math.min(reward.point_cost, spendablePoints ?? 0))}
+                className="h-1 w-full overflow-hidden rounded-full bg-iron/10"
+              >
+                <div
+                  className="h-full rounded-full bg-ember/70"
+                  style={{ width: `${affordability.percent}%` }}
+                />
+              </div>
+            )}
+          </div>
+        )}
+
         {reward.requires_tier && (
           <div className="mt-2 inline-flex rounded-full bg-amber-500/20 px-2 py-1 text-xs uppercase tracking-wide text-aurora-ink">
             {reward.requires_tier === "founder-only"
@@ -67,9 +106,12 @@ export default function RewardCardWithForm({
         {isSignedIn ? (
           <button
             onClick={() => setShowForm(true)}
-            className="mt-4 w-full rounded-lg bg-ember px-3 py-2 text-xs font-medium text-linen hover:opacity-90"
+            disabled={cannotAfford}
+            aria-disabled={cannotAfford}
+            title={cannotAfford ? hint ?? undefined : undefined}
+            className="mt-4 w-full rounded-lg bg-ember px-3 py-2 text-xs font-medium text-linen hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:opacity-50"
           >
-            Redeem →
+            {cannotAfford ? "Keep earning" : "Redeem →"}
           </button>
         ) : (
           <Link

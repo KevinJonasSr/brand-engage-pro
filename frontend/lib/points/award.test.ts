@@ -58,4 +58,32 @@ describe("awardPoints", () => {
     assert.equal(res.communityId, "jge");
     assert.equal((rpcs[0].args as { p_community_id: string }).p_community_id, "jge");
   });
+
+  it("uses the primary membership (earliest joined_at) when omitted", async () => {
+    const { client, calls } = fakeSupabase((call) =>
+      call.table === "member_community_memberships"
+        ? { data: [{ community_id: "jonas-group-ent", joined_at: "2026-01-01" }], error: null }
+        : { data: null, error: null },
+    );
+    const res = await awardPoints(client, { memberId: "m1", delta: 5, source: "daily_checkin" });
+    assert.equal(res.communityId, "jonas-group-ent");
+    const lookup = calls.find((c) => c.table === "member_community_memberships");
+    assert.ok(lookup);
+    assert.ok(lookup.chain.includes("order"));
+    assert.ok(lookup.chain.includes("limit"));
+  });
+
+  it("writes an unscoped ledger row (community_id null) when the member has no membership", async () => {
+    const { client, calls, rpcs } = fakeSupabase((call) =>
+      call.table === "member_community_memberships"
+        ? { data: [], error: null }
+        : { data: null, error: null },
+    );
+    const res = await awardPoints(client, { memberId: "m1", delta: 5, source: "daily_checkin" });
+    assert.deepEqual(res, { awarded: true, delta: 5, communityId: null });
+    const ledger = calls.find((c) => c.table === "points_ledger");
+    assert.ok(ledger);
+    assert.equal((ledger.args[0] as { community_id: unknown }).community_id, null);
+    assert.equal((rpcs[0].args as { p_community_id: unknown }).p_community_id, null);
+  });
 });

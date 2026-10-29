@@ -13,9 +13,10 @@ import type { SupabaseClient } from "@supabase/supabase-js";
  * and cron jobs alike.
  *
  * Multi-tenancy: callers should pass communityId explicitly. When
- * omitted, we resolve from the member's memberships — unambiguous when
- * they belong to exactly one community; otherwise falls back to
- * "nellies" (BEP's original single-tenant default).
+ * omitted, we resolve the member's primary membership — the earliest row
+ * in member_community_memberships by joined_at. A member with no
+ * membership gets a ledger row with community_id null (the 0046 backfill
+ * query sweeps those up); there is no brand-specific fallback.
  *
  * Idempotency: pass a deterministic `sourceRef` (e.g. `checkin:<brand>:
  * <member>:<date>`). The 0059 unique index rejects a repeat, the totals are
@@ -27,8 +28,9 @@ export interface AwardPointsResult {
   awarded: boolean;
   /** Points actually credited by this call: `delta` when awarded, else 0. */
   delta: number;
-  /** Community the ledger row was (or would have been) scoped to. */
-  communityId: string;
+  /** Community the ledger row was (or would have been) scoped to; null
+   *  when the member has no membership and none was passed. */
+  communityId: string | null;
 }
 
 export async function awardPoints(
@@ -46,19 +48,11 @@ export async function awardPoints(
     source: string;
     sourceRef?: string;
     note?: string;
-    communityId?: string;
+    communityId?: string | null;
   },
 ): Promise<AwardPointsResult> {
   if (!communityId) {
-    const { data: memberships } = await admin
-      .from("member_community_memberships")
-      .select("community_id")
-      .eq("member_id", memberId)
-      .limit(2);
-    communityId =
-      memberships && memberships.length === 1
-        ? (memberships[0].community_id as string)
-        : "nellies";
+    communityId = await resolvePrimaryCommunityId(admin, memberId);
   }
 
   // 1. Ledger entry (audit trail). The 0059 unique index rejects a repeat
@@ -89,4 +83,27 @@ export async function awardPoints(
     console.warn("awardPoints: add_member_points failed", totalErr);
   }
   return { awarded: true, delta, communityId };
+}
+
+/**
+ * The member's primary community: their earliest membership by joined_at.
+ * Null when they have none (or the read fails) — callers then write an
+ * unscoped ledger row instead of guessing a brand.
+ */
+async function resolvePrimaryCommunityId(
+  admin: SupabaseClient,
+  memberId: string,
+): Promise<string | null> {
+  const { data: memberships, error } = await admin
+    .from("member_community_memberships")
+    .select("community_id, joined_at")
+    .eq("member_id", memberId)
+    .order("joined_at", { ascending: true })
+    .limit(1);
+  if (error) {
+    console.warn("awardPoints: membership lookup failed", error);
+    return null;
+  }
+  const first = (memberships ?? [])[0] as { community_id?: string | null } | undefined;
+  return first?.community_id ?? null;
 }

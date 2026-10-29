@@ -494,7 +494,7 @@ describe("guest surfaces", () => {
     );
     assert.match(eventsPage, /nelliesPublicOffers/);
     assert.match(eventsPage, /isNelliesThreeVisitRewardActive/);
-    assert.match(eventsPage, /brand\?\.upcoming/);
+    assert.match(eventsPage, /brand\.upcoming/);
     assert.match(eventsPage, /Get tickets/);
     assert.match(eventsPage, /rel="noopener noreferrer"/);
     assert.doesNotMatch(eventsPage, /September 23/);

@@ -4,7 +4,14 @@ import { createClient } from "@/lib/supabase/server";
 import { smsTierAllowed } from "@/lib/sms-send-gate";
 import { getTiers } from "@/lib/data/tiers";
 import { PreferencesForm } from "./preferences-form";
-import { DEFAULT_PREFS, TOGGLE_KEYS, type Prefs } from "./prefs";
+import { BrandMutes } from "./brand-mutes";
+import {
+  DEFAULT_PREFS,
+  TOGGLE_KEYS,
+  setBrandMuted,
+  type BrandPref,
+  type Prefs,
+} from "./prefs";
 
 export const metadata = { title: "Notifications" };
 
@@ -25,7 +32,14 @@ export default async function NotificationPreferencesPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/me/notifications");
 
-  const [{ data: row }, { data: pushSubs }, { data: member }, tiers] = await Promise.all([
+  const [
+    { data: row },
+    { data: pushSubs },
+    { data: member },
+    tiers,
+    { data: follows },
+    { data: mutes },
+  ] = await Promise.all([
     supabase
       .from("notification_preferences")
       .select(PREFS_SELECT)
@@ -42,7 +56,38 @@ export default async function NotificationPreferencesPage() {
       .eq("id", user.id)
       .maybeSingle(),
     getTiers(),
+    // Followed brands, with the brand name via the brand_slug FK (0006).
+    supabase
+      .from("member_brand_following")
+      .select("brand_slug, brands(name)")
+      .eq("member_id", user.id),
+    // Own rows only under RLS (0083); a missing row means "not muted".
+    supabase
+      .from("member_brand_notification_prefs")
+      .select("brand_slug, muted")
+      .eq("member_id", user.id),
   ]);
+
+  const mutedSlugs = new Set(
+    ((mutes ?? []) as Array<{ brand_slug: string; muted: boolean }>)
+      .filter((m) => m.muted)
+      .map((m) => m.brand_slug),
+  );
+  const followedBrands: BrandPref[] = (
+    (follows ?? []) as Array<{
+      brand_slug: string;
+      brands: { name: string } | { name: string }[] | null;
+    }>
+  )
+    .map((f) => {
+      const b = Array.isArray(f.brands) ? f.brands[0] : f.brands;
+      return {
+        slug: f.brand_slug,
+        name: b?.name ?? f.brand_slug,
+        muted: mutedSlugs.has(f.brand_slug),
+      };
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   const stored = row as Partial<Record<string, unknown>> | null;
   const prefs: Prefs = stored
@@ -94,6 +139,10 @@ export default async function NotificationPreferencesPage() {
         smsAllowed={smsAllowed}
         smsCopy={smsCopy}
       />
+
+      <div className="mt-6">
+        <BrandMutes brands={followedBrands} setBrandMuted={setBrandMuted} />
+      </div>
 
       <p className="mt-8 text-xs text-iron/70">
         We never sell your data. You can unsubscribe from emails at any

@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendNotification } from "../send";
+import { excludeMutedFollowers } from "../brand-prefs";
 
 /**
  * Push when a prediction launches — fans of the brand get a nudge.
@@ -22,7 +23,11 @@ export async function notifyPredictionLaunched(opts: {
     ]);
     if (!brand) return;
 
-    const memberIds = (follows ?? []).map((r) => r.member_id as string);
+    // Drop members who muted this brand (one query, see brand-prefs.ts).
+    const memberIds = await excludeMutedFollowers(
+      (follows ?? []).map((r) => r.member_id as string),
+      opts.brandSlug,
+    );
     if (memberIds.length === 0) return;
 
     const MAX = 200;
@@ -66,7 +71,12 @@ export async function notifyPredictionResolved(opts: {
     ]);
     if (!brand) return;
 
-    const allVoters = (voteRows ?? []).map((r) => r.member_id as string);
+    // Voters are not necessarily followers, but the result is still a brand
+    // prediction alert, so a mute on this brand applies here too.
+    const allVoters = await excludeMutedFollowers(
+      (voteRows ?? []).map((r) => r.member_id as string),
+      opts.brandSlug,
+    );
     if (allVoters.length === 0) return;
 
     const winnerSet = new Set(opts.winnerMemberIds);

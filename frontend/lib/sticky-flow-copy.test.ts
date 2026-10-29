@@ -34,7 +34,8 @@ describe("preview-theater copy hold", () => {
     }
     assert.match(rewards, /Join free and earn from real visits/);
     assert.match(marketplace, /Live unlocks are on brand pages/);
-    assert.match(marketplace, /jonas-group-ent\/rewards/);
+    // Sprint 2: the empty state points at /brands, not a hardcoded JGE link.
+    assert.match(marketplace, /href="\/brands"/);
     assert.match(referrals, /Invite friends and earn \+150 pts per signup/);
   });
 });

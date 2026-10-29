@@ -3,6 +3,10 @@ import { isPremiumTier } from "@/lib/entitlements";
 import { ledgerNote, pointsMultiplier, scaledPoints } from "@/lib/founder-perks";
 import { emitNetworkEvent } from "@/lib/network";
 import { awardPoints } from "@/lib/points/award";
+import { getLifetimePoints, getSpendablePoints } from "@/lib/data/member";
+import { tierProgress } from "@/lib/data/member-points";
+import { getStampCardData } from "@/lib/data/stamp-card";
+import { getTiers } from "@/lib/data/tiers";
 
 export const CHECKIN_POINTS = 25;
 
@@ -130,6 +134,85 @@ async function checkinPointFlags(
   return {
     isFounder: Boolean(data?.is_founder),
     isPremium: isPremiumTier((data?.subscription_tier as string | null) ?? null),
+  };
+}
+
+/** Progress snapshot returned with a check-in so the client can show a moment, not just a number. */
+export type CheckinProgress = {
+  /** Net ledger balance the member can spend right now. */
+  spendablePoints: number;
+  /** All-time check-ins at this brand (this one included). */
+  visitCount: number;
+  /** Member-wide daily streak (members.current_streak_days), 0 when unknown. */
+  streakDays: number;
+  /** Stamp card progress, or null when the brand has no active card. */
+  stampCard: {
+    stampsEarned: number;
+    stampsRequired: number;
+    rewardTitle: string;
+    visitsRemaining: number;
+    justCompleted: boolean;
+  } | null;
+  /** Next tier on the ladder, or null at the top (or when unavailable). */
+  nextTier: { name: string; pointsToNext: number } | null;
+};
+
+/**
+ * Gather the post-check-in progress snapshot. Every lookup is best-effort:
+ * a failed read degrades to 0 / null rather than failing the check-in.
+ */
+export async function getCheckinProgress(
+  memberId: string,
+  brandSlug: string,
+): Promise<CheckinProgress> {
+  const admin = createAdminClient();
+  const quiet = <T>(p: Promise<T>, fallback: T): Promise<T> =>
+    p.catch((err: unknown) => {
+      console.warn("getCheckinProgress: lookup failed", err);
+      return fallback;
+    });
+
+  const [spendablePoints, lifetimePoints, visitCount, stamp, streakRes, tiers] =
+    await Promise.all([
+      quiet(getSpendablePoints(memberId), 0),
+      quiet(getLifetimePoints(memberId), 0),
+      quiet(getMemberCheckinCount(memberId, brandSlug), 0),
+      quiet(getStampCardData(brandSlug, memberId), null),
+      quiet(
+        Promise.resolve(
+          admin
+            .from("members")
+            .select("current_streak_days")
+            .eq("id", memberId)
+            .maybeSingle(),
+        ).then((r) => r.data as { current_streak_days: number | null } | null),
+        null,
+      ),
+      quiet(getTiers(), []),
+    ]);
+
+  const { next_tier, points_to_next_tier } = tierProgress(
+    tiers,
+    Math.max(lifetimePoints, spendablePoints),
+  );
+
+  return {
+    spendablePoints,
+    visitCount,
+    streakDays: Math.max(0, streakRes?.current_streak_days ?? 0),
+    stampCard: stamp
+      ? {
+          stampsEarned: stamp.stampsInCurrentRound,
+          stampsRequired: stamp.stampsRequired,
+          rewardTitle: stamp.rewardTitle,
+          visitsRemaining: stamp.visitsRemaining,
+          justCompleted: stamp.justCompleted,
+        }
+      : null,
+    nextTier:
+      next_tier && points_to_next_tier !== null
+        ? { name: next_tier.display_name, pointsToNext: points_to_next_tier }
+        : null,
   };
 }
 
