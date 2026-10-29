@@ -1,3 +1,5 @@
+import type { HoursJson } from "./brand-hours";
+
 /** Inline alias map — do not import brand-aliases here (Node tests + Next). */
 const JGE_FALLBACK_ALIASES = new Set([
   "jge",
@@ -45,6 +47,13 @@ export type Brand = {
   }[];
   merch: { title: string; tier: string; points: string }[];
   social: { label: string; href: string }[];
+  /** Visit essentials from brands.address / hours_json / phone / website_url
+   *  (migration 0024). DB-backed brands fill these; fallback brands leave
+   *  them undefined and the page renders nothing for them. */
+  address?: string;
+  hours?: HoursJson;
+  phone?: string;
+  websiteUrl?: string;
 };
 
 // Placeholder content for each brand — swap when Box assets are delivered.

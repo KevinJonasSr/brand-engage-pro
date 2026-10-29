@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { BRANDS as FALLBACK_BRANDS, type Brand } from "@/lib/brands";
 import { resolveBrandSlug } from "@/lib/brand-aliases";
+import type { HoursJson } from "@/lib/brand-hours";
 import { applyJgeLaunchBio, filterJgeLaunchEvents } from "@/lib/jge-launch";
 import {
   NELLIES_BRAND_SLUG,
@@ -47,6 +48,11 @@ type BrandRow = {
   social: Array<{ label: string; href: string }> | null;
   active: boolean;
   sort_order: number;
+  /** Visit essentials (migration 0024). Null when the brand has not set them. */
+  address: string | null;
+  hours_json: HoursJson | null;
+  phone: string | null;
+  website_url: string | null;
 };
 
 function isUuid(value: string | undefined): value is string {
@@ -109,6 +115,10 @@ function rowToBrand(row: BrandRow, events: BrandEvent[]): Brand {
     accentTo: row.accent_to,
     genres: row.genres ?? [],
     social: row.social ?? [],
+    address: row.address ?? undefined,
+    hours: row.hours_json ?? undefined,
+    phone: row.phone ?? undefined,
+    websiteUrl: row.website_url ?? undefined,
     upcoming,
     // Nellie's Jackie launch is specials + Bourbon — not merch redeemables.
     merch: isNellies ? [] : (fallback?.merch ?? []),
@@ -128,7 +138,7 @@ export async function getBrandFromDb(slug: string): Promise<Brand | null> {
     const [{ data: brand, error: aErr }, { data: events, error: eErr }] = await Promise.all([
       supabase
         .from("brands")
-        .select("slug, name, tagline, bio, hero_image, hero_focal_x, hero_focal_y, accent_from, accent_to, genres, social, active, sort_order")
+        .select("slug, name, tagline, bio, hero_image, hero_focal_x, hero_focal_y, accent_from, accent_to, genres, social, active, sort_order, address, hours_json, phone, website_url")
         .eq("slug", normalized)
         .eq("active", true)
         .maybeSingle(),
@@ -156,7 +166,7 @@ export async function listBrandsFromDb(): Promise<Brand[]> {
     const supabase = await createClient();
     const { data: brands, error } = await supabase
       .from("brands")
-      .select("slug, name, tagline, bio, hero_image, hero_focal_x, hero_focal_y, accent_from, accent_to, genres, social, active, sort_order")
+      .select("slug, name, tagline, bio, hero_image, hero_focal_x, hero_focal_y, accent_from, accent_to, genres, social, active, sort_order, address, hours_json, phone, website_url")
       .eq("active", true)
       .order("sort_order");
     if (error || !brands || brands.length === 0) {
@@ -198,7 +208,7 @@ export async function listBrandsForAdmin(): Promise<
   const [{ data: brands }, { data: events }, { data: follows }] = await Promise.all([
     admin
       .from("brands")
-      .select("slug, name, tagline, bio, hero_image, hero_focal_x, hero_focal_y, accent_from, accent_to, genres, social, active, sort_order")
+      .select("slug, name, tagline, bio, hero_image, hero_focal_x, hero_focal_y, accent_from, accent_to, genres, social, active, sort_order, address, hours_json, phone, website_url")
       .order("sort_order"),
     admin.from("brand_events").select("brand_slug"),
     admin.from("member_brand_following").select("brand_slug"),

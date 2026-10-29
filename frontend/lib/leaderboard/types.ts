@@ -4,15 +4,17 @@
  * row, and most points come from cross-cutting events (signup bonus,
  * streak bonuses) that wouldn't make sense to attribute to one brand.
  *
- * Activity score weights (V1):
- *   reactions placed:       1 pt
- *   comments posted:        3 pts
+ * Activity score weights (V2, Sprint 3):
+ *   visit check-ins:       10 pts
+ *   reward redemptions:     8 pts
  *   RSVPs added:            5 pts
- *   reward redemptions:    10 pts
+ *   comments posted:        3 pts
+ *   reactions placed:       1 pt
  *
- * Rationale: comments take more effort than reactions, RSVPs imply
- * intent to show up, redemptions burn points (ultimate signal of
- * engagement). Tunable in the gather module without schema impact.
+ * Rationale: a visit is the thing the brand actually wants, so a weekly
+ * regular must outrank someone who taps reactions; redemptions burn points,
+ * RSVPs imply intent to show up, comments take more effort than reactions.
+ * Tunable in the gather module without schema impact.
  */
 
 export interface LeaderboardEntry {
@@ -23,6 +25,8 @@ export interface LeaderboardEntry {
   current_tier: string | null;
   score: number;
   /** Activity breakdown — useful for the "what counts" tooltip on the page. */
+  /** Check-ins at this brand this month (one per ET day). */
+  visits: number;
   reactions: number;
   comments: number;
   rsvps: number;

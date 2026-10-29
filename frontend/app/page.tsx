@@ -296,7 +296,7 @@ export default async function Home({
             <section className="glass-card p-6">
               <p className="text-sm uppercase tracking-wide text-iron/70">Your invite</p>
               <p className="mt-2 text-xs text-iron/70">
-                Share the QR for instant sign-ups. Every verified join earns you 150 pts.
+                Share the QR for instant sign-ups. Your friend gets 50 pts to start. You get 150 pts after their first visit.
               </p>
               <div className="mt-4">
                 <InviteQRCode url={inviteUrl} />

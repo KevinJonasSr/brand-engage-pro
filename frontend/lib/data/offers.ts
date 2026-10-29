@@ -1,19 +1,23 @@
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentCommunityId } from "@/lib/community";
+import { getCurrentCommunityIdOrNull } from "@/lib/community";
 import { applyNelliesLaunchOffers } from "@/lib/nellies-launch";
 import type { Offer } from "./types";
 
 /**
  * Active offers for the current brand/community only.
  *
- * Soft-launch: scoped via `x-community-id` (defaults to Nellie's) so the
+ * Scoped via `x-community-id` (or the first active brand) so the
  * marketplace never mixes in Fan Engage / artist leftover catalog rows from
  * other communities (e.g. jonas-group-ent music offers).
  */
 export async function getActiveOffers(): Promise<Offer[]> {
+  // Resolve the community once, outside the query try/catch. When nothing
+  // resolves (no header, no active brand) there is no community to scope
+  // to, so there are no offers — never silently fall back to Nellie's.
+  const communityId = await getCurrentCommunityIdOrNull().catch(() => null);
+  if (!communityId) return [];
   try {
     const supabase = await createClient();
-    const communityId = await getCurrentCommunityId();
     const now = new Date().toISOString();
     const { data, error } = await supabase
       .from("offers")
@@ -29,7 +33,6 @@ export async function getActiveOffers(): Promise<Offer[]> {
       (data ?? []) as Offer[],
     ) as Offer[];
   } catch {
-    const communityId = await getCurrentCommunityId().catch(() => "nellies");
     return applyNelliesLaunchOffers(communityId, []) as Offer[];
   }
 }

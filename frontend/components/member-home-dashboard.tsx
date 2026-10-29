@@ -2,15 +2,15 @@ import Link from "next/link";
 import WeeklyRecapTile from "@/components/weekly-recap-tile";
 import type { WeeklyRecap } from "@/lib/personal-recap/types";
 import PushOptInBanner from "@/components/push-opt-in-banner";
-import StreakTile from "@/components/streak-tile";
 import type { MemberHomeData, MemberHomeUpcomingEvent } from "@/lib/data/member-home";
+import type { StreakState } from "@/lib/streaks/touch";
 
 /**
  * Personalized Member Home dashboard — everything a signed-in member sees at /
  * above the existing marketing content. All data comes from getMemberHomeData()
  * so there are no client-side fetches here.
  */
-export default function MemberHomeDashboard({ data, streak, recap }: { data: MemberHomeData; streak?: { currentStreakDays: number; longestStreakDays: number; pointsAwardedThisVisit: number; newMilestone: number | null; isNewToday: boolean; lastActiveDate: string | null } | null; recap?: WeeklyRecap | null }) {
+export default function MemberHomeDashboard({ data, streak, recap }: { data: MemberHomeData; streak?: StreakState | null; recap?: WeeklyRecap | null }) {
   const {
     member,
     followedBrands,
@@ -44,12 +44,7 @@ export default function MemberHomeDashboard({ data, streak, recap }: { data: Mem
 
       {/* Followed brands strip */}
       <PushOptInBanner />
-      {streak && <StreakTile
-        currentStreakDays={streak.currentStreakDays}
-        longestStreakDays={streak.longestStreakDays}
-        pointsAwardedThisVisit={streak.pointsAwardedThisVisit}
-        newMilestone={streak.newMilestone}
-      />}
+      {streak && <VisitStreakCard streak={streak} />}
       {recap && <WeeklyRecapTile recap={recap} firstName={data.member?.first_name ?? null} />}
       <FollowedBrandsStrip brands={followedBrands} />
 
@@ -78,6 +73,71 @@ export default function MemberHomeDashboard({ data, streak, recap }: { data: Mem
         points={spendablePoints}
       />
     </section>
+  );
+}
+
+/**
+ * Streak card. The headline is the VISIT streak — consecutive weeks with a
+ * check-in at any brand — because that is what "streak" means to a regular.
+ * The daily login streak still pays its small bonus (product kept it) but
+ * is demoted to a footnote so nobody mistakes page loads for visits.
+ */
+function VisitStreakCard({ streak }: { streak: StreakState }) {
+  const weeks = streak.visitStreakWeeks;
+  const next = streak.nextVisitMilestone;
+  const weeksLabel = `${weeks} week${weeks === 1 ? "" : "s"}`;
+  const showLongest =
+    streak.longestVisitStreakWeeks > 0 && streak.longestVisitStreakWeeks > weeks;
+  const loginDays = streak.currentStreakDays;
+
+  return (
+    <div className="glass-card rounded-lg p-5 ring-1 ring-iron/10">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div
+            className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-parchment/30 text-3xl ring-1 ring-iron/10"
+            aria-hidden
+          >
+            🍽️
+          </div>
+          <div>
+            <p className="text-sm text-iron/80">
+              🍽️ Visit streak · <span className="text-base font-semibold text-iron">{weeksLabel}</span>
+              {next !== null && weeks > 0 && ` · next milestone ${next} weeks`}
+            </p>
+            {weeks === 0 && (
+              <p className="mt-1 text-xs text-iron/70">
+                Check in at any brand this week to start your visit streak.
+              </p>
+            )}
+            {streak.newVisitMilestone && (
+              <p className="mt-1 text-xs font-semibold text-aurora-ink">
+                🎉 {streak.newVisitMilestone}-week visit streak milestone hit!
+              </p>
+            )}
+          </div>
+        </div>
+        {showLongest && (
+          <p className="text-xs text-iron/45">
+            Longest: {streak.longestVisitStreakWeeks} weeks
+          </p>
+        )}
+      </div>
+
+      {/* Footnote: the daily login streak, kept small. */}
+      {loginDays > 0 && (
+        <p className="mt-4 border-t border-iron/10 pt-3 text-xs text-iron/65">
+          Showed up {loginDays} day{loginDays === 1 ? "" : "s"} in a row
+          {streak.pointsAwardedThisVisit > 0 && (
+            <>
+              {" · "}
+              <span className="font-semibold text-iron">+{streak.pointsAwardedThisVisit} pts</span>
+              {streak.newMilestone ? ` — day ${streak.newMilestone} milestone` : ""}
+            </>
+          )}
+        </p>
+      )}
+    </div>
   );
 }
 

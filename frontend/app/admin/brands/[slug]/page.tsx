@@ -7,8 +7,15 @@ import { listRsvpsForEvent } from "@/lib/data/events";
 import BrandEditForm from "./edit-form";
 import CreateEventForm from "./create-event-form";
 import EditableEventRow from "./editable-event-row";
-import CheckinQrCard from "@/components/checkin-qr-card";
-import { checkinPath, checkinSecretFromEnv, signCheckinToken } from "@/lib/checkin-token";
+import CheckinQr from "./checkin-qr";
+import {
+  ROTATION_SECONDS,
+  checkinPath,
+  checkinRotationEnabled,
+  checkinSecretFromEnv,
+  checkinTokenExpiresAt,
+  signCheckinToken,
+} from "@/lib/checkin-token";
 import { canRsvpNow, FOUNDER_EARLY_RSVP_HOURS } from "@/lib/founder-perks";
 import {
   deleteEventAction,
@@ -247,19 +254,36 @@ export default async function AdminBrandEditPage({
         <CreateEventForm slug={slug} brandEarlyHours={earlyHours} />
       </section>
 
-      {/* Check-in QR — print or display at the register / entrance */}
-      <CheckinQrCard
+      {/* Check-in QR — live, rotating code to display at the register / entrance */}
+      <CheckinQr
+        brandSlug={brand.slug as string}
         brandName={brand.name as string}
-        checkinPath={signedCheckinPath(brand.slug as string)}
+        rotationSeconds={ROTATION_SECONDS}
+        {...signedCheckinQr(brand.slug as string)}
       />
     </div>
   );
 }
 
-/** Check-in path for the printed QR, signed when CHECKIN_SIGNING_SECRET is set. */
-function signedCheckinPath(brandSlug: string): string {
+/**
+ * First render of the check-in QR: the current signed path (when
+ * CHECKIN_SIGNING_SECRET is set), when it stops being current, and whether
+ * tokens rotate. The client component then keeps it fresh itself.
+ */
+function signedCheckinQr(brandSlug: string): {
+  initialPath: string;
+  initialExpiresAt: number | null;
+  rotation: "on" | "off";
+} {
   const secret = checkinSecretFromEnv();
-  return checkinPath(brandSlug, secret ? signCheckinToken(brandSlug, secret) : null);
+  const rotation = checkinRotationEnabled() ? "on" : "off";
+  const now = Date.now();
+  const token = secret ? signCheckinToken(brandSlug, secret, now) : null;
+  return {
+    initialPath: checkinPath(brandSlug, token),
+    initialExpiresAt: token && rotation === "on" ? checkinTokenExpiresAt(now) : null,
+    rotation,
+  };
 }
 
 function ReminderChip({

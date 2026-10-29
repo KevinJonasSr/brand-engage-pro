@@ -1,15 +1,64 @@
-import { createAdminClient } from "@/lib/supabase/admin";
+import type { SupabaseClient } from "@supabase/supabase-js";
+// Relative, extension-full import so gather.test.ts can load this module
+// under plain `node --test` without the "@/" alias (see lib/streaks/touch.ts).
+import { createAdminClient } from "../supabase/admin.ts";
 import type {
   BrandMonthlyLeaderboard,
   LeaderboardEntry,
-} from "./types";
+} from "./types.ts";
 
-const SCORE_WEIGHTS = {
-  reaction: 1,
-  comment: 3,
+/**
+ * Activity weights. Visits sit on top: a weekly regular who never touches
+ * the community feed must still outrank a member who taps reactions. The
+ * relative order of the rest is unchanged from V1 (see types.ts).
+ */
+export const SCORE_WEIGHTS = {
+  visit: 10,
+  redemption: 8,
   rsvp: 5,
-  redemption: 10,
+  comment: 3,
+  reaction: 1,
 } as const;
+
+export type ActivityKey = "visits" | "reactions" | "comments" | "rsvps" | "redemptions";
+
+export type ActivityScore = Pick<LeaderboardEntry, ActivityKey | "score">;
+
+const WEIGHT_FOR: Record<ActivityKey, number> = {
+  visits: SCORE_WEIGHTS.visit,
+  reactions: SCORE_WEIGHTS.reaction,
+  comments: SCORE_WEIGHTS.comment,
+  rsvps: SCORE_WEIGHTS.rsvp,
+  redemptions: SCORE_WEIGHTS.redemption,
+};
+
+/** Member ids per activity kind, one entry per row (duplicates count). */
+export type ActivityRows = Partial<Record<ActivityKey, Array<string | null | undefined>>>;
+
+/**
+ * Pure aggregation: fold activity rows into a per-member score map using
+ * SCORE_WEIGHTS. Rows with no member id are skipped.
+ */
+export function aggregateScores(rows: ActivityRows): Map<string, ActivityScore> {
+  const scores = new Map<string, ActivityScore>();
+  for (const key of Object.keys(WEIGHT_FOR) as ActivityKey[]) {
+    for (const memberId of rows[key] ?? []) {
+      if (!memberId) continue;
+      const cur = scores.get(memberId) ?? {
+        visits: 0,
+        reactions: 0,
+        comments: 0,
+        rsvps: 0,
+        redemptions: 0,
+        score: 0,
+      };
+      cur[key] += 1;
+      cur.score += WEIGHT_FOR[key];
+      scores.set(memberId, cur);
+    }
+  }
+  return scores;
+}
 
 /** Get the first day (UTC midnight) of the month containing `at`. */
 function startOfMonthUtc(at: Date): Date {
@@ -28,8 +77,8 @@ function formatMonthLabel(monthStart: Date): string {
  * Compute the per-brand monthly leaderboard. Returns top N + the viewer's
  * own rank if they have any activity this month.
  *
- * Implementation: 4 parallel COUNT-style queries scoped to the month and
- * brand, merged in TS into a per-member score map. Then sort, slice, and
+ * Implementation: 5 parallel COUNT-style queries scoped to the month and
+ * brand, merged in TS into a per-member score map (aggregateScores). Then sort, slice, and
  * resolve display names + avatars in a single batch read on `members`.
  *
  * Failure mode: any error returns a benign empty leaderboard so the
@@ -40,6 +89,8 @@ export async function gatherBrandLeaderboard(opts: {
   viewerMemberId?: string | null;
   topN?: number;
   monthStart?: Date; // defaults to current calendar month UTC
+  /** Injected for tests; defaults to the service-role client. */
+  admin?: SupabaseClient;
 }): Promise<BrandMonthlyLeaderboard | null> {
   const topN = opts.topN ?? 10;
   const monthStart = startOfMonthUtc(opts.monthStart ?? new Date());
@@ -60,7 +111,7 @@ export async function gatherBrandLeaderboard(opts: {
   };
 
   try {
-    const admin = createAdminClient();
+    const admin = opts.admin ?? createAdminClient();
 
     // Resolve brand display name (best-effort; falls back to slug).
     const artistPromise = admin
@@ -123,8 +174,10 @@ export async function gatherBrandLeaderboard(opts: {
             .from("event_rsvps")
             .select("member_id")
             .in("event_id", eventIds)
-            .gte("created_at", monthStartIso)
-            .lt("created_at", nextMonthIso)
+            // event_rsvps stamps rsvp_at (0007); it has no created_at, so
+            // this query errored and RSVPs never counted until 2026-10-29.
+            .gte("rsvp_at", monthStartIso)
+            .lt("rsvp_at", nextMonthIso)
         : Promise.resolve({ data: [] as Array<{ member_id: string }> });
 
     // Redemptions are scoped via reward_redemptions.community_id == brandSlug.
@@ -138,8 +191,20 @@ export async function gatherBrandLeaderboard(opts: {
       .gte("created_at", monthStartIso)
       .lt("created_at", nextMonthIso);
 
-    const [reactionsRes, commentsRes, rsvpsRes, redemptionsRes] =
+    // Visits: this month's check-ins at the brand. checkins carries
+    // brand_slug directly (0035) and is already one row per member per ET
+    // day, so every row is one visit. Month edges use the same UTC window
+    // as the other queries so one member's activity lines up across kinds.
+    const visitsPromise = admin
+      .from("checkins")
+      .select("member_id")
+      .eq("brand_slug", opts.brandSlug)
+      .gte("created_at", monthStartIso)
+      .lt("created_at", nextMonthIso);
+
+    const [visitsRes, reactionsRes, commentsRes, rsvpsRes, redemptionsRes] =
       await Promise.all([
+        visitsPromise,
         reactionsPromise,
         commentsPromise,
         rsvpsPromise,
@@ -147,36 +212,13 @@ export async function gatherBrandLeaderboard(opts: {
       ]);
 
     // Aggregate into per-member score map.
-    const scores = new Map<
-      string,
-      Pick<LeaderboardEntry, "reactions" | "comments" | "rsvps" | "redemptions" | "score">
-    >();
-
-    function bump(
-      memberId: string,
-      key: "reactions" | "comments" | "rsvps" | "redemptions",
-      pts: number,
-    ) {
-      const cur = scores.get(memberId) ?? {
-        reactions: 0,
-        comments: 0,
-        rsvps: 0,
-        redemptions: 0,
-        score: 0,
-      };
-      cur[key] += 1;
-      cur.score += pts;
-      scores.set(memberId, cur);
-    }
-
-    for (const r of reactionsRes.data ?? [])
-      bump(r.member_id as string, "reactions", SCORE_WEIGHTS.reaction);
-    for (const c of commentsRes.data ?? [])
-      bump(c.author_id as string, "comments", SCORE_WEIGHTS.comment);
-    for (const r of rsvpsRes.data ?? [])
-      bump(r.member_id as string, "rsvps", SCORE_WEIGHTS.rsvp);
-    for (const r of redemptionsRes.data ?? [])
-      bump(r.member_id as string, "redemptions", SCORE_WEIGHTS.redemption);
+    const scores = aggregateScores({
+      visits: (visitsRes.data ?? []).map((r) => r.member_id as string),
+      reactions: (reactionsRes.data ?? []).map((r) => r.member_id as string),
+      comments: (commentsRes.data ?? []).map((c) => c.author_id as string),
+      rsvps: (rsvpsRes.data ?? []).map((r) => r.member_id as string),
+      redemptions: (redemptionsRes.data ?? []).map((r) => r.member_id as string),
+    });
 
     if (scores.size === 0) {
       return { ...empty, brandName };
@@ -237,6 +279,7 @@ export async function gatherBrandLeaderboard(opts: {
         avatar_url: info?.avatar_url ?? null,
         current_tier: info?.current_tier ?? null,
         score: s.score,
+        visits: s.visits,
         reactions: s.reactions,
         comments: s.comments,
         rsvps: s.rsvps,

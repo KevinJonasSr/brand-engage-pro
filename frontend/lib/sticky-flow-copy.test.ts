@@ -36,6 +36,11 @@ describe("preview-theater copy hold", () => {
     assert.match(marketplace, /Live unlocks are on brand pages/);
     // Sprint 2: the empty state points at /brands, not a hardcoded JGE link.
     assert.match(marketplace, /href="\/brands"/);
-    assert.match(referrals, /Invite friends and earn \+150 pts per signup/);
+    // Sprint 3: referrals pay both sides, the inviter on the friend's first visit.
+    assert.match(referrals, /Invite friends\. Both of you earn\./);
+    assert.match(
+      referrals,
+      /Your friend gets 50 pts to start\. You get 150 pts after their first visit\./,
+    );
   });
 });

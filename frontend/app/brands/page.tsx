@@ -120,7 +120,7 @@ export default async function BrandsIndexPage({ searchParams }: { searchParams?:
         {filteredBrands.map((a) => (
           <div
             key={a.slug}
-            className="group relative overflow-hidden rounded-lg border border-iron/10 transition hover:border-iron/30 hover:-translate-y-0.5"
+            className="group flex flex-col overflow-hidden rounded-lg border border-iron/10 transition hover:border-iron/30 hover:-translate-y-0.5"
           >
           <Link href={`/brands/${a.slug}`} className="block" aria-label={`Enter ${a.name} member club`}>
             {/* 3:4 portrait poster — same shape as the Member Home strip cards
@@ -179,11 +179,12 @@ export default async function BrandsIndexPage({ searchParams }: { searchParams?:
                 )}
               </div>
 
-              {/* Bottom-left content: name + tagline + CTA arrow. Right
-                  padding leaves room for the follow control overlaid below. */}
-              <div className="absolute inset-x-0 bottom-0 p-5 pr-36">
+              {/* Bottom-left content: name + tagline. Full width — the
+                  follow control lives in the footer row below, so long
+                  names wrap instead of being clipped. */}
+              <div className="absolute inset-x-0 bottom-0 p-5">
                 <h2
-                  className="truncate text-2xl font-semibold text-linen drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]"
+                  className="break-words text-2xl font-semibold leading-tight text-linen drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]"
                   style={{ fontFamily: "var(--font-display)" }}
                 >
                   {a.name}
@@ -193,15 +194,20 @@ export default async function BrandsIndexPage({ searchParams }: { searchParams?:
                     {a.tagline}
                   </p>
                 )}
-                <span className="mt-3 inline-flex text-sm text-linen/90 transition group-hover:text-linen">
-                  Enter member club →
-                </span>
               </div>
             </div>
           </Link>
-          {/* Follow control sits above the poster link so it is not an
-              interactive element nested inside an <a>. */}
-          <div className="absolute bottom-5 right-5 z-10">
+          {/* Footer row: enter link left, follow control right. Sits beside
+              the poster link (not inside it) so the button is never an
+              interactive element nested in an <a>. Dark surface continues
+              the poster gradient so the follow styles stay legible. */}
+          <div className="flex items-center justify-between gap-3 bg-iron px-5 py-4">
+            <Link
+              href={`/brands/${a.slug}`}
+              className="text-sm text-linen/90 transition hover:text-linen"
+            >
+              Enter member club →
+            </Link>
             <BrandDirectoryFollow
               brandSlug={a.slug}
               isSignedIn={isSignedIn}
