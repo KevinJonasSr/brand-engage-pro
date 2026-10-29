@@ -2,8 +2,18 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { isPremiumTier } from "@/lib/entitlements";
 import { ledgerNote, pointsMultiplier, scaledPoints } from "@/lib/founder-perks";
 import { emitNetworkEvent } from "@/lib/network";
+import { awardPoints } from "@/lib/points/award";
 
 export const CHECKIN_POINTS = 25;
+
+/** Ledger idempotency key: one visit award per member per brand per ET day. */
+export function checkinSourceRef(
+  brandSlug: string,
+  memberId: string,
+  dateET: string,
+): string {
+  return `checkin:${brandSlug}:${memberId}:${dateET}`;
+}
 
 export type CheckinResult =
   | { ok: true; alreadyCheckedIn: false; pointsAwarded: number }
@@ -69,50 +79,23 @@ export async function recordCheckin(
     return { ok: false, error: checkinErr.message };
   }
 
-  // Award points with idempotency key
-  const sourceRef = `checkin:${brandSlug}:${memberId}:${todayET}`;
-  // The 0059 ledger unique index makes this insert the idempotency check:
-  // totals only move when the ledger row was actually written.
-  const { error: ledgerErr } = await admin.from("points_ledger").insert({
-    member_id: memberId,
+  // Award points through the ledger. The source_ref keeps the shape already
+  // in production (`checkin:<brand>:<member>:<date>`) so a retry of today's
+  // check-in collides with the row that is already there. The 0059 unique
+  // index rejects the repeat and awardPoints then leaves both totals alone;
+  // otherwise add_member_points (0061) moves members.total_points and the
+  // brand membership total in one atomic UPDATE each (and the membership
+  // bump is a no-op when the member does not follow this brand).
+  const { awarded } = await awardPoints(admin, {
+    memberId,
     delta: pointsAwarded,
     source: "daily_checkin",
-    source_ref: sourceRef,
+    sourceRef: checkinSourceRef(brandSlug, memberId, todayET),
     note,
+    communityId: brandSlug,
   });
-  if (ledgerErr && ledgerErr.code !== "23505") {
-    console.warn("recordCheckin: ledger insert failed", ledgerErr);
-  }
 
-  if (!ledgerErr) {
-    // Increment denormalized total — read-then-write is acceptable here since
-    // the unique index on checkins already prevents concurrent check-ins.
-    const { data: m } = await admin
-      .from("members")
-      .select("total_points")
-      .eq("id", memberId)
-      .single();
-    if (m) {
-      await admin
-        .from("members")
-        .update({ total_points: ((m.total_points as number) ?? 0) + pointsAwarded })
-        .eq("id", memberId);
-    }
-
-    // Also bump community membership points if the member follows this brand
-    const { data: mem } = await admin
-      .from("member_community_memberships")
-      .select("total_points")
-      .eq("member_id", memberId)
-      .eq("community_id", brandSlug)
-      .maybeSingle();
-    if (mem) {
-      await admin
-        .from("member_community_memberships")
-        .update({ total_points: ((mem.total_points as number) ?? 0) + pointsAwarded })
-        .eq("member_id", memberId)
-        .eq("community_id", brandSlug);
-    }
+  if (awarded) {
     // Jonas Network: report the check-in. Day-scoped dedupe mirrors the
     // app's own one-per-day idempotency above.
     emitNetworkEvent({

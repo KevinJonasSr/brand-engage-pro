@@ -3,7 +3,11 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentCommunityId } from "@/lib/community";
 import type { MemberKpis, MemberProfile, Tier, TierSlug } from "./types";
 import { getTiers } from "./tiers";
-import { sumLedgerDeltas } from "./member-points";
+import {
+  sumLedgerDeltas,
+  sumPositiveLedgerDeltas,
+  tierProgress,
+} from "./member-points";
 
 /**
  * Per-community membership row — the authoritative source of a member's
@@ -110,6 +114,46 @@ export async function getSpendablePoints(memberId?: string): Promise<number> {
 }
 
 /**
+ * Lifetime points earned: SUM(points_ledger.delta) WHERE delta > 0, floored
+ * at members.lifetime_points (migration 0082 backfills that column from the
+ * ledger and from grants that predate the ledger, so it can only be higher).
+ * Tier progress reads this, not the spendable balance: redeeming a reward
+ * never moves a member back toward a lower tier. Returns 0 when signed out
+ * or every read fails.
+ */
+export async function getLifetimePoints(memberId?: string): Promise<number> {
+  try {
+    let id = memberId;
+    if (!id) {
+      const supabase = await createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return 0;
+      id = user.id;
+    }
+
+    const admin = createAdminClient();
+    const [ledgerRes, memberRes] = await Promise.all([
+      admin.from("points_ledger").select("delta").eq("member_id", id).gt("delta", 0),
+      // Missing column (0082 not applied yet) is an error here, not a crash.
+      admin.from("members").select("lifetime_points").eq("id", id).maybeSingle(),
+    ]);
+    if (ledgerRes.error) {
+      console.warn("getLifetimePoints: supabase error", ledgerRes.error.message);
+    }
+    const fromLedger = sumPositiveLedgerDeltas(ledgerRes.data ?? []);
+    const column = memberRes.error
+      ? 0
+      : Number((memberRes.data as { lifetime_points?: number | null } | null)?.lifetime_points ?? 0);
+    return Math.max(fromLedger, Number.isFinite(column) ? column : 0);
+  } catch (err) {
+    console.warn("getLifetimePoints: failed", err);
+    return 0;
+  }
+}
+
+/**
  * Sum of points the current member has earned, grouped by source. Returns an
  * empty array for signed-out users or when the member has no ledger entries.
  */
@@ -181,6 +225,10 @@ export async function getCurrentMember(): Promise<MemberProfile | null> {
  * Rolls up the member's headline KPIs: spendable points from the ledger
  * (not membership.total_points / members.total_points — those drift),
  * community-scoped referrals and badges, distance to next tier.
+ *
+ * Wallet figures (`total_points` / `spendable_points`) are the net ledger
+ * balance. Tier progress (`next_tier` / `points_to_next_tier`) is computed
+ * from `lifetime_points` so spending never demotes (migration 0082).
  */
 export async function getCurrentMemberKpis(): Promise<MemberKpis | null> {
   try {
@@ -192,8 +240,9 @@ export async function getCurrentMemberKpis(): Promise<MemberKpis | null> {
 
     const communityId = await getCurrentCommunityId();
 
-    const [total_points, referralsRes, badgesRes, tiers] = await Promise.all([
+    const [total_points, lifetime_points, referralsRes, badgesRes, tiers] = await Promise.all([
       getSpendablePoints(user.id),
+      getLifetimePoints(user.id),
       supabase
         .from("referrals")
         .select("id", { count: "exact", head: true })
@@ -209,17 +258,15 @@ export async function getCurrentMemberKpis(): Promise<MemberKpis | null> {
     const referral_count = referralsRes.count ?? 0;
     const badge_count = badgesRes.count ?? 0;
 
-    const next_tier =
-      tiers
-        .filter((t) => t.min_points > total_points)
-        .sort((a, b) => a.min_points - b.min_points)[0] ?? null;
-
-    const points_to_next_tier = next_tier
-      ? Math.max(0, next_tier.min_points - total_points)
-      : null;
+    // Lifetime can never be below the spendable balance; guard against a
+    // ledger with only net rows (e.g. a manual adjustment that nets out).
+    const lifetime = Math.max(lifetime_points, total_points);
+    const { next_tier, points_to_next_tier } = tierProgress(tiers, lifetime);
 
     return {
       total_points,
+      spendable_points: total_points,
+      lifetime_points: lifetime,
       referral_count,
       badge_count,
       next_tier: (next_tier ?? null) as Tier | null,

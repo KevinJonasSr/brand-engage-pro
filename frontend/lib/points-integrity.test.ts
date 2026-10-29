@@ -84,8 +84,12 @@ describe("check-in integrity", () => {
   });
 
   it("moves totals only when the ledger insert succeeded", () => {
-    assert.match(checkins, /if \(!ledgerErr\) \{/);
+    // awardPoints owns the ledger insert + atomic total; check-in only
+    // reports the visit onward when a row was actually written.
+    assert.match(checkins, /const \{ awarded \} = await awardPoints\(admin, \{/);
+    assert.match(checkins, /if \(awarded\) \{/);
     assert.doesNotMatch(checkins, /existingPts/);
+    assert.doesNotMatch(checkins, /from\("points_ledger"\)/);
   });
 });
 
@@ -93,7 +97,7 @@ describe("other ledger writers", () => {
   it("awardPoints writes member_id and stops on a ledger error", () => {
     assert.doesNotMatch(award, /fan_id:/);
     assert.match(award, /member_id: memberId/);
-    assert.match(award, /if \(ledgerErr\) \{[\s\S]*?return;/);
+    assert.match(award, /if \(ledgerErr\) \{[\s\S]*?return \{ awarded: false, delta: 0, communityId \};/);
   });
 
   it("challenge winner bonus goes through awardPoints with a source_ref", () => {
