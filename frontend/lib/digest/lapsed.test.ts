@@ -197,3 +197,17 @@ describe("nearestReward", () => {
     assert.equal(nearestReward(rewards, null), null);
   });
 });
+
+import { readFileSync as readSrc } from "node:fs";
+import { fileURLToPath as toPath } from "node:url";
+import { describe as describeRoute, it as itRoute } from "node:test";
+import assertRoute from "node:assert/strict";
+
+describeRoute("digest route auth", () => {
+  itRoute("lets a super-admin run only the dry run; real sends stay cron-only", () => {
+    const src = readSrc(toPath(new URL("../../app/api/cron/weekly-member-digest/route.ts", import.meta.url)), "utf8");
+    const authBlock = src.slice(src.indexOf("const authErr = verifyCronAuth(req);"), src.indexOf("const testEmail ="));
+    assertRoute.match(authBlock, /if \(!dryRun\) return authErr;/);
+    assertRoute.match(authBlock, /if \(!ctx\?\.isSuperAdmin\) return authErr;/);
+  });
+});
