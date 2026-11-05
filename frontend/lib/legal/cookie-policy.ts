@@ -77,7 +77,7 @@ Session — deleted when you close the browser Persistent — remain until they 
 
 9. Contact Questions about cookies or this policy:
 
-Email: [raymond@jonasgroup.com](mailto:raymond@jonasgroup.com)
+Email: [support@brandengagepro.com](mailto:support@brandengagepro.com)
 
 `,
   // LEGAL-REVIEW: Entity line. Raymond confirmed on 2026-10-01 that the operating entity is Fan Engage Pro LLC, a Colorado limited liability company. Kevin confirmed on 2026-10-08.

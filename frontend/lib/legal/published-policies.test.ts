@@ -7,6 +7,8 @@ import {
   isPublishedPolicyContent,
   policyForDisplay,
 } from "./policy-display.ts";
+import { CANCELLATION_REFUND_MD } from "./cancellation-refund.ts";
+import { PRIVACY_POLICY_MD } from "./privacy-policy.ts";
 import { TERMS_OF_USE_MD } from "./terms-of-use.ts";
 
 const privacyPage = readFileSync(
@@ -33,6 +35,12 @@ const footer = readFileSync(
   fileURLToPath(new URL("../../components/footer.tsx", import.meta.url)),
   "utf8",
 );
+const policyMigration = readFileSync(
+  fileURLToPath(
+    new URL("../../../supabase/migrations/0089_align_public_policy_copy.sql", import.meta.url),
+  ),
+  "utf8",
+);
 
 const fepLeftovers = [
   /Fan Engage/,
@@ -56,7 +64,8 @@ describe("published terms and cookie policy", () => {
   it("adapts FEP product names and keeps the privacy-page contact", () => {
     for (const body of [TERMS_OF_USE_MD, COOKIE_POLICY_MD]) {
       assert.match(body, /Brand Engage Pro/);
-      assert.match(body, /raymond@jonasgroup\.com/);
+      assert.match(body, /support@brandengagepro\.com/);
+      assert.doesNotMatch(body, /raymond@jonasgroup\.com/);
       assert.match(body, /brandengagepro\.com/);
       const productCopy = withoutConfirmedEntity(body);
       for (const leftover of fepLeftovers) {
@@ -99,8 +108,9 @@ describe("published terms and cookie policy", () => {
     assert.match(termsSource, /LEGAL-REVIEW: DMCA agent/);
     assert.match(termsSource, /LEGAL-REVIEW: Loyalty points/);
     assert.match(termsSource, /LEGAL-REVIEW: Subscription/);
-    assert.match(TERMS_OF_USE_MD, /up to \$100 per month/);
-    assert.doesNotMatch(TERMS_OF_USE_MD, /subscription of \$100 per month/);
+    assert.match(TERMS_OF_USE_MD, /monthly subscription of \$50 per month/);
+    assert.doesNotMatch(TERMS_OF_USE_MD, /up to \$100/);
+    assert.match(TERMS_OF_USE_MD, /ONE HUNDRED DOLLARS \(\$100\)/);
     assert.match(TERMS_OF_USE_MD, /price shown at checkout is the price that applies/);
     assert.match(TERMS_OF_USE_MD, /30 days by email/);
     assert.match(TERMS_OF_USE_MD, /next billing period/);
@@ -117,6 +127,27 @@ describe("published terms and cookie policy", () => {
     assert.match(cookieSource, /LEGAL-REVIEW: Do Not Track/);
     assert.match(COOKIE_POLICY_MD, /Cloudflare Turnstile/);
     assert.match(COOKIE_POLICY_MD, /local storage/);
+  });
+
+  it("aligns published price, age, and support contact across the public policies", () => {
+    for (const body of [TERMS_OF_USE_MD, CANCELLATION_REFUND_MD]) {
+      assert.match(body, /monthly subscription of \$50 per month/);
+      assert.doesNotMatch(body, /up to \$100/);
+      assert.match(body, /support@brandengagepro\.com/);
+      assert.doesNotMatch(body, /raymond@jonasgroup\.com/);
+    }
+    assert.match(TERMS_OF_USE_MD, /under age 18/i);
+    assert.match(PRIVACY_POLICY_MD, /18 and older/);
+    assert.match(PRIVACY_POLICY_MD, /under age 18/i);
+    assert.doesNotMatch(PRIVACY_POLICY_MD, /under 13|parental consent/i);
+    assert.match(PRIVACY_POLICY_MD, /support@brandengagepro\.com/);
+    assert.doesNotMatch(PRIVACY_POLICY_MD, /raymond@jonasgroup\.com/);
+    assert.match(policyMigration, /monthly subscription of \$50 per month/);
+    assert.match(policyMigration, /support@brandengagepro\.com/);
+    assert.match(policyMigration, /## Age requirement/);
+    assert.match(policyMigration, /18 and older/);
+    assert.match(policyMigration, /updated_at >= timestamptz '2026-10-18 00:00:00\+00'/);
+    assert.doesNotMatch(policyMigration, /create table/i);
   });
 
   it("renders terms, cookies, and privacy through the shared policy layout", () => {

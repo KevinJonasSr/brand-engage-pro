@@ -325,7 +325,7 @@ export default async function ForBrandsPage() {
               a: (
                 <>
                   $50 per brand per month after a 30-day free trial. Our first
-                  10 founding brands are free for 12 months, then $50 per
+                  15 founding brands are free for 12 months, then $50 per
                   month.{" "}
                   <Link
                     href="/pricing"

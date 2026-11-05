@@ -58,8 +58,9 @@ describe("published cancellation and refund policy", () => {
       CANCELLATION_REFUND_MD.replaceAll("Fan Engage Pro LLC", ""),
       /Fan Engage/,
     );
-    assert.match(CANCELLATION_REFUND_MD, /raymond@jonasgroup\.com/);
-    assert.match(CANCELLATION_REFUND_MD, /mailto:raymond@jonasgroup\.com/);
+    assert.match(CANCELLATION_REFUND_MD, /support@brandengagepro\.com/);
+    assert.match(CANCELLATION_REFUND_MD, /mailto:support@brandengagepro\.com/);
+    assert.doesNotMatch(CANCELLATION_REFUND_MD, /raymond@jonasgroup\.com/);
     for (const leftover of fepLeftovers) {
       assert.doesNotMatch(CANCELLATION_REFUND_MD, leftover);
     }
@@ -68,7 +69,7 @@ describe("published cancellation and refund policy", () => {
   it("states the confirmed brand price, cancellation, and refund rules", () => {
     assert.match(
       CANCELLATION_REFUND_MD,
-      /monthly subscription of up to \$100 per month/,
+      /monthly subscription of \$50 per month/,
     );
     assert.match(
       CANCELLATION_REFUND_MD,
@@ -102,8 +103,9 @@ describe("published cancellation and refund policy", () => {
     assert.doesNotMatch(CANCELLATION_REFUND_MD, /within 7 days/);
     assert.match(
       cancellationSource,
-      /"up to \$100\/month" model is confirmed by Raymond \(Kevin informed via Raymond\)/,
+      /Published subscription price is \$50 per month, matching \/pricing and \/help/,
     );
+    assert.doesNotMatch(CANCELLATION_REFUND_MD, /up to \$100/);
     assert.match(
       cancellationSource,
       /exact wording needs attorney review before launch/,

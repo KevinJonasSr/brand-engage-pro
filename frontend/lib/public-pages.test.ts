@@ -20,14 +20,17 @@ describe("public pricing and help pages", () => {
   it("states founding-brand pricing and links it from for-brands and the footer", () => {
     for (const sentence of [
       "$50 per brand per month after a 30-day free trial.",
-      "Our first 10 founding brands are free for 12 months, then $50 per month.",
+      "Our first 15 founding brands are free for 12 months, then $50 per month.",
       "Works with any POS, no Square or Toast required.",
       "check-in rewards, points, and member messaging by email",
     ]) {
       assert.match(pricing, new RegExp(sentence.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
     }
     const foundingOffer =
-      /Our first\s+10 founding\s+brands are free for 12 months, then \$50 per\s+month\./;
+      /Our first\s+15 founding\s+brands are free for 12 months, then \$50 per\s+month\./;
+    assert.doesNotMatch(pricing, /first 10 founding brands/);
+    assert.doesNotMatch(forBrands, /first 10 founding brands/);
+    assert.doesNotMatch(help, /first 10 founding brands/);
     assert.match(forBrands, foundingOffer);
     assert.match(help, foundingOffer);
     assert.match(forBrands, /href="\/pricing"/);

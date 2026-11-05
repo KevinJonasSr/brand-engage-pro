@@ -19,20 +19,21 @@ const signupPage = readFileSync(
   "utf8",
 );
 
-const CHILDREN_PARAGRAPH =
-  'Our Website is not intended for children under 13 years of age. No one under age 13 may provide any information to or on the Website. We do not knowingly collect Personal Information from children under 13. If you are under 13, do not use or provide any information on this Website or on or through any of its features, register on the Website, make any purchases through the Website, or provide any information about yourself to us, including your name, address, telephone number, e-mail address or any screen name or user name you may use. If we learn we have collected or received Personal Information from a child under 13 without verification of parental consent, we will delete that information. If you believe we might have any information from or about a child under 13, please contact us (please see the "Contact Us" section below).';
+const AGE_PARAGRAPH =
+  'Our Website is intended for people 18 and older. No one under age 18 may provide any information to or on the Website. We do not knowingly collect Personal Information from anyone under 18. If you are under 18, do not use or provide any information on this Website or on or through any of its features, register on the Website, make any purchases through the Website, or provide any information about yourself to us, including your name, address, telephone number, e-mail address or any screen name or user name you may use. If we learn we have collected or received Personal Information from someone under 18, we will delete that information. If you believe we might have any information from or about someone under 18, please contact us (please see the "Contact Us" section below).';
 
 describe("published privacy policy", () => {
-  it("names the email send path and keeps the four staff-inbox links", () => {
+  it("names the email send path and keeps the four support-inbox links", () => {
     assert.match(
       PRIVACY_POLICY_MD,
       /email \(Mailchimp Transactional \(Mandrill\)\)/,
     );
     assert.doesNotMatch(PRIVACY_POLICY_MD, /email \(Mailchimp\)/);
     assert.equal(
-      PRIVACY_POLICY_MD.match(/mailto:raymond@jonasgroup\.com/g)?.length,
+      PRIVACY_POLICY_MD.match(/mailto:support@brandengagepro\.com/g)?.length,
       4,
     );
+    assert.doesNotMatch(PRIVACY_POLICY_MD, /raymond@jonasgroup\.com/);
     assert.match(PRIVACY_POLICY_MD, /This Policy was last updated on October 18, 2026/);
     assert.doesNotMatch(PRIVACY_POLICY_MD, /October 11, 2026/);
     assert.match(publishedSource, /effective_date: "2026-10-11"/);
@@ -56,14 +57,16 @@ describe("published privacy policy", () => {
     );
     assert.match(PRIVACY_POLICY_MD, /Jonas Group family of services/);
     assert.match(PRIVACY_POLICY_MD, /within our family of companies/);
-    assert.match(PRIVACY_POLICY_MD, /## Children Under the Age of 13/);
-    assert.ok(PRIVACY_POLICY_MD.includes(CHILDREN_PARAGRAPH));
-    assert.doesNotMatch(PRIVACY_POLICY_MD, /under age 18|18 and older|18\+/i);
+    assert.match(PRIVACY_POLICY_MD, /## Age requirement/);
+    assert.ok(PRIVACY_POLICY_MD.includes(AGE_PARAGRAPH));
+    assert.match(PRIVACY_POLICY_MD, /18 and older/);
+    assert.match(PRIVACY_POLICY_MD, /under age 18/i);
+    assert.doesNotMatch(PRIVACY_POLICY_MD, /under 13|Children Under the Age of 13|parental consent/i);
     assert.doesNotMatch(PRIVACY_POLICY_MD, /OPEN QUESTION/);
     assert.match(privacySource, /OPEN QUESTION \(Kevin and Brad\): Legal entity/);
-    assert.match(privacySource, /OPEN QUESTION \(Kevin and Brad\): Contact address/);
+    assert.match(privacySource, /ALIGNED 2026-11-05: Public contact/);
     assert.match(privacySource, /OPEN QUESTION \(Kevin and Brad\): Affiliate sharing/);
-    assert.match(privacySource, /OPEN QUESTION \(Brad and Kevin\): Age/);
+    assert.match(privacySource, /ALIGNED 2026-11-05 \(Kevin and counsel still to confirm\)/);
     assert.match(privacySource, /four mailto links/);
   });
 

@@ -35,7 +35,7 @@ WE RESERVE THE RIGHT, FROM TIME TO TIME, WITH OR WITHOUT NOTICE TO YOU, TO MAKE 
 THIS AGREEMENT REQUIRES THE BINDING ARBITRATION OF ANY AND ALL DISPUTES, AS STATED IN THE "ARBITRATION" SECTION BELOW (OTHER THAN CERTAIN INTELLECTUAL PROPERTY DISPUTES DESCRIBED IN THAT SECTION), WHICH YOU SHOULD READ IN ITS ENTIRETY. YOU EXPRESSLY AGREE WITH US THAT ANY DISPUTE MAY ONLY BE RESOLVED THROUGH AN INDIVIDUAL ARBITRATION BETWEEN YOU AND US, AND SHALL NOT BE BROUGHT AS A CLASS ARBITRATION, A CLASS ACTION, OR ANY OTHER REPRESENTATIVE PROCEEDING.
 
 `,
-  // LEGAL-REVIEW: Age. These terms keep FEP's 18-and-older rule. The published BEP privacy policy says the site is not for children under 13. Counsel must reconcile the age gate. Not changed here.
+  // LEGAL-REVIEW: Age. Published terms stay 18 and older. Privacy was drafted to the same bar on 2026-11-05. Kevin and counsel should confirm before launch. The one-hundred-dollar figure later in Limitation of Liability is a damages cap, not the subscription price, and was left as written.
   `
 
 ## AGE REQUIREMENT
@@ -111,14 +111,14 @@ Changes to Messaging/Bouncebacks: BEP may change its Messaging at any time. Your
 Message Content: You shall be fully responsible for the content of any Messaging and to examine and review any Messaging before transmission. You shall protect and compensate BEP for any issues or disputes or claims brought by any third party due to the content of such Messaging. If any provisions in these Terms are violated, BEP shall have the right to immediately suspend or terminate the Services, at its sole discretion, without prejudice to any damages that BEP may be entitled to claim, and any penalties shall not be applicable to BEP in this case. Each User acknowledges that the commitments and obligations contained in these Terms are binding and valid. All of the content and message profiles sent by each User on the Service must comply with the terms of acceptable use described in these Terms. BEP reserves the right, at its sole discretion, to monitor any User's messaging traffic, and determine if Services are being used in compliance or in violation of the Terms. BEP reserves the right, at its sole discretion, to (i) delay the delivery of any Messaging from the User if additional approval for User's Messaging traffic is required from BEP's carrier or service provider partners, or (ii) cancel the delivery of any Messages from the User in case of any violations or attempted violations of these Terms by User. Each User acknowledges and agrees that Messages to or from such User may be blocked by carriers or other service provider partners for reasons known or unknown to BEP. BEP is under no obligation to investigate or remedy any such blockage for any User.
 
 `,
-  // LEGAL-REVIEW: Subscription. The "up to $100/month" brand fee is confirmed by Raymond. Raymond and Kevin want the "up to" language so the fee is not a fixed $100. The exact wording needs attorney review before launch. Different plans, promotional pricing, specials, and the price shown at checkout are part of that confirmed model.
+  // LEGAL-REVIEW: Subscription. Published price is $50 per month, matching /pricing and /help (aligned 2026-11-05). Different plans, promotional pricing, specials, and the price shown at checkout stay in the following sentences. The exact wording needs attorney review before launch.
   `
 
 ## SUBSCRIPTION & PAYMENT
 
 Your user account will be accessed through a user ID and password that you will create (your "ID") when you engage in the registration process. You are responsible for maintaining the confidentiality of your ID, and you are fully and solely responsible for all activities that occur under your ID. It is up to you to take adequate precautions with your ID, and to immediately notify BEP of any unauthorized use of your ID.
 
-Brand Engage Pro brands pay a monthly subscription of up to $100 per month. Fan Engage Pro LLC may offer different plans, promotional pricing, or specials. The price shown at checkout is the price that applies.
+Brand Engage Pro brands pay a monthly subscription of $50 per month. Fan Engage Pro LLC may offer different plans, promotional pricing, or specials. The price shown at checkout is the price that applies.
 
 By signing up for the Services, you agree to the price shown at checkout.
 
@@ -129,12 +129,12 @@ If automatic billing fails to occur for any reason, BEP will suspend or terminat
 We do not store your payment method information. They are processed by our payment processors ("Payment Processors"). The processing of your payments may be subject to the terms, conditions, and privacy policies of the Payment Processors in addition to this Agreement. We are not responsible for error by the Payment Processors. By choosing to use Services you are authorizing our Payment Processors to charge your payment for the Subscription fees associated with the Services that you sign up for. Any payment method that you provide must be valid, and kept current by you during the subscription term. We will begin billing your payment method for the Services on the day that you sign up for such Services, regardless of whether you have fully completed your account as of that date.
 
 `,
-  // LEGAL-REVIEW: Billing. Brands can cancel at any time from account settings, and access continues to the end of the paid period. That is part of the confirmed "up to $100/month" model. The exact wording needs attorney review before launch.
+  // LEGAL-REVIEW: Billing. Brands can cancel at any time from account settings, and access continues to the end of the paid period. The exact wording needs attorney review before launch.
   `
 
 Termination / Cancellation
 
-Brands can cancel a Brand Engage Pro subscription at any time from account settings. Access continues to the end of the paid period. You may also contact BEP customer support at [raymond@jonasgroup.com](mailto:raymond@jonasgroup.com). You agree to notify us of any changes required to keep your payment method-on-file current. You agree that failure to keep your payment method-on-file current may result in interruption to your use of the services.
+Brands can cancel a Brand Engage Pro subscription at any time from account settings. Access continues to the end of the paid period. You may also contact BEP customer support at [support@brandengagepro.com](mailto:support@brandengagepro.com). You agree to notify us of any changes required to keep your payment method-on-file current. You agree that failure to keep your payment method-on-file current may result in interruption to your use of the services.
 
 `,
   // LEGAL-REVIEW: Loyalty points. FEP also forfeited Founding Fan status on cancellation. That sentence was removed because founding-fan / founding-badge status is not a BEP term, and no replacement badge term was invented. The remaining rewards-points forfeiture sentence still needs review for BEP loyalty points.
@@ -143,7 +143,7 @@ Brands can cancel a Brand Engage Pro subscription at any time from account setti
 If you terminate or cancel your subscription you will lose any Brand Engage Pro Rewards Program rewards points.
 
 `,
-  // LEGAL-REVIEW: Billing. Advance notice (for example 30 days by email), applying a change to the next billing period, and avoiding the new price by cancelling before it takes effect are part of the confirmed "up to $100/month" model. The exact wording needs attorney review before launch.
+  // LEGAL-REVIEW: Billing. Advance notice (for example 30 days by email), applying a change to the next billing period, and avoiding the new price by cancelling before it takes effect stay in this section. The exact wording needs attorney review before launch.
   `
 
 Price Changes
@@ -156,7 +156,7 @@ Fan Engage Pro LLC may change prices with advance notice, for example 30 days by
 
 Refunds
 
-Fan Engage Pro LLC does not offer refunds for partial billing periods. If you believe you were charged in error, contact [raymond@jonasgroup.com](mailto:raymond@jonasgroup.com) within 30 days of the charge and we will investigate. A promotion or special does not create a refund right. Following any cancellation, you will continue to have access to the subscription Services through the end of the paid period.
+Fan Engage Pro LLC does not offer refunds for partial billing periods. If you believe you were charged in error, contact [support@brandengagepro.com](mailto:support@brandengagepro.com) within 30 days of the charge and we will investigate. A promotion or special does not create a refund right. Following any cancellation, you will continue to have access to the subscription Services through the end of the paid period.
 
 `,
   // LEGAL-REVIEW: Billing. Specials and trials can carry their own terms, which apply to that offer. The exact wording needs attorney review before launch.
@@ -237,7 +237,7 @@ BEP and its third-party providers own all material and content of the Services. 
 DMCA Notice and Procedure for Copyright Infringement Claims
 
 If you are a copyright owner or authorized on behalf of one, and you believe that the copyrighted work has been copied in a way that constitutes copyright infringement, please submit your claim via email to `,
-  // LEGAL-REVIEW: DMCA agent. bhamilton@joneskeller.com is carried from FEP. Confirm this agent covers Brand Engage Pro. Other contact email on this page is raymond@jonasgroup.com, matching the BEP privacy policy.
+  // LEGAL-REVIEW: DMCA agent. bhamilton@joneskeller.com is carried from FEP. Confirm this agent covers Brand Engage Pro. Other contact email on this page is support@brandengagepro.com, the same address as /help, the footer, and the privacy policy.
   `bhamilton@joneskeller.com, with the subject line: "Copyright Infringement" and include in your claim a detailed description of the alleged Infringement as detailed below.
 
 UNDER FEDERAL LAW, IF YOU KNOWINGLY MISREPRESENT THAT ONLINE MATERIAL IS INFRINGING, YOU MAY BE SUBJECT TO CIVIL PENALTIES, INCLUDING MONETARY DAMAGES, COURT COSTS, AND ATTORNEYS' FEES.

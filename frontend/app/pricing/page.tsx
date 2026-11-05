@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "$50 per brand per month after a 30-day free trial. Our first 10 founding brands are free for 12 months, then $50 per month. Works with any POS, no Square or Toast required.",
+    "$50 per brand per month after a 30-day free trial. Our first 15 founding brands are free for 12 months, then $50 per month. Works with any POS, no Square or Toast required.",
   alternates: { canonical: "/pricing" },
   openGraph: {
     type: "website",
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     siteName: "Brand Engage Pro",
     title: "Pricing",
     description:
-      "$50 per brand per month after a 30-day free trial. Our first 10 founding brands are free for 12 months, then $50 per month.",
+      "$50 per brand per month after a 30-day free trial. Our first 15 founding brands are free for 12 months, then $50 per month.",
   },
 };
 
@@ -30,7 +30,7 @@ export default function PricingPage() {
           Pricing
         </h1>
         <p className="mx-auto max-w-2xl text-base text-iron/80 md:text-lg">
-          $50 per brand per month after a 30-day free trial. Our first 10
+          $50 per brand per month after a 30-day free trial. Our first 15
           founding brands are free for 12 months, then $50 per month. Works
           with any POS, no Square or Toast required.
         </p>
