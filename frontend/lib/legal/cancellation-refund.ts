@@ -18,10 +18,10 @@ export const CANCELLATION_REFUND_MD = [
   `# Cancellation & Refund Policy
 
 `,
-  // LEGAL-REVIEW: Billing. The "up to $100/month" model is confirmed by Raymond (Kevin informed via Raymond) and the exact wording needs attorney review before launch. Different plans, promotional pricing, specials, and the checkout price are part of that confirmed model.
+  // LEGAL-REVIEW: Billing. Published subscription price is $50 per month, matching /pricing and /help. Different plans, promotional pricing, specials, and the checkout price stay in the following sentence. The exact wording needs attorney review before launch.
   `## 1. Subscription price
 
-Brand Engage Pro brands pay a monthly subscription of up to $100 per month. Fan Engage Pro LLC may offer different plans, promotional pricing, or specials. The price shown at checkout is the price that applies.
+Brand Engage Pro brands pay a monthly subscription of $50 per month. Fan Engage Pro LLC may offer different plans, promotional pricing, or specials. The price shown at checkout is the price that applies.
 
 `,
   // LEGAL-REVIEW: Billing. Advance notice (for example 30 days by email), applying a change to the next billing period, and avoiding the new price by cancelling before it takes effect are part of the confirmed model. The exact wording needs attorney review before launch.

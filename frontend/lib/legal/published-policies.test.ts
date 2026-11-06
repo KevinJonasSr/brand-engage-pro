@@ -99,8 +99,9 @@ describe("published terms and cookie policy", () => {
     assert.match(termsSource, /LEGAL-REVIEW: DMCA agent/);
     assert.match(termsSource, /LEGAL-REVIEW: Loyalty points/);
     assert.match(termsSource, /LEGAL-REVIEW: Subscription/);
-    assert.match(TERMS_OF_USE_MD, /up to \$100 per month/);
-    assert.doesNotMatch(TERMS_OF_USE_MD, /subscription of \$100 per month/);
+    assert.match(TERMS_OF_USE_MD, /monthly subscription of \$50 per month/);
+    assert.doesNotMatch(TERMS_OF_USE_MD, /up to \$100/);
+    assert.match(TERMS_OF_USE_MD, /ONE HUNDRED DOLLARS \(\$100\)/);
     assert.match(TERMS_OF_USE_MD, /price shown at checkout is the price that applies/);
     assert.match(TERMS_OF_USE_MD, /30 days by email/);
     assert.match(TERMS_OF_USE_MD, /next billing period/);
