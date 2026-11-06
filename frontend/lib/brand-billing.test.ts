@@ -1,7 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
-import { fileURLToPath } from "node:url";
 import {
   BRAND_WRITE_LOCKED_MESSAGE,
   BRAND_WRITE_TRY_AGAIN_MESSAGE,
@@ -15,7 +13,6 @@ import {
   isBrandBillingLocked,
   isLockedAdminWritePath,
   mapStripeStatusToBrand,
-  BRAND_FREE_SLOT_LIMIT,
   nextFreeSlot,
   nextPastDueSince,
   shouldOfferTrial,
@@ -135,28 +132,12 @@ describe("shouldOfferTrial / hasLiveSubscription", () => {
 
 describe("nextFreeSlot", () => {
   it("returns the lowest open slot", () => {
-    assert.equal(BRAND_FREE_SLOT_LIMIT, 15);
     assert.equal(nextFreeSlot([]), 1);
     assert.equal(nextFreeSlot([1, 2, 4, null]), 3);
   });
 
-  it("returns null when all 15 founding slots are taken", () => {
-    assert.equal(nextFreeSlot([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), 11);
-    assert.equal(
-      nextFreeSlot([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]),
-      null,
-    );
-  });
-
-  it("widens the shipped free_slot check to 15 without a new table", () => {
-    const migration = readFileSync(
-      fileURLToPath(
-        new URL("../../supabase/migrations/0090_founding_brand_slots_15.sql", import.meta.url),
-      ),
-      "utf8",
-    );
-    assert.match(migration, /free_slot between 1 and 15/);
-    assert.doesNotMatch(migration, /create table/i);
+  it("returns null when all 10 are taken", () => {
+    assert.equal(nextFreeSlot([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]), null);
   });
 });
 

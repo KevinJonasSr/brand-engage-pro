@@ -3,7 +3,7 @@
  * tested and shared by the admin UI, server actions and the Stripe webhook.
  *
  * Brands pay, guests are always free:
- *   - The first 15 businesses are free (plan "free", free_slot 1..15).
+ *   - The first 10 businesses are free (plan "free", free_slot 1..10).
  *   - Everyone after that pays $50 per brand per month, card up front,
  *     30-day trial.
  *   - If a paid brand stops paying, admin tools go read-only after a 14-day
@@ -13,7 +13,7 @@
  * (supabase/migrations/0073_brand_billing.sql). Change both together.
  */
 
-export const BRAND_FREE_SLOT_LIMIT = 15;
+export const BRAND_FREE_SLOT_LIMIT = 10;
 export const BRAND_TRIAL_DAYS = 30;
 export const BRAND_PAST_DUE_GRACE_DAYS = 14;
 export const BRAND_MONTHLY_PRICE_USD = 50;
@@ -131,7 +131,7 @@ export function hasLiveSubscription(
   );
 }
 
-/** Lowest open free slot (1..15), or null when all 15 are taken. */
+/** Lowest open free slot (1..10), or null when all 10 are taken. */
 export function nextFreeSlot(taken: ReadonlyArray<number | null>): number | null {
   const used = new Set(taken.filter((n): n is number => typeof n === "number"));
   for (let slot = 1; slot <= BRAND_FREE_SLOT_LIMIT; slot += 1) {

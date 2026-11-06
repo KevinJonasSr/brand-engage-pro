@@ -12,10 +12,8 @@
  * - The body sentence "This Policy was last updated..." says October 18, 2026.
  *   The effective date stays October 11, 2026.
  *
- * Left unchanged, and marked OPEN QUESTION below: the legal entity and the
- * affiliate-sharing clause. The public contact address is now
- * support@brandengagepro.com (already on /help, the footer, SMS HELP, and
- * email reply-to). The age bar now matches Terms: 18 and older.
+ * Left unchanged, and marked OPEN QUESTION below: the legal entity, the
+ * contact address, the affiliate-sharing clause, and the under-13 age bar.
  * A search of this policy found no music, fan, or artist product wording
  * other than the open entity name "Fan Engage Pro LLC". The SMS word "drops"
  * is the live sentence and was not rewritten.
@@ -190,10 +188,10 @@ Users may exercise data rights under applicable law by contacting BEP directly (
 We may, from time to time, send you an e-mail if you have requested us to do so. You also have choices with respect to cookies, as described above. By modifying your browser preferences, you have the choice to accept all cookies, to be notified when a cookie is set, or to reject all cookies. If you choose to reject all cookies some parts of our Website may not work properly in your case.
 
 `,
-  // ALIGNED 2026-11-05 (Kevin and counsel still to confirm): Terms require 18 and older. This section now uses that bar. The previous children section, including its parental-consent sentence, was softened so privacy does not invite under-18 use. If counsel needs a separate children statement, restore it deliberately.
-  `## Age requirement
+  // OPEN QUESTION (Brad and Kevin): Age. Terms of Use require 18 and older (frontend/lib/legal/terms-of-use.ts). This section still uses the under-13 bar from the live privacy policy. The heading and the paragraph are unchanged. No minimum age was chosen here.
+  `## Children Under the Age of 13
 
-Our Website is intended for people 18 and older. No one under age 18 may provide any information to or on the Website. We do not knowingly collect Personal Information from anyone under 18. If you are under 18, do not use or provide any information on this Website or on or through any of its features, register on the Website, make any purchases through the Website, or provide any information about yourself to us, including your name, address, telephone number, e-mail address or any screen name or user name you may use. If we learn we have collected or received Personal Information from someone under 18, we will delete that information. If you believe we might have any information from or about someone under 18, please contact us (please see the "Contact Us" section below).
+Our Website is not intended for children under 13 years of age. No one under age 13 may provide any information to or on the Website. We do not knowingly collect Personal Information from children under 13. If you are under 13, do not use or provide any information on this Website or on or through any of its features, register on the Website, make any purchases through the Website, or provide any information about yourself to us, including your name, address, telephone number, e-mail address or any screen name or user name you may use. If we learn we have collected or received Personal Information from a child under 13 without verification of parental consent, we will delete that information. If you believe we might have any information from or about a child under 13, please contact us (please see the "Contact Us" section below).
 
 ## Additional Information for Residents of Certain States
 
@@ -277,11 +275,11 @@ CalOPPA is the first state law in the nation to require commercial websites and 
 According to CalOPPA we agree to the following:
 
 `,
-  // ALIGNED 2026-11-05: Public contact on this page is support@brandengagepro.com, the address already used on /help, the site footer, the SMS HELP reply, and email reply-to. No new address was invented. four mailto links: CalOPPA item 4, the CCPA sale opt-out, the CCPA "By email" line, and Contact Us. The "Legal Team" label was left; the inbox is the product support address.
+  // OPEN QUESTION (Kevin and Brad): Contact address. raymond@jonasgroup.com is a staff inbox. The live page on 2026-10-18 renders it in four places: CalOPPA item 4, the CCPA sale opt-out, the CCPA "By email" line, and Contact Us. The scrub request counted five; four mailto links are what the page shows, and all four are kept. privacy@brandengagepro.com and support@brandengagepro.com were not chosen. The site footer, help page, SMS HELP reply, and email reply-to already use support@brandengagepro.com. That is context for the decision, not a selection.
   `1. users can visit our site anonymously;
 2. our Privacy Policy link includes the word "Privacy", and can easily be found on the home page of our website;
 3. users will be notified of any privacy policy changes on our Privacy Policy Page;
-4. users are able to change their personal information by emailing us at [support@brandengagepro.com](mailto:support@brandengagepro.com).
+4. users are able to change their personal information by emailing us at [raymond@jonasgroup.com](mailto:raymond@jonasgroup.com).
 
 ## Your Data Protection Rights under the California Consumer Privacy Act (CCPA)
 
@@ -303,13 +301,13 @@ Please note, you are entitled to ask us to provide you with this information up 
 
 (c) To stop selling your personal information. We do not sell your personal information for monetary consideration. However, under some circumstances, a transfer of personal information to a third party, or within our family of companies, without monetary consideration may be considered a "sale" under California law.
 
-If you submit a request to stop selling your personal information, we will stop making such transfers. If you are a California resident, to opt-out of the sale of your personal information, send an email to [support@brandengagepro.com](mailto:support@brandengagepro.com).
+If you submit a request to stop selling your personal information, we will stop making such transfers. If you are a California resident, to opt-out of the sale of your personal information, send an email to [raymond@jonasgroup.com](mailto:raymond@jonasgroup.com).
 
 Please note, if you ask us to delete or stop selling your data, it may impact your experience with us, and you may not be able to participate in certain programs or membership services which require the usage of your personal information to function. But in no circumstances will we discriminate against you for exercising your rights.
 
 To exercise your California data protection rights described above, please send your request(s) by one of the following means:
 
-By email: [support@brandengagepro.com](mailto:support@brandengagepro.com)
+By email: [raymond@jonasgroup.com](mailto:raymond@jonasgroup.com)
 
 Your data protection rights, described above, are covered by the CCPA, short for the California Consumer Privacy Act. To find out more, visit the official California Legislative Information website. The CCPA took effect on 01/01/2020.
 
@@ -337,6 +335,6 @@ BEP reserves the right to modify this Policy as necessary to comply with legal r
 
 If you have any questions or wish to exercise your rights, please contact us at:
 
-Brand Engage Pro Legal Team Email: [support@brandengagepro.com](mailto:support@brandengagepro.com)
+Brand Engage Pro Legal Team Email: [raymond@jonasgroup.com](mailto:raymond@jonasgroup.com)
 `,
 ].join("");

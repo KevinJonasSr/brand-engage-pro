@@ -18,7 +18,7 @@ export const CANCELLATION_REFUND_MD = [
   `# Cancellation & Refund Policy
 
 `,
-  // LEGAL-REVIEW: Billing. Published subscription price is $50 per month, matching /pricing and /help (aligned 2026-11-05). Different plans, promotional pricing, specials, and the checkout price stay in the following sentence. The exact wording needs attorney review before launch.
+  // LEGAL-REVIEW: Billing. Published subscription price is $50 per month, matching /pricing and /help. Different plans, promotional pricing, specials, and the checkout price stay in the following sentence. The exact wording needs attorney review before launch.
   `## 1. Subscription price
 
 Brand Engage Pro brands pay a monthly subscription of $50 per month. Fan Engage Pro LLC may offer different plans, promotional pricing, or specials. The price shown at checkout is the price that applies.
@@ -39,7 +39,7 @@ Brands can cancel a Brand Engage Pro subscription at any time from account setti
   // LEGAL-REVIEW: Billing. The refusal of partial-period refunds and the 30-day charge-error window are carried from FEP. A promotion or special does not create a refund right. The exact wording needs attorney review before launch.
   `## 4. Refunds
 
-Fan Engage Pro LLC does not offer refunds for partial billing periods. If you believe you were charged in error, contact [support@brandengagepro.com](mailto:support@brandengagepro.com) within 30 days of the charge and we will investigate. A promotion or special does not create a refund right.
+Fan Engage Pro LLC does not offer refunds for partial billing periods. If you believe you were charged in error, contact [raymond@jonasgroup.com](mailto:raymond@jonasgroup.com) within 30 days of the charge and we will investigate. A promotion or special does not create a refund right.
 
 `,
   // LEGAL-REVIEW: Billing. Specials and trials can carry their own terms, which apply to that offer. The exact wording needs attorney review before launch.
@@ -52,7 +52,7 @@ Specials and trials can carry their own terms. Those terms apply to that offer.
   // LEGAL-REVIEW: Chargeback. The chargeback and account-suspension sentence is carried from FEP and was not rewritten.
   `## 6. Disputes
 
-Before initiating a chargeback with your card issuer, please contact [support@brandengagepro.com](mailto:support@brandengagepro.com) so we can resolve the issue directly. Chargebacks without prior contact may result in account suspension.
+Before initiating a chargeback with your card issuer, please contact [raymond@jonasgroup.com](mailto:raymond@jonasgroup.com) so we can resolve the issue directly. Chargebacks without prior contact may result in account suspension.
 
 `,
   `## 7. Changes to this policy

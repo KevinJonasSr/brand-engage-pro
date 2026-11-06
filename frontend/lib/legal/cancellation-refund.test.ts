@@ -58,9 +58,8 @@ describe("published cancellation and refund policy", () => {
       CANCELLATION_REFUND_MD.replaceAll("Fan Engage Pro LLC", ""),
       /Fan Engage/,
     );
-    assert.match(CANCELLATION_REFUND_MD, /support@brandengagepro\.com/);
-    assert.match(CANCELLATION_REFUND_MD, /mailto:support@brandengagepro\.com/);
-    assert.doesNotMatch(CANCELLATION_REFUND_MD, /raymond@jonasgroup\.com/);
+    assert.match(CANCELLATION_REFUND_MD, /raymond@jonasgroup\.com/);
+    assert.match(CANCELLATION_REFUND_MD, /mailto:raymond@jonasgroup\.com/);
     for (const leftover of fepLeftovers) {
       assert.doesNotMatch(CANCELLATION_REFUND_MD, leftover);
     }
